@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   publish:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     uses: ./.github/workflows/docker-publish.yml
     with:
       images: >-
