@@ -163,6 +163,12 @@ export default defineConfig(({ command }) => ({
             type: 'image/png',
           },
           {
+            src: 'assets/zybc-maskable-icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
             src: 'assets/zybc-seal.svg',
             sizes: 'any',
             type: 'image/svg+xml',
