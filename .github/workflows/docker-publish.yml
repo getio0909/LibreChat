@@ -52,6 +52,7 @@ permissions:
 
 jobs:
   build:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     name: Build ${{ matrix.image.image_name }} (${{ matrix.arch }})
     runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     timeout-minutes: ${{ inputs.build_timeout_minutes }}
@@ -156,6 +157,7 @@ jobs:
           overwrite: true
 
   merge:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     name: Merge manifests (${{ matrix.image.image_name }})
     runs-on: ubuntu-latest
     needs: build
