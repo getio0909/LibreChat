@@ -171,8 +171,8 @@ function ExpandedPanel({
           </Button>
         }
       />
-      <div className="flex h-9 w-9 items-center justify-center" aria-label="庄严宝刹">
-        <img src="assets/zybc-seal.svg" alt="" className="h-7 w-7 object-contain" />
+      <div className="flex h-9 w-9 items-center justify-center">
+        <img src="assets/zybc-seal.svg" alt="庄严宝刹" className="h-7 w-7 object-contain" />
       </div>
       <NewChatButton setActive={setActive} switchToHistory={switchToHistory} />
       <AgentMarketplaceButton />
