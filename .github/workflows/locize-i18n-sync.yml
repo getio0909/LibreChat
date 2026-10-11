@@ -52,9 +52,8 @@ jobs:
         run: echo "Skipping sync as the event is not a push."
 
   create-pull-request:
-    if: github.repository == 'LibreChat-AI/LibreChat'
     name: Create Translation PR on Version Published
-    if: ${{ github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch' }}
+    if: github.repository == 'LibreChat-AI/LibreChat' && (github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     needs: sync-translations
     permissions:
