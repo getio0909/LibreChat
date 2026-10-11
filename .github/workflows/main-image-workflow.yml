@@ -11,6 +11,7 @@ jobs:
   # Resolved once here rather than per build leg: the tag is an input to the
   # publish, and the merge job needs it too.
   resolve-tag:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
@@ -43,6 +44,7 @@ jobs:
           printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   publish:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     needs: resolve-tag
     uses: ./.github/workflows/docker-publish.yml
     with:
