@@ -76,8 +76,7 @@ api/tsconfig.json
 .floo
 .flooignore
 
-#config file
-librechat.yaml
+# 正式配置文件 librechat.yaml 纳入版本控制，其他命名的备用配置继续忽略
 librechat.yml
 
 # Environment
