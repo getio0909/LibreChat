@@ -14,6 +14,7 @@ jobs:
   # `latest` is only applied when this tag is both stable and the newest stable
   # tag in the repository, so re-cutting an older patch cannot move `latest`.
   resolve-tags:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
@@ -62,6 +63,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   publish:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     needs: resolve-tags
     uses: ./.github/workflows/docker-publish.yml
     with:
