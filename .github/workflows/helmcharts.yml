@@ -14,6 +14,7 @@ on:
 
 jobs:
   release:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     permissions:
       contents: read
       packages: write
