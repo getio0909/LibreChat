@@ -32,6 +32,10 @@ services:
       - type: bind
         source: ./.env
         target: /app/.env
+      - type: bind
+        source: ./librechat.yaml
+        target: /app/librechat.yaml
+        read_only: true
       - ./images:/app/client/public/images
       - ./uploads:/app/uploads
       - ./logs:/app/logs
