@@ -158,10 +158,14 @@ export default defineConfig(({ command }) => ({
         theme_color: '#d81718',
         icons: [
           {
+            src: 'assets/zybc-icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
             src: 'assets/zybc-seal.svg',
             sizes: 'any',
             type: 'image/svg+xml',
-            purpose: 'any',
           },
         ],
       },
