@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   pack:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check.outputs.skip }}
@@ -66,6 +67,7 @@ jobs:
           retention-days: 2
 
   publish-npm:
+    if: github.repository == 'LibreChat-AI/LibreChat'
     needs: pack
     if: github.ref == 'refs/heads/main' && needs.pack.outputs.skip != 'true'
     runs-on: ubuntu-latest
