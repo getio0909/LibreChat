@@ -67,9 +67,8 @@ jobs:
           retention-days: 2
 
   publish-npm:
-    if: github.repository == 'LibreChat-AI/LibreChat'
     needs: pack
-    if: github.ref == 'refs/heads/main' && needs.pack.outputs.skip != 'true'
+    if: github.repository == 'LibreChat-AI/LibreChat' && (github.ref == 'refs/heads/main' && needs.pack.outputs.skip != 'true')
     runs-on: ubuntu-latest
     environment: publish  # Must match npm trusted publisher config
     permissions:
