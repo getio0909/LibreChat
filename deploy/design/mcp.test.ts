@@ -490,7 +490,7 @@ test('atomic PDF publication permits one writer and preserves its exact bytes', 
   assert.deepEqual(await fs.readdir(f.root), ['same.pdf']);
 });
 
-test('cancellation during publication removes only the owned, unchanged PDF', async () => {
+test('cancellation after publication retains complete PDFs and concurrent user edits', async () => {
   const f = await fixture();
   for (const change of ['none', 'replace', 'edit'] as const) {
     const controller = new AbortController();
@@ -511,13 +511,12 @@ test('cancellation during publication removes only the owned, unchanged PDF', as
       (error: Error) => error.name === 'AbortError',
     );
     if (change === 'none') {
-      await assert.rejects(fs.stat(path.join(f.root, filename)), { code: 'ENOENT' });
-      await writePdf(
-        f.settings,
-        filename,
-        Buffer.from('retried export'),
-        new AbortController().signal,
+      assert.equal((await fs.readFile(path.join(f.root, filename))).toString(), 'complete export');
+      await assert.rejects(
+        writePdf(f.settings, filename, Buffer.from('retried export'), new AbortController().signal),
+        (error: Error) => error instanceof ToolFailure && error.code === 'FILE_EXISTS',
       );
+      assert.equal((await fs.readFile(path.join(f.root, filename))).toString(), 'complete export');
     } else {
       assert.equal((await fs.readFile(path.join(f.root, filename))).toString(), 'changed by user');
     }

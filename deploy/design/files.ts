@@ -166,37 +166,11 @@ export async function writePdf(
   const target = path.join(settings.workspace, filename);
   try {
     await fs.writeFile(staged, bytes, { flag: 'wx', mode: 0o644, signal });
-    const owned = await fs.lstat(staged, { bigint: true });
     signal.throwIfAborted();
     // 同目录硬链接原子发布完整文件，并且不会覆盖已有目标。
     await publish(staged, target);
-    if (signal.aborted) {
-      try {
-        const current = await fs.lstat(target, { bigint: true });
-        // 仅撤回本次未被修改的文件，保留取消期间替换或编辑的用户数据。
-        if (
-          current.dev === owned.dev &&
-          current.ino === owned.ino &&
-          current.size === owned.size &&
-          current.mtimeNs === owned.mtimeNs
-        ) {
-          // 文件系统时间戳可能粒度较粗，同尺寸修改仍需校验内容与最终身份。
-          const unchanged = (await readWorkspace(settings, filename)).equals(bytes);
-          const after = await fs.lstat(target, { bigint: true });
-          if (
-            unchanged &&
-            after.dev === owned.dev &&
-            after.ino === owned.ino &&
-            after.size === owned.size &&
-            after.mtimeNs === owned.mtimeNs
-          )
-            await fs.unlink(target);
-        }
-      } catch (error) {
-        if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) throw error;
-      }
-      signal.throwIfAborted();
-    }
+    // 发布后的路径可能已被其他服务替换，取消时保留完整文件而不撤回目标。
+    signal.throwIfAborted();
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
       throw new ToolFailure('FILE_EXISTS');
