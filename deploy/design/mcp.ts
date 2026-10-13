@@ -92,7 +92,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'workspace_files',
       {
         description:
-          "List the current private CAD workspace, including CSV cut lists, and download links. After every CAD/3D export, call this tool and include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Files above direct_download_limit_bytes remain listed with download_requires_login and an authenticated download URL; explain that these use the user's CAD file-manager credentials. Entries with download_status are changing or crossed a size bound during inspection: wait for the writer to finish and call this tool again before presenting them as completed exports. Request fresh links with this tool when expired. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
+          "List the current private CAD workspace, including CSV cut lists, and download links. Finish and await every save, export, and verification that writes files before calling this tool; never run it in parallel with writers or modify linked files afterward. Include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Files above direct_download_limit_bytes remain listed with download_requires_login and an authenticated download URL; explain that these use the user's CAD file-manager credentials. Entries with download_status are changing or crossed a size bound during inspection: wait for the writer to finish and call this tool again before presenting them as completed exports. Request fresh links with this tool when expired or when a file has changed. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
         inputSchema: {},
       },
       () => run(async () => text(await listWorkspace(settings))),
@@ -101,7 +101,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link and a rendered source-sheet preview. Inspect the returned image for overlap, cropping, missing details, and unreadable text. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
+          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link and a rendered source-sheet preview. Existing PDF files are preserved: use a new revision filename for each corrected export; FILE_EXISTS means choose a new filename and retry. Run design exports and inspections sequentially; DESIGN_BUSY means await the active operation before retrying. Inspect the returned image for overlap, cropping, missing details, and unreadable text. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
         inputSchema: {
           source_filename: z.string().min(1),
           pdf_filename: z.string().endsWith('.pdf'),
@@ -130,10 +130,16 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             settings.maxImageBytes,
             settings.maxImagePixels,
           );
-          await fs.writeFile(path.join(settings.workspace, pdf_filename), bytes, {
-            flag: 'wx',
-            mode: 0o644,
-          });
+          try {
+            await fs.writeFile(path.join(settings.workspace, pdf_filename), bytes, {
+              flag: 'wx',
+              mode: 0o644,
+            });
+          } catch (error) {
+            if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
+              throw new ToolFailure('FILE_EXISTS');
+            throw error;
+          }
           return {
             content: [
               ...text({
@@ -150,7 +156,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'inspect_drawing',
       {
         description:
-          'Inspect a selected region of a physical SVG drawing sheet in /tmp/cad at the original render resolution. Use this after the overview from export_drawing_pdf to read small annotations and check detail views on large sheets; the overview alone cannot certify every detail. Supply the same paper dimensions as the PDF export. The region is measured in paper millimeters from the upper-left corner. Choose a small region around the text or detail being checked; the returned image is a source-sheet detail, not an independent PDF rendering.',
+          'Inspect a selected region of a physical SVG drawing sheet in /tmp/cad at the original render resolution. Run design exports and inspections sequentially; DESIGN_BUSY means await the active operation before retrying. Use this after the overview from export_drawing_pdf to read small annotations and check detail views on large sheets; the overview alone cannot certify every detail. Supply the same paper dimensions as the PDF export. The region is measured in paper millimeters from the upper-left corner. Choose a small region around the text or detail being checked; the returned image is a source-sheet detail, not an independent PDF rendering.',
         inputSchema: {
           source_filename: z.string().endsWith('.svg'),
           page_width_mm: z.number().min(50).max(1200),

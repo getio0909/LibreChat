@@ -104,7 +104,21 @@ test('exports a real PDF with a download URL and preserves an existing destinati
     arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing.pdf' },
   });
   assert.equal(repeated.isError, true);
+  assert.deepEqual(CallToolResultSchema.parse(repeated).content, [
+    { type: 'text', text: JSON.stringify({ ok: false, error: { code: 'FILE_EXISTS' } }) },
+  ]);
   assert.deepEqual(await fs.readFile(path.join(f.root, 'drawing.pdf')), bytes);
+  const revision = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing-r02.pdf' },
+  });
+  assert.equal(revision.isError, undefined);
+  assert.equal(
+    (
+      await PDFDocument.load(await fs.readFile(path.join(f.root, 'drawing-r02.pdf')))
+    ).getPageCount(),
+    1,
+  );
 });
 
 test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomplete dimensions', async () => {
