@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { constants } from 'node:fs';
 import * as fs from 'node:fs/promises';
+import { createHash, createHmac } from 'node:crypto';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 
@@ -23,6 +24,7 @@ const types: Record<string, string> = {
   '.dxf': 'application/dxf',
   '.igs': 'model/iges',
   '.iges': 'model/iges',
+  '.csv': 'text/csv',
 };
 
 export function fileType(filename: string): string {
@@ -34,12 +36,30 @@ export function fileType(filename: string): string {
   return type;
 }
 
-export function fileInfo(settings: Settings, filename: string, bytes: number) {
+export function fileInfo(settings: Settings, filename: string, bytes: Buffer) {
+  const fallback = `${settings.workspaceUrl.replace(/\/$/, '')}/${encodeURIComponent(filename)}`;
+  let link: { download_url: string; expires_at?: string } = { download_url: fallback };
+  if (settings.downloadUrl && settings.downloadSigningKey && settings.userId) {
+    const expires = Math.floor(Date.now() / 1000) + settings.downloadLinkTtlSeconds;
+    const ticket = Buffer.from(
+      JSON.stringify({
+        filename,
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+        expires,
+      }),
+    ).toString('base64url');
+    const signature = createHmac('sha256', Buffer.from(settings.downloadSigningKey, 'hex'))
+      .update(`${settings.userId}\n${ticket}`)
+      .digest('base64url');
+    const url = new URL(encodeURIComponent(filename), settings.downloadUrl.replace(/\/?$/, '/'));
+    url.searchParams.set('ticket', `${ticket}.${signature}`);
+    link = { download_url: url.href, expires_at: new Date(expires * 1000).toISOString() };
+  }
   return {
     filename,
-    bytes,
+    bytes: bytes.length,
     path: path.join(settings.workspace, filename),
-    download_url: `${settings.workspaceUrl.replace(/\/$/, '')}/${encodeURIComponent(filename)}`,
+    ...link,
   };
 }
 
@@ -54,7 +74,8 @@ export async function listWorkspace(settings: Settings) {
       continue;
     }
     const stat = await fs.lstat(path.join(settings.workspace, entry.name));
-    if (stat.isFile()) records.push(fileInfo(settings, entry.name, stat.size));
+    if (stat.isFile() && stat.size <= settings.maxFileBytes)
+      records.push(fileInfo(settings, entry.name, await readWorkspace(settings, entry.name)));
   }
   return {
     upload_url: settings.workspaceUrl,

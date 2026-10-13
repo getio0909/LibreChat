@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { randomBytes } from 'node:crypto';
 
 const target = path.join(process.env.RUNNER_TEMP, 'bundle');
 const accounts = {};
@@ -23,6 +24,8 @@ for (const account of ['admin', 'user']) {
     path.join(target, `design-${account}.json`),
     JSON.stringify({
       workspaceUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-files/${account}/`,
+      downloadUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-downloads/${account}/`,
+      downloadSigningKey: randomBytes(32).toString('hex'),
       arkApiKey: process.env.ARK_API_KEY,
       geminiApiKey: process.env.GEMINI_API_KEY,
     }),

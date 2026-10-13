@@ -103,6 +103,93 @@ test('exports a real PDF with a download URL and preserves an existing destinati
   assert.deepEqual(await fs.readFile(path.join(f.root, 'drawing.pdf')), bytes);
 });
 
+function localDownload(f: { url: URL }, remote: string): URL {
+  const target = new URL(remote);
+  target.host = f.url.host;
+  target.protocol = f.url.protocol;
+  return target;
+}
+
+test('chat download links deliver exact files without login and reject other users or files', async () => {
+  const sharedKey = 'c'.repeat(64);
+  const a = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: sharedKey,
+  });
+  const b = await fixture({
+    userId: 'b'.repeat(24),
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: sharedKey,
+  });
+  await fs.writeFile(path.join(a.root, 'drawing.pdf'), '%PDF-admin');
+  await fs.writeFile(path.join(a.root, 'other.pdf'), '%PDF-other');
+  await fs.writeFile(path.join(a.root, 'cutlist.csv'), 'Part,Qty\nDoor,4\n');
+  await fs.writeFile(path.join(b.root, 'drawing.pdf'), '%PDF-user');
+  const result = await a.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const files = JSON.parse(block.text).files as {
+    filename: string;
+    download_url: string;
+    expires_at: string;
+  }[];
+  assert.ok(files.some((file) => file.filename === 'cutlist.csv'));
+  const file = files.find((file) => file.filename === 'drawing.pdf');
+  assert.ok(file);
+  assert.ok(Date.parse(file.expires_at) > Date.now());
+  const url = localDownload(a, file.download_url);
+  const response = await fetch(url);
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), '%PDF-admin');
+  assert.equal(response.headers.get('cache-control'), 'private, no-store');
+  assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
+  assert.match(response.headers.get('content-disposition') ?? '', /attachment/);
+  const head = await fetch(url, { method: 'HEAD' });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), '');
+  assert.equal((await fetch(url, { method: 'POST' })).status, 405);
+  assert.equal((await fetch(new URL('/download/drawing.pdf', a.url))).status, 403);
+  assert.equal((await fetch(localDownload(b, file.download_url))).status, 403);
+  const differentFile = new URL(url);
+  differentFile.pathname = '/download/other.pdf';
+  assert.equal((await fetch(differentFile)).status, 403);
+  const forged = new URL(url);
+  forged.searchParams.set('ticket', forged.searchParams.get('ticket')!.replace(/.$/, 'A'));
+  assert.equal((await fetch(forged)).status, 403);
+  const traversal = new URL(url);
+  traversal.pathname = '/download/%2e%2e%2fsecret.pdf';
+  assert.equal((await fetch(traversal)).status, 403);
+});
+
+test('download links expire and do not silently deliver changed files', async (context) => {
+  const f = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+    downloadLinkTtlSeconds: 60,
+  });
+  await fs.writeFile(
+    path.join(f.root, 'drawing.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20" fill="black"/></svg>',
+  );
+  const result = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing.pdf' },
+  });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const file = JSON.parse(block.text) as { download_url: string; expires_at: string };
+  const url = localDownload(f, file.download_url);
+  assert.equal((await fetch(url)).status, 200);
+  const original = await fs.readFile(path.join(f.root, 'drawing.pdf'));
+  await fs.writeFile(path.join(f.root, 'drawing.pdf'), '%PDF-replaced');
+  assert.equal((await fetch(url)).status, 409);
+  await fs.writeFile(path.join(f.root, 'drawing.pdf'), original);
+  context.mock.method(Date, 'now', () => Date.parse(file.expires_at) + 1000);
+  assert.equal((await fetch(url)).status, 403);
+});
+
 test('uses supported Seedream size and does not send credentials to another destination', async () => {
   const png = await sharp({ create: { width: 16, height: 16, channels: 3, background: 'white' } })
     .png()

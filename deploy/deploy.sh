@@ -73,6 +73,15 @@ for file in "${config_files[@]}" registry.token accounts.json; do
     exit 1
   fi
 done
+for account in admin user; do
+  previous_key="$deploy_root/design-$account.json"
+  if [[ -f "$previous_key" ]] && jq -e '.downloadSigningKey | strings | test("^[a-f0-9]{64}$")' "$previous_key" >/dev/null; then
+    # 沿用已有签名密钥，让聊天中的下载链接在正常重新部署后仍然有效。
+    jq --slurpfile previous "$previous_key" '.downloadSigningKey = $previous[0].downloadSigningKey' \
+      "$stage/design-$account.json" > "$stage/design-retained.json"
+    mv "$stage/design-retained.json" "$stage/design-$account.json"
+  fi
+done
 if ! grep -Eq '^LIBRECHAT_IMAGE=ghcr\.io/getio0909/librechat-dev@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
   echo 'The deployment must reference an immutable development image digest.' >&2
   exit 1
@@ -230,6 +239,14 @@ for account in admin user; do
     "$stage/accounts.json" > "$stage/files-header"
   curl --fail --silent --show-error -H "@$stage/files-header" -o /dev/null \
     "http://127.0.0.1:$port/cad-files/$account/?json"
+  download_port=5003
+  if [[ "$account" == user ]]; then download_port=5004; fi
+  download_status=$(curl --silent --show-error -o /dev/null -w '%{http_code}' \
+    "http://127.0.0.1:$download_port/download/check.pdf")
+  if [[ "$download_status" != 403 ]]; then
+    echo 'The private download endpoint failed its access check.' >&2
+    exit 1
+  fi
 done
 # 账户和角色验证通过后恢复用户配置的注册设置。
 "${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240

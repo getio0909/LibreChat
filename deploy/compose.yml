@@ -208,6 +208,7 @@ services:
     tmpfs: [/tmp]
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
+    ports: ['127.0.0.1:5003:8000']
     networks:
       cad-admin:
         aliases: ['design-${CAD_ADMIN_USER_ID:-admin}']
@@ -230,6 +231,7 @@ services:
 
   design-user:
     <<: *design
+    ports: ['127.0.0.1:5004:8000']
     networks:
       cad-user:
         aliases: ['design-${CAD_USER_USER_ID:-user}']

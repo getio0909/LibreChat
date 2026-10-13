@@ -11,6 +11,7 @@ import { ToolFailure } from './config.ts';
 import { fileType, fileInfo, listWorkspace, readWorkspace } from './files.ts';
 import { imageInput, compactImage } from './images.ts';
 import { drawingPdf } from './pdf.ts';
+import { serveDownload } from './download.ts';
 
 function text(value: object): CallToolResult {
   return { content: [{ type: 'text', text: JSON.stringify(value) }] };
@@ -21,6 +22,20 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
   return async (req, res) => {
     if (req.url === '/health') {
       res.end('OK');
+      return;
+    }
+    if (req.url?.startsWith('/download/')) {
+      if (activeJobs >= settings.maxConcurrentJobs) {
+        res.writeHead(503, { 'Cache-Control': 'private, no-store', 'Retry-After': '2' });
+        res.end('The workspace is busy. Retry the download.');
+        return;
+      }
+      activeJobs += 1;
+      try {
+        await serveDownload(settings, req, res);
+      } finally {
+        activeJobs -= 1;
+      }
       return;
     }
     if (req.url !== '/mcp') {
@@ -63,7 +78,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'workspace_files',
       {
         description:
-          'List the current private CAD workspace and authenticated download links. Use upload_url to upload files manually. Pass returned local paths to FreeCAD/Blender import tools. Use archive_url to download a ZIP for manual storage in LibreChat Files when the browser cannot identify a native CAD file type. Extract the ZIP locally before uploading native models into the CAD workspace.',
+          "List the current private CAD workspace, including CSV cut lists, and direct download links. After every CAD/3D export, call this tool and include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Request fresh links with this tool when expired. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
         inputSchema: {},
       },
       () => run(async () => text(await listWorkspace(settings))),
@@ -72,7 +87,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Convert an exported PNG/JPEG/WebP/SVG drawing or render to a PDF and return its authenticated download link. This exports a drawing/view, while the editable model remains a separate CAD file.',
+          'Convert an exported PNG/JPEG/WebP/SVG drawing or render in /tmp/cad to a real PDF and return its direct download link. When a user requests CAD drawings, create a dimensioned SVG or rendered view, call this tool, and include the exact returned download_url as a Markdown link. A rendered view is a preview, not a dimensioned manufacturing drawing; identify which you exported. Keep the editable CAD model separate.',
         inputSchema: {
           source_filename: z.string().min(1),
           pdf_filename: z.string().endsWith('.pdf'),
@@ -91,7 +106,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             flag: 'wx',
             mode: 0o644,
           });
-          return text(fileInfo(settings, pdf_filename, bytes.length));
+          return text(fileInfo(settings, pdf_filename, bytes));
         }),
     );
     for (const provider of providers) {

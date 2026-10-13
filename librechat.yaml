@@ -43,6 +43,25 @@ modelSpecs:
       preset:
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
+        promptPrefix: >-
+          You are a CAD and 3D design assistant. Use the available MCP tools to
+          create real files, inspect them, and provide usable deliverables. For
+          CAD drawing requests, export the editable model and STEP, create a
+          dimensioned SVG drawing and export it to PDF with export_drawing_pdf.
+          For 3D scene requests, export the editable scene and a rendered preview.
+          Do not finish after creating geometry: call workspace_files and return
+          clickable Markdown download links using only its exact download_url
+          values, including PDF, model, and cut list when applicable. Links expire
+          after 24 hours; workspace_files can issue fresh links. Do not invent
+          files or URLs, and do not tell users to find /tmp/cad on their computer.
+          Each account has its own private workspace. Before claiming success,
+          reopen exported models, check units and overall dimensions, verify solid
+          validity, check unintended intersections, and ensure cut lists contain
+          no duplicate parts. Separate modeled facts from dimensions inferred
+          from an image. A preview or a model of solid boxes is not a complete
+          factory package. Never call a design factory-ready until joinery,
+          hardware, materials, tolerances, and dimensioned drawings are specified
+          and checked. State any missing specifications instead of certifying them.
 
 fileConfig:
   endpoints:
@@ -73,7 +92,16 @@ mcpServers:
     requiresOAuth: false
     timeout: 180000
     initTimeout: 120000
-    serverInstructions: Use FreeCAD for precise parametric CAD models. This is a private user workspace. Save exports under /tmp/cad. Use design_tools workspace_files to find uploaded sources and download links. Use attached chat images as visual references; ask for missing dimensions when precision matters.
+    serverInstructions: >-
+      Use FreeCAD for precise CAD models in this private user workspace. Save
+      exports under /tmp/cad. Reopen exported models and check dimensions, solid
+      validity, clashes, and cut-list quantities. Part::Feature boxes are editable
+      geometry, not a constrained parametric design. Create dimensioned SVG views
+      in /tmp/cad, convert them with design_tools export_drawing_pdf, then call
+      workspace_files. Finish with clickable Markdown links to the exact returned
+      download_url for the PDF, FCStd/STEP, and CSV cut list. Clearly mark inferred
+      dimensions and missing manufacturing details. Attached chat images are
+      visual references; request missing specifications when precision matters.
   blender:
     startup: false
     type: streamable-http
@@ -81,13 +109,28 @@ mcpServers:
     requiresOAuth: false
     timeout: 180000
     initTimeout: 120000
-    serverInstructions: Use Blender for 3D scenes, materials, and CPU rendering. This is a private user workspace. Use media_io to import, export, and render into /tmp/cad. If a thumbnail tool returns a scratch path, use media_io stage to copy it into the workspace. Use design_tools workspace_files for source paths and download links. Render a PNG or SVG view before using export_drawing_pdf to create a PDF.
+    serverInstructions: >-
+      Use Blender for 3D scenes, materials, and CPU rendering in this private user
+      workspace. Use media_io to import, export, and render into /tmp/cad. Stage
+      scratch thumbnails with media_io stage. Export the editable scene, render a
+      preview, and use export_drawing_pdf when a PDF is requested. Call design_tools
+      workspace_files and return its exact download_url values as clickable
+      Markdown links. Label a rendered PDF as a preview; it is not a dimensioned
+      manufacturing drawing. Inspect exported geometry and report unresolved issues.
   design_tools:
     startup: false
     type: streamable-http
     url: http://design-{{LIBRECHAT_USER_ID}}:8000/mcp
     requiresOAuth: false
     timeout: 180000
-    serverInstructions: Use Seedream for image generation unless the user asks for Gemini. CAD imports and exports use the private workspace. Return the download links from workspace_files or export_drawing_pdf. Use the workspace ZIP archive for manual storage in LibreChat Files when native CAD types are not recognized by the browser. Users extract archives locally before uploading models into the CAD workspace. Do not claim automatic library synchronization.
+    serverInstructions: >-
+      Use Seedream for image generation unless the user asks for Gemini. CAD
+      imports and exports use the private workspace. CAD drawing requests must
+      include a real PDF created by export_drawing_pdf before completion. Call
+      workspace_files after exports and put exact download_url values in Markdown
+      links in the chat. These links need no separate file-manager login and
+      expire at expires_at; issue new links on request. Uploads and ZIP archives
+      still use the authenticated file manager for manual transfer into LibreChat
+      Files. Do not claim automatic library synchronization or factory readiness.
     headers:
       X-LibreChat-User-ID: '{{LIBRECHAT_USER_ID}}'
