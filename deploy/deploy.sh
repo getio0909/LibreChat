@@ -136,6 +136,7 @@ const { StreamableHTTPClientTransport } = require('@modelcontextprotocol/sdk/cli
 NODE
 
 # 按顺序创建首个管理员和普通用户，密码通过标准输入传递给现有账户工具。
+printf '{}\n' > "$stage/owners.json"
 for account in admin user; do
   email=$(jq -r --arg account "$account" '.[$account].email' "$stage/accounts.json")
   username=$(jq -r --arg account "$account" '.[$account].username' "$stage/accounts.json")
@@ -161,7 +162,20 @@ for account in admin user; do
     printf 'Default %s account role verification failed.\n' "$account" >&2
     exit 1
   fi
+  user_id=$(jq -r '.user.id // .user._id' "$stage/login.json")
+  if [[ ! "$user_id" =~ ^[0-9a-f]{24}$ ]]; then
+    echo 'The verified account has no valid user ID.' >&2
+    exit 1
+  fi
+  printf 'CAD_%s_USER_ID=%s\n' "${account^^}" "$user_id" >> "$deploy_root/.env"
+  jq --arg account "$account" --arg id "$user_id" '.[$account] = $id' \
+    "${stage}/owners.json" > "$stage/owners.next.json"
+  mv "$stage/owners.next.json" "$stage/owners.json"
 done
+# 在公开访问恢复前，将导出目录和内部网络地址绑定到已验证的用户标识。
+"${closed_compose[@]}" exec -T api node /app/config/configure-cad.js \
+  < "$stage/owners.json" > "$stage/configured.yaml"
+install -m 600 "$stage/configured.yaml" "$deploy_root/librechat.yaml"
 # 账户和角色验证通过后恢复用户配置的注册设置。
 "${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
 rm -f -- "$gate"

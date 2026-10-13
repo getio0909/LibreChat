@@ -40,7 +40,9 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run build:packages
       - name: Verify image tools
-        run: npm run test:ci --workspace=@librechat/api -- --runInBand --coverage=false src/mcp/image.spec.ts
+        run: npm run test:ci --workspace=@librechat/api -- --runInBand --coverage=false src/mcp/image.spec.ts src/cad/files.spec.ts
+      - name: Verify design controls
+        run: npm run test:ci --workspace=@librechat/frontend -- --runInBand --coverage=false src/components/Nav/__tests__/CAD.spec.tsx src/components/Chat/Messages/Content/ToolOutput/__tests__/OutputRenderer.test.tsx
       - name: Typecheck API workspace
         working-directory: packages/api
         run: npx tsc --noEmit

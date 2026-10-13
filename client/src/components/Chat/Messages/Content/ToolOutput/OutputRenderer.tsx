@@ -3,6 +3,7 @@ import copy from 'copy-to-clipboard';
 import { Button } from '@librechat/client';
 import { hasToolCallErrorPrefix, stripToolCallErrorPrefix } from 'librechat-data-provider';
 import type { UIEvent } from 'react';
+import { errorCopy } from '~/components/Messages/Content/Error/registry';
 import CopyButton from '~/components/Messages/Content/CopyButton';
 import { useToolContentPending } from '../disclosure';
 import { PANE_COPY_REVEAL } from '../rows';
@@ -15,6 +16,19 @@ interface ContentBlock {
 }
 
 const ERROR_INNER = /^Error\s+\w+ing to endpoint\s*\(HTTP \d+\):\s*/i;
+
+function imageErrorCode(text: string): string | undefined {
+  try {
+    const payload: unknown = JSON.parse(stripToolCallErrorPrefix(text).trim());
+    if (typeof payload !== 'object' || payload === null || !('error' in payload)) return;
+    const error = payload.error;
+    if (typeof error !== 'object' || error === null || !('code' in error)) return;
+    const code = error.code;
+    if (typeof code === 'string' && code.startsWith('IMAGE_') && errorCopy[code]) return code;
+  } catch {
+    return;
+  }
+}
 
 function cleanError(text: string): string {
   let cleaned = stripToolCallErrorPrefix(text).trim();
@@ -34,6 +48,7 @@ const VALIDATION_FEEDBACK = /^Error:[\s\S]*\n Please fix your mistakes\.$/i;
 
 export function isError(text: string): boolean {
   return (
+    imageErrorCode(text) != null ||
     hasToolCallErrorPrefix(text) ||
     text.startsWith('Error processing tool') ||
     VALIDATION_FEEDBACK.test(text)
@@ -136,7 +151,10 @@ export default function OutputRenderer({
   const localize = useLocalize();
   const terminal = variant === 'terminal';
   const extracted = useMemo(() => extractText(text, terminal), [text, terminal]);
-  const { text: displayText, rawError, isJson } = extracted;
+  const { rawError } = extracted;
+  const imageCode = terminal ? undefined : imageErrorCode(extracted.text);
+  const displayText = imageCode ? localize(errorCopy[imageCode]) : extracted.text;
+  const isJson = extracted.isJson && !imageCode;
   const error = extracted.error || forceError;
   const [showErrorDetails, setShowErrorDetails] = useState(false);
   const [isCopied, setIsCopied] = useState(false);

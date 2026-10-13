@@ -49,6 +49,10 @@ case "$operation" in
     "$closed"
     test -f "$DEPLOY_TEST_GATE"
     cat >/dev/null
+    if [[ "$*" == *'/app/config/configure-cad.js'* ]]; then
+      cat "$root/librechat.yaml"
+      exit 0
+    fi
     if [[ "$*" != *'/app/config/create-user.js'* ]]; then
       if [[ "$DEPLOY_TEST_FAILURE" == mcp ]]; then exit 1; fi
       exit 0
@@ -70,7 +74,9 @@ email=$(jq -r .email)
 if [[ "$DEPLOY_TEST_FAILURE" == login ]]; then exit 22; fi
 role=USER
 if [[ "$email" == admin@example.test && "$DEPLOY_TEST_FAILURE" != role ]]; then role=ADMIN; fi
-jq -n --arg role "$role" '{user: {role: $role}}' > "$output"
+id=$(printf 'b%.0s' {1..24})
+if [[ "$email" == admin@example.test ]]; then id=$(printf 'a%.0s' {1..24}); fi
+jq -n --arg role "$role" --arg id "$id" '{user: {role: $role, id: $id}}' > "$output"
 EOF
 chmod 755 "$work/bin/docker" "$work/bin/curl"
 printf 'previous compose\n' > "$work/previous/compose.yml"
@@ -80,6 +86,8 @@ printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\n' 0 > "$wo
 printf 'new compose\n' > "$work/bundle/compose.yml"
 printf 'new config\n' > "$work/bundle/librechat.yaml"
 cp "$work/previous/.env" "$work/bundle/.env"
+cp "$work/bundle/.env" "$work/expected.env"
+printf 'CAD_ADMIN_USER_ID=%s\nCAD_USER_USER_ID=%s\n' "$(printf 'a%.0s' {1..24})" "$(printf 'b%.0s' {1..24})" >> "$work/expected.env"
 printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\n' "$(printf '1%.0s' {1..64})" > "$work/bundle/image.env"
 printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
@@ -117,7 +125,11 @@ for scenario in none health mcp command login role final first-none first-login 
   grep -q '^up:true:.*11111111' "$DEPLOY_TEST_LOG"
   if [[ "$scenario" != first-* || "$failure" == none ]]; then
     for file in compose.yml librechat.yaml .env image.env; do
-      cmp "$expected/$file" "$root/$file"
+      if [[ "$file" == .env && "$failure" == none ]]; then
+        cmp "$work/expected.env" "$root/$file"
+      else
+        cmp "$expected/$file" "$root/$file"
+      fi
       test "$(stat -c '%a' "$root/$file")" = 600
     done
     test ! -f "$DEPLOY_TEST_GATE"

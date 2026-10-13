@@ -1,6 +1,9 @@
+import sharp from 'sharp';
 import { once } from 'node:events';
 import { createServer } from 'node:http';
+import { randomBytes } from 'node:crypto';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Server } from 'node:http';
 import { createImageMCPHandler } from './image';
@@ -11,11 +14,13 @@ describe('image MCP provider boundary', () => {
   const clients: Client[] = [];
   let server: Server;
   let baseURL: string;
+  let configSource: string;
 
   beforeEach(async () => {
     request.mockReset();
     reportError.mockClear();
-    server = createServer(createImageMCPHandler({ request, reportError }));
+    configSource = 'imageTools:\n  maxImageBytes: 20000\n  maxPromptLength: 100\n';
+    server = createServer(createImageMCPHandler({ request, reportError, configSource }));
     server.listen(0, '127.0.0.1');
     await once(server, 'listening');
     const address = server.address();
@@ -60,8 +65,42 @@ describe('image MCP provider boundary', () => {
         name: 'generate_image',
         arguments: { prompt: 'A temple courtyard' },
       }),
-    ).toMatchObject({ isError: true });
+    ).toMatchObject({
+      isError: true,
+      structuredContent: { error: { code: 'IMAGE_API_KEY_REQUIRED' } },
+    });
     expect(request).not.toHaveBeenCalled();
+  });
+
+  test('advertises the configured prompt limit and only supported Seedream sizes', async () => {
+    const client = await connect('seedream', 'key');
+    const { tools } = await client.listTools();
+    expect(tools[0].inputSchema.properties).toMatchObject({ prompt: { maxLength: 100 } });
+    const result = await client.callTool({
+      name: 'generate_image',
+      arguments: { prompt: 'test', size: '4K' },
+    });
+    expect(result.isError).toBe(true);
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test('compacts a large provider image before returning it through MCP', async () => {
+    const png = await sharp(randomBytes(128 * 128 * 3), {
+      raw: { width: 128, height: 128, channels: 3 },
+    })
+      .png()
+      .toBuffer();
+    expect(png.byteLength).toBeGreaterThan(20000);
+    request.mockResolvedValue(
+      new Response(JSON.stringify({ data: [{ b64_json: png.toString('base64') }] })),
+    );
+    const client = await connect('seedream', 'key');
+    const result = await client.callTool({ name: 'generate_image', arguments: { prompt: 'test' } });
+    expect(result.content).toMatchObject([{ type: 'image', mimeType: 'image/jpeg' }]);
+    const image = CallToolResultSchema.parse(result).content[0];
+    if (!image || image.type !== 'image' || typeof image.data !== 'string')
+      throw new Error('Expected an image result.');
+    expect(Buffer.from(image.data, 'base64').byteLength).toBeLessThanOrEqual(20000);
   });
 
   test('returns a Seedream image using the configured model and request-scoped key', async () => {

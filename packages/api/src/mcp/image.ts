@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import sharp from 'sharp';
+import yaml from 'js-yaml';
+import { configSchema } from 'librechat-data-provider';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -9,10 +12,10 @@ type Provider = 'seedream' | 'gemini';
 interface ImageDeps {
   request: (...args: Parameters<typeof fetch>) => ReturnType<typeof fetch>;
   reportError: (message: string) => void;
+  configSource?: string;
 }
 
 const inputSchema = {
-  prompt: z.string().min(1).max(32000),
   aspect_ratio: z.enum(['1:1', '3:2', '2:3', '16:9', '9:16']).default('1:1'),
 };
 
@@ -46,12 +49,33 @@ const geminiResponse = z.object({
   ),
 });
 
-function failure(text: string): CallToolResult {
-  return { isError: true, content: [{ type: 'text', text }] };
+function failure(code: string): CallToolResult {
+  const result = { ok: false, error: { code } };
+  return {
+    isError: true,
+    structuredContent: result,
+    content: [{ type: 'text', text: JSON.stringify(result) }],
+  };
 }
 
 /** 将图片接口转换为 MCP 工具，凭据仅存在于当前 HTTP 请求中。 */
-export function createImageMCPHandler({ request, reportError }: ImageDeps): RequestListener {
+export function createImageMCPHandler({
+  request,
+  reportError,
+  configSource = '{}',
+}: ImageDeps): RequestListener {
+  const { imageTools } = configSchema.pick({ imageTools: true }).parse(yaml.load(configSource));
+  async function imageResult(data: string, mimeType: string): Promise<CallToolResult> {
+    const bytes = Buffer.from(data, 'base64');
+    if (bytes.byteLength <= imageTools.maxImageBytes) {
+      return { content: [{ type: 'image', mimeType, data }] };
+    }
+    const compact = await sharp(bytes).jpeg().toBuffer();
+    if (compact.byteLength > imageTools.maxImageBytes) return failure('IMAGE_TOO_LARGE');
+    return {
+      content: [{ type: 'image', mimeType: 'image/jpeg', data: compact.toString('base64') }],
+    };
+  }
   return async (req, res) => {
     if (req.url === '/health') {
       res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -87,21 +111,19 @@ export function createImageMCPHandler({ request, reportError }: ImageDeps): Requ
         description: `Generate an original image from a text prompt using ${model}.`,
         inputSchema: {
           ...inputSchema,
+          prompt: z.string().min(1).max(imageTools.maxPromptLength),
           size:
             provider === 'seedream'
-              ? z.enum(['2K', '4K']).default('2K')
+              ? z.literal('2K').default('2K')
               : z.enum(['1K', '2K', '4K']).default('1K'),
         },
       },
       async ({ prompt, aspect_ratio, size }): Promise<CallToolResult> => {
         if (typeof key !== 'string' || key.length === 0) {
-          return failure(
-            'Enter your provider API key in the MCP server settings before generating an image.',
-          );
+          return failure('IMAGE_API_KEY_REQUIRED');
         }
         try {
           const [width, height] = dimensions[aspect_ratio];
-          const scale = size === '4K' ? 2 : 1;
           const response = await request(
             provider === 'seedream'
               ? 'https://ark.cn-beijing.volces.com/api/v3/images/generations'
@@ -120,7 +142,7 @@ export function createImageMCPHandler({ request, reportError }: ImageDeps): Requ
                   ? {
                       model,
                       prompt,
-                      size: `${width * scale}x${height * scale}`,
+                      size: `${width}x${height}`,
                       output_format: 'png',
                       response_format: 'b64_json',
                       watermark: true,
@@ -136,19 +158,16 @@ export function createImageMCPHandler({ request, reportError }: ImageDeps): Requ
             },
           );
           if (!response.ok) {
-            return failure(
-              'Image generation failed. Check your API key, model access, and provider quota.',
-            );
+            if (response.status === 401 || response.status === 403)
+              return failure('IMAGE_PROVIDER_AUTH');
+            if (response.status === 429) return failure('IMAGE_PROVIDER_QUOTA');
+            return failure('IMAGE_PROVIDER_REJECTED');
           }
           const body: unknown = await response.json();
           if (provider === 'seedream') {
             const parsed = seedreamResponse.safeParse(body);
             if (parsed.success) {
-              return {
-                content: [
-                  { type: 'image', mimeType: 'image/png', data: parsed.data.data[0].b64_json },
-                ],
-              };
+              return await imageResult(parsed.data.data[0].b64_json, 'image/png');
             }
           } else {
             const parsed = geminiResponse.safeParse(body);
@@ -156,15 +175,13 @@ export function createImageMCPHandler({ request, reportError }: ImageDeps): Requ
               ? parsed.data.candidates[0]?.content.parts.find((part) => part.inlineData)?.inlineData
               : undefined;
             if (image) {
-              return { content: [{ type: 'image', mimeType: image.mimeType, data: image.data }] };
+              return await imageResult(image.data, image.mimeType);
             }
           }
-          return failure(
-            'The image provider did not return an image. Try a different prompt or check model access.',
-          );
+          return failure('IMAGE_PROVIDER_NO_IMAGE');
         } catch {
           reportError('Image provider request failed.');
-          return failure('Image generation could not complete. Please retry.');
+          return failure('IMAGE_PROVIDER_UNAVAILABLE');
         }
       },
     );

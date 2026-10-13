@@ -671,3 +671,6 @@ export const graphToken = (scopes: string) =>
   `${BASE_URL}/api/auth/graph-token?scopes=${encodeURIComponent(scopes)}`;
 
 export const resetToolApprovalGrants = (): string => `${BASE_URL}/api/agents/tools/approvals/reset`;
+export const cadExports = (): string => `${BASE_URL}/api/cad`;
+export const cadExportDownload = (filename: string): string =>
+  `${cadExports()}/${encodeURIComponent(filename)}`;

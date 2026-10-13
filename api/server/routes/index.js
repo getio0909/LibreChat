@@ -35,6 +35,7 @@ const agents = require('./agents');
 const roles = require('./roles');
 const oauth = require('./oauth');
 const files = require('./files');
+const cad = require('./cad');
 const share = require('./share');
 const tags = require('./tags');
 const auth = require('./auth');
@@ -67,6 +68,7 @@ module.exports = {
   roles,
   oauth,
   files,
+  cad,
   share,
   banner,
   openapi,

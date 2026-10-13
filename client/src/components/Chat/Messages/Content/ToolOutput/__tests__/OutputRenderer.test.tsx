@@ -32,6 +32,12 @@ jest.mock('~/components/Messages/Content/CopyButton', () => ({
 }));
 
 describe('OutputRenderer', () => {
+  it('localizes image tool failures using their stable code', () => {
+    const text = JSON.stringify({ ok: false, error: { code: 'IMAGE_PROVIDER_QUOTA' } });
+    expect(isError(text)).toBe(true);
+    render(<OutputRenderer text={text} />);
+    expect(screen.getByText('com_error_image_quota')).toBeInTheDocument();
+  });
   beforeEach(() => {
     (copy as jest.Mock).mockClear();
   });

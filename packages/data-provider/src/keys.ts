@@ -1,4 +1,5 @@
 export enum QueryKeys {
+  cadExports = 'cadExports',
   messages = 'messages',
   /* Full content of one tool-call part, fetched when its preview is not enough */
   toolCallPart = 'toolCallPart',
@@ -126,6 +127,7 @@ export const DynamicQueryKeys = {
 } as const;
 
 export enum MutationKeys {
+  cadDownload = 'cadDownload',
   resetToolApprovalGrants = 'resetToolApprovalGrants',
   subagentControl = 'subagentControl',
   cancelBackgroundTasks = 'cancelBackgroundTasks',

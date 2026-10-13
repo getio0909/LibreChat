@@ -107,3 +107,4 @@ export * from './code/workspace';
 export * from './types/scheduleConsent';
 
 export * from './approval';
+export type { CADExport } from './types/cad';

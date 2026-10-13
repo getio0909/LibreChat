@@ -407,6 +407,7 @@ const startServer = async () => {
   app.use('/api/admin/config', routes.adminConfig);
   app.use('/api/admin/code-environments', routes.adminCodeEnvironments);
   app.use('/api/code-environments', routes.codeEnvironments);
+  app.use('/api/cad', routes.cad);
   app.use('/api/admin/langfuse', routes.adminLangfuse);
   app.use('/api/admin/grants', routes.adminGrants);
   app.use('/api/admin/groups', routes.adminGroups);
