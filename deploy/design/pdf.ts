@@ -3,7 +3,16 @@ import os from 'node:os';
 import path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { SaxesParser } from 'saxes';
-import { PDFDocument, PDFName, PDFNumber, PDFArray, PDFDict, PDFRef, PDFStream } from 'pdf-lib';
+import {
+  PDFDocument,
+  PDFName,
+  PDFNumber,
+  PDFArray,
+  PDFDict,
+  PDFRef,
+  PDFStream,
+  PrintScaling,
+} from 'pdf-lib';
 import type { PDFObject } from 'pdf-lib';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
@@ -223,7 +232,7 @@ export async function drawingPdf(
       : Math.min((pageSize.width - 48) / source.width, (pageSize.height - 48) / source.height);
     const width = paper ? pageSize.width : source.width * scale;
     const height = paper ? pageSize.height : source.height * scale;
-    return render(
+    const rendered = await render(
       'rsvg-convert',
       [
         '--format=pdf',
@@ -242,9 +251,14 @@ export async function drawingPdf(
       signal,
       settings.maxRenderMemoryBytes,
     );
+    const pdf = await PDFDocument.load(rendered);
+    pdf.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
+    signal.throwIfAborted();
+    return Buffer.from(await pdf.save());
   }
   const { bytes: png } = await renderDrawing(bytes, settings, signal);
   const pdf = await PDFDocument.create();
+  pdf.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
   const image = await pdf.embedPng(png);
   const page = pdf.addPage(image.width > image.height ? [841.89, 595.28] : [595.28, 841.89]);
   const scale = Math.min(
@@ -333,6 +347,12 @@ export async function loadDrawingPdf(
       // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
       object.delete(PDFName.of('Metadata'));
       const type = object.lookup(PDFName.of('Type'));
+      if (object.has(PDFName.of('Ref')) || object.has(PDFName.of('OPI')))
+        throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
+      if (object.has(PDFName.of('Alternates')))
+        throw new ToolFailure('PDF_IMAGE_ALTERNATES_UNSUPPORTED');
+      if (object.has(PDFName.of('OC')) || type === PDFName.of('OCG') || type === PDFName.of('OCMD'))
+        throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
       if (
         object.has(PDFName.of('AF')) ||
         object.has(PDFName.of('EF')) ||

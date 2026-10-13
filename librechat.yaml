@@ -153,6 +153,9 @@ modelSpecs:
           dimensions, or native PDFs with their dimensions omitted. Deliver one
           combined PDF, not only scattered one-page exports. Do not convert
           drawings to screenshots or fit a scaled sheet to another paper size.
+          For scaled drawings, tell the user to select the matching paper size,
+          print at Actual Size / 100%, and verify a known dimension on paper;
+          print preferences can be overridden.
           Call inspect_pdf for every finished PDF page, and for regions with
           small annotations or detail views. Fix unreadable text, overlap,
           clipping, missing geometry, and inconsistent references before delivery.

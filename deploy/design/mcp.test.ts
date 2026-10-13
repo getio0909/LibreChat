@@ -10,7 +10,16 @@ import { watch } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { test, afterEach } from 'node:test';
 import { inflateSync, deflateSync } from 'node:zlib';
-import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFString, degrees } from 'pdf-lib';
+import {
+  PDFArray,
+  PDFDict,
+  PDFDocument,
+  PDFName,
+  PDFRawStream,
+  PDFString,
+  PrintScaling,
+  degrees,
+} from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -153,6 +162,7 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   assert.ok(previewMetadata.height != null && previewMetadata.height <= 1600);
   assert.ok(previewBytes.length <= f.settings.maxImageBytes);
   const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'sheet.pdf')));
+  assert.equal(pdf.catalog.getOrCreateViewerPreferences().getPrintScaling(), PrintScaling.None);
   const page = pdf.getPage(0);
   assert.ok(Math.abs(page.getWidth() - (420 * 72) / 25.4) < 0.001);
   assert.ok(Math.abs(page.getHeight() - (297 * 72) / 25.4) < 0.001);
@@ -286,6 +296,7 @@ test('large CAD sheets retain A0 vector geometry while previews stay bounded', a
 test('ordered drawing sets preserve native pages, CJK text, vectors, paper sizes and rotations', async () => {
   const f = await fixture();
   const native = await PDFDocument.create();
+  native.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
   native.addPage([(297 * 72) / 25.4, (420 * 72) / 25.4]).drawText('ASSEMBLY - G01');
   const rotated = native.addPage([(210 * 72) / 25.4, (297 * 72) / 25.4]);
   rotated.setRotation(degrees(90));
@@ -315,6 +326,7 @@ test('ordered drawing sets preserve native pages, CJK text, vectors, paper sizes
   const bytes = await fs.readFile(path.join(f.root, 'set.pdf'));
   const pdf = await PDFDocument.load(bytes);
   assert.equal(pdf.getPageCount(), 3);
+  assert.equal(pdf.catalog.getOrCreateViewerPreferences().getPrintScaling(), PrintScaling.None);
   assert.equal(imageCount(pdf), 0);
   assert.equal(pdf.getPage(1).getRotation().angle, 90);
   assert.ok(Math.abs(pdf.getPage(2).getWidth() - (420 * 72) / 25.4) < 0.001);
@@ -704,6 +716,113 @@ test('private editing data and external file streams are excluded from copied re
     assert.doesNotMatch(JSON.stringify(rejected), /hidden editing fixture|not-present/);
     await assert.rejects(fs.stat(path.join(f.root, 'private-set.pdf')), { code: 'ENOENT' });
   }
+});
+
+test('external reference and OPI resources, alternate images and resource layers are rejected', async () => {
+  const f = await fixture();
+  for (const kind of ['reference', 'opi', 'alternate', 'layer']) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage();
+    const external = PDFString.of('/private/old-drawing.pdf');
+    const primary = pdf.context.register(
+      pdf.context.flateStream(kind === 'reference' ? '0 0 10 10 re f' : Buffer.from([0, 0, 0]), {
+        Type: 'XObject',
+        ...(kind === 'reference'
+          ? { Subtype: 'Form', BBox: [0, 0, 10, 10] }
+          : {
+              Subtype: 'Image',
+              Width: 1,
+              Height: 1,
+              ColorSpace: 'DeviceRGB',
+              BitsPerComponent: 8,
+            }),
+        ...(kind === 'reference'
+          ? { Ref: { F: external, Page: 0 } }
+          : kind === 'opi'
+            ? { OPI: { '2.0': { F: external, Size: [1, 1] } } }
+            : kind === 'alternate'
+              ? {
+                  Alternates: [
+                    {
+                      Image: pdf.context.register(
+                        pdf.context.flateStream(Buffer.from([255, 0, 0]), {
+                          Type: 'XObject',
+                          Subtype: 'Image',
+                          Width: 1,
+                          Height: 1,
+                          ColorSpace: 'DeviceRGB',
+                          BitsPerComponent: 8,
+                        }),
+                      ),
+                      DefaultForPrinting: true,
+                    },
+                  ],
+                }
+              : { OC: { Type: 'OCG', Name: PDFString.of('hidden layer') } }),
+      }),
+    );
+    page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: primary } }));
+    const bytes = Buffer.from(await pdf.save());
+    await fs.writeFile(path.join(f.root, `${kind}.pdf`), bytes);
+    const rejected = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: {
+        pdf_filename: 'unsupported.pdf',
+        sheets: [{ source_filename: `${kind}.pdf` }],
+      },
+    });
+    const code =
+      kind === 'alternate'
+        ? 'PDF_IMAGE_ALTERNATES_UNSUPPORTED'
+        : kind === 'layer'
+          ? 'PDF_LAYERS_UNSUPPORTED'
+          : 'PDF_EXTERNAL_STREAM_UNSUPPORTED';
+    assert.equal(rejected.isError, true);
+    assert.match(JSON.stringify(rejected), new RegExp(code));
+    assert.doesNotMatch(JSON.stringify(rejected), /private|old-drawing/);
+    await assert.rejects(fs.stat(path.join(f.root, 'unsupported.pdf')), { code: 'ENOENT' });
+    assert.deepEqual(await fs.readFile(path.join(f.root, `${kind}.pdf`)), bytes);
+  }
+});
+
+test('renderer concurrency fits one aggregate budget while permitted concurrent exports work', async () => {
+  for (const config of [
+    { maxConcurrentJobs: 2, maxRenderMemoryBytes: 384 * 1024 * 1024 },
+    { maxConcurrentJobs: 4, maxRenderMemoryBytes: 256 * 1024 * 1024 },
+  ]) {
+    assert.equal(
+      settingsSchema.safeParse({ workspaceUrl: 'https://example.test/cad/', ...config }).success,
+      false,
+    );
+  }
+  const f = await fixture({ maxConcurrentJobs: 4, maxRenderMemoryBytes: 96 * 1024 * 1024 });
+  await fs.writeFile(
+    path.join(f.root, 'concurrent.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"><rect x="20" y="20" width="100" height="50" fill="none" stroke="black"/></svg>',
+  );
+  const results = await Promise.all(
+    [1, 2, 3, 4].map((index) =>
+      f.client.callTool({
+        name: 'export_drawing_pdf',
+        arguments: {
+          source_filename: 'concurrent.svg',
+          pdf_filename: `concurrent-${index}.pdf`,
+          page_width_mm: 210,
+          page_height_mm: 297,
+        },
+      }),
+    ),
+  );
+  for (const [index, result] of results.entries()) {
+    assert.equal(result.isError, undefined);
+    const pdf = await PDFDocument.load(
+      await fs.readFile(path.join(f.root, `concurrent-${index + 1}.pdf`)),
+    );
+    assert.equal(pdf.getPageCount(), 1);
+    assert.equal(pdf.catalog.getOrCreateViewerPreferences().getPrintScaling(), PrintScaling.None);
+    assert.equal(imageCount(pdf), 0);
+  }
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
 });
 
 test('catalog color output intents are rejected without changing the source', async () => {
