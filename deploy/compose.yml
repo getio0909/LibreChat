@@ -11,6 +11,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3080
       NODE_ENV: production
+      ENDPOINTS: custom
       MONGO_URI: mongodb://mongodb:27017/LibreChat
       MEILI_HOST: http://meilisearch:7700
       RAG_API_URL: http://rag_api:8000
@@ -22,6 +23,19 @@ services:
         condition: service_started
       rag_api:
         condition: service_started
+      freecad-admin:
+        condition: service_healthy
+      freecad-user:
+        condition: service_healthy
+      blender-admin:
+        condition: service_healthy
+      blender-user:
+        condition: service_healthy
+      design-admin:
+        condition: service_healthy
+      design-user:
+        condition: service_healthy
+    networks: [default, cad-admin, cad-user]
     volumes:
       - ./librechat.yaml:/app/librechat.yaml:ro
       - images:/app/client/public/images
@@ -93,6 +107,139 @@ services:
       vectordb:
         condition: service_healthy
 
+  freecad-admin: &freecad
+    image: ${FREECAD_IMAGE:?Set FREECAD_IMAGE in image.env}
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks:
+      cad-admin:
+        aliases: ['freecad-${CAD_ADMIN_USER_ID:-admin}']
+    volumes:
+      - cad-admin:/tmp/cad
+    mem_limit: 2g
+    cpus: 1.5
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 12
+
+  freecad-user:
+    <<: *freecad
+    networks:
+      cad-user:
+        aliases: ['freecad-${CAD_USER_USER_ID:-user}']
+    volumes: [cad-user:/tmp/cad]
+
+  blender-admin: &blender
+    image: ghcr.io/hotspoons/blender-agent@sha256:23455350cdfa23be743a999da50e68786ff3edd0415e219cba1fab435ee25c44
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      BLENDER_AGENT_MCP_PORT: 10101
+      BLENDER_AGENT_DATA_DIR: /tmp/cad
+      BLENDER_MCP_MEDIA_DIR: /tmp/cad
+    command: [--spawn-blender]
+    networks:
+      cad-admin:
+        aliases: ['blender-${CAD_ADMIN_USER_ID:-admin}']
+    volumes:
+      - cad-admin:/tmp/cad
+    mem_limit: 2g
+    cpus: 1.5
+    healthcheck:
+      test: ['CMD', 'bash', '-c', 'exec 3<>/dev/tcp/127.0.0.1/10101']
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 12
+
+  blender-user:
+    <<: *blender
+    networks:
+      cad-user:
+        aliases: ['blender-${CAD_USER_USER_ID:-user}']
+    volumes: [cad-user:/tmp/cad]
+
+  design-admin: &design
+    image: ${DESIGN_IMAGE:?Set DESIGN_IMAGE in image.env}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks:
+      cad-admin:
+        aliases: ['design-${CAD_ADMIN_USER_ID:-admin}']
+      design-admin:
+    volumes:
+      - ./design-admin.json:/run/secrets/design.json:ro
+      - cad-admin:/tmp/cad
+    mem_limit: 768m
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  design-user:
+    <<: *design
+    networks:
+      cad-user:
+        aliases: ['design-${CAD_USER_USER_ID:-user}']
+      design-user:
+    volumes:
+      - ./design-user.json:/run/secrets/design.json:ro
+      - cad-user:/tmp/cad
+
+  files-admin: &files
+    image: sigoden/dufs@sha256:8dd3b750015734703e64b55641fb7d2254c112e0ff3967074766177dc15dc982
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    command: [--config, /run/secrets/files.yaml]
+    networks: [cad-admin]
+    ports: ['127.0.0.1:5001:5000']
+    volumes:
+      - ./files-admin.yaml:/run/secrets/files.yaml:ro
+      - cad-admin:/data
+    mem_limit: 128m
+
+  files-user:
+    <<: *files
+    networks: [cad-user]
+    ports: ['127.0.0.1:5002:5000']
+    volumes:
+      - ./files-user.yaml:/run/secrets/files.yaml:ro
+      - cad-user:/data
+
+networks:
+  cad-admin:
+    internal: true
+  cad-user:
+    internal: true
+  design-admin:
+  design-user:
+
 volumes:
   mongodb:
   search:
@@ -101,3 +248,5 @@ volumes:
   uploads:
   logs:
   appdata:
+  cad-admin:
+  cad-user:
