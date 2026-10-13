@@ -1,4 +1,7 @@
 import sharp from 'sharp';
+import os from 'node:os';
+import path from 'node:path';
+import * as fs from 'node:fs/promises';
 import { SaxesParser } from 'saxes';
 import { PDFDocument, PDFName, PDFNumber, PDFArray, PDFDict, PDFRef, PDFStream } from 'pdf-lib';
 import type { PDFObject } from 'pdf-lib';
@@ -260,17 +263,45 @@ export async function drawingPdf(
   return Buffer.from(await pdf.save());
 }
 
-export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<PDFDocument> {
+export async function loadDrawingPdf(
+  bytes: Buffer,
+  settings: Settings,
+  signal: AbortSignal,
+): Promise<PDFDocument> {
+  signal.throwIfAborted();
+  const folder = await fs.mkdtemp(path.join(os.tmpdir(), 'cad-pdf-'));
+  let normalized: Buffer;
+  try {
+    const input = path.join(folder, 'source.pdf');
+    await fs.writeFile(input, bytes, { mode: 0o600, signal });
+    // 先在受限进程中展开对象流，再让长期运行的服务解析有界普通对象。
+    normalized = await render(
+      'qpdf',
+      ['--object-streams=disable', '--stream-data=preserve', input, '-'],
+      Buffer.alloc(0),
+      settings.maxFileBytes,
+      signal,
+      settings.maxRenderMemoryBytes,
+    );
+  } catch (error) {
+    if (error instanceof ToolFailure && error.code === 'DRAWING_RENDER_FAILED')
+      throw new ToolFailure('INVALID_PDF');
+    throw error;
+  } finally {
+    await fs.rm(folder, { recursive: true, force: true });
+  }
   let pdf: PDFDocument;
   try {
-    pdf = await PDFDocument.load(bytes, { throwOnInvalidObject: true });
+    pdf = await PDFDocument.load(normalized, { throwOnInvalidObject: true });
   } catch {
     throw new ToolFailure('INVALID_PDF');
   }
-  if (pdf.getPageCount() < 1 || pdf.getPageCount() > maxPages)
+  if (pdf.getPageCount() < 1 || pdf.getPageCount() > settings.maxPdfPages)
     throw new ToolFailure('PDF_PAGE_LIMIT');
   if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
   if (pdf.catalog.has(PDFName.of('AcroForm'))) throw new ToolFailure('PDF_FORMS_UNSUPPORTED');
+  if (pdf.catalog.has(PDFName.of('OutputIntents')))
+    throw new ToolFailure('PDF_COLOR_PROFILE_UNSUPPORTED');
   const pages = pdf.getPages();
   const roots = new Set<PDFObject>(pages.map((page) => page.node));
   const pending: PDFObject[] = [...roots];
@@ -287,14 +318,17 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
       const value = pdf.context.lookup(object);
       if (value) pending.push(value);
     } else if (object instanceof PDFArray) {
-      pending.push(...object.asArray());
+      for (const value of object.asArray()) pending.push(value);
     } else if (object instanceof PDFStream) {
+      if (['F', 'FFilter', 'FDecodeParms'].some((key) => object.dict.has(PDFName.of(key))))
+        throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
       pending.push(object.dict);
     } else if (object instanceof PDFDict) {
       const type = object.lookup(PDFName.of('Type'));
       if (
         object.has(PDFName.of('AF')) ||
         object.has(PDFName.of('EF')) ||
+        object.has(PDFName.of('PieceInfo')) ||
         type === PDFName.of('Filespec') ||
         type === PDFName.of('EmbeddedFile')
       )
@@ -346,7 +380,7 @@ export async function pdfPreview(
   pageNumber = 1,
   region?: DrawingRegion,
 ): Promise<{ preview: Buffer; paper: PaperSize; pageCount: number }> {
-  const pdf = await loadDrawingPdf(bytes, settings.maxPdfPages);
+  const pdf = await loadDrawingPdf(bytes, settings, signal);
   if (pageNumber > pdf.getPageCount()) throw new ToolFailure('PDF_PAGE_NOT_FOUND');
   const page = pdf.getPage(pageNumber - 1);
   const box = page.getCropBox();

@@ -9,7 +9,7 @@ import { connect } from 'node:net';
 import { watch } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { test, afterEach } from 'node:test';
-import { inflateSync } from 'node:zlib';
+import { inflateSync, deflateSync } from 'node:zlib';
 import { PDFArray, PDFDocument, PDFName, PDFRawStream, PDFString, degrees } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
@@ -669,6 +669,137 @@ test('associated source files cannot hide in nested or inherited drawing resourc
     assert.match(JSON.stringify(rejected), /PDF_ATTACHMENTS_UNSUPPORTED/);
     await assert.rejects(fs.stat(path.join(f.root, 'nested-set.pdf')), { code: 'ENOENT' });
   }
+});
+
+test('private editing data and external file streams are excluded from copied resources', async () => {
+  const f = await fixture();
+  for (const kind of ['piece', 'external']) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage();
+    const privateData = pdf.context.register(pdf.context.flateStream('hidden editing fixture'));
+    const form = pdf.context.register(
+      pdf.context.flateStream('0 0 10 10 re f', {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, 10, 10],
+        ...(kind === 'piece'
+          ? { PieceInfo: { Producer: { Private: privateData } } }
+          : { F: PDFString.of('/not-present/source.data') }),
+      }),
+    );
+    page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+    await fs.writeFile(path.join(f.root, 'private.pdf'), await pdf.save());
+    const rejected = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: {
+        pdf_filename: 'private-set.pdf',
+        sheets: [{ source_filename: 'private.pdf' }],
+      },
+    });
+    assert.match(
+      JSON.stringify(rejected),
+      kind === 'piece'
+        ? /PDF_ATTACHMENTS_UNSUPPORTED/
+        : /PDF_EXTERNAL_STREAM_UNSUPPORTED|INVALID_PDF/,
+    );
+    assert.doesNotMatch(JSON.stringify(rejected), /hidden editing fixture|not-present/);
+    await assert.rejects(fs.stat(path.join(f.root, 'private-set.pdf')), { code: 'ENOENT' });
+  }
+});
+
+test('catalog color output intents are rejected without changing the source', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  pdf.addPage();
+  const profile = pdf.context.register(pdf.context.flateStream('ICC fixture', { N: 3 }));
+  pdf.catalog.set(
+    PDFName.of('OutputIntents'),
+    pdf.context.obj([{ Type: 'OutputIntent', S: 'GTS_PDFX', DestOutputProfile: profile }]),
+  );
+  await fs.writeFile(path.join(f.root, 'managed.pdf'), await pdf.save());
+  const rejected = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'managed-set.pdf',
+      sheets: [{ source_filename: 'managed.pdf' }],
+    },
+  });
+  assert.match(JSON.stringify(rejected), /PDF_COLOR_PROFILE_UNSUPPORTED/);
+  await assert.rejects(fs.stat(path.join(f.root, 'managed-set.pdf')), { code: 'ENOENT' });
+});
+
+test('compressed PDF object expansion is bounded outside the long-running service', async () => {
+  const f = await fixture({ maxRenderMemoryBytes: 64 * 1024 * 1024 });
+  const expanded = Buffer.alloc(80 * 1024 * 1024, 88);
+  const compressed = deflateSync(Buffer.concat([Buffer.from('5 0 ('), expanded, Buffer.from(')')]));
+  const chunks: Buffer[] = [Buffer.from('%PDF-1.5\n')];
+  const offsets = [0];
+  let offset = chunks[0].length;
+  function object(number: number, bytes: Buffer) {
+    offsets[number] = offset;
+    const wrapped = Buffer.concat([
+      Buffer.from(`${number} 0 obj\n`),
+      bytes,
+      Buffer.from('\nendobj\n'),
+    ]);
+    chunks.push(wrapped);
+    offset += wrapped.length;
+  }
+  object(1, Buffer.from('<< /Type /Catalog /Pages 2 0 R >>'));
+  object(2, Buffer.from('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'));
+  object(
+    3,
+    Buffer.from(
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << >> /PieceInfo 5 0 R >>',
+    ),
+  );
+  object(4, Buffer.from('<< >>'));
+  object(
+    6,
+    Buffer.concat([
+      Buffer.from(
+        `<< /Type /ObjStm /N 1 /First 4 /Filter /FlateDecode /Length ${compressed.length} >>\nstream\n`,
+      ),
+      compressed,
+      Buffer.from('\nendstream'),
+    ]),
+  );
+  offsets[7] = offset;
+  const xref = Buffer.alloc(8 * 7);
+  for (let i = 0; i < 8; i++) {
+    xref[i * 7] = i === 0 ? 0 : i === 5 ? 2 : 1;
+    xref.writeUInt32BE(i === 5 ? 6 : (offsets[i] ?? 0), i * 7 + 1);
+    xref.writeUInt16BE(i === 0 ? 65535 : 0, i * 7 + 5);
+  }
+  object(
+    7,
+    Buffer.concat([
+      Buffer.from(
+        `<< /Type /XRef /Size 8 /Root 1 0 R /W [1 4 2] /Length ${xref.length} >>\nstream\n`,
+      ),
+      xref,
+      Buffer.from('\nendstream'),
+    ]),
+  );
+  chunks.push(Buffer.from(`startxref\n${offsets[7]}\n%%EOF\n`));
+  const bytes = Buffer.concat(chunks);
+  assert.ok(bytes.length < 1024 * 1024);
+  await fs.writeFile(path.join(f.root, 'compressed.pdf'), bytes);
+  const rejected = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'expanded.pdf',
+      sheets: [{ source_filename: 'compressed.pdf' }],
+    },
+  });
+  assert.equal(rejected.isError, true);
+  assert.match(JSON.stringify(rejected), /INVALID_PDF|FILE_TOO_LARGE/);
+  await assert.rejects(fs.stat(path.join(f.root, 'expanded.pdf')), { code: 'ENOENT' });
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
+  assert.equal(
+    (await f.client.callTool({ name: 'workspace_files', arguments: {} })).isError,
+    undefined,
+  );
 });
 
 test('all native print boundaries must match the full sheet', async () => {

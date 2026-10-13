@@ -42,7 +42,7 @@ jobs:
       - name: Verify standalone design MCP
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends librsvg2-bin poppler-utils fonts-noto-cjk util-linux
+          sudo apt-get install -y --no-install-recommends librsvg2-bin poppler-utils fonts-noto-cjk util-linux qpdf
           node --test deploy/config.test.cjs deploy/bundle.test.cjs
           npm ci --prefix deploy/design --no-audit --no-fund
           npm --prefix deploy/design run check

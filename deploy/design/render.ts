@@ -3,7 +3,7 @@ import type { ExecFileException } from 'node:child_process';
 import { ToolFailure, defaultRenderMemoryBytes } from './config.ts';
 
 export function render(
-  command: 'rsvg-convert' | 'pdftoppm',
+  command: 'rsvg-convert' | 'pdftoppm' | 'qpdf',
   args: string[],
   input: Buffer,
   maxBytes: number,
