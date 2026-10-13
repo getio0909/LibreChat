@@ -155,7 +155,8 @@ test('chat download links deliver exact files without login and reject other use
   differentFile.pathname = '/download/other.pdf';
   assert.equal((await fetch(differentFile)).status, 403);
   const forged = new URL(url);
-  forged.searchParams.set('ticket', forged.searchParams.get('ticket')!.replace(/.$/, 'A'));
+  const ticket = forged.searchParams.get('ticket')!;
+  forged.searchParams.set('ticket', ticket.slice(0, -1) + (ticket.endsWith('A') ? 'Q' : 'A'));
   assert.equal((await fetch(forged)).status, 403);
   const traversal = new URL(url);
   traversal.pathname = '/download/%2e%2e%2fsecret.pdf';
