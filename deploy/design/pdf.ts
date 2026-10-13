@@ -19,6 +19,7 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
   if (source.includes('\0')) throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
   let root = true;
   let inStyle = false;
+  let style = '';
   const unsupported = () => {
     throw new ToolFailure('SVG_NOT_SELF_CONTAINED');
   };
@@ -48,7 +49,7 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
       if (
         physical &&
         !['width', 'height'].every((name) =>
-          /^\s*(?:\d+(?:\.\d*)?|\.\d+)\s*(?:mm|cm|in|pt|pc)\s*$/.test(
+          /^\s*\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\s*(?:mm|cm|in|pt|pc)\s*$/.test(
             tag.attributes[name]?.value ?? '',
           ),
         )
@@ -59,16 +60,23 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
       if (attribute.local === 'href' && !/^(#|data:)/i.test(attribute.value)) unsupported();
       checkCss(attribute.value);
     }
-    if (tag.local === 'style') inStyle = true;
+    if (tag.local === 'style') {
+      inStyle = true;
+      style = '';
+    }
   });
   parser.on('closetag', (tag) => {
-    if (tag.local === 'style') inStyle = false;
+    if (tag.local === 'style') {
+      checkCss(style);
+      inStyle = false;
+      style = '';
+    }
   });
   parser.on('text', (value) => {
-    if (inStyle) checkCss(value);
+    if (inStyle) style += value;
   });
   parser.on('cdata', (value) => {
-    if (inStyle) checkCss(value);
+    if (inStyle) style += value;
   });
   parser.write(source).close();
 }
@@ -240,6 +248,7 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
   if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
   if (pdf.catalog.has(PDFName.of('AcroForm'))) throw new ToolFailure('PDF_FORMS_UNSUPPORTED');
   for (const page of pdf.getPages()) {
+    if (page.node.has(PDFName.of('AF'))) throw new ToolFailure('PDF_ATTACHMENTS_UNSUPPORTED');
     if (page.node.has(PDFName.of('AA')) || (page.node.Annots()?.size() ?? 0) > 0)
       throw new ToolFailure('PDF_ACTIONS_UNSUPPORTED');
     const unit = page.node.get(PDFName.of('UserUnit'));

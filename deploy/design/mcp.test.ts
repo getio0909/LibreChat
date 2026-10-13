@@ -178,6 +178,22 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   );
   assert.doesNotMatch(operators, /\/Image/);
   assert.equal(imageCount(pdf), 0);
+  await fs.writeFile(
+    path.join(f.root, 'exponent.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="+4.2e2mm" height="2.97E+2mm" viewBox="0 0 420 297"><path d="M20 50h100" stroke="black"/></svg>',
+  );
+  const exponent = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'exponent.svg',
+      pdf_filename: 'exponent.pdf',
+      page_width_mm: 420,
+      page_height_mm: 297,
+    },
+  });
+  assert.equal(exponent.isError, undefined);
+  const exponentPdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'exponent.pdf')));
+  assert.ok(Math.abs(exponentPdf.getPage(0).getWidth() - (420 * 72) / 25.4) < 0.001);
   for (const dimensions of [
     { page_width_mm: 297, page_height_mm: 210 },
     { page_width_mm: 420 },
@@ -582,6 +598,37 @@ test('static drawing sets reject page actions and annotation-bearing sources', a
   }
 });
 
+test('drawing sets reject page-associated source files', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const embedded = pdf.context.register(
+    pdf.context.flateStream('private STEP source fixture', { Type: 'EmbeddedFile' }),
+  );
+  const file = pdf.context.register(
+    pdf.context.obj({
+      Type: 'Filespec',
+      F: PDFString.of('source.step'),
+      AFRelationship: 'Source',
+      EF: { F: embedded },
+    }),
+  );
+  page.node.set(PDFName.of('AF'), pdf.context.obj([file]));
+  const bytes = await pdf.save();
+  await fs.writeFile(path.join(f.root, 'associated.pdf'), bytes);
+  const rejected = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'published.pdf',
+      sheets: [{ source_filename: 'associated.pdf' }],
+    },
+  });
+  assert.match(JSON.stringify(rejected), /PDF_ATTACHMENTS_UNSUPPORTED/);
+  assert.doesNotMatch(JSON.stringify(rejected), /private STEP source fixture/);
+  await assert.rejects(fs.stat(path.join(f.root, 'published.pdf')), { code: 'ENOENT' });
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'associated.pdf')), Buffer.from(bytes));
+});
+
 test('all native print boundaries must match the full sheet', async () => {
   const f = await fixture();
   for (const name of ['TrimBox', 'BleedBox', 'ArtBox']) {
@@ -697,6 +744,8 @@ test('SVG exports reject external resources and DTDs instead of silently losing 
     '<rect style="fill:url(file:///run/secrets/design.json)"/>',
     String.raw`<rect style="fill:u\72l(https://example.test/resource.svg#paint)"/>`,
     String.raw`<style><![CDATA[.part { fill:u\000072l(https://example.test/resource.svg#paint); }]]></style>`,
+    '<style>rect{fill:u<![CDATA[rl(https://example.test/p.svg#paint)]]>}</style>',
+    '<style>@im<![CDATA[port url(https://example.test/font.css);]]></style>',
   ]) {
     await fs.writeFile(
       path.join(f.root, 'external.svg'),
