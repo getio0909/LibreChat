@@ -1156,6 +1156,86 @@ test('nested drawing resources retain selected patterns and states and omit unus
   assert.deepEqual(await fs.readFile(path.join(f.root, 'patterns.pdf')), bytes);
 });
 
+test('nested shading keeps selected gradients and removes unused function streams', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const gradient = pdf.context.register(
+    pdf.context.obj({
+      ShadingType: 2,
+      ColorSpace: 'DeviceRGB',
+      Coords: [0, 0, 150, 0],
+      Extend: [true, true],
+      Function: { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
+    }),
+  );
+  const functionRef = pdf.context.register(
+    pdf.context.flateStream('{ 0 0 0 }', {
+      FunctionType: 4,
+      Domain: [0, 1],
+      Range: [0, 1, 0, 1, 0, 1],
+    }),
+  );
+  const stale = pdf.context.register(
+    pdf.context.obj({
+      ShadingType: 2,
+      ColorSpace: 'DeviceRGB',
+      Coords: [0, 0, 200, 0],
+      Function: functionRef,
+    }),
+  );
+  const form = pdf.context.register(
+    pdf.context.flateStream('/Current sh', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 150, 150],
+      Resources: { Shading: { Current: gradient, Old: stale } },
+    }),
+  );
+  page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+  page.pushOperators(drawObject('Drawing'));
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'shading.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'shading-set.pdf',
+      sheets: [{ source_filename: 'shading.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'shading-set.pdf')));
+  const objects = output.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'));
+  assert.ok(objects instanceof PDFDict);
+  const copiedForm = objects.lookup(PDFName.of('Drawing'));
+  assert.ok(copiedForm instanceof PDFRawStream);
+  const resources = copiedForm.dict.lookup(PDFName.of('Resources'));
+  assert.ok(resources instanceof PDFDict);
+  const shading = resources.lookup(PDFName.of('Shading'));
+  assert.ok(shading instanceof PDFDict);
+  assert.deepEqual(
+    shading.keys().map((name) => name.decodeText()),
+    ['Current'],
+  );
+  assert.equal(
+    output.context
+      .enumerateIndirectObjects()
+      .some(
+        ([, object]) =>
+          object instanceof PDFRawStream && object.dict.has(PDFName.of('FunctionType')),
+      ),
+    false,
+  );
+  const image = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(image?.type === 'image');
+  assert.ok(
+    (await sharp(Buffer.from(image.data, 'base64')).stats()).channels.some(
+      (channel) => channel.min < 30,
+    ),
+  );
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'shading.pdf')), bytes);
+});
+
 test('PDF NUL whitespace and null Flate parameters retain visible drawing resources', async () => {
   const f = await fixture();
   for (const [index, params] of [PDFNull, undefined].entries()) {
