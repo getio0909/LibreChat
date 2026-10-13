@@ -1,5 +1,5 @@
 import { inflateSync } from 'node:zlib';
-import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFObject } from 'pdf-lib';
+import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFObject, PDFNull } from 'pdf-lib';
 import { ToolFailure } from './config.ts';
 
 function references(content: Uint8Array): Set<PDFName> {
@@ -10,10 +10,11 @@ function references(content: Uint8Array): Set<PDFName> {
   let name: PDFName | undefined;
   let nested = 0;
   let i = 0;
-  const delimiter = (char: string) => /[\s()<>\[\]{}/%]/.test(char);
+  const whitespace = (char: string) => /[\x00\t\n\f\r ]/.test(char);
+  const delimiter = (char: string) => whitespace(char) || '()<>[]/%'.includes(char);
   while (i < text.length) {
     const char = text[i];
-    if (/\s/.test(char)) {
+    if (whitespace(char)) {
       i++;
       continue;
     }
@@ -89,10 +90,13 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
     const filter = stream.dict.lookup(PDFName.of('Filter'));
     if (filter) {
       const filters = filter instanceof PDFArray ? filter.asArray() : [filter];
+      const params = stream.dict.lookup(PDFName.of('DecodeParms'));
+      const parameter = params instanceof PDFArray ? pdf.context.lookup(params.get(0)) : params;
       if (
         filters.length !== 1 ||
         pdf.context.lookup(filters[0]) !== PDFName.of('FlateDecode') ||
-        stream.dict.has(PDFName.of('DecodeParms'))
+        (params instanceof PDFArray && params.size() !== filters.length) ||
+        (parameter != null && parameter !== PDFNull)
       )
         throw new ToolFailure('PDF_CONTENT_FILTER_UNSUPPORTED');
       try {
@@ -134,7 +138,7 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
         scan(object, own instanceof PDFDict ? own : resources);
       }
     }
-    // 图案、软蒙版和 Type3 字形可能通过资源间接调用 XObject，保留这些作用域。
+    // 图案和软蒙版可能间接调用 XObject；Type3 字体需要生产端转换以移除未使用字形。
     for (const key of ['Pattern', 'ExtGState', 'Font']) {
       const entries = resources.lookup(PDFName.of(key));
       if (!(entries instanceof PDFDict)) continue;
@@ -144,11 +148,8 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
           const own = object.dict.lookup(PDFName.of('Resources'));
           scan(object, own instanceof PDFDict ? own : resources);
         } else if (object instanceof PDFDict) {
-          const glyphs = object.lookup(PDFName.of('CharProcs'));
-          const own = object.lookup(PDFName.of('Resources'));
-          if (glyphs instanceof PDFDict)
-            for (const [, glyph] of glyphs.entries())
-              scan(glyph, own instanceof PDFDict ? own : resources);
+          if (object.lookup(PDFName.of('Subtype')) === PDFName.of('Type3'))
+            throw new ToolFailure('PDF_TYPE3_FONT_UNSUPPORTED');
           const mask = object.lookup(PDFName.of('SMask'));
           if (mask instanceof PDFDict) {
             const form = mask.lookup(PDFName.of('G'));

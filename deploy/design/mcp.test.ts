@@ -15,6 +15,7 @@ import {
   PDFDict,
   PDFDocument,
   PDFName,
+  PDFNull,
   PDFRawStream,
   PDFString,
   PrintScaling,
@@ -969,6 +970,139 @@ test('drawing publication prunes stale unused page and Form resources', async ()
     1,
   );
   assert.deepEqual(await fs.readFile(path.join(f.root, 'unused.pdf')), bytes);
+});
+
+test('PDF NUL whitespace and null Flate parameters retain visible drawing resources', async () => {
+  const f = await fixture();
+  for (const [index, params] of [PDFNull, undefined].entries()) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage();
+    const form = pdf.context.register(
+      pdf.context.flateStream('20 20 100 100 re f', {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, 150, 150],
+      }),
+    );
+    page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+    const content = pdf.context.flateStream('/Drawing\x00Do');
+    content.dict.set(PDFName.of('Filter'), pdf.context.obj(['FlateDecode']));
+    content.dict.set(PDFName.of('DecodeParms'), params ?? pdf.context.obj([null]));
+    page.node.set(PDFName.of('Contents'), pdf.context.register(content));
+    const bytes = Buffer.from(await pdf.save());
+    const copied = await pdfTask(
+      {
+        operation: 'assemble',
+        sources: [{ source_filename: 'null.pdf', bytes: new Uint8Array(bytes) }],
+        limits: f.settings,
+      },
+      f.settings,
+      new AbortController().signal,
+    );
+    const document = await PDFDocument.load(copied.bytes);
+    const resources = document.getPage(0).node.Resources();
+    assert.ok(resources?.lookup(PDFName.of('XObject')) instanceof PDFDict);
+    assert.equal(
+      (resources.lookup(PDFName.of('XObject')) as PDFDict).has(PDFName.of('Drawing')),
+      true,
+    );
+    await fs.writeFile(path.join(f.root, `null-${index}.pdf`), bytes);
+    const result = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: {
+        pdf_filename: `visible-${index}.pdf`,
+        sheets: [{ source_filename: `null-${index}.pdf` }],
+      },
+    });
+    assert.equal(result.isError, undefined);
+    const image = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+    assert.ok(image?.type === 'image');
+    assert.ok(
+      (await sharp(Buffer.from(image.data, 'base64')).stats()).channels.some(
+        (channel) => channel.min < 30,
+      ),
+    );
+    assert.deepEqual(await fs.readFile(path.join(f.root, `null-${index}.pdf`)), bytes);
+  }
+});
+
+test('Type3 fonts require producer conversion before dormant glyph assets can be published', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const image = pdf.context.register(
+    pdf.context.flateStream(Buffer.from([255, 0, 0]), {
+      Type: 'XObject',
+      Subtype: 'Image',
+      Width: 1,
+      Height: 1,
+      ColorSpace: 'DeviceRGB',
+      BitsPerComponent: 8,
+    }),
+  );
+  const visible = pdf.context.register(pdf.context.flateStream('600 0 d0 0 0 100 100 re f'));
+  const dormant = pdf.context.register(pdf.context.flateStream('600 0 d0 /OldImage Do'));
+  const font = pdf.context.register(
+    pdf.context.obj({
+      Type: 'Font',
+      Subtype: 'Type3',
+      FontBBox: [0, 0, 600, 600],
+      FontMatrix: [0.001, 0, 0, 0.001, 0, 0],
+      CharProcs: { A: visible, B: dormant },
+      Encoding: { Type: 'Encoding', Differences: [65, 'A', 'B'] },
+      FirstChar: 65,
+      LastChar: 66,
+      Widths: [600, 600],
+      Resources: { XObject: { OldImage: image } },
+    }),
+  );
+  page.node.set(PDFName.of('Resources'), pdf.context.obj({ Font: { F1: font } }));
+  page.node.set(
+    PDFName.of('Contents'),
+    pdf.context.register(pdf.context.flateStream('BT /F1 12 Tf 20 20 Td (A) Tj ET')),
+  );
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'glyphs.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: { pdf_filename: 'glyphs-set.pdf', sheets: [{ source_filename: 'glyphs.pdf' }] },
+  });
+  assert.equal(result.isError, true);
+  assert.match(JSON.stringify(result), /PDF_TYPE3_FONT_UNSUPPORTED/);
+  await assert.rejects(fs.stat(path.join(f.root, 'glyphs-set.pdf')), { code: 'ENOENT' });
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'glyphs.pdf')), bytes);
+});
+
+test('PDF exports, assembly and finished-page inspection accept mixed-case file extensions', async () => {
+  const f = await fixture();
+  await fs.writeFile(
+    path.join(f.root, 'case.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"><rect x="10" y="10" width="50" height="20"/></svg>',
+  );
+  const exported = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'case.svg',
+      pdf_filename: 'SHEET.PDF',
+      page_width_mm: 210,
+      page_height_mm: 297,
+    },
+  });
+  assert.equal(exported.isError, undefined);
+  assert.equal(fileType('SHEET.PDF'), 'application/pdf');
+  const assembled = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: { pdf_filename: 'Set.PdF', sheets: [{ source_filename: 'SHEET.PDF' }] },
+  });
+  assert.equal(assembled.isError, undefined);
+  for (const pdf_filename of ['SHEET.PDF', 'Set.PdF']) {
+    const inspected = await f.client.callTool({
+      name: 'inspect_pdf',
+      arguments: { pdf_filename, page: 1 },
+    });
+    assert.equal(inspected.isError, undefined);
+    assert.match(JSON.stringify(inspected), /finished_pdf/);
+  }
 });
 
 test('compressed drawing content is bounded before its resource references are scanned', async () => {

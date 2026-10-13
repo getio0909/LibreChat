@@ -66,7 +66,10 @@ const resultSchema = z.discriminatedUnion('operation', [
 ]);
 const packetSchema = z.discriminatedUnion('ok', [
   z.object({ ok: z.literal(true), value: resultSchema }),
-  z.object({ ok: z.literal(false), error: z.object({ code: z.string().regex(/^[A-Z_]+$/) }) }),
+  z.object({
+    ok: z.literal(false),
+    error: z.object({ code: z.string().regex(/^[A-Z][A-Z0-9_]*$/) }),
+  }),
 ]);
 type PdfInput = z.infer<typeof inputSchema>;
 type PdfResult = z.infer<typeof resultSchema>;

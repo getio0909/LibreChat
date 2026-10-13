@@ -33,9 +33,17 @@ function bundle(overrides) {
     result.status === 0
       ? JSON.parse(fs.readFileSync(path.join(root, 'bundle', 'design-user.json'), 'utf8'))
       : undefined;
+  const files =
+    result.status === 0
+      ? JSON.parse(fs.readFileSync(path.join(root, 'bundle', 'files-user.yaml'), 'utf8'))
+      : undefined;
   fs.rmSync(root, { recursive: true, force: true });
-  return { result, settings };
+  return { result, settings, files };
 }
+
+test('file listings and archives hide only the atomic PDF staging namespace', () => {
+  assert.deepEqual(bundle({}).files.hidden, ['.????????-????-????-????-????????????.tmp']);
+});
 
 test('public downloads require HTTPS before any credentials are bundled', () => {
   const { result } = bundle({ DEPLOY_URL: 'http://example.test' });

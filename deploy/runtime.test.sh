@@ -24,7 +24,7 @@ for account in admin user; do
   if [[ "$account" == user ]]; then id=$(printf 'b%.0s' {1..24}); fi
   printf '{"userId":"%s","workspaceUrl":"https://example.test/cad-files/%s/","downloadUrl":"http://127.0.0.1:8000/download/","downloadSigningKey":"%s"}\n' \
     "$id" "$account" "$(printf 'a%.0s' {1..64})" > "$work/design-$account.json"
-  printf '{"serve-path":"/data","bind":"0.0.0.0","port":5000,"path-prefix":"/cad-files/%s","auth":["%s:fixture-%s-password@/:rw"],"allow-upload":true,"allow-archive":true,"allow-symlink":false}\n' \
+  printf '{"serve-path":"/data","bind":"0.0.0.0","port":5000,"path-prefix":"/cad-files/%s","auth":["%s:fixture-%s-password@/:rw"],"allow-upload":true,"allow-archive":true,"allow-symlink":false,"hidden":[".????????-????-????-????-????????????.tmp"]}\n' \
     "$account" "$account" "$account" > "$work/files-$account.yaml"
   chmod 600 "$work/design-$account.json" "$work/files-$account.yaml"
   if [[ $(id -u) == 0 ]]; then
@@ -101,6 +101,14 @@ try {
   assert.equal(imported.status, 'ok');
   const fileUrl = `http://files-${account}:5000/cad-files/${account}/`;
   const headers = { Authorization: 'Basic ' + Buffer.from(`${account}:fixture-${account}-password`).toString('base64') };
+  const staged = '.12345678-1234-1234-1234-123456789abc.tmp';
+  await fs.writeFile('/tmp/cad/' + staged, 'incomplete export fixture');
+  await fs.writeFile('/tmp/cad/.notes.tmp', 'unrelated temporary file');
+  const filesListing = await fetch(fileUrl + '?json', { headers });
+  assert.equal(filesListing.status, 200);
+  const filesText = await filesListing.text();
+  assert.ok(!filesText.includes(staged));
+  assert.ok(filesText.includes('.notes.tmp'));
   const upload = await fetch(fileUrl + 'drawing.svg', { method: 'PUT', headers, body: '<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect x="40" y="40" width="200" height="100" fill="none" stroke="black" stroke-width="0.3"/><text x="40" y="30" font-family="Noto Sans CJK SC" font-size="5">连接详图</text></svg>' });
   assert.ok(upload.ok);
   const design = await connect('Design', new StreamableHTTPClientTransport(new URL('http://127.0.0.1:8000/mcp'), { requestInit: { headers: { 'X-LibreChat-User-ID': settings.userId } } }));
@@ -130,7 +138,10 @@ try {
   assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).toString(), '%PDF-');
   const zip = await fetch(fileUrl + '?zip', { headers });
   assert.equal(zip.status, 200);
-  assert.equal(Buffer.from(await zip.arrayBuffer()).subarray(0, 2).toString(), 'PK');
+  const archive = Buffer.from(await zip.arrayBuffer());
+  assert.equal(archive.subarray(0, 2).toString(), 'PK');
+  assert.ok(!archive.includes(Buffer.from(staged)));
+  assert.ok(archive.includes(Buffer.from('.notes.tmp')));
   const denied = await fetch(fileUrl + 'drawing.pdf');
   assert.equal(denied.status, 401);
   const escaped = await fetch(fileUrl + 'private-config.yaml', { headers });
