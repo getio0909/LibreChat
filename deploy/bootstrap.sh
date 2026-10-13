@@ -39,9 +39,30 @@ fi
 install -d -m 700 /etc/ssl/librechat-dev "$deploy_root"
 install -d -m 755 /usr/local/lib/librechat
 install -m 755 "$source_dir/deploy.sh" /usr/local/lib/librechat/deploy.sh
+# 先验证证书和私钥，再通过单个链接切换整对凭据，保留旧版本供恢复。
+tls_root=/etc/ssl/librechat-dev
+tls_stage=$(mktemp -d "$tls_root/.tls.XXXXXX")
+trap 'rm -rf -- "$tls_stage"' EXIT
 openssl x509 -in "$source_dir/origin.pem" -checkhost dev.xuqian.io -noout
-install -m 644 "$source_dir/origin.pem" /etc/ssl/librechat-dev/dev.xuqian.io.pem
-install -m 600 "$source_dir/origin.key" /etc/ssl/librechat-dev/dev.xuqian.io.key
+openssl x509 -in "$source_dir/origin.pem" -pubkey -noout > "$tls_stage/cert.pub"
+openssl pkey -in "$source_dir/origin.key" -passin pass: -pubout > "$tls_stage/key.pub"
+if ! cmp -s "$tls_stage/cert.pub" "$tls_stage/key.pub"; then
+  echo 'The origin certificate and private key do not match.' >&2
+  exit 1
+fi
+install -m 644 "$source_dir/origin.pem" "$tls_stage/dev.xuqian.io.pem"
+install -m 600 "$source_dir/origin.key" "$tls_stage/dev.xuqian.io.key"
+printf 'events {}\nhttp { server { listen 443 ssl; ssl_certificate %s/dev.xuqian.io.pem; ssl_certificate_key %s/dev.xuqian.io.key; } }\n' \
+  "$tls_stage" "$tls_stage" > "$tls_stage/nginx.conf"
+nginx -t -c "$tls_stage/nginx.conf"
+tls_version=$(sha256sum "$tls_stage/dev.xuqian.io.pem" | cut -d ' ' -f 1)
+install -d -m 700 "$tls_root/$tls_version"
+install -m 644 "$tls_stage/dev.xuqian.io.pem" "$tls_root/$tls_version/dev.xuqian.io.pem"
+install -m 600 "$tls_stage/dev.xuqian.io.key" "$tls_root/$tls_version/dev.xuqian.io.key"
+ln -s "$tls_version" "$tls_stage/current"
+mv -Tf "$tls_stage/current" "$tls_root/current"
+rm -rf -- "$tls_stage"
+trap - EXIT
 
 # 每次都重新生成可信代理配置，修复旧版本可能留下的不完整文件。
 realip_stage=$(mktemp -d "$source_dir/.realip.XXXXXX")

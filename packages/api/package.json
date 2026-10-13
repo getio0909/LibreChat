@@ -23,6 +23,12 @@
         "types": "./dist/credentials.d.cts",
         "default": "./dist/credentials.cjs"
       }
+    },
+    "./image": {
+      "require": {
+        "types": "./dist/image.d.cts",
+        "default": "./dist/mcp/image.cjs"
+      }
     }
   },
   "scripts": {

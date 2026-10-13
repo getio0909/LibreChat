@@ -10,6 +10,7 @@ export default defineConfig({
     'src/index.ts',
     'src/telemetry.ts',
     'src/credentials.ts',
+    'src/mcp/image.ts',
     'src/agents/files/edit-worker.ts',
   ],
   format: ['cjs'],

@@ -9,11 +9,76 @@ interface:
   multiConvo: false
   sharedLinks: false
   temporaryChat: false
-  customWelcome: "庄严宝刹 AI 设计助手"
+  mcpServers:
+    use: true
+    create: false
+    share: false
+  customWelcome: '庄严宝刹 AI 设计助手'
 
 endpoints:
+  custom:
+    - name: OpenRouter
+      apiKey: '${OPENROUTER_API_KEY}'
+      baseURL: https://openrouter.ai/api/v1
+      models:
+        default: [anthropic/claude-haiku-5.5]
+        fetch: false
+      titleConvo: true
+      titleModel: anthropic/claude-haiku-5.5
+      modelDisplayLabel: Claude Haiku 5.5
+      dropParams: [stop]
   agents:
     disableBuilder: true
     capabilities:
       - tools
       - context
+
+modelSpecs:
+  enforce: true
+  list:
+    - name: haiku-design
+      label: Claude Haiku 5.5
+      default: true
+      mcpServers: [freecad, blender, seedream, gemini_images]
+      preset:
+        endpoint: OpenRouter
+        model: anthropic/claude-haiku-5.5
+
+mcpSettings:
+  allowedAddresses:
+    - freecad:8000
+    - blender:10101
+    - image-tools:8000
+
+mcpServers:
+  freecad:
+    type: sse
+    url: http://freecad:8000/sse
+    requiresOAuth: false
+    timeout: 180000
+    initTimeout: 120000
+    serverInstructions: Use FreeCAD for precise parametric CAD models. Save exports under /data.
+  blender:
+    type: streamable-http
+    url: http://blender:10101/
+    requiresOAuth: false
+    timeout: 180000
+    initTimeout: 120000
+    serverInstructions: Use Blender for 3D scenes, materials, and CPU rendering. Save exports under /data.
+  seedream:
+    type: streamable-http
+    url: http://image-tools:8000/seedream
+    requiresOAuth: false
+    timeout: 180000
+    serverInstructions: Use Seedream for image generation unless the user explicitly asks for Gemini.
+    headers:
+      X-Image-Model: doubao-seedream-5-0-flash-260915
+      X-Provider-API-Key: '${ARK_API_KEY}'
+  gemini_images:
+    type: streamable-http
+    url: http://image-tools:8000/gemini
+    requiresOAuth: false
+    timeout: 180000
+    headers:
+      X-Image-Model: gemini-3.1-flash-image
+      X-Provider-API-Key: '${GEMINI_API_KEY}'

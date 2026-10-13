@@ -49,6 +49,10 @@ case "$operation" in
     "$closed"
     test -f "$DEPLOY_TEST_GATE"
     cat >/dev/null
+    if [[ "$*" != *'/app/config/create-user.js'* ]]; then
+      if [[ "$DEPLOY_TEST_FAILURE" == mcp ]]; then exit 1; fi
+      exit 0
+    fi
     if [[ "$DEPLOY_TEST_FAILURE" == command ]]; then
       exit 1
     fi
@@ -81,7 +85,7 @@ printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-for scenario in none health command login role final first-none first-login first-role; do
+for scenario in none health mcp command login role final first-none first-login first-role; do
   failure=${scenario#first-}
   root="$work/$scenario"
   mkdir "$root"

@@ -11,6 +11,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3080
       NODE_ENV: production
+      ENDPOINTS: custom
       MONGO_URI: mongodb://mongodb:27017/LibreChat
       MEILI_HOST: http://meilisearch:7700
       RAG_API_URL: http://rag_api:8000
@@ -22,6 +23,13 @@ services:
         condition: service_started
       rag_api:
         condition: service_started
+      freecad:
+        condition: service_healthy
+      blender:
+        condition: service_healthy
+      image-tools:
+        condition: service_healthy
+    networks: [default, cad, images]
     volumes:
       - ./librechat.yaml:/app/librechat.yaml:ro
       - images:/app/client/public/images
@@ -93,6 +101,80 @@ services:
       vectordb:
         condition: service_healthy
 
+  freecad:
+    image: ${FREECAD_IMAGE:?Set FREECAD_IMAGE in image.env}
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [cad]
+    volumes:
+      - cadfiles:/data
+    mem_limit: 2g
+    cpus: 1.5
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 12
+
+  blender:
+    image: ghcr.io/hotspoons/blender-agent@sha256:23455350cdfa23be743a999da50e68786ff3edd0415e219cba1fab435ee25c44
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      BLENDER_AGENT_MCP_PORT: 10101
+      BLENDER_AGENT_DATA_DIR: /data
+    command: [--spawn-blender]
+    networks: [cad]
+    volumes:
+      - blenderfiles:/data
+    mem_limit: 2g
+    cpus: 1.5
+    healthcheck:
+      test: ['CMD', 'bash', '-c', 'exec 3<>/dev/tcp/127.0.0.1/10101']
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 12
+
+  image-tools:
+    image: ${LIBRECHAT_IMAGE:?Set LIBRECHAT_IMAGE in image.env}
+    restart: unless-stopped
+    init: true
+    entrypoint: [node, /app/api/server/image.js]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [images]
+    mem_limit: 512m
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+networks:
+  cad:
+    internal: true
+  images:
+
 volumes:
   mongodb:
   search:
@@ -101,3 +183,5 @@ volumes:
   uploads:
   logs:
   appdata:
+  cadfiles:
+  blenderfiles:

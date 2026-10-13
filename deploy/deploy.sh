@@ -28,7 +28,7 @@ cleanup() {
           restored=false
         fi
       done
-      if "$restored" && "${compose[@]}" up -d --wait --wait-timeout 240; then
+      if "$restored" && "${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240; then
         rm -f -- "$gate"
         echo 'The previous application deployment has been restored.' >&2
       else
@@ -106,11 +106,34 @@ services:
       ALLOW_REGISTRATION: 'false'
 EOF
 closed_compose=("${compose[@]}" -f "$stage/accounts.yml")
-if ! "${closed_compose[@]}" up -d --wait --wait-timeout 240; then
+if ! "${closed_compose[@]}" up -d --remove-orphans --wait --wait-timeout 240; then
   echo 'Deployment health checks failed.' >&2
   exit 1
 fi
 "${closed_compose[@]}" ps
+
+# 验证真实协议握手和工具发现，避免代理正常但 CAD 服务实际不可用。
+"${closed_compose[@]}" exec -T api node <<'NODE'
+const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
+const { SSEClientTransport } = require('@modelcontextprotocol/sdk/client/sse.js');
+const { StreamableHTTPClientTransport } = require('@modelcontextprotocol/sdk/client/streamableHttp.js');
+(async () => {
+  for (const [name, transport] of [
+    ['FreeCAD', new SSEClientTransport(new URL('http://freecad:8000/sse'))],
+    ['Blender', new StreamableHTTPClientTransport(new URL('http://blender:10101/'))],
+  ]) {
+    const client = new Client({ name: 'deployment-check', version: '1.0.0' });
+    try {
+      await client.connect(transport, { timeout: 120000 });
+      const result = await client.listTools();
+      if (result.tools.length === 0) throw new Error('The CAD server returned no tools.');
+      console.log(`${name} MCP is ready with ${result.tools.length} tools.`);
+    } finally {
+      await client.close();
+    }
+  }
+})().catch(() => { console.error('CAD MCP readiness verification failed.'); process.exit(1); });
+NODE
 
 # 按顺序创建首个管理员和普通用户，密码通过标准输入传递给现有账户工具。
 for account in admin user; do
@@ -140,6 +163,6 @@ for account in admin user; do
   fi
 done
 # 账户和角色验证通过后恢复用户配置的注册设置。
-"${compose[@]}" up -d --wait --wait-timeout 240
+"${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
 rm -f -- "$gate"
 echo 'Development deployment passed health checks.'
