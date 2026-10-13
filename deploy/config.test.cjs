@@ -32,6 +32,7 @@ test('CAD requests send maximum adaptive effort even with saved low-effort or sa
     const request = new ChatOpenRouter(llmConfig).invocationParams();
     assert.deepEqual(request.reasoning, { effort: 'max', enabled: true });
     assert.equal(request.max_tokens, 65536);
+    assert.ok(spec.preset.maxContextTokens + request.max_tokens <= 1000000);
     assert.equal(request.temperature, undefined);
     assert.equal(request.top_p, undefined);
     assert.equal(request.include_reasoning, undefined);

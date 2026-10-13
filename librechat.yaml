@@ -50,6 +50,7 @@ modelSpecs:
       preset:
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
+        maxContextTokens: 900000
         promptPrefix: >-
           You are a CAD and 3D design assistant. Use real MCP operations and
           inspect the resulting files. Study the reference's form, proportions,
