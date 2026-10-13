@@ -1,0 +1,102 @@
+name: librechat-dev
+
+services:
+  api:
+    image: ${LIBRECHAT_IMAGE:?Set LIBRECHAT_IMAGE in image.env}
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${APP_PORT:-3080}:3080'
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3080
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongodb:27017/LibreChat
+      MEILI_HOST: http://meilisearch:7700
+      RAG_API_URL: http://rag_api:8000
+      LIBRECHAT_TEMP_CREDENTIALS_PATH: /app/data/.env.temp
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      meilisearch:
+        condition: service_started
+      rag_api:
+        condition: service_started
+    volumes:
+      - ./librechat.yaml:/app/librechat.yaml:ro
+      - images:/app/client/public/images
+      - uploads:/app/uploads
+      - logs:/app/api/logs
+      - appdata:/app/data
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+
+  mongodb:
+    image: mongo:8.0.20
+    restart: unless-stopped
+    command: mongod --noauth
+    volumes:
+      - mongodb:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.35.1
+    restart: unless-stopped
+    environment:
+      MEILI_NO_ANALYTICS: 'true'
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?Set MEILI_MASTER_KEY in .env}
+    volumes:
+      - search:/meili_data
+
+  vectordb:
+    image: pgvector/pgvector:0.8.0-pg15-trixie
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: ${RAG_DB_PASSWORD:?Set RAG_DB_PASSWORD in .env}
+    volumes:
+      - vectors:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U myuser -d mydatabase']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  rag_api:
+    image: registry.librechat.ai/librechat-ai/librechat-rag-api-dev-lite:latest
+    restart: unless-stopped
+    environment:
+      DB_HOST: vectordb
+      DB_PORT: 5432
+      DB_DATABASE: mydatabase
+      DB_USER: myuser
+      DB_PASSWORD: ${RAG_DB_PASSWORD}
+      RAG_PORT: 8000
+    env_file: .env
+    depends_on:
+      vectordb:
+        condition: service_healthy
+
+volumes:
+  mongodb:
+  search:
+  vectors:
+  images:
+  uploads:
+  logs:
+  appdata:
