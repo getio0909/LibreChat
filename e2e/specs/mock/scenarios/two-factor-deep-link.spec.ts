@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { expect, test } from '@playwright/test';
 import type { Page, Route } from '@playwright/test';
 
@@ -261,4 +262,9 @@ test.describe('ordinary 2FA challenge · deep links', () => {
     await expectAuthenticatedShell(page);
     expect(await page.evaluate(() => sessionStorage.getItem('post_login_redirect_to'))).toBeNull();
   });
+});
+
+// 本文件的控件断言使用英文，空会话不等同于未选择界面语言。
+test.beforeEach(async ({ context }) => {
+  await setEnglishLanguage(context);
 });

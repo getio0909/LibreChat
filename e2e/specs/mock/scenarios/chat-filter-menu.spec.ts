@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import type { APIRequestContext, Locator, Page, Route } from '@playwright/test';
@@ -468,6 +469,7 @@ test.describe('chat list properties menu', () => {
     };
     await cleanupUser(user);
     const context = await browser.newContext({ storageState: undefined, baseURL });
+    await setEnglishLanguage(context);
     await context.addInitScript(() => {
       localStorage.setItem('navVisible', 'true');
     });
@@ -633,6 +635,7 @@ test.describe('chat list properties menu', () => {
     });
 
     const context = await browser.newContext({ storageState: undefined, baseURL });
+    await setEnglishLanguage(context);
     await context.addInitScript(() => {
       localStorage.setItem('navVisible', 'true');
     });
