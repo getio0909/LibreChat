@@ -128,6 +128,13 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   );
   assert.ok(resultText?.type === 'text');
   assert.equal(JSON.parse(resultText.text).layout, 'sheet');
+  const preview = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(preview?.type === 'image');
+  const previewBytes = Buffer.from(preview.data, 'base64');
+  const previewMetadata = await sharp(previewBytes).metadata();
+  assert.ok(previewMetadata.width != null && previewMetadata.width <= 1600);
+  assert.ok(previewMetadata.height != null && previewMetadata.height <= 1600);
+  assert.ok(previewBytes.length <= f.settings.maxImageBytes);
   const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'sheet.pdf')));
   const page = pdf.getPage(0);
   assert.ok(Math.abs(page.getWidth() - (420 * 72) / 25.4) < 0.001);

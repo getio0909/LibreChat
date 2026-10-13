@@ -101,7 +101,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, inspect every rendered page, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
+          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link and a rendered source-sheet preview. Inspect the returned image for overlap, cropping, missing details, and unreadable text. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
         inputSchema: {
           source_filename: z.string().min(1),
           pdf_filename: z.string().endsWith('.pdf'),
@@ -119,21 +119,31 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             page_width_mm != null && page_height_mm != null
               ? { widthMm: page_width_mm, heightMm: page_height_mm }
               : undefined;
-          const bytes = await drawingPdf(
+          const { bytes, preview } = await drawingPdf(
             await readWorkspace(settings, source_filename),
             settings.maxImagePixels,
             paper,
           );
           if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
           await fs.writeFile(path.join(settings.workspace, pdf_filename), bytes, {
             flag: 'wx',
             mode: 0o644,
           });
-          return text({
-            ...fileInfo(settings, pdf_filename, bytes),
-            layout: paper ? 'sheet' : 'preview',
-            page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
-          });
+          return {
+            content: [
+              ...text({
+                ...fileInfo(settings, pdf_filename, bytes),
+                layout: paper ? 'sheet' : 'preview',
+                page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
         }),
     );
     for (const provider of providers) {
