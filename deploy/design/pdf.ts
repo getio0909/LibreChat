@@ -42,9 +42,10 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
     if (!raster) unsupported();
   };
   const checkCss = (value: string) => {
+    const css = value.replace(/\/\*[\s\S]*?\*\//g, '');
     // 外部资源无法在无基准路径的渲染中可靠交付，拒绝而不是静默缺图。
-    if (/@import|\\/i.test(value)) unsupported();
-    for (const match of value.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
+    if (/@import|\\/i.test(css)) unsupported();
+    for (const match of css.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
       reference(match[1]);
     }
   };

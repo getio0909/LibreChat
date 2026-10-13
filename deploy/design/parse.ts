@@ -8,6 +8,8 @@ import {
   PDFDict,
   PDFRef,
   PDFStream,
+  PDFString,
+  PDFHexString,
   PrintScaling,
 } from 'pdf-lib';
 import type { PDFObject } from 'pdf-lib';
@@ -116,6 +118,8 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
       const subtype = object.lookup(PDFName.of('Subtype'));
       const image = subtype === PDFName.of('Image');
       const form = subtype === PDFName.of('Form');
+      if (type === PDFName.of('XObject') && !image && !form)
+        throw new ToolFailure('PDF_XOBJECT_UNSUPPORTED');
       // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
       const metadata = object.lookup(PDFName.of('Metadata'));
       if (
@@ -140,10 +144,20 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
         type === PDFName.of('OCMD')
       )
         throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
+      const pieceInfo = object.lookup(PDFName.of('PieceInfo'));
+      const privatePieces =
+        pieceInfo instanceof PDFDict &&
+        pieceInfo.entries().some(([, entry]) => {
+          const value = pdf.context.lookup(entry);
+          return value instanceof PDFDict && value.has(PDFName.of('Private'));
+        });
+      const filename = object.lookup(PDFName.of('F')) ?? object.lookup(PDFName.of('UF'));
       if (
-        object.has(PDFName.of('AF')) ||
-        object.has(PDFName.of('EF')) ||
-        object.has(PDFName.of('PieceInfo')) ||
+        ((type === PDFName.of('Page') || image || form) &&
+          (object.has(PDFName.of('AF')) || object.has(PDFName.of('PieceInfo')))) ||
+        (object.has(PDFName.of('EF')) &&
+          (filename instanceof PDFString || filename instanceof PDFHexString)) ||
+        privatePieces ||
         type === PDFName.of('Filespec') ||
         type === PDFName.of('EmbeddedFile')
       )
@@ -239,8 +253,8 @@ if (parentPort) {
   processInput(inputSchema.parse(workerData))
     .then((value) => {
       if ('bytes' in value) {
-        const bytes = new Uint8Array(value.bytes);
-        port.postMessage({ ok: true, value: { ...value, bytes } }, [bytes.buffer]);
+        if (!(value.bytes.buffer instanceof ArrayBuffer)) throw new ToolFailure('INVALID_PDF');
+        port.postMessage({ ok: true, value }, [value.bytes.buffer]);
       } else {
         port.postMessage({ ok: true, value });
       }

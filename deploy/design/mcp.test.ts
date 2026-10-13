@@ -729,46 +729,57 @@ test('private editing data and external file streams are excluded from copied re
 
 test('external reference and OPI resources, alternate images and resource layers are rejected', async () => {
   const f = await fixture();
-  for (const kind of ['reference', 'opi', 'alternate', 'layer']) {
+  for (const kind of ['reference', 'opi', 'alternate', 'layer', 'postscript']) {
     const pdf = await PDFDocument.create();
     const page = pdf.addPage();
     const external = PDFString.of('/private/old-drawing.pdf');
     const primary = pdf.context.register(
-      pdf.context.flateStream(kind === 'reference' ? '0 0 10 10 re f' : Buffer.from([0, 0, 0]), {
-        Type: 'XObject',
-        ...(kind === 'reference'
-          ? { Subtype: 'Form', BBox: [0, 0, 10, 10] }
-          : {
-              Subtype: 'Image',
-              Width: 1,
-              Height: 1,
-              ColorSpace: 'DeviceRGB',
-              BitsPerComponent: 8,
-            }),
-        ...(kind === 'reference'
-          ? { Ref: { F: external, Page: 0 } }
-          : kind === 'opi'
-            ? { OPI: { '2.0': { F: external, Size: [1, 1] } } }
-            : kind === 'alternate'
-              ? {
-                  Alternates: [
-                    {
-                      Image: pdf.context.register(
-                        pdf.context.flateStream(Buffer.from([255, 0, 0]), {
-                          Type: 'XObject',
-                          Subtype: 'Image',
-                          Width: 1,
-                          Height: 1,
-                          ColorSpace: 'DeviceRGB',
-                          BitsPerComponent: 8,
-                        }),
-                      ),
-                      DefaultForPrinting: true,
-                    },
-                  ],
-                }
-              : { OC: { Type: 'OCG', Name: PDFString.of('hidden layer') } }),
-      }),
+      pdf.context.flateStream(
+        kind === 'reference'
+          ? '0 0 10 10 re f'
+          : kind === 'postscript'
+            ? '0 0 moveto 10 10 lineto stroke'
+            : Buffer.from([0, 0, 0]),
+        {
+          Type: 'XObject',
+          ...(kind === 'postscript'
+            ? { Subtype: 'PS' }
+            : kind === 'reference'
+              ? { Subtype: 'Form', BBox: [0, 0, 10, 10] }
+              : {
+                  Subtype: 'Image',
+                  Width: 1,
+                  Height: 1,
+                  ColorSpace: 'DeviceRGB',
+                  BitsPerComponent: 8,
+                }),
+          ...(kind === 'reference'
+            ? { Ref: { F: external, Page: 0 } }
+            : kind === 'opi'
+              ? { OPI: { '2.0': { F: external, Size: [1, 1] } } }
+              : kind === 'alternate'
+                ? {
+                    Alternates: [
+                      {
+                        Image: pdf.context.register(
+                          pdf.context.flateStream(Buffer.from([255, 0, 0]), {
+                            Type: 'XObject',
+                            Subtype: 'Image',
+                            Width: 1,
+                            Height: 1,
+                            ColorSpace: 'DeviceRGB',
+                            BitsPerComponent: 8,
+                          }),
+                        ),
+                        DefaultForPrinting: true,
+                      },
+                    ],
+                  }
+                : kind === 'layer'
+                  ? { OC: { Type: 'OCG', Name: PDFString.of('hidden layer') } }
+                  : {}),
+        },
+      ),
     );
     page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: primary } }));
     const bytes = Buffer.from(await pdf.save());
@@ -781,11 +792,13 @@ test('external reference and OPI resources, alternate images and resource layers
       },
     });
     const code =
-      kind === 'alternate'
-        ? 'PDF_IMAGE_ALTERNATES_UNSUPPORTED'
-        : kind === 'layer'
-          ? 'PDF_LAYERS_UNSUPPORTED'
-          : 'PDF_EXTERNAL_STREAM_UNSUPPORTED';
+      kind === 'postscript'
+        ? 'PDF_XOBJECT_UNSUPPORTED'
+        : kind === 'alternate'
+          ? 'PDF_IMAGE_ALTERNATES_UNSUPPORTED'
+          : kind === 'layer'
+            ? 'PDF_LAYERS_UNSUPPORTED'
+            : 'PDF_EXTERNAL_STREAM_UNSUPPORTED';
     assert.equal(rejected.isError, true);
     assert.match(JSON.stringify(rejected), new RegExp(code));
     assert.doesNotMatch(JSON.stringify(rejected), /private|old-drawing/);
@@ -811,12 +824,25 @@ test('ordinary XObject aliases are not mistaken for control fields', async () =>
   page.node.set(
     PDFName.of('Resources'),
     pdf.context.obj({
-      XObject: { Ref: image, OPI: image, Alternates: image, OC: image, Metadata: image },
+      XObject: {
+        Ref: image,
+        OPI: image,
+        Alternates: image,
+        OC: image,
+        Metadata: image,
+        AF: image,
+        EF: image,
+        PieceInfo: image,
+      },
     }),
   );
   page.node.set(
     PDFName.of('Contents'),
-    pdf.context.register(pdf.context.flateStream('q 50 0 0 50 20 20 cm /Metadata Do Q')),
+    pdf.context.register(
+      pdf.context.flateStream(
+        'q 50 0 0 50 20 20 cm /Metadata Do Q q 50 0 0 50 80 20 cm /AF Do Q q 50 0 0 50 140 20 cm /EF Do Q q 50 0 0 50 200 20 cm /PieceInfo Do Q',
+      ),
+    ),
   );
   await fs.writeFile(path.join(f.root, 'aliases.pdf'), await pdf.save());
   const result = await f.client.callTool({
@@ -839,6 +865,11 @@ test('renderer concurrency fits one aggregate budget while permitted concurrent 
   for (const config of [
     { maxConcurrentJobs: 2, maxRenderMemoryBytes: 384 * 1024 * 1024 },
     { maxConcurrentJobs: 4, maxRenderMemoryBytes: 256 * 1024 * 1024 },
+    {
+      maxConcurrentJobs: 4,
+      maxRenderMemoryBytes: 96 * 1024 * 1024,
+      maxFileBytes: 25 * 1024 * 1024,
+    },
   ]) {
     assert.equal(
       settingsSchema.safeParse({ workspaceUrl: 'https://example.test/cad/', ...config }).success,
@@ -1268,6 +1299,8 @@ test('SVG exports reject external resources and DTDs instead of silently losing 
     '<image href="file:///run/secrets/design.json" width="40" height="40"/>',
     '<image href="&#104;ttps://example.test/private.png" width="40" height="40"/>',
     '<style><![CDATA[@import url(https://example.test/font.css);]]></style>',
+    '<rect style="fill:u/**/rl(https://example.test/resource.svg#paint)"/>',
+    '<style><![CDATA[@im/**/port url(https://example.test/font.css);]]></style>',
     '<rect style="fill:url(file:///run/secrets/design.json)"/>',
     String.raw`<rect style="fill:u\72l(https://example.test/resource.svg#paint)"/>`,
     String.raw`<style><![CDATA[.part { fill:u\000072l(https://example.test/resource.svg#paint); }]]></style>`,
