@@ -4,7 +4,6 @@ import debounce from 'lodash/debounce';
 import { useToastContext } from '@librechat/client';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { Constants, EToolResources, isAssistantsEndpoint } from 'librechat-data-provider';
-import type { TEndpointOption } from 'librechat-data-provider';
 import type { KeyboardEvent } from 'react';
 import type { UploadLifecycleCallbacks } from '~/hooks/Files/useFileHandling';
 import {
@@ -21,7 +20,6 @@ import {
   getFilesDraft,
   setDraft,
   markPastedTextFile,
-  getEntityName,
   getEntity,
   checkIfScrollable,
 } from '~/utils';
@@ -32,7 +30,6 @@ import useComposerBindings from '~/hooks/Input/useComposerBindings';
 import useFileUploadRouter from '~/hooks/Files/useFileUploadRouter';
 import { useAgentsMapContext } from '~/Providers/AgentsMapContext';
 import { useChatSettings } from '~/Providers/ChatSettingsContext';
-import useGetSender from '~/hooks/Conversations/useGetSender';
 import useUploadOptions from '~/hooks/Files/useUploadOptions';
 import { useInteractionHealthCheck } from '~/data-provider';
 import { resolveComposerKeyDown } from '~/utils/shortcuts';
@@ -70,7 +67,6 @@ export default function useTextarea({
   enterToSend: boolean;
 }) {
   const localize = useLocalize();
-  const getSender = useGetSender();
   const { setValue } = useChatFormContext();
   const isComposing = useRef(false);
   const agentsMap = useAgentsMapContext();
@@ -107,14 +103,13 @@ export default function useTextarea({
   );
 
   const { endpoint = '' } = conversation || {};
-  const { entity, isAgent, isAssistant } = getEntity({
+  const { isAgent, isAssistant } = getEntity({
     endpoint,
     agentsMap,
     assistantMap,
     agent_id: conversation?.agent_id,
     assistant_id: conversation?.assistant_id,
   });
-  const entityName = entity?.name ?? '';
 
   const isNotAppendable =
     latestMessage?.error === true && latestMessage.isCreatedByUser === true && !isAssistant;
@@ -202,14 +197,8 @@ export default function useTextarea({
         return placeholder;
       }
 
-      const sender =
-        isAssistant || isAgent
-          ? getEntityName({ name: entityName, isAgent, localize })
-          : getSender(conversation as TEndpointOption);
-
-      return `${localize('com_endpoint_message_new', {
-        0: sender ? sender : localize('com_endpoint_ai'),
-      })}`;
+      // 普通输入提示不包含模型名称，配置异常和显式提示仍由上方分支处理。
+      return localize('com_endpoint_message');
     };
 
     const placeholderText = getPlaceholderText();
@@ -235,9 +224,7 @@ export default function useTextarea({
     isAgent,
     localize,
     disabled,
-    getSender,
     agentsMap,
-    entityName,
     textAreaRef,
     isAssistant,
     assistantMap,
