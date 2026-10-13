@@ -5,8 +5,10 @@ import {
   changeLanguageSafely,
   ensureLocale,
   initializeI18n,
+  detectInitialLanguage,
   normalizeLocale,
 } from './i18n';
+import Chinese from './zh-Hans/translation.json';
 import English from './en/translation.json';
 import Spanish from './es/translation.json';
 import French from './fr/translation.json';
@@ -189,5 +191,55 @@ describe('i18next translation tests', () => {
     restoreSl();
     __resetLocaleForTests('sv');
     __resetLocaleForTests('sl');
+  });
+});
+
+describe('Chinese-first interface defaults', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.cookie = 'lang=; Max-Age=0; path=/';
+    jest.spyOn(navigator, 'language', 'get').mockReturnValue('en-US');
+  });
+
+  afterEach(async () => {
+    localStorage.clear();
+    document.cookie = 'lang=; Max-Age=0; path=/';
+    jest.restoreAllMocks();
+    await changeLanguageSafely('en');
+  });
+
+  it('loads Chinese login and settings strings before the first render on an English browser', async () => {
+    expect(detectInitialLanguage()).toBe('zh-Hans');
+    await initializeI18n();
+
+    expect(i18n.language).toBe('zh-Hans');
+    expect(document.documentElement.lang).toBe('zh-Hans');
+    expect(i18n.t('com_auth_welcome_back')).toBe(Chinese.com_auth_welcome_back);
+    expect(i18n.t('com_auth_password')).toBe(Chinese.com_auth_password);
+    expect(i18n.t('com_auth_continue')).toBe(Chinese.com_auth_continue);
+    expect(i18n.t('com_nav_settings')).toBe(Chinese.com_nav_settings);
+    expect(i18n.t('com_nav_language')).toBe(Chinese.com_nav_language);
+  });
+
+  it.each(['en', '"en"'])('preserves a stored English preference: %s', async (value) => {
+    localStorage.setItem('lang', value);
+    await initializeI18n();
+
+    expect(i18n.language).toBe('en');
+    expect(localStorage.getItem('lang')).toBe(value);
+  });
+
+  it('preserves a language selected through the cookie', async () => {
+    document.cookie = 'lang=fr; path=/';
+    await initializeI18n();
+
+    expect(i18n.language).toBe('fr');
+  });
+
+  it('still follows the browser when the user explicitly selects automatic language', async () => {
+    localStorage.setItem('lang', JSON.stringify('auto'));
+    await initializeI18n();
+
+    expect(i18n.language).toBe('en');
   });
 });

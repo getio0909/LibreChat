@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { expect, test } from '@playwright/test';
 import {
   MOCK_ENDPOINTS,
@@ -73,6 +74,7 @@ test('a shared link can undock its artifacts pane @scenario:a-shared-link-can-un
 
   const readerContext = await browser.newContext({ viewport: READER_VIEWPORT });
   try {
+    await setEnglishLanguage(readerContext);
     const reader = await readerContext.newPage();
     await reader.goto(new URL(sharedLinkUrl, baseURL).toString(), { timeout: 20000 });
 

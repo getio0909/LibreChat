@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import translationEn from './en/translation.json';
+import { DEFAULT_LANGUAGE } from './defaults';
 
 export const defaultNS = 'translation';
 
@@ -218,7 +219,7 @@ export function normalizeLocale(locale?: string | null): SupportedLocale {
 export function detectInitialLanguage() {
   const cookieLang = readCookie('lang');
   const storedLang = readStoredLanguage();
-  return normalizeLocale(cookieLang || storedLang || getNavigatorLanguage());
+  return normalizeLocale(cookieLang || storedLang || DEFAULT_LANGUAGE);
 }
 
 export async function ensureLocale(locale?: string | null): Promise<SupportedLocale> {

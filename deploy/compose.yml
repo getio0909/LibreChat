@@ -8,6 +8,8 @@ services:
       - '127.0.0.1:${APP_PORT:-3080}:3080'
     env_file: .env
     environment:
+      # 后端启动配置决定浏览器标题，不能只修改前端 HTML 或环境变量示例。
+      APP_TITLE: 庄严宝刹 AI 设计助手
       HOST: 0.0.0.0
       PORT: 3080
       NODE_ENV: production
