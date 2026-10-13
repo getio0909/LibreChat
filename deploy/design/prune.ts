@@ -2,7 +2,14 @@ import { inflateSync } from 'node:zlib';
 import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFObject, PDFNull } from 'pdf-lib';
 import { ToolFailure } from './config.ts';
 
-type Resource = 'XObject' | 'Pattern' | 'ExtGState' | 'Font' | 'Shading' | 'ColorSpace';
+type Resource =
+  | 'XObject'
+  | 'Pattern'
+  | 'ExtGState'
+  | 'Font'
+  | 'Shading'
+  | 'ColorSpace'
+  | 'Properties';
 type References = Map<Resource, Set<PDFName>>;
 const operators: Record<string, Resource> = {
   Do: 'XObject',
@@ -13,6 +20,8 @@ const operators: Record<string, Resource> = {
   sh: 'Shading',
   cs: 'ColorSpace',
   CS: 'ColorSpace',
+  BDC: 'Properties',
+  DP: 'Properties',
 };
 const resourceKinds: Resource[] = [
   'XObject',
@@ -21,6 +30,7 @@ const resourceKinds: Resource[] = [
   'Font',
   'Shading',
   'ColorSpace',
+  'Properties',
 ];
 function emptyReferences(): References {
   return new Map(resourceKinds.map((key) => [key, new Set<PDFName>()]));

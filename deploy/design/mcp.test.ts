@@ -1342,6 +1342,63 @@ test('pre-separated print plates are rejected before static pages can be combine
   assert.deepEqual(await fs.readFile(path.join(f.root, 'plates.pdf')), bytes);
 });
 
+test('marked-content resources keep selected properties and omit old unused revision text', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const form = pdf.context.register(
+    pdf.context.flateStream(
+      '/Span /Current BDC 20 20 100 100 re f EMC /Point /Marker DP /Span << /ActualText (/Old BDC) >> BDC EMC',
+      {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, 150, 150],
+        Resources: {
+          Properties: {
+            Current: { ActualText: PDFString.of('current drawing') },
+            Marker: { Lang: PDFString.of('en') },
+            Old: { ActualText: PDFString.of('old private source path and revision') },
+          },
+        },
+      },
+    ),
+  );
+  page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+  page.pushOperators(drawObject('Drawing'));
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'properties.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'properties-set.pdf',
+      sheets: [{ source_filename: 'properties.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'properties-set.pdf')));
+  const objects = output.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'));
+  assert.ok(objects instanceof PDFDict);
+  const current = objects.lookup(PDFName.of('Drawing'));
+  assert.ok(current instanceof PDFRawStream);
+  const resources = current.dict.lookup(PDFName.of('Resources'));
+  assert.ok(resources instanceof PDFDict);
+  const properties = resources.lookup(PDFName.of('Properties'));
+  assert.ok(properties instanceof PDFDict);
+  assert.deepEqual(
+    properties
+      .keys()
+      .map((name) => name.decodeText())
+      .sort(),
+    ['Current', 'Marker'],
+  );
+  const selected = properties.lookup(PDFName.of('Current'));
+  assert.ok(selected instanceof PDFDict);
+  const text = selected.lookup(PDFName.of('ActualText'));
+  assert.ok(text instanceof PDFString);
+  assert.equal(text.decodeText(), 'current drawing');
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'properties.pdf')), bytes);
+});
+
 test('PDF NUL whitespace and null Flate parameters retain visible drawing resources', async () => {
   const f = await fixture();
   for (const [index, params] of [PDFNull, undefined].entries()) {
