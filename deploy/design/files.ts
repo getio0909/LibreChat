@@ -179,8 +179,19 @@ export async function writePdf(
           current.ino === owned.ino &&
           current.size === owned.size &&
           current.mtimeNs === owned.mtimeNs
-        )
-          await fs.unlink(target);
+        ) {
+          // 文件系统时间戳可能粒度较粗，同尺寸修改仍需校验内容与最终身份。
+          const unchanged = (await readWorkspace(settings, filename)).equals(bytes);
+          const after = await fs.lstat(target, { bigint: true });
+          if (
+            unchanged &&
+            after.dev === owned.dev &&
+            after.ino === owned.ino &&
+            after.size === owned.size &&
+            after.mtimeNs === owned.mtimeNs
+          )
+            await fs.unlink(target);
+        }
       } catch (error) {
         if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) throw error;
       }
