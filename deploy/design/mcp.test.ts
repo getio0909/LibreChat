@@ -785,6 +785,45 @@ test('external reference and OPI resources, alternate images and resource layers
   }
 });
 
+test('ordinary XObject aliases are not mistaken for control fields', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const image = pdf.context.register(
+    pdf.context.flateStream(Buffer.from([0, 0, 0]), {
+      Type: 'XObject',
+      Subtype: 'Image',
+      Width: 1,
+      Height: 1,
+      ColorSpace: 'DeviceRGB',
+      BitsPerComponent: 8,
+    }),
+  );
+  page.node.set(
+    PDFName.of('Resources'),
+    pdf.context.obj({ XObject: { Ref: image, OPI: image, Alternates: image, OC: image } }),
+  );
+  page.node.set(
+    PDFName.of('Contents'),
+    pdf.context.register(pdf.context.flateStream('q 50 0 0 50 20 20 cm /Ref Do Q')),
+  );
+  await fs.writeFile(path.join(f.root, 'aliases.pdf'), await pdf.save());
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'aliases-set.pdf',
+      sheets: [{ source_filename: 'aliases.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'aliases-set.pdf')));
+  assert.equal(imageCount(output), 1);
+  const preview = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(preview?.type === 'image');
+  const stats = await sharp(Buffer.from(preview.data, 'base64')).stats();
+  assert.ok(stats.channels.some((channel) => channel.min === 0));
+});
+
 test('renderer concurrency fits one aggregate budget while permitted concurrent exports work', async () => {
   for (const config of [
     { maxConcurrentJobs: 2, maxRenderMemoryBytes: 384 * 1024 * 1024 },

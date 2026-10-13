@@ -347,11 +347,21 @@ export async function loadDrawingPdf(
       // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
       object.delete(PDFName.of('Metadata'));
       const type = object.lookup(PDFName.of('Type'));
-      if (object.has(PDFName.of('Ref')) || object.has(PDFName.of('OPI')))
+      const subtype = object.lookup(PDFName.of('Subtype'));
+      const image = subtype === PDFName.of('Image');
+      const form = subtype === PDFName.of('Form');
+      if (
+        (form && object.has(PDFName.of('Ref'))) ||
+        ((image || form) && object.has(PDFName.of('OPI')))
+      )
         throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
-      if (object.has(PDFName.of('Alternates')))
+      if (image && object.has(PDFName.of('Alternates')))
         throw new ToolFailure('PDF_IMAGE_ALTERNATES_UNSUPPORTED');
-      if (object.has(PDFName.of('OC')) || type === PDFName.of('OCG') || type === PDFName.of('OCMD'))
+      if (
+        ((image || form) && object.has(PDFName.of('OC'))) ||
+        type === PDFName.of('OCG') ||
+        type === PDFName.of('OCMD')
+      )
         throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
       if (
         object.has(PDFName.of('AF')) ||
