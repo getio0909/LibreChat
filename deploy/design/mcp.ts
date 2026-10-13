@@ -1,18 +1,19 @@
 import { z } from 'zod';
 import path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { PDFDocument, PrintScaling } from 'pdf-lib';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { RequestListener } from 'node:http';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { ImageProvider, ImageData } from './images.ts';
 import type { Settings } from './config.ts';
+import type { PdfSource } from './parse.ts';
 import { ToolFailure } from './config.ts';
 import { fileType, fileInfo, listWorkspace, readWorkspace, writePdf } from './files.ts';
 import { imageInput, compactImage } from './images.ts';
-import { drawingPdf, drawingRegion, loadDrawingPdf, pdfPreview } from './pdf.ts';
+import { drawingPdf, drawingRegion, normalizeDrawingPdf, pdfPreview } from './pdf.ts';
 import { serveDownload } from './download.ts';
+import { pdfTask } from './parse.ts';
 
 function text(value: object): CallToolResult {
   return { content: [{ type: 'text', text: JSON.stringify(value) }] };
@@ -169,9 +170,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       ({ pdf_filename, sheets }) =>
         run(async () => {
           fileType(pdf_filename);
-          const combined = await PDFDocument.create();
-          combined.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
-          const pages: { page: number; source_filename: string; source_page: number }[] = [];
+          const sources: PdfSource[] = [];
           let inputBytes = 0;
           let generatedBytes = 0;
           let normalizedBytes = 0;
@@ -204,28 +203,22 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             }
             generatedBytes += bytes.length;
             if (generatedBytes > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
-            const loaded = await loadDrawingPdf(
+            const normalized = await normalizeDrawingPdf(
               bytes,
               settings,
               signal,
               settings.maxFileBytes - normalizedBytes,
             );
-            normalizedBytes += loaded.normalizedBytes;
-            const pdf = loaded.document;
-            if (combined.getPageCount() + pdf.getPageCount() > settings.maxPdfPages)
-              throw new ToolFailure('PDF_PAGE_LIMIT');
-            const copied = await combined.copyPages(pdf, pdf.getPageIndices());
-            for (const [index, page] of copied.entries()) {
-              combined.addPage(page);
-              pages.push({
-                page: pages.length + 1,
-                source_filename: sheet.source_filename,
-                source_page: index + 1,
-              });
-            }
+            normalizedBytes += normalized.length;
+            sources.push({ source_filename: sheet.source_filename, bytes: normalized });
           }
-          const bytes = Buffer.from(await combined.save());
-          if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+          const result = await pdfTask(
+            { operation: 'assemble', sources, limits: settings },
+            settings,
+            signal,
+          );
+          const bytes = Buffer.from(result.bytes);
+          const pages = result.pages;
           const { preview } = await pdfPreview(bytes, settings, signal);
           const image = await compactImage(
             { bytes: preview, mimeType: 'image/png' },

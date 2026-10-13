@@ -31,6 +31,7 @@ import { fileType, readWorkspace, writePdf } from './files.ts';
 import { createHandler } from './mcp.ts';
 import { imageProviders, compactImage } from './images.ts';
 import { render } from './render.ts';
+import { pdfTask } from './parse.ts';
 
 const fixtures: { server: Server; root: string; client: Client }[] = [];
 afterEach(async () => {
@@ -578,13 +579,21 @@ test('native title-block forms and inconsistent paper boxes cannot enter a drawi
 
 test('static drawing sets reject page actions and annotation-bearing sources', async () => {
   const f = await fixture();
-  for (const kind of ['page', 'link', 'comment']) {
+  for (const kind of ['page', 'presentation', 'link', 'comment']) {
     const pdf = await PDFDocument.create();
     const page = pdf.addPage();
     if (kind === 'page') {
       page.node.set(
         PDFName.of('AA'),
         pdf.context.obj({ O: { S: 'JavaScript', JS: PDFString.of('app.alert("fixture")') } }),
+      );
+    } else if (kind === 'presentation') {
+      page.node.set(
+        PDFName.of('PresSteps'),
+        pdf.context.obj({
+          Type: 'NavNode',
+          NA: { S: 'JavaScript', JS: PDFString.of('app.alert("fixture")') },
+        }),
       );
     } else {
       const annotation = pdf.context.obj({
@@ -836,7 +845,11 @@ test('renderer concurrency fits one aggregate budget while permitted concurrent 
       false,
     );
   }
-  const f = await fixture({ maxConcurrentJobs: 4, maxRenderMemoryBytes: 96 * 1024 * 1024 });
+  const f = await fixture({
+    maxConcurrentJobs: 4,
+    maxRenderMemoryBytes: 96 * 1024 * 1024,
+    maxFileBytes: 16 * 1024 * 1024,
+  });
   await fs.writeFile(
     path.join(f.root, 'concurrent.svg'),
     '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"><rect x="20" y="20" width="100" height="50" fill="none" stroke="black"/></svg>',
@@ -998,6 +1011,75 @@ test('drawing sets omit invisible page and resource metadata without modifying s
   );
   assert.deepEqual(await fs.readFile(path.join(f.root, 'metadata.pdf')), bytes);
   assert.equal((await PDFDocument.load(bytes)).getPage(0).node.has(PDFName.of('Metadata')), true);
+});
+
+test('drawing sets omit invisible article beads and thread metadata', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  page.drawLine({ start: { x: 20, y: 20 }, end: { x: 120, y: 20 }, thickness: 1 });
+  const thread = pdf.context.obj({
+    Type: 'Thread',
+    I: { Author: PDFString.of('private author fixture'), Subject: PDFString.of('old revision') },
+  });
+  const threadRef = pdf.context.register(thread);
+  const bead = pdf.context.obj({ Type: 'Bead', T: threadRef, P: page.ref, R: [0, 0, 10, 10] });
+  const beadRef = pdf.context.register(bead);
+  bead.set(PDFName.of('N'), beadRef);
+  bead.set(PDFName.of('V'), beadRef);
+  thread.set(PDFName.of('F'), beadRef);
+  page.node.set(PDFName.of('B'), pdf.context.obj([beadRef]));
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'article.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: { pdf_filename: 'article-set.pdf', sheets: [{ source_filename: 'article.pdf' }] },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'article-set.pdf')));
+  assert.equal(output.getPage(0).node.has(PDFName.of('B')), false);
+  assert.equal(
+    output.context.enumerateIndirectObjects().some(([, object]) => {
+      const type = object instanceof PDFDict ? object.lookup(PDFName.of('Type')) : undefined;
+      return type === PDFName.of('Thread') || type === PDFName.of('Bead');
+    }),
+    false,
+  );
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'article.pdf')), bytes);
+});
+
+test('object-heavy PDF parsing stops on cancellation and the parent service stays usable', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const objects = [];
+  for (let i = 0; i < 30000; i++)
+    objects.push(pdf.context.register(pdf.context.obj({ Position: [i, i + 1, i + 2] })));
+  page.node.set(PDFName.of('FixtureRows'), pdf.context.obj(objects));
+  const bytes = await pdf.save({ useObjectStreams: false });
+  const started = Date.now();
+  await assert.rejects(
+    pdfTask(
+      { operation: 'inspect', bytes, page: 1, limits: f.settings },
+      f.settings,
+      AbortSignal.timeout(120),
+    ),
+    (error: Error) => error instanceof ToolFailure && error.code === 'REQUEST_CANCELLED',
+  );
+  assert.ok(Date.now() - started < 1500);
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
+  const small = await PDFDocument.create();
+  small.addPage();
+  const next = await pdfTask(
+    { operation: 'inspect', bytes: await small.save(), page: 1, limits: f.settings },
+    f.settings,
+    new AbortController().signal,
+  );
+  assert.equal(next.pageCount, 1);
+  assert.equal(
+    (await f.client.callTool({ name: 'workspace_files', arguments: {} })).isError,
+    undefined,
+  );
 });
 
 test('compressed PDF object expansion is bounded outside the long-running service', async () => {
@@ -1219,6 +1301,78 @@ test('SVG exports reject external resources and DTDs instead of silently losing 
     arguments: { source_filename: 'external.svg', pdf_filename: 'external.pdf' },
   });
   assert.match(JSON.stringify(dtd), /SVG_NOT_SELF_CONTAINED/);
+});
+
+test('nested SVG data resources are rejected while genuine embedded raster images remain usable', async () => {
+  const f = await fixture();
+  const nested =
+    '<svg xmlns="http://www.w3.org/2000/svg"><image href="file:///private/source.png"/></svg>';
+  const encoded = Buffer.from(nested).toString('base64');
+  const cases = [
+    'data:image/svg+xml;base64,' + encoded,
+    'data:image/png;base64,' + encoded,
+    'data:image/svg+xml,' + encodeURIComponent(nested),
+  ];
+  for (const [index, uri] of cases.entries()) {
+    await fs.writeFile(
+      path.join(f.root, 'nested-' + index + '.svg'),
+      '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"><image href="' +
+        uri +
+        '" width="20" height="20"/></svg>',
+    );
+    const result = await f.client.callTool({
+      name: 'export_drawing_pdf',
+      arguments: { source_filename: 'nested-' + index + '.svg', pdf_filename: 'nested.pdf' },
+    });
+    assert.equal(result.isError, true);
+    assert.match(JSON.stringify(result), /SVG_NOT_SELF_CONTAINED/);
+  }
+  const png = await sharp({
+    create: { width: 8, height: 8, channels: 3, background: '#ff0000' },
+  })
+    .png()
+    .toBuffer();
+  await fs.writeFile(
+    path.join(f.root, 'raster.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"><image href="data:image/png;base64,' +
+      png.toString('base64') +
+      '" width="20" height="20"/></svg>',
+  );
+  const result = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: { source_filename: 'raster.svg', pdf_filename: 'raster.pdf' },
+  });
+  assert.equal(result.isError, undefined);
+  assert.equal(
+    (await PDFDocument.load(await fs.readFile(path.join(f.root, 'raster.pdf')))).getPageCount(),
+    1,
+  );
+  await assert.rejects(fs.stat(path.join(f.root, 'nested.pdf')), { code: 'ENOENT' });
+});
+
+test('missing wrapped renderers report deployment unavailability instead of blaming the PDF', async () => {
+  const f = await fixture();
+  await fs.symlink('/usr/bin/prlimit', path.join(f.root, 'prlimit'));
+  const script = [
+    "import assert from 'node:assert/strict';",
+    "import { PDFDocument } from 'pdf-lib';",
+    "import { render } from './render.ts';",
+    "import { normalizeDrawingPdf } from './pdf.ts';",
+    "import { settingsSchema, ToolFailure } from './config.ts';",
+    "const settings = settingsSchema.parse({ workspaceUrl: 'https://example.test/cad/' });",
+    'const pdf = await PDFDocument.create(); pdf.addPage(); const bytes = Buffer.from(await pdf.save());',
+    'for (const operation of [',
+    "() => render('rsvg-convert', [], Buffer.alloc(0), 4096, new AbortController().signal),",
+    '() => normalizeDrawingPdf(bytes, settings, new AbortController().signal),',
+    "]) await assert.rejects(operation(), error => error instanceof ToolFailure && error.code === 'PDF_RENDERER_UNAVAILABLE');",
+    "console.log('Missing renderer classification verified.');",
+  ].join('\n');
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', script], {
+    env: { ...process.env, PATH: f.root },
+    encoding: 'utf8',
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Missing renderer classification verified/);
 });
 
 test('native renderers bound output and honor cancellation without exposing input diagnostics', async () => {

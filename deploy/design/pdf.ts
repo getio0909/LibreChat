@@ -3,20 +3,11 @@ import os from 'node:os';
 import path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { SaxesParser } from 'saxes';
-import {
-  PDFDocument,
-  PDFName,
-  PDFNumber,
-  PDFArray,
-  PDFDict,
-  PDFRef,
-  PDFStream,
-  PrintScaling,
-} from 'pdf-lib';
-import type { PDFObject } from 'pdf-lib';
+import { PDFDocument, PrintScaling } from 'pdf-lib';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 import { render } from './render.ts';
+import { pdfTask } from './parse.ts';
 
 export type PaperSize = { widthMm: number; heightMm: number };
 export type DrawingRegion = { leftMm: number; topMm: number; widthMm: number; heightMm: number };
@@ -36,11 +27,25 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
   const unsupported = () => {
     throw new ToolFailure('SVG_NOT_SELF_CONTAINED');
   };
+  const reference = (value: string) => {
+    if (value.startsWith('#')) return;
+    const data = /^data:image\/(png|jpeg|webp);base64,([a-z0-9+/]*={0,2})$/i.exec(value);
+    if (!data) return unsupported();
+    const image = Buffer.from(data[2], 'base64');
+    const raster =
+      data[1].toLowerCase() === 'png'
+        ? image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+        : data[1].toLowerCase() === 'jpeg'
+          ? image.subarray(0, 3).equals(Buffer.from([255, 216, 255]))
+          : image.subarray(0, 4).toString() === 'RIFF' &&
+            image.subarray(8, 12).toString() === 'WEBP';
+    if (!raster) unsupported();
+  };
   const checkCss = (value: string) => {
     // 外部资源无法在无基准路径的渲染中可靠交付，拒绝而不是静默缺图。
     if (/@import|\\/i.test(value)) unsupported();
     for (const match of value.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
-      if (!/^(#|data:)/i.test(match[1])) unsupported();
+      reference(match[1]);
     }
   };
   parser.on('error', () => {
@@ -76,7 +81,7 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
         attribute.value
       )
         unsupported();
-      if (attribute.local === 'href' && !/^(#|data:)/i.test(attribute.value)) unsupported();
+      if (attribute.local === 'href') reference(attribute.value);
       checkCss(attribute.value);
     }
     if (tag.local === 'style') {
@@ -251,10 +256,12 @@ export async function drawingPdf(
       signal,
       settings.maxRenderMemoryBytes,
     );
-    const pdf = await PDFDocument.load(rendered);
-    pdf.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
-    signal.throwIfAborted();
-    return Buffer.from(await pdf.save());
+    const result = await pdfTask(
+      { operation: 'prepare', bytes: rendered, limits: settings },
+      settings,
+      signal,
+    );
+    return Buffer.from(result.bytes);
   }
   const { bytes: png } = await renderDrawing(bytes, settings, signal);
   const pdf = await PDFDocument.create();
@@ -277,12 +284,12 @@ export async function drawingPdf(
   return Buffer.from(await pdf.save());
 }
 
-export async function loadDrawingPdf(
+export async function normalizeDrawingPdf(
   bytes: Buffer,
   settings: Settings,
   signal: AbortSignal,
   normalizedLimit = settings.maxFileBytes,
-): Promise<{ document: PDFDocument; normalizedBytes: number }> {
+): Promise<Buffer> {
   if (normalizedLimit < 1) throw new ToolFailure('FILE_TOO_LARGE');
   signal.throwIfAborted();
   const folder = await fs.mkdtemp(path.join(os.tmpdir(), 'cad-pdf-'));
@@ -290,7 +297,7 @@ export async function loadDrawingPdf(
   try {
     const input = path.join(folder, 'source.pdf');
     await fs.writeFile(input, bytes, { mode: 0o600, signal });
-    // 先在受限进程中展开对象流，再让长期运行的服务解析有界普通对象。
+    // 先在受限进程中展开对象流，再在线程中解析有界普通对象。
     normalized = await render(
       'qpdf',
       ['--object-streams=disable', '--stream-data=preserve', input, '-'],
@@ -306,118 +313,7 @@ export async function loadDrawingPdf(
   } finally {
     await fs.rm(folder, { recursive: true, force: true });
   }
-  let pdf: PDFDocument;
-  try {
-    pdf = await PDFDocument.load(normalized, { throwOnInvalidObject: true });
-  } catch {
-    throw new ToolFailure('INVALID_PDF');
-  }
-  if (pdf.getPageCount() < 1 || pdf.getPageCount() > settings.maxPdfPages)
-    throw new ToolFailure('PDF_PAGE_LIMIT');
-  if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
-  if (pdf.catalog.has(PDFName.of('AcroForm'))) throw new ToolFailure('PDF_FORMS_UNSUPPORTED');
-  if (pdf.catalog.has(PDFName.of('OutputIntents')))
-    throw new ToolFailure('PDF_COLOR_PROFILE_UNSUPPORTED');
-  const pages = pdf.getPages();
-  for (const page of pages) {
-    // 缩略图不参与当前图纸渲染，移除后避免携带旧版本的隐藏画面。
-    page.node.delete(PDFName.of('Thumb'));
-  }
-  const roots = new Set<PDFObject>(pages.map((page) => page.node));
-  const pending: PDFObject[] = [...roots];
-  for (const page of pages) {
-    const resources = page.node.Resources();
-    if (resources) pending.push(resources);
-  }
-  const inspected = new Set<PDFObject>();
-  while (pending.length) {
-    const object = pending.pop();
-    if (!object || inspected.has(object)) continue;
-    inspected.add(object);
-    if (object instanceof PDFRef) {
-      const value = pdf.context.lookup(object);
-      if (value) pending.push(value);
-    } else if (object instanceof PDFArray) {
-      for (const value of object.asArray()) pending.push(value);
-    } else if (object instanceof PDFStream) {
-      if (['F', 'FFilter', 'FDecodeParms'].some((key) => object.dict.has(PDFName.of(key))))
-        throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
-      pending.push(object.dict);
-    } else if (object instanceof PDFDict) {
-      const type = object.lookup(PDFName.of('Type'));
-      const subtype = object.lookup(PDFName.of('Subtype'));
-      const image = subtype === PDFName.of('Image');
-      const form = subtype === PDFName.of('Form');
-      // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
-      const metadata = object.lookup(PDFName.of('Metadata'));
-      if (
-        type === PDFName.of('Page') ||
-        image ||
-        form ||
-        (metadata instanceof PDFStream &&
-          (metadata.dict.lookup(PDFName.of('Type')) === PDFName.of('Metadata') ||
-            metadata.dict.lookup(PDFName.of('Subtype')) === PDFName.of('XML')))
-      )
-        object.delete(PDFName.of('Metadata'));
-      if (
-        (form && object.has(PDFName.of('Ref'))) ||
-        ((image || form) && object.has(PDFName.of('OPI')))
-      )
-        throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
-      if (image && object.has(PDFName.of('Alternates')))
-        throw new ToolFailure('PDF_IMAGE_ALTERNATES_UNSUPPORTED');
-      if (
-        ((image || form) && object.has(PDFName.of('OC'))) ||
-        type === PDFName.of('OCG') ||
-        type === PDFName.of('OCMD')
-      )
-        throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
-      if (
-        object.has(PDFName.of('AF')) ||
-        object.has(PDFName.of('EF')) ||
-        object.has(PDFName.of('PieceInfo')) ||
-        type === PDFName.of('Filespec') ||
-        type === PDFName.of('EmbeddedFile')
-      )
-        throw new ToolFailure('PDF_ATTACHMENTS_UNSUPPORTED');
-      for (const [key, value] of object.entries()) {
-        // 复制页会剥离父节点，继承资源已单独加入检查队列。
-        if (roots.has(object) && key === PDFName.of('Parent')) continue;
-        pending.push(value);
-      }
-    }
-  }
-  for (const page of pages) {
-    if (page.node.has(PDFName.of('AF'))) throw new ToolFailure('PDF_ATTACHMENTS_UNSUPPORTED');
-    if (page.node.has(PDFName.of('AA')) || (page.node.Annots()?.size() ?? 0) > 0)
-      throw new ToolFailure('PDF_ACTIONS_UNSUPPORTED');
-    const unit = page.node.lookup(PDFName.of('UserUnit'));
-    if (unit != null && (!(unit instanceof PDFNumber) || unit.asNumber() !== 1))
-      throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
-    const media = page.getMediaBox();
-    const boundaries = [page.getCropBox(), page.getBleedBox(), page.getTrimBox(), page.getArtBox()];
-    for (const box of [media, ...boundaries]) {
-      if (
-        ![box.x, box.y, box.width, box.height].every(Number.isFinite) ||
-        ![box.width, box.height].every((v) => v > 0 && v <= (1200 * 72) / 25.4)
-      )
-        throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
-    }
-    // 制造图纸必须检查完整纸张，拒绝打印区域与预览区域不同的源页。
-    if (
-      boundaries.some(
-        (box) =>
-          Math.abs(media.x - box.x) > 0.001 ||
-          Math.abs(media.y - box.y) > 0.001 ||
-          Math.abs(media.width - box.width) > 0.001 ||
-          Math.abs(media.height - box.height) > 0.001,
-      )
-    )
-      throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
-    const rotation = ((page.getRotation().angle % 360) + 360) % 360;
-    if (![0, 90, 180, 270].includes(rotation)) throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
-  }
-  return { document: pdf, normalizedBytes: normalized.length };
+  return normalized;
 }
 
 export async function pdfPreview(
@@ -427,16 +323,14 @@ export async function pdfPreview(
   pageNumber = 1,
   region?: DrawingRegion,
 ): Promise<{ preview: Buffer; paper: PaperSize; pageCount: number }> {
-  const { document: pdf } = await loadDrawingPdf(bytes, settings, signal);
-  if (pageNumber > pdf.getPageCount()) throw new ToolFailure('PDF_PAGE_NOT_FOUND');
-  const page = pdf.getPage(pageNumber - 1);
-  const box = page.getCropBox();
-  const rotated = page.getRotation().angle % 180 !== 0;
-  const widthPt = rotated ? box.height : box.width;
-  const heightPt = rotated ? box.width : box.height;
-  const paper = { widthMm: (widthPt * 25.4) / 72, heightMm: (heightPt * 25.4) / 72 };
-  if (Math.ceil(widthPt) * Math.ceil(heightPt) > settings.maxImagePixels)
-    throw new ToolFailure('PAGE_PIXEL_LIMIT');
+  const normalized = await normalizeDrawingPdf(bytes, settings, signal);
+  const { paper, pageCount } = await pdfTask(
+    { operation: 'inspect', bytes: normalized, page: pageNumber, limits: settings },
+    settings,
+    signal,
+  );
+  const widthPt = (paper.widthMm * 72) / 25.4;
+  const heightPt = (paper.heightMm * 72) / 25.4;
   const args = ['-png', '-singlefile', '-cropbox', '-f', `${pageNumber}`, '-l', `${pageNumber}`];
   if (region) {
     if (
@@ -485,5 +379,5 @@ export async function pdfPreview(
     signal,
     settings.maxRenderMemoryBytes,
   );
-  return { preview, paper, pageCount: pdf.getPageCount() };
+  return { preview, paper, pageCount };
 }

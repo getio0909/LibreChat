@@ -27,7 +27,11 @@ export function render(
       if (signal.aborted) return reject(new ToolFailure('REQUEST_CANCELLED'));
       if (result?.error?.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER')
         return reject(new ToolFailure('FILE_TOO_LARGE'));
-      if (result?.error?.code === 'ENOENT')
+      if (
+        result?.error?.code === 'ENOENT' ||
+        result?.error?.code === 126 ||
+        result?.error?.code === 127
+      )
         return reject(new ToolFailure('PDF_RENDERER_UNAVAILABLE'));
       if (!result || result.error) return reject(new ToolFailure('DRAWING_RENDER_FAILED'));
       resolve(result.stdout);

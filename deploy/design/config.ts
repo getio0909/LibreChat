@@ -69,6 +69,16 @@ export const settingsSchema = z
       path: ['maxConcurrentJobs'],
       message: 'Concurrent render jobs must share at most 384 MiB of address space.',
     },
+  )
+  // 并发 PDF 输入及输出缓冲区也计入预算，容器保留 256 MiB 供主服务使用。
+  .refine(
+    (settings) =>
+      settings.maxConcurrentJobs * (settings.maxRenderMemoryBytes + 2 * settings.maxFileBytes) <=
+      512 * 1024 * 1024,
+    {
+      path: ['maxConcurrentJobs'],
+      message: 'Concurrent PDF jobs and file buffers must fit a 512 MiB processing budget.',
+    },
   );
 
 export type Settings = z.infer<typeof settingsSchema>;
