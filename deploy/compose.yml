@@ -83,9 +83,9 @@ services:
     environment:
       DB_HOST: vectordb
       DB_PORT: 5432
-      DB_DATABASE: mydatabase
-      DB_USER: myuser
-      DB_PASSWORD: ${RAG_DB_PASSWORD}
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: ${RAG_DB_PASSWORD}
       RAG_PORT: 8000
     env_file: .env
     depends_on:
