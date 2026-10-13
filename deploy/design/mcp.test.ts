@@ -473,6 +473,81 @@ test('atomic PDF publication permits one writer and preserves its exact bytes', 
   assert.deepEqual(await fs.readdir(f.root), ['same.pdf']);
 });
 
+test('cancellation during publication removes only the owned, unchanged PDF', async () => {
+  const f = await fixture();
+  for (const change of ['none', 'replace', 'edit'] as const) {
+    const controller = new AbortController();
+    const filename = `${change}.pdf`;
+    await assert.rejects(
+      writePdf(
+        f.settings,
+        filename,
+        Buffer.from('complete export'),
+        controller.signal,
+        async (source, target) => {
+          await fs.link(source, target);
+          if (change === 'replace') await fs.unlink(target);
+          if (change !== 'none') await fs.writeFile(target, 'changed by user');
+          controller.abort();
+        },
+      ),
+      (error: Error) => error.name === 'AbortError',
+    );
+    if (change === 'none') {
+      await assert.rejects(fs.stat(path.join(f.root, filename)), { code: 'ENOENT' });
+      await writePdf(
+        f.settings,
+        filename,
+        Buffer.from('retried export'),
+        new AbortController().signal,
+      );
+    } else {
+      assert.equal((await fs.readFile(path.join(f.root, filename))).toString(), 'changed by user');
+    }
+  }
+  assert.deepEqual((await fs.readdir(f.root)).sort(), ['edit.pdf', 'none.pdf', 'replace.pdf']);
+});
+
+test('native title-block forms and inconsistent paper boxes cannot enter a drawing set', async () => {
+  const f = await fixture();
+  const formPdf = await PDFDocument.create();
+  const formPage = formPdf.addPage();
+  const field = formPdf.getForm().createTextField('title');
+  field.setText('Filled title block');
+  field.addToPage(formPage, { x: 20, y: 20, width: 200, height: 25 });
+  const sources = [
+    { filename: 'form.pdf', bytes: await formPdf.save(), code: 'PDF_FORMS_UNSUPPORTED' },
+  ];
+  for (const [index, size] of [
+    [100000, 100000],
+    [595, 842],
+    [-10, 842],
+  ].entries()) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage([595, 842]);
+    page.setMediaBox(0, 0, size[0], size[1]);
+    page.setCropBox(10, 10, 200, 300);
+    sources.push({
+      filename: `box-${index}.pdf`,
+      bytes: await pdf.save(),
+      code: 'PDF_PAGE_UNSUPPORTED',
+    });
+  }
+  for (const source of sources) {
+    await fs.writeFile(path.join(f.root, source.filename), source.bytes);
+    for (const tool of ['assemble_drawing_pdf', 'inspect_pdf']) {
+      const arguments_ =
+        tool === 'assemble_drawing_pdf'
+          ? { pdf_filename: 'unsupported.pdf', sheets: [{ source_filename: source.filename }] }
+          : { pdf_filename: source.filename, page: 1 };
+      const rejected = await f.client.callTool({ name: tool, arguments: arguments_ });
+      assert.equal(rejected.isError, true);
+      assert.match(JSON.stringify(rejected), new RegExp(source.code));
+    }
+  }
+  await assert.rejects(fs.stat(path.join(f.root, 'unsupported.pdf')), { code: 'ENOENT' });
+});
+
 test('drawing assembly rejects page and aggregate byte overflow, malformed and unscaled sources without writing', async () => {
   const f = await fixture({ maxPdfPages: 2 });
   const native = await PDFDocument.create();

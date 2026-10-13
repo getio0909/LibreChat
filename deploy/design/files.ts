@@ -157,16 +157,35 @@ export async function writePdf(
   filename: string,
   bytes: Buffer,
   signal: AbortSignal,
+  publish: typeof fs.link = fs.link,
 ): Promise<void> {
   if (fileType(filename) !== 'application/pdf') throw new ToolFailure('PDF_REQUIRED');
   if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
   signal.throwIfAborted();
   const staged = path.join(settings.workspace, `.${randomUUID()}.tmp`);
+  const target = path.join(settings.workspace, filename);
   try {
     await fs.writeFile(staged, bytes, { flag: 'wx', mode: 0o644, signal });
+    const owned = await fs.lstat(staged, { bigint: true });
     signal.throwIfAborted();
-    // 同目录硬链接是原子提交点，并且不会像重命名那样覆盖已有目标。
-    await fs.link(staged, path.join(settings.workspace, filename));
+    // 同目录硬链接原子发布完整文件，并且不会覆盖已有目标。
+    await publish(staged, target);
+    if (signal.aborted) {
+      try {
+        const current = await fs.lstat(target, { bigint: true });
+        // 仅撤回本次未被修改的文件，保留取消期间替换或编辑的用户数据。
+        if (
+          current.dev === owned.dev &&
+          current.ino === owned.ino &&
+          current.size === owned.size &&
+          current.mtimeNs === owned.mtimeNs
+        )
+          await fs.unlink(target);
+      } catch (error) {
+        if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) throw error;
+      }
+      signal.throwIfAborted();
+    }
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
       throw new ToolFailure('FILE_EXISTS');

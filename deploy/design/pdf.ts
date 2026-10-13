@@ -224,15 +224,26 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
   if (pdf.getPageCount() < 1 || pdf.getPageCount() > maxPages)
     throw new ToolFailure('PDF_PAGE_LIMIT');
   if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
+  if (pdf.catalog.has(PDFName.of('AcroForm'))) throw new ToolFailure('PDF_FORMS_UNSUPPORTED');
   for (const page of pdf.getPages()) {
     const unit = page.node.get(PDFName.of('UserUnit'));
     if (unit != null && (!(unit instanceof PDFNumber) || unit.asNumber() !== 1))
       throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
-    const size = page.getCropBox();
-    if (
-      ![size.width, size.height].every(
-        (v) => Number.isFinite(v) && v > 0 && v <= (1200 * 72) / 25.4,
+    const media = page.getMediaBox();
+    const crop = page.getCropBox();
+    for (const box of [media, crop]) {
+      if (
+        ![box.x, box.y, box.width, box.height].every(Number.isFinite) ||
+        ![box.width, box.height].every((v) => v > 0 && v <= (1200 * 72) / 25.4)
       )
+        throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
+    }
+    // 制造图纸必须检查完整纸张，拒绝打印区域与预览区域不同的源页。
+    if (
+      Math.abs(media.x - crop.x) > 0.001 ||
+      Math.abs(media.y - crop.y) > 0.001 ||
+      Math.abs(media.width - crop.width) > 0.001 ||
+      Math.abs(media.height - crop.height) > 0.001
     )
       throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
     const rotation = ((page.getRotation().angle % 360) + 360) % 360;
