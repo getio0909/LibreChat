@@ -2,11 +2,25 @@ import { inflateSync } from 'node:zlib';
 import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFObject, PDFNull } from 'pdf-lib';
 import { ToolFailure } from './config.ts';
 
-function references(content: Uint8Array): Set<PDFName> {
+type Resource = 'XObject' | 'Pattern' | 'ExtGState' | 'Font';
+type References = Map<Resource, Set<PDFName>>;
+const operators: Record<string, Resource> = {
+  Do: 'XObject',
+  SCN: 'Pattern',
+  scn: 'Pattern',
+  gs: 'ExtGState',
+  Tf: 'Font',
+};
+const resourceKinds: Resource[] = ['XObject', 'Pattern', 'ExtGState', 'Font'];
+function emptyReferences(): References {
+  return new Map(resourceKinds.map((key) => [key, new Set<PDFName>()]));
+}
+
+function references(content: Uint8Array): References {
   const text = Buffer.from(content.buffer, content.byteOffset, content.byteLength).toString(
     'latin1',
   );
-  const names = new Set<PDFName>();
+  const names = emptyReferences();
   let name: PDFName | undefined;
   let nested = 0;
   let i = 0;
@@ -71,7 +85,8 @@ function references(content: Uint8Array): Set<PDFName> {
       continue;
     }
     if (token === 'BI') throw new ToolFailure('PDF_INLINE_IMAGE_UNSUPPORTED');
-    if (token === 'Do' && name) names.add(name);
+    const kind = Object.hasOwn(operators, token) ? operators[token] : undefined;
+    if (kind && name) names.get(kind)!.add(name);
     if (!/^[+-]?(?:\d*\.?\d+)$/.test(token)) name = undefined;
   }
   if (nested) throw new ToolFailure('INVALID_PDF');
@@ -79,12 +94,13 @@ function references(content: Uint8Array): Set<PDFName> {
 }
 
 export function pruneResources(pdf: PDFDocument, limit: number): void {
-  const used = new Map<PDFDict, Set<PDFName>>();
-  const parsed = new Map<PDFRawStream, Set<PDFName>>();
+  const used = new Map<PDFDict, References>();
+  const decoded = new Map<PDFRawStream, Uint8Array>();
+  const parsed = new Map<PDFObject, References>();
   const scanned = new Map<PDFObject, Set<PDFDict>>();
   let expanded = 0;
-  const streamNames = (stream: PDFRawStream) => {
-    const cached = parsed.get(stream);
+  const streamBytes = (stream: PDFRawStream) => {
+    const cached = decoded.get(stream);
     if (cached) return cached;
     let bytes = stream.getContents();
     const filter = stream.dict.lookup(PDFName.of('Filter'));
@@ -107,9 +123,8 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
     }
     expanded += bytes.byteLength;
     if (expanded > limit) throw new ToolFailure('FILE_TOO_LARGE');
-    const result = references(bytes);
-    parsed.set(stream, result);
-    return result;
+    decoded.set(stream, bytes);
+    return bytes;
   };
   const scan = (content: PDFObject | undefined, resources: PDFDict | undefined): void => {
     if (!content || !resources) return;
@@ -119,36 +134,36 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
     if (scopes.has(resources)) return;
     scopes.add(resources);
     scanned.set(resolved, scopes);
-    if (resolved instanceof PDFArray) {
-      for (const item of resolved.asArray()) scan(item, resources);
-      return;
+    let calls = parsed.get(resolved);
+    if (!calls) {
+      const streams = resolved instanceof PDFArray ? resolved.asArray() : [resolved];
+      const chunks = streams.map((item) => {
+        const stream = pdf.context.lookup(item);
+        if (!(stream instanceof PDFRawStream)) throw new ToolFailure('INVALID_PDF');
+        return streamBytes(stream);
+      });
+      const size = chunks.reduce((total, chunk) => total + chunk.byteLength, 0);
+      if (size > limit) throw new ToolFailure('FILE_TOO_LARGE');
+      // 页面内容数组是一条连续指令流，名称、字符串和操作符都可能跨越流边界。
+      calls = references(chunks.length === 1 ? chunks[0] : Buffer.concat(chunks, size));
+      parsed.set(resolved, calls);
     }
-    if (!(resolved instanceof PDFRawStream)) throw new ToolFailure('INVALID_PDF');
-    const names = used.get(resources) ?? new Set<PDFName>();
+    const names = used.get(resources) ?? emptyReferences();
     used.set(resources, names);
-    const xobjects = resources.lookup(PDFName.of('XObject'));
-    for (const name of streamNames(resolved)) {
-      names.add(name);
-      const object = xobjects instanceof PDFDict ? xobjects.lookup(name) : undefined;
-      if (
-        object instanceof PDFRawStream &&
-        object.dict.lookup(PDFName.of('Subtype')) === PDFName.of('Form')
-      ) {
-        const own = object.dict.lookup(PDFName.of('Resources'));
-        scan(object, own instanceof PDFDict ? own : resources);
-      }
-    }
-    // 图案和软蒙版可能间接调用 XObject；Type3 字体需要生产端转换以移除未使用字形。
-    for (const key of ['Pattern', 'ExtGState', 'Font']) {
+    for (const key of resourceKinds) {
       const entries = resources.lookup(PDFName.of(key));
-      if (!(entries instanceof PDFDict)) continue;
-      for (const [, ref] of entries.entries()) {
-        const object = pdf.context.lookup(ref);
-        if (object instanceof PDFRawStream) {
+      for (const name of calls.get(key)!) {
+        names.get(key)!.add(name);
+        const object = entries instanceof PDFDict ? entries.lookup(name) : undefined;
+        if (
+          object instanceof PDFRawStream &&
+          (key === 'Pattern' ||
+            (key === 'XObject' && object.dict.lookup(PDFName.of('Subtype')) === PDFName.of('Form')))
+        ) {
           const own = object.dict.lookup(PDFName.of('Resources'));
           scan(object, own instanceof PDFDict ? own : resources);
         } else if (object instanceof PDFDict) {
-          if (object.lookup(PDFName.of('Subtype')) === PDFName.of('Type3'))
+          if (key === 'Font' && object.lookup(PDFName.of('Subtype')) === PDFName.of('Type3'))
             throw new ToolFailure('PDF_TYPE3_FONT_UNSUPPORTED');
           const mask = object.lookup(PDFName.of('SMask'));
           if (mask instanceof PDFDict) {
@@ -165,13 +180,16 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
   for (const page of pdf.getPages()) {
     const resources = page.node.Resources();
     if (resources) {
-      if (!used.has(resources)) used.set(resources, new Set());
+      if (!used.has(resources)) used.set(resources, emptyReferences());
       scan(page.node.Contents(), resources);
     }
   }
   for (const [resources, names] of used) {
-    const objects = resources.lookup(PDFName.of('XObject'));
-    if (objects instanceof PDFDict)
-      for (const [name] of objects.entries()) if (!names.has(name)) objects.delete(name);
+    for (const key of resourceKinds) {
+      const objects = resources.lookup(PDFName.of(key));
+      if (objects instanceof PDFDict)
+        for (const [name] of objects.entries())
+          if (!names.get(key)!.has(name)) objects.delete(name);
+    }
   }
 }

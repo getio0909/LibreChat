@@ -26,6 +26,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Server } from 'node:http';
+import type { PDFObject } from 'pdf-lib';
 import type { FileHandle } from 'node:fs/promises';
 import type { Settings, Request } from './config.ts';
 import { settingsSchema, ToolFailure, boundedBody } from './config.ts';
@@ -280,6 +281,37 @@ test('physical SVG dimensions are compared before integer pixel rounding can hid
         await fs.readFile(path.join(f.root, 'physical-' + index + '.pdf')),
       );
       assert.ok(Math.abs(pdf.getPage(0).getWidth() - (50 * 72) / 25.4) < 0.001);
+    }
+  }
+});
+
+test('rounded physical unit conversions fit the requested sheet without accepting a real size mismatch', async () => {
+  const f = await fixture();
+  for (const [index, width] of ['595.28pt', '49.6063pc', '8.26772in', '209.98mm'].entries()) {
+    await fs.writeFile(
+      path.join(f.root, 'rounded.svg'),
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="841.89pt"><path d="M10 10h100" stroke="black"/></svg>`,
+    );
+    const result = await f.client.callTool({
+      name: 'export_drawing_pdf',
+      arguments: {
+        source_filename: 'rounded.svg',
+        pdf_filename: `rounded-${index}.pdf`,
+        page_width_mm: 210,
+        page_height_mm: 297,
+      },
+    });
+    if (index === 3) {
+      assert.equal(result.isError, true);
+      assert.match(JSON.stringify(result), /PAGE_SIZE_MISMATCH/);
+      await assert.rejects(fs.stat(path.join(f.root, `rounded-${index}.pdf`)), { code: 'ENOENT' });
+    } else {
+      assert.equal(result.isError, undefined);
+      const pdf = await PDFDocument.load(
+        await fs.readFile(path.join(f.root, `rounded-${index}.pdf`)),
+      );
+      assert.ok(Math.abs(pdf.getPage(0).getWidth() - (210 * 72) / 25.4) < 0.001);
+      assert.ok(Math.abs(pdf.getPage(0).getHeight() - (297 * 72) / 25.4) < 0.001);
     }
   }
 });
@@ -970,6 +1002,158 @@ test('drawing publication prunes stale unused page and Form resources', async ()
     1,
   );
   assert.deepEqual(await fs.readFile(path.join(f.root, 'unused.pdf')), bytes);
+});
+
+test('page content arrays retain drawing operands and strings across stream boundaries', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const visible = pdf.context.register(
+    pdf.context.flateStream('20 20 100 100 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 150, 150],
+    }),
+  );
+  const stale = pdf.context.register(
+    pdf.context.flateStream('0 0 10 10 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 10, 10],
+    }),
+  );
+  page.node.set(
+    PDFName.of('Resources'),
+    pdf.context.obj({ XObject: { Drawing: visible, OldForm: stale } }),
+  );
+  page.node.set(
+    PDFName.of('Contents'),
+    pdf.context.obj([
+      pdf.context.register(pdf.context.flateStream('/Drawing ')),
+      pdf.context.register(pdf.context.flateStream('Do /Span << /ActualText (/Old')),
+      pdf.context.register(pdf.context.flateStream('Form Do) >> BDC EMC')),
+    ]),
+  );
+  const bytes = Buffer.from(await pdf.save());
+  const result = await pdfTask(
+    {
+      operation: 'assemble',
+      sources: [{ source_filename: 'streams.pdf', bytes: new Uint8Array(bytes) }],
+      limits: f.settings,
+    },
+    f.settings,
+    new AbortController().signal,
+  );
+  const output = await PDFDocument.load(result.bytes);
+  const resources = output.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'));
+  assert.ok(resources instanceof PDFDict);
+  assert.equal(resources.has(PDFName.of('Drawing')), true);
+  assert.equal(resources.has(PDFName.of('OldForm')), false);
+  await fs.writeFile(path.join(f.root, 'streams.pdf'), bytes);
+  const published = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'streams-set.pdf',
+      sheets: [{ source_filename: 'streams.pdf' }],
+    },
+  });
+  assert.equal(published.isError, undefined);
+  const image = CallToolResultSchema.parse(published).content.find((item) => item.type === 'image');
+  assert.ok(image?.type === 'image');
+  assert.ok(
+    (await sharp(Buffer.from(image.data, 'base64')).stats()).channels.some(
+      (channel) => channel.min < 30,
+    ),
+  );
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'streams.pdf')), bytes);
+});
+
+test('nested drawing resources retain selected patterns and states and omit unused programs', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const pattern = pdf.context.register(
+    pdf.context.flateStream('0 0 5 5 re f', {
+      Type: 'Pattern',
+      PatternType: 1,
+      PaintType: 1,
+      TilingType: 1,
+      BBox: [0, 0, 10, 10],
+      XStep: 10,
+      YStep: 10,
+      Resources: {},
+    }),
+  );
+  const stale = pdf.context.register(
+    pdf.context.flateStream('0 0 200 200 re f', {
+      Type: 'Pattern',
+      PatternType: 1,
+      PaintType: 1,
+      TilingType: 1,
+      BBox: [0, 0, 200, 200],
+      XStep: 200,
+      YStep: 200,
+      Resources: {},
+    }),
+  );
+  const state = pdf.context.register(pdf.context.obj({ Type: 'ExtGState', CA: 1, ca: 1 }));
+  const unusedState = pdf.context.register(
+    pdf.context.obj({ Type: 'ExtGState', CA: 0.5, ca: 0.5 }),
+  );
+  const unusedFont = pdf.context.register(
+    pdf.context.obj({ Type: 'Font', Subtype: 'Type1', BaseFont: 'Helvetica' }),
+  );
+  const visible = pdf.context.register(
+    pdf.context.flateStream('/LiveState gs /Pattern cs /Live scn 20 20 100 100 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 150, 150],
+      Resources: {
+        Pattern: { Live: pattern, Old: stale },
+        ExtGState: { LiveState: state, OldState: unusedState },
+        Font: { OldFont: unusedFont },
+      },
+    }),
+  );
+  page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: visible } }));
+  page.pushOperators(drawObject('Drawing'));
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'patterns.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'patterns-set.pdf',
+      sheets: [{ source_filename: 'patterns.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'patterns-set.pdf')));
+  const objects = output.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'));
+  assert.ok(objects instanceof PDFDict);
+  const form = objects.lookup(PDFName.of('Drawing'));
+  assert.ok(form instanceof PDFRawStream);
+  const resources = form.dict.lookup(PDFName.of('Resources'));
+  assert.ok(resources instanceof PDFDict);
+  for (const [key, expected] of [
+    ['Pattern', ['Live']],
+    ['ExtGState', ['LiveState']],
+    ['Font', []],
+  ] as const) {
+    const entries: PDFObject | undefined = resources.lookup(PDFName.of(key));
+    assert.ok(entries instanceof PDFDict);
+    assert.deepEqual(
+      entries.keys().map((name) => name.decodeText()),
+      expected,
+    );
+  }
+  const image = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(image?.type === 'image');
+  assert.ok(
+    (await sharp(Buffer.from(image.data, 'base64')).stats()).channels.some(
+      (channel) => channel.min < 30,
+    ),
+  );
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'patterns.pdf')), bytes);
 });
 
 test('PDF NUL whitespace and null Flate parameters retain visible drawing resources', async () => {

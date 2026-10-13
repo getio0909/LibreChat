@@ -85,10 +85,10 @@ function selfContainedSvg(bytes: Buffer, paper?: PaperSize): void {
             throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
           return value;
         };
-        // 比较声明的物理尺寸，不能使用渲染器取整后的像素值推断图纸比例。
+        // 比较物理尺寸并容许单位换算的常见小数取整；0.01 毫米仅用于纸张匹配。
         if (
-          Math.abs(millimeters('width') - paper.widthMm) > 0.000001 ||
-          Math.abs(millimeters('height') - paper.heightMm) > 0.000001
+          Math.abs(millimeters('width') - paper.widthMm) > 0.01 ||
+          Math.abs(millimeters('height') - paper.heightMm) > 0.01
         )
           throw new ToolFailure('PAGE_SIZE_MISMATCH');
       }
