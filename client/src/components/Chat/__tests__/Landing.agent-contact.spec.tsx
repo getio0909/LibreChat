@@ -5,6 +5,9 @@ import '@testing-library/jest-dom';
 import { ChatSettingsContext, defaultChatSettings } from '~/Providers/ChatSettingsContext';
 import Landing from '../Landing';
 
+let mockStartupConfig: { appTitle?: string; interface: { customWelcome?: string } } = {
+  interface: {},
+};
 let mockConversation: Record<string, unknown> | null = null;
 let mockAgentsMap: Record<string, any> | undefined;
 let mockAssistantMap: Record<string, any> | undefined;
@@ -36,15 +39,16 @@ jest.mock('~/Providers', () => ({
 }));
 
 jest.mock('~/data-provider', () => ({
-  useGetStartupConfig: () => ({ data: { interface: {} } }),
+  useGetStartupConfig: () => ({ data: mockStartupConfig }),
   useGetEndpointsQuery: () => ({ data: {} }),
 }));
 
 jest.mock('~/hooks', () => ({
   useAuthContext: () => ({ user: undefined }),
   useGreeting: () => 'Welcome',
-  useLocalize: () => (key: string) => {
+  useLocalize: () => (key: string, options?: { 0: string }) => {
     const translations: Record<string, string> = {
+      com_ui_logo: `${options?.[0]} Logo`,
       com_agents_contact: 'Contact',
       com_agents_no_contact_available: 'No contact available',
       com_ui_temporary: 'Temporary Chat',
@@ -87,11 +91,17 @@ jest.mock('~/utils', () => ({
 
 jest.mock('~/components/Endpoints/ConvoIcon', () => () => <span data-testid="convo-icon" />);
 
-function renderLanding({ isTemporary = false }: { isTemporary?: boolean } = {}) {
+function renderLanding({
+  isTemporary = false,
+  centerFormOnLanding = false,
+}: {
+  isTemporary?: boolean;
+  centerFormOnLanding?: boolean;
+} = {}) {
   return render(
     <RecoilRoot>
       <ChatSettingsContext.Provider value={{ ...defaultChatSettings, isTemporary }}>
-        <Landing centerFormOnLanding={false} />
+        <Landing centerFormOnLanding={centerFormOnLanding} />
       </ChatSettingsContext.Provider>
     </RecoilRoot>,
   );
@@ -229,6 +239,52 @@ describe('Landing temporary chat empty state', () => {
 
     expect(screen.getByText('Welcome')).toBeInTheDocument();
     expect(screen.queryByText('Temporary Chat')).not.toBeInTheDocument();
-    expect(screen.getByTestId('convo-icon')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: '庄严宝刹 Logo' })).toHaveAttribute(
+      'src',
+      'assets/zybc-seal.svg',
+    );
+  });
+});
+
+describe('Landing brand identity', () => {
+  beforeEach(() => {
+    mockConversation = { endpoint: 'openAI', model: 'gpt-6' };
+    mockAgentsMap = undefined;
+    mockAssistantMap = undefined;
+    mockStartupConfig = {
+      appTitle: '庄严宝刹 AI 设计助手',
+      interface: { customWelcome: '庄严宝刹 AI 设计助手' },
+    };
+  });
+
+  afterEach(() => {
+    mockStartupConfig = { interface: {} };
+  });
+
+  it.each([true, false])('uses the brand seal with centered composer=%s', (centerFormOnLanding) => {
+    renderLanding({ centerFormOnLanding });
+
+    const logo = screen.getByRole('img', { name: '庄严宝刹 AI 设计助手 Logo' });
+    expect(logo).toHaveAttribute('src', 'assets/zybc-seal.svg');
+    expect(logo).toHaveAttribute('width', '40');
+    expect(logo).toHaveAttribute('height', '40');
+    expect(logo).toHaveClass('object-contain');
+    expect(screen.getByText('庄严宝刹 AI 设计助手')).toBeInTheDocument();
+    expect(screen.queryByTestId('convo-icon')).not.toBeInTheDocument();
+  });
+
+  it.each(['anthropic', 'custom'])('does not substitute a provider icon for %s', (endpoint) => {
+    mockConversation = { endpoint, model: 'another-model' };
+    renderLanding();
+
+    expect(screen.getByRole('img')).toHaveAttribute('src', 'assets/zybc-seal.svg');
+    expect(screen.queryByTestId('convo-icon')).not.toBeInTheDocument();
+  });
+
+  it('preserves the temporary-chat indicator instead of displaying the brand seal', () => {
+    renderLanding({ isTemporary: true });
+
+    expect(screen.getByText('Temporary Chat')).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

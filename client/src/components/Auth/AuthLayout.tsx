@@ -93,8 +93,12 @@ function AuthLayout({
       <BlinkAnimation active={isFetching}>
         <div className="mt-6 flex w-full flex-col items-center gap-1">
           <img src="assets/zybc-seal.svg" className="h-16 w-16 object-contain" alt="庄严宝刹" />
-          <span className="text-text-primary text-base font-semibold tracking-widest">庄严宝刹</span>
-          <span className="text-text-secondary text-[10px] tracking-widest">ZHUANG YAN BAO CHA</span>
+          <span className="text-text-primary text-base font-semibold tracking-widest">
+            {localize('com_ui_brand_name')}
+          </span>
+          <span className="text-text-secondary text-xs tracking-widest">
+            {localize('com_ui_brand_romanized')}
+          </span>
         </div>
       </BlinkAnimation>
       <DisplayError />
