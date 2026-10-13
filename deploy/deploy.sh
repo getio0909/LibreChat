@@ -18,6 +18,13 @@ config_files=(compose.yml librechat.yaml .env image.env design-admin.json design
 gate=/etc/nginx/librechat-dev.provisioning
 compose=(docker compose -p librechat-dev --project-directory "$deploy_root" \
   --env-file "$deploy_root/.env" --env-file "$deploy_root/image.env" -f "$deploy_root/compose.yml")
+own_service_configs() {
+  for file in design-admin.json design-user.json files-admin.yaml files-user.yaml; do
+    if [[ -f "$deploy_root/$file" ]]; then
+      chown 10001:10001 "$deploy_root/$file" || return 1
+    fi
+  done
+}
 cleanup() {
   status=$?
   trap - EXIT
@@ -32,7 +39,7 @@ cleanup() {
         fi
       done
       # 单文件挂载保留旧 inode；强制重建才能恢复已轮换的密钥和文件服务凭据。
-      if "$restored" && "${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
+      if "$restored" && own_service_configs && "${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
         rm -f -- "$gate"
         echo 'The previous application deployment has been restored.' >&2
       else
@@ -105,6 +112,7 @@ activated=true
 for file in "${config_files[@]}"; do
   install -m 600 "$stage/$file" "$deploy_root/$file"
 done
+own_service_configs
 
 # 默认账户验证完成前关闭公开注册，避免首个管理员被抢先创建。
 cat > "$stage/accounts.yml" <<'EOF'
@@ -200,6 +208,7 @@ for account in admin user; do
   jq --arg id "$user_id" '.userId = $id' "$stage/design-$account.json" > "$stage/design-bound.json"
   install -m 600 "$stage/design-bound.json" "$deploy_root/design-$account.json"
 done
+own_service_configs
 # 在公开访问恢复前，将内部网络地址绑定到已验证的用户标识。
 "${closed_compose[@]}" exec -T api node -e '
 const fs = require("node:fs"), yaml = require("js-yaml");
@@ -213,6 +222,15 @@ install -m 600 "$stage/configured.yaml" "$deploy_root/librechat.yaml"
 "${closed_compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
 "${closed_compose[@]}" up -d --no-deps --force-recreate --wait --wait-timeout 240 files-admin files-user design-admin design-user api
 "${closed_compose[@]}" exec -T api node -e "$(cat "$stage/checks.js")" < "$stage/accounts.json"
+# 同时验证 Nginx 使用的主机端口，容器内部可达并不代表端口已发布。
+for account in admin user; do
+  port=5001
+  if [[ "$account" == user ]]; then port=5002; fi
+  jq -r --arg account "$account" '"Authorization: Basic " + (.[$account] | (.username + ":" + .password) | @base64)' \
+    "$stage/accounts.json" > "$stage/files-header"
+  curl --fail --silent --show-error -H "@$stage/files-header" -o /dev/null \
+    "http://127.0.0.1:$port/cad-files/$account/?json"
+done
 # 账户和角色验证通过后恢复用户配置的注册设置。
 "${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
 rm -f -- "$gate"

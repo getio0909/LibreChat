@@ -58,8 +58,8 @@ jobs:
         run: npm run lighthouse
       - name: Validate deployment files
         run: |
-          bash -n deploy/deploy.sh deploy/bootstrap.sh deploy/deploy.test.sh deploy/bootstrap.test.sh deploy/freecad.sh
-          shellcheck -x deploy/deploy.sh deploy/bootstrap.sh deploy/deploy.test.sh deploy/bootstrap.test.sh deploy/freecad.sh
+          bash -n deploy/deploy.sh deploy/bootstrap.sh deploy/deploy.test.sh deploy/bootstrap.test.sh deploy/freecad.sh deploy/runtime.test.sh
+          shellcheck -x deploy/deploy.sh deploy/bootstrap.sh deploy/deploy.test.sh deploy/bootstrap.test.sh deploy/freecad.sh deploy/runtime.test.sh
           bash deploy/deploy.test.sh
           bash deploy/bootstrap.test.sh
           mkdir -p /tmp/compose-check
@@ -139,6 +139,11 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha,scope=design
           cache-to: type=gha,mode=max,scope=design
+      - name: Verify the complete private CAD stack
+        env:
+          FREECAD_IMAGE: ghcr.io/getio0909/librechat-freecad@${{ steps.cad.outputs.digest }}
+          DESIGN_IMAGE: ghcr.io/getio0909/librechat-design@${{ steps.design.outputs.digest }}
+        run: bash deploy/runtime.test.sh
 
   deploy:
     needs: image

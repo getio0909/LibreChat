@@ -88,6 +88,6 @@ mcpServers:
     url: http://design-{{LIBRECHAT_USER_ID}}:8000/mcp
     requiresOAuth: false
     timeout: 180000
-    serverInstructions: Use Seedream for image generation unless the user asks for Gemini. CAD imports and exports use the private workspace. Return the download links from workspace_files or export_drawing_pdf. Users may manually upload downloaded files into LibreChat Files for reuse; do not claim automatic library synchronization.
+    serverInstructions: Use Seedream for image generation unless the user asks for Gemini. CAD imports and exports use the private workspace. Return the download links from workspace_files or export_drawing_pdf. Use the workspace ZIP archive for manual storage in LibreChat Files when native CAD types are not recognized by the browser. Users extract archives locally before uploading models into the CAD workspace. Do not claim automatic library synchronization.
     headers:
       X-LibreChat-User-ID: '{{LIBRECHAT_USER_ID}}'

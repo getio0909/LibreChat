@@ -75,6 +75,10 @@ EOF
 cat > "$work/bin/curl" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+if [[ "$*" == *'/cad-files/'* ]]; then
+  if [[ "$DEPLOY_TEST_FAILURE" == file-port ]]; then exit 7; fi
+  exit 0
+fi
 while [[ "$1" != -o ]]; do shift; done
 output=$2
 email=$(jq -r .email)
@@ -85,7 +89,14 @@ id=$(printf 'b%.0s' {1..24})
 if [[ "$email" == admin@example.test ]]; then id=$(printf 'a%.0s' {1..24}); fi
 jq -n --arg role "$role" --arg id "$id" '{user: {role: $role, id: $id}}' > "$output"
 EOF
-chmod 755 "$work/bin/docker" "$work/bin/curl"
+cat > "$work/bin/chown" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+test "$1" = 10001:10001
+test -f "$2"
+printf 'config-owner:%s\n' "${2##*/}" >> "$DEPLOY_TEST_LOG"
+EOF
+chmod 755 "$work/bin/docker" "$work/bin/curl" "$work/bin/chown"
 printf 'previous compose\n' > "$work/previous/compose.yml"
 printf 'previous config\n' > "$work/previous/librechat.yaml"
 printf 'ALLOW_REGISTRATION=true\n' > "$work/previous/.env"
@@ -109,7 +120,7 @@ for account in admin user; do
 done
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-for scenario in none health mcp command login role final first-none first-login first-role rotated-mcp rotated-final; do
+for scenario in none health mcp command login role final file-port first-none first-login first-role rotated-mcp rotated-final; do
   failure=${scenario#first-}
   failure=${failure#rotated-}
   previous="$work/previous"
@@ -143,6 +154,9 @@ for scenario in none health mcp command login role final first-none first-login 
     grep -q '^up:false:.*00000000' "$DEPLOY_TEST_LOG"
   fi
   grep -q '^up:true:.*11111111' "$DEPLOY_TEST_LOG"
+  for file in design-admin.json design-user.json files-admin.yaml files-user.yaml; do
+    grep -q "^config-owner:$file" "$DEPLOY_TEST_LOG"
+  done
   if [[ "$scenario" != first-* || "$failure" == none ]]; then
     for file in compose.yml librechat.yaml .env image.env; do
       if [[ "$file" == .env && "$failure" == none ]]; then

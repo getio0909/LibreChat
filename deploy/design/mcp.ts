@@ -63,7 +63,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'workspace_files',
       {
         description:
-          'List the current private CAD workspace and authenticated download links. Use upload_url to upload files manually. Pass returned local paths to FreeCAD/Blender import tools. Users can download exports and upload them into LibreChat Files for reuse.',
+          'List the current private CAD workspace and authenticated download links. Use upload_url to upload files manually. Pass returned local paths to FreeCAD/Blender import tools. Use archive_url to download a ZIP for manual storage in LibreChat Files when the browser cannot identify a native CAD file type. Extract the ZIP locally before uploading native models into the CAD workspace.',
         inputSchema: {},
       },
       () => run(async () => text(await listWorkspace(settings))),
