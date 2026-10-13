@@ -1,3 +1,4 @@
+import { createInstance } from 'i18next';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { Constants, EToolResources } from 'librechat-data-provider';
 import type { UploadLifecycleCallbacks } from '~/hooks/Files/useFileHandling';
@@ -9,6 +10,9 @@ import {
   getPendingDraftId,
   renewNewConversationDraftToken,
 } from '~/utils/drafts';
+import chineseTranslations from '~/locales/zh-Hans/translation.json';
+import finnishTranslations from '~/locales/fi/translation.json';
+import germanTranslations from '~/locales/de/translation.json';
 import translations from '~/locales/en/translation.json';
 
 const mockForceResize = jest.fn();
@@ -1158,6 +1162,30 @@ describe('useTextarea model-independent placeholder', () => {
 
     await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
   });
+
+  it.each(['de', 'fi', 'zh-Hans'])(
+    'uses the standalone Message fallback in %s',
+    async (language) => {
+      const i18n = createInstance();
+      await i18n.init({
+        lng: language,
+        fallbackLng: 'en',
+        resources: {
+          en: { translation: translations },
+          de: { translation: germanTranslations },
+          fi: { translation: finnishTranslations },
+          'zh-Hans': { translation: chineseTranslations },
+        },
+        interpolation: { escapeValue: false },
+      });
+      mockLocalize.mockImplementation((key, options) =>
+        String(i18n.t(key as keyof typeof translations, options)),
+      );
+      const { textArea } = renderTextareaHook();
+
+      await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
+    },
+  );
 
   it('keeps Message when the selected model changes', async () => {
     const { textArea, rerender } = renderTextareaHook();

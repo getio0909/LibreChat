@@ -198,7 +198,7 @@ export default function useTextarea({
       }
 
       // 普通输入提示不包含模型名称，配置异常和显式提示仍由上方分支处理。
-      return localize('com_endpoint_message');
+      return localize('com_endpoint_message_placeholder');
     };
 
     const placeholderText = getPlaceholderText();
