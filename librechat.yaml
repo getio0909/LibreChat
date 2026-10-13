@@ -31,9 +31,28 @@ endpoints:
         # 清空标量映射，防止旧会话参数覆盖 OpenRouter 的完整推理配置。
         reasoning_effort: ''
         reasoning:
+          effort: high
+          enabled: true
+        maxTokens: 128000
+        maxCompletionTokens: 128000
+      dropParams: [stop, temperature, top_p, top_k, include_reasoning]
+    - name: OpenRouterMax
+      apiKey: '${OPENROUTER_API_KEY}'
+      baseURL: https://openrouter.ai/api/v1
+      models:
+        default: [anthropic/claude-haiku-5.5]
+        fetch: false
+      titleConvo: true
+      titleModel: anthropic/claude-haiku-5.5
+      titleEndpoint: OpenRouterTitles
+      modelDisplayLabel: Claude Haiku 5.5
+      addParams:
+        reasoning_effort: ''
+        reasoning:
           effort: max
           enabled: true
-        maxTokens: 65536
+        maxTokens: 128000
+        maxCompletionTokens: 128000
       dropParams: [stop, temperature, top_p, top_k, include_reasoning]
     - name: OpenRouterTitles
       apiKey: '${OPENROUTER_API_KEY}'
@@ -47,6 +66,7 @@ endpoints:
         reasoning:
           effort: low
           enabled: false
+        maxCompletionTokens: 256
       dropParams: [stop, temperature, top_p, top_k, include_reasoning]
   agents:
     disableBuilder: true
@@ -58,16 +78,22 @@ modelSpecs:
   enforce: true
   list:
     - name: haiku-design
-      label: Claude Haiku 5.5
+      label: Claude Haiku 5.5 · High
       default: true
       mcpServers: [freecad, blender, design_tools]
-      preset:
+      preset: &cad-preset
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
-        maxContextTokens: 900000
+        maxContextTokens: 850000
         promptPrefix: >-
           You are a CAD and 3D design assistant. Use real MCP operations and
-          inspect the resulting files. Study the reference's form, proportions,
+          inspect the resulting files. Begin every CAD task with the FreeCAD
+          connection and workflow-guidance tools before planning the complete
+          model or drawing layout. Use the actual workspace state and tool
+          capabilities to work in small saved steps: model, inspect, export,
+          draw, and verify. Make tool calls early and refine the files iteratively
+          instead of planning the entire deliverable before the first tool call.
+          Study the reference's form, proportions,
           layout, and significant details before modeling. Preserve supplied
           dimensions and units; reconstruct orthographic geometry rather than
           copying photographic perspective. Treat specified overall dimensions
@@ -94,7 +120,10 @@ modelSpecs:
           export_drawing_pdf with matching page_width_mm and page_height_mm so
           paper size and drawing scale are preserved. Export each sheet when
           several views or details need multiple pages. Inspect every rendered
-          page and fix unreadable text, overlap, or cropping before delivery.
+          page using the returned sheet preview and fix unreadable text,
+          overlap, or cropping before delivery. On large sheets, call
+          inspect_drawing for regions containing small annotations or detail
+          views; a reduced overview alone is not a complete text inspection.
           Reopen exported models and compatible drawings, check units, complete
           envelope dimensions, solid validity, unintended intersections,
           assembly clearances, and cut-list quantities. Count instances once and
@@ -110,10 +139,17 @@ modelSpecs:
           links expire at expires_at; issue fresh links on request. Explain a
           large file's download_requires_login flag. Do not invent files or URLs
           or tell users to find /tmp/cad on their own computer.
+    - name: haiku-design-max
+      label: Claude Haiku 5.5 · Max
+      default: false
+      mcpServers: [freecad, blender, design_tools]
+      preset:
+        <<: *cad-preset
+        endpoint: OpenRouterMax
 
 fileConfig:
   endpoints:
-    OpenRouter:
+    OpenRouter: &cad-files
       supportedMimeTypes:
         - '^(text/(x-c|x-csharp|tab-separated-values|x-c\+\+|x-h|x-java|html|markdown|x-php|x-python|x-script\.python|x-ruby|x-tex|plain|css|vtt|javascript|csv|xml|calendar))$'
         - '^application/(vnd\.ms-excel|msexcel|x-msexcel|x-ms-excel|x-excel|x-dos_ms_excel|xls|x-xls|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet)$'
@@ -128,6 +164,7 @@ fileConfig:
         overrides:
           '^model/(step|stl|obj|gltf-binary|gltf\+json|iges)$': none
           '^application/(octet-stream|x-blender|x-freecad|dxf|iges|step|stl|sla|vnd\.blender)$': none
+    OpenRouterMax: *cad-files
 
 mcpSettings:
   allowedAddresses: []

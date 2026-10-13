@@ -128,6 +128,13 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   );
   assert.ok(resultText?.type === 'text');
   assert.equal(JSON.parse(resultText.text).layout, 'sheet');
+  const preview = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(preview?.type === 'image');
+  const previewBytes = Buffer.from(preview.data, 'base64');
+  const previewMetadata = await sharp(previewBytes).metadata();
+  assert.ok(previewMetadata.width != null && previewMetadata.width <= 1600);
+  assert.ok(previewMetadata.height != null && previewMetadata.height <= 1600);
+  assert.ok(previewBytes.length <= f.settings.maxImageBytes);
   const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'sheet.pdf')));
   const page = pdf.getPage(0);
   assert.ok(Math.abs(page.getWidth() - (420 * 72) / 25.4) < 0.001);
@@ -219,6 +226,69 @@ test('large CAD sheets retain A0 size while rasterization stays within its confi
   });
   assert.equal(rejected.isError, true);
   assert.match(JSON.stringify(rejected), /PAGE_PIXEL_LIMIT/);
+});
+
+test('large-sheet detail inspection retains readable annotation pixels and bounds the selected region', async () => {
+  const f = await fixture();
+  await fs.writeFile(
+    path.join(f.root, 'detail.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="841mm" height="1189mm" viewBox="0 0 841 1189"><rect width="841" height="1189" fill="white"/><text x="100" y="104" font-family="sans-serif" font-size="2.5">HOLE 6 THRU</text></svg>',
+  );
+  const arguments_ = {
+    source_filename: 'detail.svg',
+    page_width_mm: 841,
+    page_height_mm: 1189,
+    left_mm: 98,
+    top_mm: 99,
+    width_mm: 45,
+    height_mm: 10,
+  };
+  const result = await f.client.callTool({ name: 'inspect_drawing', arguments: arguments_ });
+  assert.equal(result.isError, undefined);
+  const preview = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(preview?.type === 'image');
+  const bytes = Buffer.from(preview.data, 'base64');
+  const { data, info } = await sharp(bytes)
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const inkRows = new Set<number>();
+  for (let y = 0; y < info.height; y++) {
+    for (let x = 0; x < info.width; x++) {
+      if (data[(y * info.width + x) * info.channels] < 128) {
+        inkRows.add(y);
+        break;
+      }
+    }
+  }
+  assert.ok(inkRows.size >= 8, `Annotation covers only ${inkRows.size} pixel rows`);
+  assert.ok(bytes.length <= f.settings.maxImageBytes);
+  const rejected = await f.client.callTool({
+    name: 'inspect_drawing',
+    arguments: { ...arguments_, left_mm: 840 },
+  });
+  assert.equal(rejected.isError, true);
+  assert.match(JSON.stringify(rejected), /REGION_OUT_OF_BOUNDS/);
+});
+
+test('a preview exceeding the shared byte cap does not commit a PDF', async () => {
+  const f = await fixture({ maxImageBytes: 1 });
+  await fs.writeFile(
+    path.join(f.root, 'sheet.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297"><rect width="210" height="297" fill="white"/><text x="10" y="20">Visible text</text></svg>',
+  );
+  const rejected = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'sheet.svg',
+      pdf_filename: 'sheet.pdf',
+      page_width_mm: 210,
+      page_height_mm: 297,
+    },
+  });
+  assert.equal(rejected.isError, true);
+  assert.match(JSON.stringify(rejected), /IMAGE_TOO_LARGE/);
+  await assert.rejects(fs.stat(path.join(f.root, 'sheet.pdf')), { code: 'ENOENT' });
 });
 
 function localDownload(f: { url: URL }, remote: string): URL {

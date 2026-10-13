@@ -10,7 +10,7 @@ import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 import { fileType, fileInfo, listWorkspace, readWorkspace } from './files.ts';
 import { imageInput, compactImage } from './images.ts';
-import { drawingPdf } from './pdf.ts';
+import { drawingPdf, drawingRegion } from './pdf.ts';
 import { serveDownload } from './download.ts';
 
 function text(value: object): CallToolResult {
@@ -101,7 +101,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, inspect every rendered page, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
+          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link and a rendered source-sheet preview. Inspect the returned image for overlap, cropping, missing details, and unreadable text. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
         inputSchema: {
           source_filename: z.string().min(1),
           pdf_filename: z.string().endsWith('.pdf'),
@@ -119,21 +119,81 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             page_width_mm != null && page_height_mm != null
               ? { widthMm: page_width_mm, heightMm: page_height_mm }
               : undefined;
-          const bytes = await drawingPdf(
+          const { bytes, preview } = await drawingPdf(
             await readWorkspace(settings, source_filename),
             settings.maxImagePixels,
             paper,
           );
           if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
           await fs.writeFile(path.join(settings.workspace, pdf_filename), bytes, {
             flag: 'wx',
             mode: 0o644,
           });
-          return text({
-            ...fileInfo(settings, pdf_filename, bytes),
-            layout: paper ? 'sheet' : 'preview',
-            page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
-          });
+          return {
+            content: [
+              ...text({
+                ...fileInfo(settings, pdf_filename, bytes),
+                layout: paper ? 'sheet' : 'preview',
+                page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
+        }),
+    );
+    server.registerTool(
+      'inspect_drawing',
+      {
+        description:
+          'Inspect a selected region of a physical SVG drawing sheet in /tmp/cad at the original render resolution. Use this after the overview from export_drawing_pdf to read small annotations and check detail views on large sheets; the overview alone cannot certify every detail. Supply the same paper dimensions as the PDF export. The region is measured in paper millimeters from the upper-left corner. Choose a small region around the text or detail being checked; the returned image is a source-sheet detail, not an independent PDF rendering.',
+        inputSchema: {
+          source_filename: z.string().endsWith('.svg'),
+          page_width_mm: z.number().min(50).max(1200),
+          page_height_mm: z.number().min(50).max(1200),
+          left_mm: z.number().min(0),
+          top_mm: z.number().min(0),
+          width_mm: z.number().min(1).max(1200),
+          height_mm: z.number().min(1).max(1200),
+        },
+      },
+      (input) =>
+        run(async () => {
+          const preview = await drawingRegion(
+            await readWorkspace(settings, input.source_filename),
+            settings.maxImagePixels,
+            { widthMm: input.page_width_mm, heightMm: input.page_height_mm },
+            {
+              leftMm: input.left_mm,
+              topMm: input.top_mm,
+              widthMm: input.width_mm,
+              heightMm: input.height_mm,
+            },
+          );
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
+          return {
+            content: [
+              ...text({
+                source_filename: input.source_filename,
+                page_size_mm: [input.page_width_mm, input.page_height_mm],
+                region_mm: {
+                  left: input.left_mm,
+                  top: input.top_mm,
+                  width: input.width_mm,
+                  height: input.height_mm,
+                },
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
         }),
     );
     for (const provider of providers) {

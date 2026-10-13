@@ -15,6 +15,7 @@ function bundle(overrides) {
       RUNNER_TEMP: root,
       DEPLOY_URL: 'https://example.test',
       CAD_DOWNLOAD_LINK_TTL_SECONDS: '',
+      LIBRECHAT_ENV: '',
       ADMIN_EMAIL: 'admin@example.test',
       ADMIN_USERNAME: 'admin',
       ADMIN_PASSWORD: 'fixture-admin-password',
@@ -50,5 +51,21 @@ test('the development environment can configure download expiry with a 24-hour d
   assert.match(custom.settings.downloadSigningKey, /^[a-f0-9]{64}$/);
   for (const value of ['59', '604801', 'invalid', '60.5']) {
     assert.notEqual(bundle({ CAD_DOWNLOAD_LINK_TTL_SECONDS: value }).result.status, 0);
+  }
+});
+
+test('design images share the host MCP byte limit before PDFs are committed', () => {
+  assert.equal(bundle({}).settings.maxImageBytes, 10 * 1024 * 1024);
+  for (const value of ['8192', '"8192"']) {
+    assert.equal(
+      bundle({ LIBRECHAT_ENV: `MCP_IMAGE_DATA_MAX_BYTES=${value}\n` }).settings.maxImageBytes,
+      8192,
+    );
+  }
+  for (const value of ['0', 'invalid', '1.5', '999999999']) {
+    assert.equal(
+      bundle({ LIBRECHAT_ENV: `MCP_IMAGE_DATA_MAX_BYTES=${value}\n` }).settings.maxImageBytes,
+      10 * 1024 * 1024,
+    );
   }
 });
