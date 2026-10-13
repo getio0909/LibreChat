@@ -15,6 +15,7 @@ function bundle(overrides) {
       RUNNER_TEMP: root,
       DEPLOY_URL: 'https://example.test',
       CAD_DOWNLOAD_LINK_TTL_SECONDS: '',
+      CAD_MAX_PDF_PAGES: '',
       LIBRECHAT_ENV: '',
       ADMIN_EMAIL: 'admin@example.test',
       ADMIN_USERNAME: 'admin',
@@ -40,6 +41,14 @@ test('public downloads require HTTPS before any credentials are bundled', () => 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /must be an HTTPS URL/);
   assert.doesNotMatch(result.stderr, /fixture-.*-password/);
+});
+
+test('drawing-set page limits are bounded and configurable', () => {
+  assert.equal(bundle({}).settings.maxPdfPages, 32);
+  assert.equal(bundle({ CAD_MAX_PDF_PAGES: '12' }).settings.maxPdfPages, 12);
+  for (const value of ['0', '129', 'invalid', '1.5']) {
+    assert.notEqual(bundle({ CAD_MAX_PDF_PAGES: value }).result.status, 0);
+  }
 });
 
 test('the development environment can configure download expiry with a 24-hour default', () => {

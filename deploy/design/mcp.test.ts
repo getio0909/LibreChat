@@ -6,9 +6,10 @@ import * as fs from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { connect } from 'node:net';
+import { spawnSync } from 'node:child_process';
 import { test, afterEach } from 'node:test';
 import { inflateSync } from 'node:zlib';
-import { PDFArray, PDFDocument, PDFName, PDFNumber, PDFRawStream } from 'pdf-lib';
+import { PDFArray, PDFDocument, PDFName, PDFRawStream, degrees } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -19,6 +20,7 @@ import { settingsSchema, ToolFailure, boundedBody } from './config.ts';
 import { fileType, readWorkspace } from './files.ts';
 import { createHandler } from './mcp.ts';
 import { imageProviders, compactImage } from './images.ts';
+import { render } from './render.ts';
 
 const fixtures: { server: Server; root: string; client: Client }[] = [];
 afterEach(async () => {
@@ -154,11 +156,27 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   assert.ok(Math.abs(page.getWidth() - (420 * 72) / 25.4) < 0.001);
   assert.ok(Math.abs(page.getHeight() - (297 * 72) / 25.4) < 0.001);
   const contents = page.node.Contents();
-  assert.ok(contents instanceof PDFArray);
-  const stream = pdf.context.lookup(contents.get(0));
-  assert.ok(stream instanceof PDFRawStream);
-  const operators = inflateSync(stream.getContents()).toString();
-  assert.ok(operators.includes(`${page.getWidth()} 0 0 ${page.getHeight()} 0 0 cm`));
+  const streams =
+    contents instanceof PDFArray
+      ? contents.asArray().map((item) => pdf.context.lookup(item))
+      : [contents];
+  const operators = streams
+    .map((stream) => {
+      assert.ok(stream instanceof PDFRawStream);
+      return inflateSync(stream.getContents()).toString();
+    })
+    .join('\n');
+  const lines = [...operators.matchAll(/([\d.]+) ([\d.]+) m ([\d.]+) ([\d.]+) l/g)];
+  assert.ok(
+    lines.some(
+      (line) =>
+        Math.abs(Number(line[3]) - Number(line[1]) - (100 * 72) / 25.4) < 0.01 &&
+        Number(line[2]) === Number(line[4]),
+    ),
+    'The dimensioned 100 mm line must remain 100 mm on paper',
+  );
+  assert.doesNotMatch(operators, /\/Image/);
+  assert.equal(imageCount(pdf), 0);
   for (const dimensions of [
     { page_width_mm: 297, page_height_mm: 210 },
     { page_width_mm: 420 },
@@ -195,7 +213,17 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   assert.match(JSON.stringify(raster), /SVG_SHEET_REQUIRED/);
 });
 
-test('large CAD sheets retain A0 size while rasterization stays within its configured pixel budget', async () => {
+function imageCount(pdf: PDFDocument): number {
+  return pdf.context
+    .enumerateIndirectObjects()
+    .filter(
+      ([, object]) =>
+        object instanceof PDFRawStream &&
+        object.dict.get(PDFName.of('Subtype'))?.toString() === '/Image',
+    ).length;
+}
+
+test('large CAD sheets retain A0 vector geometry while previews stay bounded', async () => {
   const f = await fixture();
   await fs.writeFile(
     path.join(f.root, 'large.svg'),
@@ -214,19 +242,15 @@ test('large CAD sheets retain A0 size while rasterization stays within its confi
   const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'large.pdf')));
   assert.ok(Math.abs(pdf.getPage(0).getWidth() - (841 * 72) / 25.4) < 0.001);
   assert.ok(Math.abs(pdf.getPage(0).getHeight() - (1189 * 72) / 25.4) < 0.001);
-  let images = 0;
-  for (const [, object] of pdf.context.enumerateIndirectObjects()) {
-    if (
-      !(object instanceof PDFRawStream) ||
-      object.dict.get(PDFName.of('Subtype'))?.toString() !== '/Image'
-    )
-      continue;
-    const width = object.dict.lookup(PDFName.of('Width'), PDFNumber).asNumber();
-    const height = object.dict.lookup(PDFName.of('Height'), PDFNumber).asNumber();
-    assert.ok(width * height <= f.settings.maxImagePixels);
-    images += 1;
-  }
-  assert.ok(images > 0);
+  assert.equal(imageCount(pdf), 0);
+  const preview = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(preview?.type === 'image');
+  const metadata = await sharp(Buffer.from(preview.data, 'base64')).metadata();
+  assert.ok(
+    metadata.width &&
+      metadata.height &&
+      metadata.width * metadata.height <= f.settings.maxImagePixels,
+  );
   const limited = await fixture({ maxImagePixels: 10000 });
   await fs.copyFile(path.join(f.root, 'large.svg'), path.join(limited.root, 'large.svg'));
   const rejected = await limited.client.callTool({
@@ -240,6 +264,213 @@ test('large CAD sheets retain A0 size while rasterization stays within its confi
   });
   assert.equal(rejected.isError, true);
   assert.match(JSON.stringify(rejected), /PAGE_PIXEL_LIMIT/);
+});
+
+test('ordered drawing sets preserve native pages, CJK text, vectors, paper sizes and rotations', async () => {
+  const f = await fixture();
+  const native = await PDFDocument.create();
+  native.addPage([(297 * 72) / 25.4, (420 * 72) / 25.4]).drawText('ASSEMBLY - G01');
+  const rotated = native.addPage([(210 * 72) / 25.4, (297 * 72) / 25.4]);
+  rotated.setRotation(degrees(90));
+  rotated.drawText('SECTION - G02', { x: 50, y: 50 });
+  await fs.writeFile(path.join(f.root, 'native.pdf'), await native.save());
+  await fs.writeFile(
+    path.join(f.root, 'parts.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><path d="M20 80h180v100H20z" fill="none" stroke="black"/><text x="20" y="40" font-family="Noto Sans CJK SC" font-size="5">侧板 - P03</text></svg>',
+  );
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'set.pdf',
+      sheets: [
+        { source_filename: 'native.pdf' },
+        { source_filename: 'parts.svg', page_width_mm: 420, page_height_mm: 297 },
+      ],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const text = CallToolResultSchema.parse(result).content.find((item) => item.type === 'text');
+  assert.ok(text?.type === 'text');
+  assert.deepEqual(
+    JSON.parse(text.text).pages.map((item: { source_page: number }) => item.source_page),
+    [1, 2, 1],
+  );
+  const bytes = await fs.readFile(path.join(f.root, 'set.pdf'));
+  const pdf = await PDFDocument.load(bytes);
+  assert.equal(pdf.getPageCount(), 3);
+  assert.equal(imageCount(pdf), 0);
+  assert.equal(pdf.getPage(1).getRotation().angle, 90);
+  assert.ok(Math.abs(pdf.getPage(2).getWidth() - (420 * 72) / 25.4) < 0.001);
+  const extracted = spawnSync('pdftotext', ['-', '-'], { input: bytes, encoding: 'utf8' });
+  assert.equal(extracted.status, 0);
+  assert.match(extracted.stdout, /ASSEMBLY - G01[\s\S]*SECTION - G02[\s\S]*侧板 - P03/);
+  for (const page of [1, 2, 3]) {
+    const inspected = await f.client.callTool({
+      name: 'inspect_pdf',
+      arguments: { pdf_filename: 'set.pdf', page },
+    });
+    assert.equal(inspected.isError, undefined);
+    assert.match(
+      JSON.stringify(
+        CallToolResultSchema.parse(inspected).content.filter((item) => item.type === 'text'),
+      ),
+      /finished_pdf/,
+    );
+    assert.ok(CallToolResultSchema.parse(inspected).content.some((item) => item.type === 'image'));
+  }
+  const region = await f.client.callTool({
+    name: 'inspect_pdf',
+    arguments: {
+      pdf_filename: 'set.pdf',
+      page: 3,
+      region: { left_mm: 18, top_mm: 34, width_mm: 60, height_mm: 10 },
+    },
+  });
+  assert.equal(region.isError, undefined);
+  const image = CallToolResultSchema.parse(region).content.find((item) => item.type === 'image');
+  assert.ok(image?.type === 'image');
+  const stats = await sharp(Buffer.from(image.data, 'base64')).stats();
+  assert.ok(stats.channels.some((channel) => channel.min < 50));
+  for (const arguments_ of [
+    { pdf_filename: 'set.pdf', page: 4 },
+    {
+      pdf_filename: 'set.pdf',
+      page: 2,
+      region: { left_mm: 296, top_mm: 0, width_mm: 2, height_mm: 10 },
+    },
+  ]) {
+    assert.equal(
+      (await f.client.callTool({ name: 'inspect_pdf', arguments: arguments_ })).isError,
+      true,
+    );
+  }
+  const repeated = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'set.pdf',
+      sheets: [{ source_filename: 'native.pdf' }],
+    },
+  });
+  assert.match(JSON.stringify(repeated), /FILE_EXISTS/);
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'set.pdf')), bytes);
+});
+
+test('drawing assembly rejects page and aggregate byte overflow, malformed and unscaled sources without writing', async () => {
+  const f = await fixture({ maxPdfPages: 2 });
+  const native = await PDFDocument.create();
+  native.addPage();
+  native.addPage();
+  const source = Buffer.from(await native.save());
+  await fs.writeFile(path.join(f.root, 'two.pdf'), source);
+  await fs.writeFile(path.join(f.root, 'bad.pdf'), 'not a PDF: private input');
+  await fs.writeFile(
+    path.join(f.root, 'pixel.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1191" height="842"><path d="M0 0h100"/></svg>',
+  );
+  const cases = [
+    {
+      sheets: [{ source_filename: 'two.pdf' }, { source_filename: 'two.pdf' }],
+      code: 'PDF_PAGE_LIMIT',
+    },
+    {
+      sheets: [{ source_filename: 'two.pdf', page_width_mm: 420 }],
+      code: 'PDF_PAGE_SIZE_PRESERVED',
+    },
+    { sheets: [{ source_filename: 'pixel.svg' }], code: 'PAGE_SIZE_REQUIRED' },
+    {
+      sheets: [{ source_filename: 'pixel.svg', page_width_mm: 420, page_height_mm: 297 }],
+      code: 'SVG_PHYSICAL_SIZE_REQUIRED',
+    },
+    { sheets: [{ source_filename: 'bad.pdf' }], code: 'INVALID_PDF' },
+    { sheets: [{ source_filename: 'model.step' }], code: 'DRAWING_SHEET_REQUIRED' },
+  ];
+  for (const { sheets, code } of cases) {
+    const rejected = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: { pdf_filename: 'rejected.pdf', sheets },
+    });
+    assert.equal(rejected.isError, true);
+    assert.match(JSON.stringify(rejected), new RegExp(code));
+    assert.doesNotMatch(JSON.stringify(rejected), /private input/);
+    await assert.rejects(fs.stat(path.join(f.root, 'rejected.pdf')), { code: 'ENOENT' });
+  }
+  const limited = await fixture({ maxFileBytes: source.length + 1 });
+  await fs.writeFile(path.join(limited.root, 'two.pdf'), source);
+  const overflow = await limited.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'overflow.pdf',
+      sheets: [{ source_filename: 'two.pdf' }, { source_filename: 'two.pdf' }],
+    },
+  });
+  assert.match(JSON.stringify(overflow), /FILE_TOO_LARGE/);
+  await assert.rejects(fs.stat(path.join(limited.root, 'overflow.pdf')), { code: 'ENOENT' });
+});
+
+test('SVG exports reject external resources and DTDs instead of silently losing them', async () => {
+  const f = await fixture();
+  for (const content of [
+    '<image href="file:///run/secrets/design.json" width="40" height="40"/>',
+    '<image href="&#104;ttps://example.test/private.png" width="40" height="40"/>',
+    '<style><![CDATA[@import url(https://example.test/font.css);]]></style>',
+    '<rect style="fill:url(file:///run/secrets/design.json)"/>',
+  ]) {
+    await fs.writeFile(
+      path.join(f.root, 'external.svg'),
+      `<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm">${content}</svg>`,
+    );
+    const rejected = await f.client.callTool({
+      name: 'export_drawing_pdf',
+      arguments: {
+        source_filename: 'external.svg',
+        pdf_filename: 'external.pdf',
+        page_width_mm: 210,
+        page_height_mm: 297,
+      },
+    });
+    assert.match(JSON.stringify(rejected), /SVG_NOT_SELF_CONTAINED/);
+    assert.doesNotMatch(JSON.stringify(rejected), /run\/secrets|private.png|font.css/);
+    await assert.rejects(fs.stat(path.join(f.root, 'external.pdf')), { code: 'ENOENT' });
+  }
+  await fs.writeFile(
+    path.join(f.root, 'external.svg'),
+    '<!DOCTYPE svg [<!ENTITY secret SYSTEM "file:///run/secrets/design.json">]><svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"/>',
+  );
+  const dtd = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: { source_filename: 'external.svg', pdf_filename: 'external.pdf' },
+  });
+  assert.match(JSON.stringify(dtd), /SVG_NOT_SELF_CONTAINED/);
+});
+
+test('native renderers bound output and honor cancellation without exposing input diagnostics', async () => {
+  const input = Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="50" height="50"/></svg>',
+  );
+  await assert.rejects(
+    render('rsvg-convert', ['--format=pdf'], input, 16, new AbortController().signal),
+    (error: Error) => error instanceof ToolFailure && error.code === 'FILE_TOO_LARGE',
+  );
+  await assert.rejects(
+    render(
+      'rsvg-convert',
+      ['--format=pdf'],
+      Buffer.from('private malformed input'),
+      1024,
+      new AbortController().signal,
+    ),
+    (error: Error) =>
+      error instanceof ToolFailure &&
+      error.code === 'DRAWING_RENDER_FAILED' &&
+      !error.message.includes('private'),
+  );
+  const controller = new AbortController();
+  const running = render('rsvg-convert', ['--format=pdf'], input, 100000, controller.signal);
+  controller.abort();
+  await assert.rejects(
+    running,
+    (error: Error) => error instanceof ToolFailure && error.code === 'REQUEST_CANCELLED',
+  );
 });
 
 test('large-sheet detail inspection retains readable annotation pixels and bounds the selected region', async () => {
