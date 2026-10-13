@@ -1,57 +1,85 @@
 import { z } from 'zod';
 
-export const settingsSchema = z.object({
-  userId: z
-    .string()
-    .regex(/^[a-f0-9]{24}$/)
-    .or(z.literal(''))
-    .default(''),
-  workspaceUrl: z.string().url(),
-  downloadUrl: z.string().url().optional(),
-  downloadSigningKey: z
-    .string()
-    .regex(/^[a-f0-9]{64}$/)
-    .or(z.literal(''))
-    .default(''),
-  downloadLinkTtlSeconds: z
-    .number()
-    .int()
-    .min(60)
-    .max(7 * 86400)
-    .default(86400),
-  workspace: z.string().default('/tmp/cad'),
-  maxFileBytes: z
-    .number()
-    .int()
-    .positive()
-    .max(100 * 1024 * 1024)
-    .default(25 * 1024 * 1024),
-  maxImageBytes: z
-    .number()
-    .int()
-    .positive()
-    .max(10 * 1024 * 1024)
-    .default(10 * 1024 * 1024),
-  maxPromptLength: z.number().int().positive().default(32000),
-  maxImagePixels: z
-    .number()
-    .int()
-    .positive()
-    .max(64 * 1024 * 1024)
-    .default(32 * 1024 * 1024),
-  maxConcurrentJobs: z.number().int().min(1).max(4).default(1),
-  requestTimeoutMs: z.number().int().positive().default(180000),
-  arkApiKey: z.string().default(''),
-  geminiApiKey: z.string().default(''),
-  seedreamModel: z
-    .string()
-    .regex(/^[a-zA-Z0-9._-]+$/)
-    .default('doubao-seedream-5-0-flash-260915'),
-  geminiModel: z
-    .string()
-    .regex(/^[a-zA-Z0-9._-]+$/)
-    .default('gemini-3.1-flash-image'),
-});
+export const defaultRenderMemoryBytes = 256 * 1024 * 1024;
+
+export const settingsSchema = z
+  .object({
+    userId: z
+      .string()
+      .regex(/^[a-f0-9]{24}$/)
+      .or(z.literal(''))
+      .default(''),
+    workspaceUrl: z.string().url(),
+    downloadUrl: z.string().url().optional(),
+    downloadSigningKey: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .or(z.literal(''))
+      .default(''),
+    downloadLinkTtlSeconds: z
+      .number()
+      .int()
+      .min(60)
+      .max(7 * 86400)
+      .default(86400),
+    workspace: z.string().default('/tmp/cad'),
+    maxFileBytes: z
+      .number()
+      .int()
+      .positive()
+      .max(100 * 1024 * 1024)
+      .default(25 * 1024 * 1024),
+    maxImageBytes: z
+      .number()
+      .int()
+      .positive()
+      .max(10 * 1024 * 1024)
+      .default(10 * 1024 * 1024),
+    maxPromptLength: z.number().int().positive().default(32000),
+    maxImagePixels: z
+      .number()
+      .int()
+      .positive()
+      .max(64 * 1024 * 1024)
+      .default(32 * 1024 * 1024),
+    maxPdfPages: z.number().int().min(1).max(128).default(32),
+    maxRenderMemoryBytes: z
+      .number()
+      .int()
+      .min(64 * 1024 * 1024)
+      .max(384 * 1024 * 1024)
+      .default(defaultRenderMemoryBytes),
+    maxConcurrentJobs: z.number().int().min(1).max(4).default(1),
+    requestTimeoutMs: z.number().int().positive().default(180000),
+    arkApiKey: z.string().default(''),
+    geminiApiKey: z.string().default(''),
+    seedreamModel: z
+      .string()
+      .regex(/^[a-zA-Z0-9._-]+$/)
+      .default('doubao-seedream-5-0-flash-260915'),
+    geminiModel: z
+      .string()
+      .regex(/^[a-zA-Z0-9._-]+$/)
+      .default('gemini-3.1-flash-image'),
+  })
+  // 为 768 MiB 容器中的长期服务留出空间，约束全部并发子进程的上限。
+  .refine(
+    (settings) => settings.maxConcurrentJobs * settings.maxRenderMemoryBytes <= 384 * 1024 * 1024,
+    {
+      path: ['maxConcurrentJobs'],
+      message: 'Concurrent render jobs must share at most 384 MiB of address space.',
+    },
+  )
+  // 并发 PDF 输入及输出缓冲区也计入预算，容器保留 256 MiB 供主服务使用。
+  .refine(
+    (settings) =>
+      settings.maxConcurrentJobs * (settings.maxRenderMemoryBytes + 2 * settings.maxFileBytes) <=
+      512 * 1024 * 1024,
+    {
+      path: ['maxConcurrentJobs'],
+      message: 'Concurrent PDF jobs and file buffers must fit a 512 MiB processing budget.',
+    },
+  );
 
 export type Settings = z.infer<typeof settingsSchema>;
 export type Request = typeof fetch;

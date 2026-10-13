@@ -24,7 +24,7 @@ for account in admin user; do
   if [[ "$account" == user ]]; then id=$(printf 'b%.0s' {1..24}); fi
   printf '{"userId":"%s","workspaceUrl":"https://example.test/cad-files/%s/","downloadUrl":"http://127.0.0.1:8000/download/","downloadSigningKey":"%s"}\n' \
     "$id" "$account" "$(printf 'a%.0s' {1..64})" > "$work/design-$account.json"
-  printf '{"serve-path":"/data","bind":"0.0.0.0","port":5000,"path-prefix":"/cad-files/%s","auth":["%s:fixture-%s-password@/:rw"],"allow-upload":true,"allow-archive":true,"allow-symlink":false}\n' \
+  printf '{"serve-path":"/data","bind":"0.0.0.0","port":5000,"path-prefix":"/cad-files/%s","auth":["%s:fixture-%s-password@/:rw"],"allow-upload":true,"allow-archive":true,"allow-symlink":false,"hidden":[".????????-????-????-????-????????????.tmp"]}\n' \
     "$account" "$account" "$account" > "$work/files-$account.yaml"
   chmod 600 "$work/design-$account.json" "$work/files-$account.yaml"
   if [[ $(id -u) == 0 ]]; then
@@ -69,6 +69,7 @@ import dns from 'node:dns/promises';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
 const account = process.env.ACCOUNT;
 const other = account === 'admin' ? 'user' : 'admin';
 const settings = JSON.parse(await fs.readFile('/run/secrets/design.json', 'utf8'));
@@ -100,10 +101,29 @@ try {
   assert.equal(imported.status, 'ok');
   const fileUrl = `http://files-${account}:5000/cad-files/${account}/`;
   const headers = { Authorization: 'Basic ' + Buffer.from(`${account}:fixture-${account}-password`).toString('base64') };
-  const upload = await fetch(fileUrl + 'drawing.svg', { method: 'PUT', headers, body: '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect x="100" y="100" width="600" height="400" fill="none" stroke="black" stroke-width="4"/></svg>' });
+  const staged = '.12345678-1234-1234-1234-123456789abc.tmp';
+  await fs.writeFile('/tmp/cad/' + staged, 'incomplete export fixture');
+  await fs.writeFile('/tmp/cad/.notes.tmp', 'unrelated temporary file');
+  const filesListing = await fetch(fileUrl + '?json', { headers });
+  assert.equal(filesListing.status, 200);
+  const filesText = await filesListing.text();
+  assert.ok(!filesText.includes(staged));
+  assert.ok(filesText.includes('.notes.tmp'));
+  const upload = await fetch(fileUrl + 'drawing.svg', { method: 'PUT', headers, body: '<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect x="40" y="40" width="200" height="100" fill="none" stroke="black" stroke-width="0.3"/><text x="40" y="30" font-family="Noto Sans CJK SC" font-size="5">连接详图</text></svg>' });
   assert.ok(upload.ok);
   const design = await connect('Design', new StreamableHTTPClientTransport(new URL('http://127.0.0.1:8000/mcp'), { requestInit: { headers: { 'X-LibreChat-User-ID': settings.userId } } }));
-  data(await design.callTool({ name: 'export_drawing_pdf', arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing.pdf' } }));
+  data(await design.callTool({ name: 'export_drawing_pdf', arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing.pdf', page_width_mm: 420, page_height_mm: 297 } }));
+  const set = data(await design.callTool({ name: 'assemble_drawing_pdf', arguments: { pdf_filename: 'set.pdf', sheets: [{ source_filename: 'drawing.pdf' }, { source_filename: 'drawing.svg', page_width_mm: 420, page_height_mm: 297 }] } }));
+  assert.equal(set.page_count, 2);
+  const document = await PDFDocument.load(await fs.readFile('/tmp/cad/set.pdf'));
+  assert.equal(document.getPageCount(), 2);
+  assert.ok(Math.abs(document.getPage(1).getWidth() - 420 * 72 / 25.4) < 0.001);
+  assert.equal(document.context.enumerateIndirectObjects().filter(([, object]) => object instanceof PDFRawStream && object.dict.get(PDFName.of('Subtype'))?.toString() === '/Image').length, 0);
+  for (const page of [1, 2]) {
+    const inspection = await design.callTool({ name: 'inspect_pdf', arguments: { pdf_filename: 'set.pdf', page } });
+    assert.equal(data(inspection).preview_source, 'finished_pdf');
+    assert.ok(inspection.content.some(item => item.type === 'image'));
+  }
   const listing = data(await design.callTool({ name: 'workspace_files', arguments: {} }));
   assert.ok(listing.files.some(file => file.filename === 'cube.stl'));
   assert.ok(listing.archive_url.endsWith('/?zip'));
@@ -118,14 +138,17 @@ try {
   assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).toString(), '%PDF-');
   const zip = await fetch(fileUrl + '?zip', { headers });
   assert.equal(zip.status, 200);
-  assert.equal(Buffer.from(await zip.arrayBuffer()).subarray(0, 2).toString(), 'PK');
+  const archive = Buffer.from(await zip.arrayBuffer());
+  assert.equal(archive.subarray(0, 2).toString(), 'PK');
+  assert.ok(!archive.includes(Buffer.from(staged)));
+  assert.ok(archive.includes(Buffer.from('.notes.tmp')));
   const denied = await fetch(fileUrl + 'drawing.pdf');
   assert.equal(denied.status, 401);
   const escaped = await fetch(fileUrl + 'private-config.yaml', { headers });
   assert.ok([403, 404].includes(escaped.status));
   const wrong = await fetch(fileUrl + 'drawing.pdf', { headers: { Authorization: 'Basic ' + Buffer.from(`${other}:fixture-${other}-password`).toString('base64') } });
   assert.equal(wrong.status, 401);
-  console.log(`${account}: private native import/export, PDF, ZIP, and file authentication passed.`);
+  console.log(`${account}: private native import/export, vector drawing sets, PDF inspection, ZIP, and file authentication passed.`);
 } finally {
   await Promise.all(clients.map(client => client.close()));
 }

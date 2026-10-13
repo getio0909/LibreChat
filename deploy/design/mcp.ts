@@ -7,11 +7,13 @@ import type { RequestListener } from 'node:http';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { ImageProvider, ImageData } from './images.ts';
 import type { Settings } from './config.ts';
+import type { PdfSource } from './parse.ts';
 import { ToolFailure } from './config.ts';
-import { fileType, fileInfo, listWorkspace, readWorkspace } from './files.ts';
+import { fileType, fileInfo, listWorkspace, readWorkspace, writePdf } from './files.ts';
 import { imageInput, compactImage } from './images.ts';
-import { drawingPdf, drawingRegion } from './pdf.ts';
+import { drawingPdf, drawingRegion, normalizeDrawingPdf, pdfPreview } from './pdf.ts';
 import { serveDownload } from './download.ts';
+import { pdfTask } from './parse.ts';
 
 function text(value: object): CallToolResult {
   return { content: [{ type: 'text', text: JSON.stringify(value) }] };
@@ -92,7 +94,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'workspace_files',
       {
         description:
-          "List the current private CAD workspace, including CSV cut lists, and download links. Finish and await every save, export, and verification that writes files before calling this tool; never run it in parallel with writers or modify linked files afterward. Include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Files above direct_download_limit_bytes remain listed with download_requires_login and an authenticated download URL; explain that these use the user's CAD file-manager credentials. Entries with download_status are changing or crossed a size bound during inspection: wait for the writer to finish and call this tool again before presenting them as completed exports. Request fresh links with this tool when expired or when a file has changed. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
+          "List the current private CAD workspace, including CSV cut lists, and download links. Finish and await every save, export, and verification that writes files before calling this tool; never run it in parallel with writers or modify linked files afterward. Include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Files above direct_download_limit_bytes remain listed with download_requires_login and an authenticated download URL; explain that these use the user's CAD file-manager credentials. Entries with download_status are changing or crossed a size bound during inspection: wait for the writer to finish and call this tool again before presenting them as completed exports. Request fresh links with this tool when expired or when a file has changed. A cancelled export may have already published a complete output: list files before retrying; publication is retained to preserve concurrent user edits. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
         inputSchema: {},
       },
       () => run(async () => text(await listWorkspace(settings))),
@@ -101,10 +103,10 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link and a rendered source-sheet preview. Existing PDF files are preserved: use a new revision filename for each corrected export; FILE_EXISTS means choose a new filename and retry. Run design exports and inspections sequentially; DESIGN_BUSY means await the active operation before retrying. Inspect the returned image for overlap, cropping, missing details, and unreadable text. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
+          'Export one PNG/JPEG/WebP/SVG in /tmp/cad to PDF with a download link and an independently rendered preview of the finished PDF. SVG geometry and text are written as PDF vectors; raster inputs remain raster previews. For a scaled CAD sheet, use a self-contained UTF-8 SVG with explicit physical dimensions (for example width="420mm" height="297mm" viewBox="0 0 420 297") and BOTH matching page_width_mm and page_height_mm. Keep borders and margins inside the SVG. Missing external resources, DTDs, escaped CSS, mismatched dimensions, and incomplete dimensions are rejected. SVG_ENCODING_UNSUPPORTED means re-export the SVG as UTF-8. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Use assemble_drawing_pdf for an ordered multi-sheet set or existing native CAD PDFs. Inspect the finished pages with inspect_pdf, including small details. Existing files are preserved: FILE_EXISTS means choose a new revision filename. Run design operations sequentially; DESIGN_BUSY means await the active operation. Finish all saves before requesting workspace_files links.',
         inputSchema: {
           source_filename: z.string().min(1),
-          pdf_filename: z.string().endsWith('.pdf'),
+          pdf_filename: z.string().regex(/\.pdf$/i),
           page_width_mm: z.number().min(50).max(1200).optional(),
           page_height_mm: z.number().min(50).max(1200).optional(),
         },
@@ -119,33 +121,177 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             page_width_mm != null && page_height_mm != null
               ? { widthMm: page_width_mm, heightMm: page_height_mm }
               : undefined;
-          const { bytes, preview } = await drawingPdf(
+          const bytes = await drawingPdf(
             await readWorkspace(settings, source_filename),
-            settings.maxImagePixels,
+            settings,
+            signal,
             paper,
+            fileType(source_filename) === 'image/svg+xml',
           );
           if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+          const { preview } = await pdfPreview(bytes, settings, signal);
           const image = await compactImage(
             { bytes: preview, mimeType: 'image/png' },
             settings.maxImageBytes,
             settings.maxImagePixels,
           );
-          try {
-            await fs.writeFile(path.join(settings.workspace, pdf_filename), bytes, {
-              flag: 'wx',
-              mode: 0o644,
-            });
-          } catch (error) {
-            if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
-              throw new ToolFailure('FILE_EXISTS');
-            throw error;
-          }
+          await writePdf(settings, pdf_filename, bytes, signal);
           return {
             content: [
               ...text({
                 ...fileInfo(settings, pdf_filename, bytes),
                 layout: paper ? 'sheet' : 'preview',
                 page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
+                preview_source: 'finished_pdf',
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
+        }),
+    );
+    server.registerTool(
+      'assemble_drawing_pdf',
+      {
+        description: `Create one ordered drawing-set PDF from self-contained physical UTF-8 SVG sheets and/or existing native CAD PDFs in this user's /tmp/cad workspace. Each SVG requires BOTH matching paper dimensions; existing PDFs retain all pages, vector content, paper sizes, and rotations and must omit the dimensions. PDF_LAYERS_UNSUPPORTED means export a flat vector PDF from CAD with the intended layers visible, then retry; layered PDFs are rejected to prevent hidden layers changing visibility. PDF_FORMS_UNSUPPORTED means flatten form fields in the source producer before exporting. PDF_PAGE_UNSUPPORTED means export a full-sheet page up to 1200 mm per side with matching MediaBox/CropBox/BleedBox/TrimBox/ArtBox and standard units. These native PDFs must be static drawing pages, with no interactive form or differing print/preview area. PDF_ACTIONS_UNSUPPORTED means flatten annotations and remove page actions in the source producer; annotation-bearing pages are rejected. PDF_ATTACHMENTS_UNSUPPORTED means export drawing pages without associated source-file attachments or private editing data. PDF_EXTERNAL_STREAM_UNSUPPORTED means inline all stream resources in the source producer. PDF_INLINE_IMAGE_UNSUPPORTED or PDF_CONTENT_FILTER_UNSUPPORTED means re-export from the CAD producer using ordinary Image/Form XObjects and uncompressed or standard Flate content streams. PDF_TYPE3_FONT_UNSUPPORTED means re-export text using embedded TrueType/CID/Type1 fonts or vector outlines instead of Type3 glyph programs. PDF_XOBJECT_UNSUPPORTED means export a flat PDF without printer-only PostScript XObjects. PDF_IMAGE_ALTERNATES_UNSUPPORTED means export one flattened image representation without print-only alternates. PDF_SEPARATIONS_UNSUPPORTED means export an ordinary recombined drawing PDF without pre-separated print plates. PDF_COLOR_PROFILE_UNSUPPORTED means export ordinary drawing colors without PDF/X output intents; color-managed PDF/X inputs cannot be combined with this tool. Put sheet IDs, revisions, sheet numbers, scale, and reference callouts in the source drawings; this tool combines pages without inventing details, adding page numbers, or rescaling. Input bytes in total and output bytes must each stay under ${settings.maxFileBytes}; the set is limited to ${settings.maxPdfPages} pages. The response lists every page and previews the first finished page. Call inspect_pdf for EVERY page and important detail region before delivery. Keep assumptions and unperformed checks in the chat, not on drawing sheets. FILE_EXISTS requires a new revision filename. Run design operations sequentially and request workspace_files links after all exports are final.`,
+        inputSchema: {
+          pdf_filename: z.string().regex(/\.pdf$/i),
+          sheets: z
+            .array(
+              z.object({
+                source_filename: z.string().min(1),
+                page_width_mm: z.number().min(50).max(1200).optional(),
+                page_height_mm: z.number().min(50).max(1200).optional(),
+              }),
+            )
+            .min(1)
+            .max(settings.maxPdfPages),
+        },
+      },
+      ({ pdf_filename, sheets }) =>
+        run(async () => {
+          fileType(pdf_filename);
+          const sources: PdfSource[] = [];
+          let inputBytes = 0;
+          let generatedBytes = 0;
+          let normalizedBytes = 0;
+          for (const sheet of sheets) {
+            signal.throwIfAborted();
+            const type = fileType(sheet.source_filename);
+            if (type !== 'image/svg+xml' && type !== 'application/pdf')
+              throw new ToolFailure('DRAWING_SHEET_REQUIRED');
+            const source = await readWorkspace(settings, sheet.source_filename);
+            inputBytes += source.length;
+            if (inputBytes > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+            let bytes: Buffer;
+            if (type === 'image/svg+xml') {
+              if (sheet.page_width_mm == null || sheet.page_height_mm == null)
+                throw new ToolFailure('PAGE_SIZE_REQUIRED');
+              bytes = await drawingPdf(
+                source,
+                settings,
+                signal,
+                {
+                  widthMm: sheet.page_width_mm,
+                  heightMm: sheet.page_height_mm,
+                },
+                true,
+              );
+            } else {
+              if (sheet.page_width_mm != null || sheet.page_height_mm != null)
+                throw new ToolFailure('PDF_PAGE_SIZE_PRESERVED');
+              bytes = source;
+            }
+            generatedBytes += bytes.length;
+            if (generatedBytes > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+            const normalized = await normalizeDrawingPdf(
+              bytes,
+              settings,
+              signal,
+              settings.maxFileBytes - normalizedBytes,
+            );
+            normalizedBytes += normalized.length;
+            sources.push({ source_filename: sheet.source_filename, bytes: normalized });
+          }
+          const result = await pdfTask(
+            { operation: 'assemble', sources, limits: settings },
+            settings,
+            signal,
+          );
+          const bytes = Buffer.from(
+            result.bytes.buffer,
+            result.bytes.byteOffset,
+            result.bytes.byteLength,
+          );
+          const pages = result.pages;
+          const { preview } = await pdfPreview(bytes, settings, signal);
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
+          await writePdf(settings, pdf_filename, bytes, signal);
+          return {
+            content: [
+              ...text({
+                ...fileInfo(settings, pdf_filename, bytes),
+                page_count: pages.length,
+                pages,
+                preview_page: 1,
+                preview_source: 'finished_pdf',
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
+        }),
+    );
+    server.registerTool(
+      'inspect_pdf',
+      {
+        description:
+          'Render a selected page of the finished PDF in the private workspace, independently of its SVG source. Use after export or assembly to check page order, missing geometry, text, lineweights, sections, and construction details. Page numbers start at 1. Omit region for an overview; use a small region in paper millimeters from the upper-left of the visible, rotated page to read fine details. Inspect every page and fix defects before delivering the set. This verifies the rendered drawing, not physical manufacturability. Run design operations sequentially.',
+        inputSchema: {
+          pdf_filename: z.string().regex(/\.pdf$/i),
+          page: z.number().int().min(1).max(settings.maxPdfPages),
+          region: z
+            .object({
+              left_mm: z.number().min(0),
+              top_mm: z.number().min(0),
+              width_mm: z.number().min(1).max(1200),
+              height_mm: z.number().min(1).max(1200),
+            })
+            .optional(),
+        },
+      },
+      ({ pdf_filename, page, region }) =>
+        run(async () => {
+          const { preview, paper, pageCount } = await pdfPreview(
+            await readWorkspace(settings, pdf_filename),
+            settings,
+            signal,
+            page,
+            region
+              ? {
+                  leftMm: region.left_mm,
+                  topMm: region.top_mm,
+                  widthMm: region.width_mm,
+                  heightMm: region.height_mm,
+                }
+              : undefined,
+          );
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
+          return {
+            content: [
+              ...text({
+                filename: pdf_filename,
+                page,
+                page_count: pageCount,
+                page_size_mm: [paper.widthMm, paper.heightMm],
+                region_mm: region,
+                preview_source: 'finished_pdf',
               }).content,
               { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
             ],
@@ -171,7 +317,8 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         run(async () => {
           const preview = await drawingRegion(
             await readWorkspace(settings, input.source_filename),
-            settings.maxImagePixels,
+            settings,
+            signal,
             { widthMm: input.page_width_mm, heightMm: input.page_height_mm },
             {
               leftMm: input.left_mm,

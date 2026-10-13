@@ -15,6 +15,8 @@ function bundle(overrides) {
       RUNNER_TEMP: root,
       DEPLOY_URL: 'https://example.test',
       CAD_DOWNLOAD_LINK_TTL_SECONDS: '',
+      CAD_MAX_PDF_PAGES: '',
+      CAD_RENDER_MEMORY_MB: '',
       LIBRECHAT_ENV: '',
       ADMIN_EMAIL: 'admin@example.test',
       ADMIN_USERNAME: 'admin',
@@ -31,15 +33,42 @@ function bundle(overrides) {
     result.status === 0
       ? JSON.parse(fs.readFileSync(path.join(root, 'bundle', 'design-user.json'), 'utf8'))
       : undefined;
+  const files =
+    result.status === 0
+      ? JSON.parse(fs.readFileSync(path.join(root, 'bundle', 'files-user.yaml'), 'utf8'))
+      : undefined;
   fs.rmSync(root, { recursive: true, force: true });
-  return { result, settings };
+  return { result, settings, files };
 }
+
+test('file listings and archives hide only the atomic PDF staging namespace', () => {
+  assert.deepEqual(bundle({}).files.hidden, ['.????????-????-????-????-????????????.tmp']);
+});
 
 test('public downloads require HTTPS before any credentials are bundled', () => {
   const { result } = bundle({ DEPLOY_URL: 'http://example.test' });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /must be an HTTPS URL/);
   assert.doesNotMatch(result.stderr, /fixture-.*-password/);
+});
+
+test('drawing-set page limits are bounded and configurable', () => {
+  assert.equal(bundle({}).settings.maxPdfPages, 32);
+  assert.equal(bundle({ CAD_MAX_PDF_PAGES: '12' }).settings.maxPdfPages, 12);
+  for (const value of ['0', '129', 'invalid', '1.5']) {
+    assert.notEqual(bundle({ CAD_MAX_PDF_PAGES: value }).result.status, 0);
+  }
+});
+
+test('render process memory limits are bounded and portable through deployment settings', () => {
+  assert.equal(bundle({}).settings.maxRenderMemoryBytes, 256 * 1024 * 1024);
+  assert.equal(
+    bundle({ CAD_RENDER_MEMORY_MB: '128' }).settings.maxRenderMemoryBytes,
+    128 * 1024 * 1024,
+  );
+  for (const value of ['63', '385', 'invalid', '128.5']) {
+    assert.notEqual(bundle({ CAD_RENDER_MEMORY_MB: value }).result.status, 0);
+  }
 });
 
 test('the development environment can configure download expiry with a 24-hour default', () => {
