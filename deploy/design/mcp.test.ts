@@ -10,7 +10,7 @@ import { watch } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { test, afterEach } from 'node:test';
 import { inflateSync } from 'node:zlib';
-import { PDFArray, PDFDocument, PDFName, PDFRawStream, degrees } from 'pdf-lib';
+import { PDFArray, PDFDocument, PDFName, PDFRawStream, PDFString, degrees } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -546,6 +546,94 @@ test('native title-block forms and inconsistent paper boxes cannot enter a drawi
     }
   }
   await assert.rejects(fs.stat(path.join(f.root, 'unsupported.pdf')), { code: 'ENOENT' });
+});
+
+test('static drawing sets reject page actions and annotation-bearing sources', async () => {
+  const f = await fixture();
+  for (const kind of ['page', 'link', 'comment']) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage();
+    if (kind === 'page') {
+      page.node.set(
+        PDFName.of('AA'),
+        pdf.context.obj({ O: { S: 'JavaScript', JS: PDFString.of('app.alert("fixture")') } }),
+      );
+    } else {
+      const annotation = pdf.context.obj({
+        Type: 'Annot',
+        Subtype: kind === 'link' ? 'Link' : 'Text',
+        Rect: [10, 10, 100, 30],
+        ...(kind === 'link'
+          ? { A: { S: 'URI', URI: PDFString.of('https://example.test/fixture') } }
+          : { Contents: PDFString.of('Static annotation') }),
+      });
+      page.node.set(PDFName.of('Annots'), pdf.context.obj([pdf.context.register(annotation)]));
+    }
+    await fs.writeFile(path.join(f.root, `${kind}.pdf`), await pdf.save());
+    const rejected = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: {
+        pdf_filename: 'active.pdf',
+        sheets: [{ source_filename: `${kind}.pdf` }],
+      },
+    });
+    assert.match(JSON.stringify(rejected), /PDF_ACTIONS_UNSUPPORTED/);
+    await assert.rejects(fs.stat(path.join(f.root, 'active.pdf')), { code: 'ENOENT' });
+  }
+});
+
+test('all native print boundaries must match the full sheet', async () => {
+  const f = await fixture();
+  for (const name of ['TrimBox', 'BleedBox', 'ArtBox']) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage([595, 842]);
+    page.node.set(PDFName.of(name), pdf.context.obj([10, 10, 500, 700]));
+    await fs.writeFile(path.join(f.root, `${name}.pdf`), await pdf.save());
+    const rejected = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: {
+        pdf_filename: 'boundary.pdf',
+        sheets: [{ source_filename: `${name}.pdf` }],
+      },
+    });
+    assert.match(JSON.stringify(rejected), /PDF_PAGE_UNSUPPORTED/);
+    await assert.rejects(fs.stat(path.join(f.root, 'boundary.pdf')), { code: 'ENOENT' });
+  }
+});
+
+test('SVG encoding policy accepts UTF-8 BOMs and reports unsupported encodings explicitly', async () => {
+  const f = await fixture();
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm"><rect x="10" y="10" width="50" height="20"/></svg>';
+  const cases = [
+    { bytes: Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(svg, 'utf16le')]), error: true },
+    { bytes: Buffer.from('<?xml version="1.0" encoding="ISO-8859-1"?>' + svg), error: true },
+    {
+      bytes: Buffer.concat([
+        Buffer.from([0xef, 0xbb, 0xbf]),
+        Buffer.from('<?xml version="1.0" encoding="UTF-8"?>' + svg),
+      ]),
+      error: false,
+    },
+  ];
+  for (const [index, source] of cases.entries()) {
+    await fs.writeFile(path.join(f.root, 'encoded.svg'), source.bytes);
+    const result = await f.client.callTool({
+      name: 'export_drawing_pdf',
+      arguments: {
+        source_filename: 'encoded.svg',
+        pdf_filename: `encoding-${index}.pdf`,
+        page_width_mm: 210,
+        page_height_mm: 297,
+      },
+    });
+    if (source.error) {
+      assert.match(JSON.stringify(result), /SVG_ENCODING_UNSUPPORTED/);
+      await assert.rejects(fs.stat(path.join(f.root, `encoding-${index}.pdf`)), { code: 'ENOENT' });
+    } else {
+      assert.equal(result.isError, undefined);
+    }
+  }
 });
 
 test('drawing assembly rejects page and aggregate byte overflow, malformed and unscaled sources without writing', async () => {

@@ -102,7 +102,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Export one PNG/JPEG/WebP/SVG in /tmp/cad to PDF with a download link and an independently rendered preview of the finished PDF. SVG geometry and text are written as PDF vectors; raster inputs remain raster previews. For a scaled CAD sheet, use a self-contained SVG with explicit physical dimensions (for example width="420mm" height="297mm" viewBox="0 0 420 297") and BOTH matching page_width_mm and page_height_mm. Keep borders and margins inside the SVG. Missing external resources, mismatched dimensions, and incomplete dimensions are rejected. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Use assemble_drawing_pdf for an ordered multi-sheet set or existing native CAD PDFs. Inspect the finished pages with inspect_pdf, including small details. Existing files are preserved: FILE_EXISTS means choose a new revision filename. Run design operations sequentially; DESIGN_BUSY means await the active operation. Finish all saves before requesting workspace_files links.',
+          'Export one PNG/JPEG/WebP/SVG in /tmp/cad to PDF with a download link and an independently rendered preview of the finished PDF. SVG geometry and text are written as PDF vectors; raster inputs remain raster previews. For a scaled CAD sheet, use a self-contained UTF-8 SVG with explicit physical dimensions (for example width="420mm" height="297mm" viewBox="0 0 420 297") and BOTH matching page_width_mm and page_height_mm. Keep borders and margins inside the SVG. Missing external resources, DTDs, escaped CSS, mismatched dimensions, and incomplete dimensions are rejected. SVG_ENCODING_UNSUPPORTED means re-export the SVG as UTF-8. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Use assemble_drawing_pdf for an ordered multi-sheet set or existing native CAD PDFs. Inspect the finished pages with inspect_pdf, including small details. Existing files are preserved: FILE_EXISTS means choose a new revision filename. Run design operations sequentially; DESIGN_BUSY means await the active operation. Finish all saves before requesting workspace_files links.',
         inputSchema: {
           source_filename: z.string().min(1),
           pdf_filename: z.string().endsWith('.pdf'),
@@ -125,6 +125,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             settings,
             signal,
             paper,
+            fileType(source_filename) === 'image/svg+xml',
           );
           if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
           const { preview } = await pdfPreview(bytes, settings, signal);
@@ -150,7 +151,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
     server.registerTool(
       'assemble_drawing_pdf',
       {
-        description: `Create one ordered drawing-set PDF from self-contained physical SVG sheets and/or existing native CAD PDFs in this user's /tmp/cad workspace. Each SVG requires BOTH matching paper dimensions; existing PDFs retain all pages, vector content, paper sizes, and rotations and must omit the dimensions. PDF_LAYERS_UNSUPPORTED means export a flat vector PDF from CAD with the intended layers visible, then retry; layered PDFs are rejected to prevent hidden layers changing visibility. PDF_FORMS_UNSUPPORTED means flatten form fields in the source producer before exporting. PDF_PAGE_UNSUPPORTED means export a full-sheet page up to 1200 mm per side with matching MediaBox/CropBox and standard units. These native PDFs must be static drawing pages, with no interactive form or differing print/preview area. Put sheet IDs, revisions, sheet numbers, scale, and reference callouts in the source drawings; this tool combines pages without inventing details, adding page numbers, or rescaling. Input bytes in total and output bytes must each stay under ${settings.maxFileBytes}; the set is limited to ${settings.maxPdfPages} pages. The response lists every page and previews the first finished page. Call inspect_pdf for EVERY page and important detail region before delivery. Keep assumptions and unperformed checks in the chat, not on drawing sheets. FILE_EXISTS requires a new revision filename. Run design operations sequentially and request workspace_files links after all exports are final.`,
+        description: `Create one ordered drawing-set PDF from self-contained physical UTF-8 SVG sheets and/or existing native CAD PDFs in this user's /tmp/cad workspace. Each SVG requires BOTH matching paper dimensions; existing PDFs retain all pages, vector content, paper sizes, and rotations and must omit the dimensions. PDF_LAYERS_UNSUPPORTED means export a flat vector PDF from CAD with the intended layers visible, then retry; layered PDFs are rejected to prevent hidden layers changing visibility. PDF_FORMS_UNSUPPORTED means flatten form fields in the source producer before exporting. PDF_PAGE_UNSUPPORTED means export a full-sheet page up to 1200 mm per side with matching MediaBox/CropBox/BleedBox/TrimBox/ArtBox and standard units. These native PDFs must be static drawing pages, with no interactive form or differing print/preview area. PDF_ACTIONS_UNSUPPORTED means flatten annotations and remove page actions in the source producer; annotation-bearing pages are rejected. Put sheet IDs, revisions, sheet numbers, scale, and reference callouts in the source drawings; this tool combines pages without inventing details, adding page numbers, or rescaling. Input bytes in total and output bytes must each stay under ${settings.maxFileBytes}; the set is limited to ${settings.maxPdfPages} pages. The response lists every page and previews the first finished page. Call inspect_pdf for EVERY page and important detail region before delivery. Keep assumptions and unperformed checks in the chat, not on drawing sheets. FILE_EXISTS requires a new revision filename. Run design operations sequentially and request workspace_files links after all exports are final.`,
         inputSchema: {
           pdf_filename: z.string().endsWith('.pdf'),
           sheets: z
@@ -184,10 +185,16 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             if (type === 'image/svg+xml') {
               if (sheet.page_width_mm == null || sheet.page_height_mm == null)
                 throw new ToolFailure('PAGE_SIZE_REQUIRED');
-              bytes = await drawingPdf(source, settings, signal, {
-                widthMm: sheet.page_width_mm,
-                heightMm: sheet.page_height_mm,
-              });
+              bytes = await drawingPdf(
+                source,
+                settings,
+                signal,
+                {
+                  widthMm: sheet.page_width_mm,
+                  heightMm: sheet.page_height_mm,
+                },
+                true,
+              );
             } else {
               if (sheet.page_width_mm != null || sheet.page_height_mm != null)
                 throw new ToolFailure('PDF_PAGE_SIZE_PRESERVED');

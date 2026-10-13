@@ -10,6 +10,13 @@ export type DrawingRegion = { leftMm: number; topMm: number; widthMm: number; he
 
 function selfContainedSvg(bytes: Buffer, physical = false): void {
   const parser = new SaxesParser({ xmlns: true });
+  let source: string;
+  try {
+    source = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
+  }
+  if (source.includes('\0')) throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
   let root = true;
   let inStyle = false;
   const unsupported = () => {
@@ -24,6 +31,10 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
   };
   parser.on('error', () => {
     throw new ToolFailure('INVALID_SVG');
+  });
+  parser.on('xmldecl', (declaration) => {
+    if (declaration.encoding && !/^utf-?8$/i.test(declaration.encoding))
+      throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
   });
   parser.on('doctype', unsupported);
   parser.on('processinginstruction', (instruction) => {
@@ -59,7 +70,7 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
   parser.on('cdata', (value) => {
     if (inStyle) checkCss(value);
   });
-  parser.write(bytes.toString('utf8')).close();
+  parser.write(source).close();
 }
 
 async function renderDrawing(
@@ -67,8 +78,9 @@ async function renderDrawing(
   maxImagePixels: number,
   paper?: PaperSize,
 ): Promise<{ bytes: Buffer; width: number; height: number }> {
+  if (paper) selfContainedSvg(bytes, true);
   const metadata = await sharp(bytes, { density: 72, limitInputPixels: maxImagePixels }).metadata();
-  if (metadata.format === 'svg') selfContainedSvg(bytes, paper != null);
+  if (metadata.format === 'svg' && !paper) selfContainedSvg(bytes);
   const widthPt = paper ? (paper.widthMm * 72) / 25.4 : undefined;
   const heightPt = paper ? (paper.heightMm * 72) / 25.4 : undefined;
   let density = 150;
@@ -142,6 +154,7 @@ export async function drawingPdf(
   settings: Settings,
   signal: AbortSignal,
   paper?: PaperSize,
+  svg = false,
 ): Promise<Buffer> {
   signal.throwIfAborted();
   if (
@@ -150,6 +163,7 @@ export async function drawingPdf(
       settings.maxImagePixels
   )
     throw new ToolFailure('PAGE_PIXEL_LIMIT');
+  if (svg) selfContainedSvg(bytes, paper != null);
   const source = await sharp(bytes, {
     density: 72,
     limitInputPixels: settings.maxImagePixels,
@@ -169,7 +183,7 @@ export async function drawingPdf(
       throw new ToolFailure('PAGE_SIZE_MISMATCH');
   }
   if (source.format === 'svg') {
-    selfContainedSvg(bytes, paper != null);
+    if (!svg) selfContainedSvg(bytes, paper != null);
     const scale = paper
       ? 1
       : Math.min((pageSize.width - 48) / source.width, (pageSize.height - 48) / source.height);
@@ -226,12 +240,14 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
   if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
   if (pdf.catalog.has(PDFName.of('AcroForm'))) throw new ToolFailure('PDF_FORMS_UNSUPPORTED');
   for (const page of pdf.getPages()) {
+    if (page.node.has(PDFName.of('AA')) || (page.node.Annots()?.size() ?? 0) > 0)
+      throw new ToolFailure('PDF_ACTIONS_UNSUPPORTED');
     const unit = page.node.get(PDFName.of('UserUnit'));
     if (unit != null && (!(unit instanceof PDFNumber) || unit.asNumber() !== 1))
       throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
     const media = page.getMediaBox();
-    const crop = page.getCropBox();
-    for (const box of [media, crop]) {
+    const boundaries = [page.getCropBox(), page.getBleedBox(), page.getTrimBox(), page.getArtBox()];
+    for (const box of [media, ...boundaries]) {
       if (
         ![box.x, box.y, box.width, box.height].every(Number.isFinite) ||
         ![box.width, box.height].every((v) => v > 0 && v <= (1200 * 72) / 25.4)
@@ -240,10 +256,13 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
     }
     // 制造图纸必须检查完整纸张，拒绝打印区域与预览区域不同的源页。
     if (
-      Math.abs(media.x - crop.x) > 0.001 ||
-      Math.abs(media.y - crop.y) > 0.001 ||
-      Math.abs(media.width - crop.width) > 0.001 ||
-      Math.abs(media.height - crop.height) > 0.001
+      boundaries.some(
+        (box) =>
+          Math.abs(media.x - box.x) > 0.001 ||
+          Math.abs(media.y - box.y) > 0.001 ||
+          Math.abs(media.width - box.width) > 0.001 ||
+          Math.abs(media.height - box.height) > 0.001,
+      )
     )
       throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
     const rotation = ((page.getRotation().angle % 360) + 360) % 360;
