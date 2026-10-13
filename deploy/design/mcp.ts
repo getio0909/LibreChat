@@ -101,26 +101,39 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'export_drawing_pdf',
       {
         description:
-          'Convert an exported PNG/JPEG/WebP/SVG drawing or render in /tmp/cad to a real PDF and return its direct download link. When a user requests CAD drawings, create a dimensioned SVG or rendered view, call this tool, and include the exact returned download_url as a Markdown link. A rendered view is a preview, not a dimensioned manufacturing drawing; identify which you exported. Keep the editable CAD model separate.',
+          'Convert an exported PNG/JPEG/WebP/SVG in /tmp/cad to a real PDF with a direct download link. For a scaled CAD sheet, prepare SVG with explicit physical canvas dimensions (for example width="420mm" height="297mm" and viewBox="0 0 420 297"), lay out geometry at the stated drawing scale, and pass BOTH matching page_width_mm and page_height_mm. This preserves the full sheet without adding margins or fitting; mismatched dimensions are rejected. Keep borders and printable margins inside the SVG. Omit both dimensions for an A4 fit-to-page preview, which must not claim a drawing scale. Export each sheet separately when needed, inspect every rendered page, and keep commentary or inspection reports separate from drawings. Return exact download_url links and retain the editable CAD model.',
         inputSchema: {
           source_filename: z.string().min(1),
           pdf_filename: z.string().endsWith('.pdf'),
+          page_width_mm: z.number().min(50).max(1200).optional(),
+          page_height_mm: z.number().min(50).max(1200).optional(),
         },
       },
-      ({ source_filename, pdf_filename }) =>
+      ({ source_filename, pdf_filename, page_width_mm, page_height_mm }) =>
         run(async () => {
           if (!/^image\//.test(fileType(source_filename))) throw new ToolFailure('IMAGE_REQUIRED');
           fileType(pdf_filename);
+          if ((page_width_mm == null) !== (page_height_mm == null))
+            throw new ToolFailure('PAGE_SIZE_REQUIRED');
+          const paper =
+            page_width_mm != null && page_height_mm != null
+              ? { widthMm: page_width_mm, heightMm: page_height_mm }
+              : undefined;
           const bytes = await drawingPdf(
             await readWorkspace(settings, source_filename),
             settings.maxImagePixels,
+            paper,
           );
           if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
           await fs.writeFile(path.join(settings.workspace, pdf_filename), bytes, {
             flag: 'wx',
             mode: 0o644,
           });
-          return text(fileInfo(settings, pdf_filename, bytes));
+          return text({
+            ...fileInfo(settings, pdf_filename, bytes),
+            layout: paper ? 'sheet' : 'preview',
+            page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
+          });
         }),
     );
     for (const provider of providers) {

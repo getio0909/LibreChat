@@ -12,6 +12,33 @@ const {
   resolveUploadLLMDeliveryPath,
 } = require('librechat-data-provider');
 
+test('CAD requests send maximum adaptive effort even with saved low-effort or sampling settings', () => {
+  const { getOpenAILLMConfig } = require('@librechat/api');
+  const { ChatOpenRouter } = require('@librechat/agents/llm/openrouter');
+  const config = configSchema.parse(yaml.load(fs.readFileSync('librechat.yaml', 'utf8')));
+  const endpoint = config.endpoints.custom.find((item) => item.name === 'OpenRouter');
+  const spec = config.modelSpecs.list.find((item) => item.default);
+  for (const saved of [{}, { reasoning_effort: 'low', temperature: 0.7, top_p: 0.9 }]) {
+    const { llmConfig } = getOpenAILLMConfig({
+      apiKey: 'fixture-only',
+      streaming: true,
+      endpoint: 'OpenRouter',
+      baseURL: endpoint.baseURL,
+      useOpenRouter: true,
+      modelOptions: { model: spec.preset.model, ...saved },
+      addParams: endpoint.addParams,
+      dropParams: endpoint.dropParams,
+    });
+    const request = new ChatOpenRouter(llmConfig).invocationParams();
+    assert.deepEqual(request.reasoning, { effort: 'max', enabled: true });
+    assert.equal(request.max_tokens, 65536);
+    assert.equal(request.temperature, undefined);
+    assert.equal(request.top_p, undefined);
+    assert.equal(request.include_reasoning, undefined);
+    assert.equal(request.tool_choice, undefined);
+  }
+});
+
 test('manual CAD uploads are stored without parsing binary files as model context', () => {
   const config = configSchema.parse(yaml.load(fs.readFileSync('librechat.yaml', 'utf8')));
   const fileConfig = mergeFileConfig(config.fileConfig);

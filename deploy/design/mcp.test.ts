@@ -7,8 +7,10 @@ import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { connect } from 'node:net';
 import { test, afterEach } from 'node:test';
-import { PDFDocument } from 'pdf-lib';
+import { inflateSync } from 'node:zlib';
+import { PDFArray, PDFDocument, PDFRawStream } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Server } from 'node:http';
 import type { FileHandle } from 'node:fs/promises';
@@ -103,6 +105,73 @@ test('exports a real PDF with a download URL and preserves an existing destinati
   });
   assert.equal(repeated.isError, true);
   assert.deepEqual(await fs.readFile(path.join(f.root, 'drawing.pdf')), bytes);
+});
+
+test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomplete dimensions', async () => {
+  const f = await fixture();
+  await fs.writeFile(
+    path.join(f.root, 'sheet.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect x="10" y="10" width="400" height="277" fill="white" stroke="black"/><path d="M20 50h100" stroke="black" stroke-width="1"/><text x="20" y="40" font-size="5">100 mm - Scale 1:1</text></svg>',
+  );
+  const result = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'sheet.svg',
+      pdf_filename: 'sheet.pdf',
+      page_width_mm: 420,
+      page_height_mm: 297,
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const resultText = CallToolResultSchema.parse(result).content.find(
+    (item) => item.type === 'text',
+  );
+  assert.ok(resultText?.type === 'text');
+  assert.equal(JSON.parse(resultText.text).layout, 'sheet');
+  const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'sheet.pdf')));
+  const page = pdf.getPage(0);
+  assert.ok(Math.abs(page.getWidth() - (420 * 72) / 25.4) < 0.001);
+  assert.ok(Math.abs(page.getHeight() - (297 * 72) / 25.4) < 0.001);
+  const contents = page.node.Contents();
+  assert.ok(contents instanceof PDFArray);
+  const stream = pdf.context.lookup(contents.get(0));
+  assert.ok(stream instanceof PDFRawStream);
+  const operators = inflateSync(stream.getContents()).toString();
+  assert.ok(operators.includes(`${page.getWidth()} 0 0 ${page.getHeight()} 0 0 cm`));
+  for (const dimensions of [
+    { page_width_mm: 297, page_height_mm: 210 },
+    { page_width_mm: 420 },
+    { page_height_mm: 297 },
+    { page_width_mm: 0, page_height_mm: 297 },
+  ]) {
+    const rejected = await f.client.callTool({
+      name: 'export_drawing_pdf',
+      arguments: {
+        source_filename: 'sheet.svg',
+        pdf_filename: 'invalid.pdf',
+        ...dimensions,
+      },
+    });
+    assert.equal(rejected.isError, true);
+  }
+  await assert.rejects(fs.stat(path.join(f.root, 'invalid.pdf')), { code: 'ENOENT' });
+  await fs.writeFile(
+    path.join(f.root, 'preview.png'),
+    await sharp({ create: { width: 120, height: 80, channels: 3, background: 'white' } })
+      .png()
+      .toBuffer(),
+  );
+  const raster = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'preview.png',
+      pdf_filename: 'raster.pdf',
+      page_width_mm: 420,
+      page_height_mm: 297,
+    },
+  });
+  assert.equal(raster.isError, true);
+  assert.match(JSON.stringify(raster), /SVG_SHEET_REQUIRED/);
 });
 
 function localDownload(f: { url: URL }, remote: string): URL {
