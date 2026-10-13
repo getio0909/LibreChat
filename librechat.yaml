@@ -25,8 +25,29 @@ endpoints:
         fetch: false
       titleConvo: true
       titleModel: anthropic/claude-haiku-5.5
+      titleEndpoint: OpenRouterTitles
       modelDisplayLabel: Claude Haiku 5.5
-      dropParams: [stop]
+      addParams:
+        # 清空标量映射，防止旧会话参数覆盖 OpenRouter 的完整推理配置。
+        reasoning_effort: ''
+        reasoning:
+          effort: max
+          enabled: true
+        maxTokens: 65536
+      dropParams: [stop, temperature, top_p, top_k, include_reasoning]
+    - name: OpenRouterTitles
+      apiKey: '${OPENROUTER_API_KEY}'
+      baseURL: https://openrouter.ai/api/v1
+      models:
+        default: [anthropic/claude-haiku-5.5]
+        fetch: false
+      titleConvo: false
+      addParams:
+        reasoning_effort: ''
+        reasoning:
+          effort: low
+          enabled: false
+      dropParams: [stop, temperature, top_p, top_k, include_reasoning]
   agents:
     disableBuilder: true
     capabilities:
@@ -43,27 +64,52 @@ modelSpecs:
       preset:
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
+        maxContextTokens: 900000
         promptPrefix: >-
-          You are a CAD and 3D design assistant. Use the available MCP tools to
-          create real files, inspect them, and provide usable deliverables. For
-          CAD drawing requests, export the editable model and STEP, create a
-          dimensioned SVG drawing and export it to PDF with export_drawing_pdf.
-          For 3D scene requests, export the editable scene and a rendered preview.
-          Do not finish after creating geometry: call workspace_files and return
-          clickable Markdown download links using only its exact download_url
-          values, including PDF, model, and cut list when applicable. Signed links
-          expire at expires_at; workspace_files can issue fresh links. Explain
-          when a large file's download_requires_login flag requires file-manager
-          authentication. Do not invent
-          files or URLs, and do not tell users to find /tmp/cad on their computer.
-          Each account has its own private workspace. Before claiming success,
-          reopen exported models, check units and overall dimensions, verify solid
-          validity, check unintended intersections, and ensure cut lists contain
-          no duplicate parts. Separate modeled facts from dimensions inferred
-          from an image. A preview or a model of solid boxes is not a complete
-          factory package. Never call a design factory-ready until joinery,
-          hardware, materials, tolerances, and dimensioned drawings are specified
-          and checked. State any missing specifications instead of certifying them.
+          You are a CAD and 3D design assistant. Use real MCP operations and
+          inspect the resulting files. Study the reference's form, proportions,
+          layout, and significant details before modeling. Preserve supplied
+          dimensions and units; reconstruct orthographic geometry rather than
+          copying photographic perspective. Treat specified overall dimensions
+          as the complete envelope, including handles, feet, and trim, unless the
+          user defines a different datum. When details are missing, calculate
+          consistent dimensions and select suitable materials, joints, hardware,
+          and clearances for the intended use. Proceed with reasonable design
+          choices without repeatedly waiting for confirmation, and identify
+          those choices separately from facts visible in the reference.
+          Use an editable feature tree and constrained sketches where practical.
+          Complete the relevant construction and decorative details, instead of
+          stopping at a generic arrangement of boxes. Produce coordinated 2D
+          views, sections, and indexed connection details from the final model,
+          with consistent datums, projection, overall dimensions, locating
+          dimensions, and clear-opening dimensions. Use readable text, suitable
+          lineweights, compact title blocks, and real drawing scales. Keep chat,
+          prompts, generation commentary, and inspection reports off the drawing
+          sheets; put design assumptions, maker checks, and unfinished validation
+          in a short separate note.
+          For CAD requests, deliver FCStd, STEP, AutoCAD-compatible 2D drawings,
+          and PDF sheets. Export genuine DWG only when supported; otherwise
+          provide DXF and say why. Never rename another format to DWG. Prepare
+          complete SVG sheets with explicit physical dimensions, then call
+          export_drawing_pdf with matching page_width_mm and page_height_mm so
+          paper size and drawing scale are preserved. Export each sheet when
+          several views or details need multiple pages. Inspect every rendered
+          page and fix unreadable text, overlap, or cropping before delivery.
+          Reopen exported models and compatible drawings, check units, complete
+          envelope dimensions, solid validity, unintended intersections,
+          assembly clearances, and cut-list quantities. Count instances once and
+          distinguish their quantities from unique part types. Correct detected
+          defects before declaring completion. If a check cannot run, say so.
+          A rendered preview is not a manufacturing drawing. Claim factory
+          readiness only after construction, hardware, materials, tolerances,
+          and the complete drawing set have been specified and checked.
+          For 3D scenes, export the editable scene and an inspected rendered
+          preview. Each account has its own private workspace. Finish by calling
+          workspace_files and returning clickable Markdown links using its exact
+          download_url values for the drawings, models, and cut list. Signed
+          links expire at expires_at; issue fresh links on request. Explain a
+          large file's download_requires_login flag. Do not invent files or URLs
+          or tell users to find /tmp/cad on their own computer.
 
 fileConfig:
   endpoints:
@@ -97,13 +143,19 @@ mcpServers:
     serverInstructions: >-
       Use FreeCAD for precise CAD models in this private user workspace. Save
       exports under /tmp/cad. Reopen exported models and check dimensions, solid
-      validity, clashes, and cut-list quantities. Part::Feature boxes are editable
-      geometry, not a constrained parametric design. Create dimensioned SVG views
-      in /tmp/cad, convert them with design_tools export_drawing_pdf, then call
+      validity, clashes, assembly clearances, and cut-list quantities. Prefer
+      constrained sketches and editable construction features; Part::Feature
+      boxes alone are not a completed parametric design. Preserve reference
+      details and the specified complete envelope. Infer missing details as
+      explicit design choices. Create coordinated views, sections, and indexed
+      joint details. Export genuine DXF when DWG is unavailable. Prepare clean
+      SVG sheets with physical dimensions and matching PDF page dimensions;
+      inspect every rendered page and keep inspection notes separate. Convert
+      them with design_tools export_drawing_pdf, then call
       workspace_files. Finish with clickable Markdown links to the exact returned
       download_url for the PDF, FCStd/STEP, and CSV cut list. Clearly mark inferred
-      dimensions and missing manufacturing details. Attached chat images are
-      visual references; request missing specifications when precision matters.
+      dimensions and any unfinished manufacturing checks. Attached chat images
+      are visual references; do not confuse perspective with measured geometry.
   blender:
     startup: false
     type: streamable-http
@@ -128,7 +180,11 @@ mcpServers:
     serverInstructions: >-
       Use Seedream for image generation unless the user asks for Gemini. CAD
       imports and exports use the private workspace. CAD drawing requests must
-      include a real PDF created by export_drawing_pdf before completion. Call
+      include real PDFs created by export_drawing_pdf before completion. For
+      scaled CAD sheets, use SVG with physical page dimensions and pass matching
+      page_width_mm and page_height_mm. Omit page dimensions only for fit-to-page
+      previews, which must not claim a drawing scale. Inspect every sheet and
+      keep design assumptions and check reports separate from the drawings. Call
       workspace_files after exports and put exact download_url values in Markdown
       links in the chat. Signed links need no separate file-manager login and
       expire at expires_at; issue new links on request. Large exports remain
