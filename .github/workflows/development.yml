@@ -41,8 +41,8 @@ jobs:
       - run: npm run test:client-build
       - name: Validate deployment files
         run: |
-          bash -n deploy/deploy.sh
-          shellcheck deploy/deploy.sh
+          bash -n deploy/deploy.sh deploy/bootstrap.sh
+          shellcheck -x deploy/deploy.sh deploy/bootstrap.sh
           mkdir -p /tmp/compose-check
           cp deploy/compose.yml /tmp/compose-check/compose.yml
           cp librechat.yaml /tmp/compose-check/librechat.yaml
@@ -117,18 +117,30 @@ jobs:
           LIBRECHAT_ENV: ${{ secrets.LIBRECHAT_ENV }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LIBRECHAT_IMAGE: ${{ needs.image.outputs.image }}
+          ORIGIN_CERT: ${{ secrets.ORIGIN_CERT }}
+          ORIGIN_KEY: ${{ secrets.ORIGIN_KEY }}
+          ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
+          ADMIN_USERNAME: ${{ vars.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          USER_EMAIL: ${{ vars.USER_EMAIL }}
+          USER_USERNAME: ${{ vars.USER_USERNAME }}
+          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
         run: |
           set -euo pipefail
-          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PORT DEPLOY_PATH DEPLOY_URL DEPLOY_KNOWN_HOSTS DEPLOY_SSH_KEY LIBRECHAT_ENV; do
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PORT DEPLOY_PATH DEPLOY_URL DEPLOY_KNOWN_HOSTS DEPLOY_SSH_KEY LIBRECHAT_ENV ORIGIN_CERT ORIGIN_KEY ADMIN_EMAIL ADMIN_USERNAME ADMIN_PASSWORD USER_EMAIL USER_USERNAME USER_PASSWORD; do
             if [ -z "${!name}" ]; then
               echo "::error::Missing development environment setting: $name"
               exit 1
             fi
           done
+          if [[ ! "$DEPLOY_PATH" =~ ^/opt/[a-zA-Z0-9_/-]+$ ]]; then
+            echo '::error::DEPLOY_PATH must be a directory under /opt.'
+            exit 1
+          fi
           umask 077
-          mkdir -p "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle"
+          mkdir -p "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/bootstrap"
           cleanup() {
-            rm -rf "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/deploy.tgz"
+            rm -rf "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/bootstrap"
           }
           trap cleanup EXIT
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$RUNNER_TEMP/ssh/key"
@@ -138,10 +150,15 @@ jobs:
           printf '%s\n' "$LIBRECHAT_ENV" > "$RUNNER_TEMP/bundle/.env"
           printf 'LIBRECHAT_IMAGE=%s\n' "$LIBRECHAT_IMAGE" > "$RUNNER_TEMP/bundle/image.env"
           printf '%s' "$REGISTRY_TOKEN" > "$RUNNER_TEMP/bundle/registry.token"
-          tar -czf "$RUNNER_TEMP/deploy.tgz" -C "$RUNNER_TEMP/bundle" .
-          ssh -i "$RUNNER_TEMP/ssh/key" -p "$DEPLOY_PORT" \
-            -o BatchMode=yes -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts" \
-            "$DEPLOY_USER@$DEPLOY_HOST" "deploy $DEPLOY_PATH" < "$RUNNER_TEMP/deploy.tgz"
+          node -e 'require("node:fs").writeFileSync(process.env.RUNNER_TEMP + "/bundle/accounts.json", JSON.stringify({admin: {email: process.env.ADMIN_EMAIL, username: process.env.ADMIN_USERNAME, password: process.env.ADMIN_PASSWORD}, user: {email: process.env.USER_EMAIL, username: process.env.USER_USERNAME, password: process.env.USER_PASSWORD}}))'
+          tar -czf "$RUNNER_TEMP/bootstrap/deploy.tgz" -C "$RUNNER_TEMP/bundle" .
+          cp deploy/bootstrap.sh deploy/deploy.sh deploy/nginx.conf "$RUNNER_TEMP/bootstrap/"
+          printf '%s\n' "$ORIGIN_CERT" > "$RUNNER_TEMP/bootstrap/origin.pem"
+          printf '%s\n' "$ORIGIN_KEY" > "$RUNNER_TEMP/bootstrap/origin.key"
+          ssh_options=(-i "$RUNNER_TEMP/ssh/key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts")
+          ssh "${ssh_options[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "install -d -m 700 $DEPLOY_PATH/.bootstrap"
+          scp "${ssh_options[@]}" -P "$DEPLOY_PORT" "$RUNNER_TEMP/bootstrap/"* "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/.bootstrap/"
+          ssh "${ssh_options[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "set -e; trap 'rm -rf -- $DEPLOY_PATH/.bootstrap' EXIT; bash $DEPLOY_PATH/.bootstrap/bootstrap.sh $DEPLOY_PATH; SSH_ORIGINAL_COMMAND='deploy $DEPLOY_PATH' /usr/local/lib/librechat/deploy.sh $DEPLOY_PATH < $DEPLOY_PATH/.bootstrap/deploy.tgz"
           curl --fail --silent --show-error --retry 5 --retry-delay 10 "$DEPLOY_URL/health"
           printf 'Deployed commit %s to %s\n' "$GITHUB_SHA" "$DEPLOY_URL" >> "$GITHUB_STEP_SUMMARY"

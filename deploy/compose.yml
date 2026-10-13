@@ -29,12 +29,13 @@ services:
       - logs:/app/api/logs
       - appdata:/app/data
     healthcheck:
+      # 文件服务必须完成数据库初始化，部署才能被标记为健康。
       test:
         [
           'CMD',
           'node',
           '-e',
-          "fetch('http://127.0.0.1:3080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+          "Promise.all(['http://127.0.0.1:3080/health','http://rag_api:8000/openapi.json'].map(url=>fetch(url))).then(results=>process.exit(results.every(r=>r.ok)?0:1)).catch(()=>process.exit(1))",
         ]
       interval: 10s
       timeout: 5s
@@ -83,9 +84,9 @@ services:
     environment:
       DB_HOST: vectordb
       DB_PORT: 5432
-      DB_DATABASE: mydatabase
-      DB_USER: myuser
-      DB_PASSWORD: ${RAG_DB_PASSWORD}
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: ${RAG_DB_PASSWORD}
       RAG_PORT: 8000
     env_file: .env
     depends_on:
