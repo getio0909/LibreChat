@@ -41,6 +41,7 @@ jobs:
       - run: npm run build:packages
       - name: Verify standalone design MCP
         run: |
+          node --test deploy/config.test.cjs
           npm ci --prefix deploy/design --no-audit --no-fund
           npm --prefix deploy/design run check
           npm --prefix deploy/design test

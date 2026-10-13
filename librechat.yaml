@@ -44,6 +44,24 @@ modelSpecs:
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
 
+fileConfig:
+  endpoints:
+    OpenRouter:
+      supportedMimeTypes:
+        - '^(text/(x-c|x-csharp|tab-separated-values|x-c\+\+|x-h|x-java|html|markdown|x-php|x-python|x-script\.python|x-ruby|x-tex|plain|css|vtt|javascript|csv|xml|calendar))$'
+        - '^application/(vnd\.ms-excel|msexcel|x-msexcel|x-ms-excel|x-excel|x-dos_ms_excel|xls|x-xls|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet)$'
+        - '^(application/(epub\+zip|csv|json|msword|pdf|x-tar|x-sh|x-zip-compressed|typescript|sql|yaml|x-parquet|vnd\.apache\.parquet|vnd\.coffeescript|vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|presentationml\.(presentation|template)|spreadsheetml\.sheet)|vnd\.oasis\.opendocument\.(text|spreadsheet|presentation|graphics)|xml|zip))$'
+        - '^image/(jpeg|gif|png|webp|heic|heif|svg|svg\+xml)$'
+        - '^video/(mp4|avi|mov|wmv|flv|webm|mkv|m4v|3gp|ogv)$'
+        - '^audio/(mp3|mpeg|mpeg3|wav|wave|x-wav|ogg|vorbis|mp4|m4a|x-m4a|flac|x-flac|webm|aac|wma|opus)$'
+        - '^message/rfc822$'
+        - '^model/(step|stl|obj|gltf-binary|gltf\+json|iges)$'
+        - '^application/(octet-stream|x-blender|x-freecad|dxf|iges|step|stl|sla|vnd\.blender)$'
+      defaultLLMDeliveryPath:
+        overrides:
+          '^model/(step|stl|obj|gltf-binary|gltf\+json|iges)$': none
+          '^application/(octet-stream|x-blender|x-freecad|dxf|iges|step|stl|sla|vnd\.blender)$': none
+
 mcpSettings:
   allowedAddresses: []
 
