@@ -10,7 +10,6 @@ import { getIconEndpoint, getEntity, getModelSpec } from '~/utils';
 import { useLocalize, useAuthContext, useGreeting } from '~/hooks';
 import { useChatSettings } from '~/Providers/ChatSettingsContext';
 import AgentContact from '~/components/Agents/AgentContact';
-import ConvoIcon from '~/components/Endpoints/ConvoIcon';
 
 const containerClassName =
   'shadow-stroke relative flex h-full items-center justify-center rounded-full bg-presentation text-text-primary dark:after:shadow-none ';
@@ -142,21 +141,20 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
         <div
           className={`flex ${textHasMultipleLines ? 'flex-col' : 'flex-col md:flex-row'} items-center justify-center gap-2`}
         >
-          <div className={`relative size-10 justify-center ${textHasMultipleLines ? 'mb-2' : ''}`}>
+          <div
+            className={`relative size-10 shrink-0 justify-center ${textHasMultipleLines ? 'mb-2' : ''}`}
+          >
             {isTemporary ? (
               <div className={containerClassName}>
                 <HatGlasses className="text-text-primary h-2/3 w-2/3" aria-hidden="true" />
               </div>
             ) : (
-              <ConvoIcon
-                agentsMap={agentsMap}
-                assistantMap={assistantMap}
-                conversation={conversation}
-                endpointsConfig={endpointsConfig}
-                containerClassName={containerClassName}
-                context="landing"
-                className="text-text-primary h-2/3 w-2/3"
-                size={41}
+              <img
+                src="assets/zybc-seal.svg"
+                alt={localize('com_ui_logo', { 0: startupConfig?.appTitle ?? '庄严宝刹' })}
+                width={40}
+                height={40}
+                className="size-10 object-contain"
               />
             )}
             {startupConfig?.showBirthdayIcon && (

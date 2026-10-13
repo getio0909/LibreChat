@@ -1,3 +1,4 @@
+import { createInstance } from 'i18next';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { Constants, EToolResources } from 'librechat-data-provider';
 import type { UploadLifecycleCallbacks } from '~/hooks/Files/useFileHandling';
@@ -9,6 +10,10 @@ import {
   getPendingDraftId,
   renewNewConversationDraftToken,
 } from '~/utils/drafts';
+import chineseTranslations from '~/locales/zh-Hans/translation.json';
+import finnishTranslations from '~/locales/fi/translation.json';
+import germanTranslations from '~/locales/de/translation.json';
+import translations from '~/locales/en/translation.json';
 
 const mockForceResize = jest.fn();
 const mockInsertTextAtCursor = jest.fn();
@@ -18,7 +23,7 @@ const mockGetUploadOptions = jest.fn(() => [EToolResources.context]);
 const mockSetFilesLoading = jest.fn();
 const mockShowToast = jest.fn();
 const mockOpenModal = jest.fn();
-const mockLocalize = jest.fn((key: string) => key);
+const mockLocalize = jest.fn((key: string, _options?: { 0: string }) => key);
 const mockSetActivePrompt = jest.fn();
 const mockSetPendingComposerText = jest.fn();
 const mockSetValue = jest.fn();
@@ -30,7 +35,12 @@ let mockIndex = 0;
 let mockIsSubmitting = false;
 let mockIsUploadConfigPending = false;
 let mockIsUnifiedMode = false;
-let mockConversation: { endpoint: string; conversationId?: string } = {
+let mockConversation: {
+  endpoint: string;
+  conversationId?: string;
+  model?: string;
+  modelLabel?: string;
+} = {
   endpoint: 'openAI',
   conversationId: 'convo-1',
 };
@@ -1122,5 +1132,100 @@ describe('useTextarea clipboard routing in unified mode', () => {
     await waitFor(() => expect(mockRouteFiles).toHaveBeenCalledTimes(1));
     expect(mockRouteFiles.mock.calls[0][1]).toBe(EToolResources.context);
     expect(mockOpenModal).not.toHaveBeenCalled();
+  });
+});
+
+describe('useTextarea model-independent placeholder', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockActivePrompt = undefined;
+    mockPendingComposerText = undefined;
+    mockIsSubmitting = false;
+    mockConversation = { endpoint: 'openAI', conversationId: 'convo-1', model: 'gpt-6' };
+    mockLocalize.mockImplementation((key, options) => {
+      const text = translations[key as keyof typeof translations] ?? key;
+      return options ? text.replace('{{0}}', options[0]) : text;
+    });
+  });
+
+  afterEach(() => {
+    mockLocalize.mockImplementation((key) => key);
+  });
+
+  it.each([
+    ['openAI', 'gpt-6'],
+    ['anthropic', 'provider-model-b'],
+    ['custom', 'private-model-c'],
+  ])('shows only Message for %s/%s', async (endpoint, model) => {
+    mockConversation = { endpoint, model, modelLabel: 'Internal model label' };
+    const { textArea } = renderTextareaHook();
+
+    await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
+  });
+
+  it.each(['de', 'fi', 'zh-Hans'])(
+    'uses the standalone Message fallback in %s',
+    async (language) => {
+      const i18n = createInstance();
+      await i18n.init({
+        lng: language,
+        fallbackLng: 'en',
+        resources: {
+          en: { translation: translations },
+          de: { translation: germanTranslations },
+          fi: { translation: finnishTranslations },
+          'zh-Hans': { translation: chineseTranslations },
+        },
+        interpolation: { escapeValue: false },
+      });
+      mockLocalize.mockImplementation((key, options) =>
+        String(i18n.t(key as keyof typeof translations, options)),
+      );
+      const { textArea } = renderTextareaHook();
+
+      await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
+    },
+  );
+
+  it('keeps Message when the selected model changes', async () => {
+    const { textArea, rerender } = renderTextareaHook();
+    await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
+
+    mockConversation = { ...mockConversation, model: 'another-model', modelLabel: 'Another model' };
+    rerender();
+
+    await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
+  });
+
+  it('preserves an explicit question-answer placeholder', async () => {
+    const textArea = document.createElement('textarea');
+    renderHook(() =>
+      useTextarea({
+        textAreaRef: { current: textArea },
+        submitButtonRef: { current: null },
+        setIsScrollable: jest.fn(),
+        enterToSend: true,
+        placeholder: 'Answer the question',
+      }),
+    );
+
+    await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Answer the question'));
+  });
+
+  it('preserves the missing-configuration notice', async () => {
+    const textArea = document.createElement('textarea');
+    renderHook(() =>
+      useTextarea({
+        textAreaRef: { current: textArea },
+        submitButtonRef: { current: null },
+        setIsScrollable: jest.fn(),
+        enterToSend: true,
+        disabled: true,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(textArea).toHaveAttribute('placeholder', translations.com_endpoint_config_placeholder),
+    );
   });
 });
