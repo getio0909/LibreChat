@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from './language';
 import { chromium } from '@playwright/test';
 import type { FullConfig, Page } from '@playwright/test';
 import type { User } from '../types';
@@ -59,6 +60,7 @@ async function authenticate(config: FullConfig, user: User) {
   });
   try {
     const page = await browser.newPage();
+    await setEnglishLanguage(page.context());
     console.log('🤖: 🗝  authenticating user:', user.email);
 
     if (typeof baseURL !== 'string') {

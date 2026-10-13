@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { clickHouseTheme } from '../../../../packages/client/src/theme/themes/clickhouse';
@@ -193,4 +194,9 @@ test.describe('deployment theme from librechat.yaml', () => {
       clickHouseTheme.modes.dark?.colors?.['rgb-surface-primary'],
     );
   });
+});
+
+// 本文件的控件断言使用英文，空会话不等同于未选择界面语言。
+test.beforeEach(async ({ context }) => {
+  await setEnglishLanguage(context);
 });

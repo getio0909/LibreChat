@@ -1,5 +1,6 @@
 import { atom } from 'recoil';
 import Cookies from 'js-cookie';
+import { DEFAULT_LANGUAGE } from '~/locales/defaults';
 import { atomWithLocalStorage } from './utils';
 
 const readStoredLang = () => {
@@ -20,12 +21,7 @@ const readStoredLang = () => {
   }
 };
 
-const defaultLang = () => {
-  const userLang =
-    (typeof navigator !== 'undefined' ? navigator.language || navigator.languages?.[0] : null) ??
-    'en';
-  return Cookies.get('lang') || readStoredLang() || userLang;
-};
+const defaultLang = () => Cookies.get('lang') || readStoredLang() || DEFAULT_LANGUAGE;
 
 const lang = atomWithLocalStorage('lang', defaultLang());
 const languageLoading = atom<boolean>({

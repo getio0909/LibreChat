@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { randomUUID } from 'crypto';
 import { expect, test } from '@playwright/test';
 import type {
@@ -62,6 +63,7 @@ async function openContextFor(
     baseURL,
     viewport: DESKTOP,
   });
+  await setEnglishLanguage(context);
   await context.addInitScript(() => {
     localStorage.setItem('navVisible', 'true');
   });
@@ -277,6 +279,7 @@ test.describe('passkeys', () => {
     baseURL,
   }) => {
     context = await browser.newContext({ baseURL, storageState: { cookies: [], origins: [] } });
+    await setEnglishLanguage(context);
     const page = await context.newPage();
 
     await page.goto('/login', { timeout: 10000 });

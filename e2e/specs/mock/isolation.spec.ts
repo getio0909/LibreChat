@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../setup/language';
 import { expect, test } from '@playwright/test';
 import type { Browser, Page } from '@playwright/test';
 import type { User } from '../../types';
@@ -46,6 +47,7 @@ async function registerSecondaryUser(page: Page, user: User) {
 /** Register the secondary user in a throwaway context, then log in within `page`. */
 async function ensureSecondaryUser(browser: Browser, page: Page, user: User, baseURL: string) {
   const setupContext = await browser.newContext({ storageState: undefined, baseURL });
+  await setEnglishLanguage(setupContext);
   const setupPage = await setupContext.newPage();
   try {
     await registerSecondaryUser(setupPage, user);
@@ -77,6 +79,7 @@ test.describe('user isolation', () => {
 
     // User B in a fresh, unauthenticated context.
     const contextB = await browser.newContext({ storageState: undefined, baseURL });
+    await setEnglishLanguage(contextB);
     const pageB = await contextB.newPage();
     try {
       await ensureSecondaryUser(browser, pageB, getSecondaryE2EUser(), baseURL);

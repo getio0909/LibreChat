@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../setup/language';
 import { expect, test } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 import type { User } from '../../types';
@@ -77,6 +78,7 @@ test.describe('auth session', () => {
       storageState: await getIsolatedStorageState(request, user),
       baseURL,
     });
+    await setEnglishLanguage(context);
     await context.addInitScript(() => {
       localStorage.setItem('navVisible', 'true');
     });
