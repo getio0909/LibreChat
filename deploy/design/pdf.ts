@@ -344,12 +344,21 @@ export async function loadDrawingPdf(
         throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
       pending.push(object.dict);
     } else if (object instanceof PDFDict) {
-      // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
-      object.delete(PDFName.of('Metadata'));
       const type = object.lookup(PDFName.of('Type'));
       const subtype = object.lookup(PDFName.of('Subtype'));
       const image = subtype === PDFName.of('Image');
       const form = subtype === PDFName.of('Form');
+      // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
+      const metadata = object.lookup(PDFName.of('Metadata'));
+      if (
+        type === PDFName.of('Page') ||
+        image ||
+        form ||
+        (metadata instanceof PDFStream &&
+          (metadata.dict.lookup(PDFName.of('Type')) === PDFName.of('Metadata') ||
+            metadata.dict.lookup(PDFName.of('Subtype')) === PDFName.of('XML')))
+      )
+        object.delete(PDFName.of('Metadata'));
       if (
         (form && object.has(PDFName.of('Ref'))) ||
         ((image || form) && object.has(PDFName.of('OPI')))

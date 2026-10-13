@@ -801,11 +801,13 @@ test('ordinary XObject aliases are not mistaken for control fields', async () =>
   );
   page.node.set(
     PDFName.of('Resources'),
-    pdf.context.obj({ XObject: { Ref: image, OPI: image, Alternates: image, OC: image } }),
+    pdf.context.obj({
+      XObject: { Ref: image, OPI: image, Alternates: image, OC: image, Metadata: image },
+    }),
   );
   page.node.set(
     PDFName.of('Contents'),
-    pdf.context.register(pdf.context.flateStream('q 50 0 0 50 20 20 cm /Ref Do Q')),
+    pdf.context.register(pdf.context.flateStream('q 50 0 0 50 20 20 cm /Metadata Do Q')),
   );
   await fs.writeFile(path.join(f.root, 'aliases.pdf'), await pdf.save());
   const result = await f.client.callTool({
