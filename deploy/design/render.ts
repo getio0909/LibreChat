@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import type { ExecFileException } from 'node:child_process';
-import { ToolFailure } from './config.ts';
+import { ToolFailure, defaultRenderMemoryBytes } from './config.ts';
 
 export function render(
   command: 'rsvg-convert' | 'pdftoppm',
@@ -8,14 +8,15 @@ export function render(
   input: Buffer,
   maxBytes: number,
   signal: AbortSignal,
+  maxMemoryBytes = defaultRenderMemoryBytes,
 ): Promise<Buffer> {
   signal.throwIfAborted();
   return new Promise((resolve, reject) => {
     let result: { error: ExecFileException | null; stdout: Buffer } | undefined;
     // 通过标准输入传入内容，不设置 SVG 基准路径，也不经过命令解释器。
     const child = execFile(
-      command,
-      args,
+      'prlimit',
+      [`--as=${maxMemoryBytes}`, '--', command, ...args],
       { encoding: 'buffer', maxBuffer: maxBytes, signal, killSignal: 'SIGKILL' },
       (error, stdout) => {
         result = { error, stdout };

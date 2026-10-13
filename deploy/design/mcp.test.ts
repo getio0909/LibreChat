@@ -380,6 +380,7 @@ test('native CAD page rotations accept negative and non-canonical multiples of 9
     const page = native.addPage([(210 * 72) / 25.4, (297 * 72) / 25.4]);
     page.setRotation(degrees(rotation));
     page.drawText(`ROTATION ${rotation}`, { x: 20, y: 20 });
+    page.node.set(PDFName.of('UserUnit'), native.context.register(native.context.obj(1)));
   }
   await fs.writeFile(path.join(f.root, 'rotated.pdf'), await native.save());
   const result = await f.client.callTool({
@@ -629,6 +630,47 @@ test('drawing sets reject page-associated source files', async () => {
   assert.deepEqual(await fs.readFile(path.join(f.root, 'associated.pdf')), Buffer.from(bytes));
 });
 
+test('associated source files cannot hide in nested or inherited drawing resources', async () => {
+  const f = await fixture();
+  for (const inherited of [false, true]) {
+    const pdf = await PDFDocument.create();
+    const page = pdf.addPage();
+    const payload = pdf.context.register(
+      pdf.context.flateStream('attached CAD resource fixture', { Type: 'EmbeddedFile' }),
+    );
+    const file = pdf.context.register(
+      pdf.context.obj({ Type: 'Filespec', F: PDFString.of('source.step'), EF: { F: payload } }),
+    );
+    const form = pdf.context.register(
+      pdf.context.flateStream('0 0 10 10 re f', {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, 10, 10],
+        AF: [file],
+      }),
+    );
+    const resources = pdf.context.obj({ XObject: { Drawing: form } });
+    if (inherited) {
+      const parent = page.node.Parent();
+      assert.ok(parent);
+      parent.set(PDFName.of('Resources'), resources);
+      page.node.delete(PDFName.of('Resources'));
+    } else {
+      page.node.set(PDFName.of('Resources'), resources);
+    }
+    await fs.writeFile(path.join(f.root, 'nested.pdf'), await pdf.save());
+    const rejected = await f.client.callTool({
+      name: 'assemble_drawing_pdf',
+      arguments: {
+        pdf_filename: 'nested-set.pdf',
+        sheets: [{ source_filename: 'nested.pdf' }],
+      },
+    });
+    assert.match(JSON.stringify(rejected), /PDF_ATTACHMENTS_UNSUPPORTED/);
+    await assert.rejects(fs.stat(path.join(f.root, 'nested-set.pdf')), { code: 'ENOENT' });
+  }
+});
+
 test('all native print boundaries must match the full sheet', async () => {
   const f = await fixture();
   for (const name of ['TrimBox', 'BleedBox', 'ArtBox']) {
@@ -746,6 +788,7 @@ test('SVG exports reject external resources and DTDs instead of silently losing 
     String.raw`<style><![CDATA[.part { fill:u\000072l(https://example.test/resource.svg#paint); }]]></style>`,
     '<style>rect{fill:u<![CDATA[rl(https://example.test/p.svg#paint)]]>}</style>',
     '<style>@im<![CDATA[port url(https://example.test/font.css);]]></style>',
+    '<g xml:base="https://example.test/external.svg"><use href="#part"/></g>',
   ]) {
     await fs.writeFile(
       path.join(f.root, 'external.svg'),
@@ -802,6 +845,29 @@ test('native renderers bound output and honor cancellation without exposing inpu
   await assert.rejects(
     running,
     (error: Error) => error instanceof ToolFailure && error.code === 'REQUEST_CANCELLED',
+  );
+});
+
+test('native render memory is bounded before large allocations and the service remains usable', async () => {
+  const input = Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="30000" height="30000"><rect width="30000" height="30000" fill="white"/></svg>',
+  );
+  await assert.rejects(
+    render(
+      'rsvg-convert',
+      ['--format=png'],
+      input,
+      1024 * 1024,
+      new AbortController().signal,
+      64 * 1024 * 1024,
+    ),
+    (error: Error) => error instanceof ToolFailure && error.code === 'DRAWING_RENDER_FAILED',
+  );
+  const f = await fixture();
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
+  assert.equal(
+    (await f.client.callTool({ name: 'workspace_files', arguments: {} })).isError,
+    undefined,
   );
 });
 

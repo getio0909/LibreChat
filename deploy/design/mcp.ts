@@ -311,7 +311,8 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         run(async () => {
           const preview = await drawingRegion(
             await readWorkspace(settings, input.source_filename),
-            settings.maxImagePixels,
+            settings,
+            signal,
             { widthMm: input.page_width_mm, heightMm: input.page_height_mm },
             {
               leftMm: input.left_mm,

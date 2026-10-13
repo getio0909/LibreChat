@@ -1,5 +1,5 @@
 FROM node:24.16.0-bookworm-slim
-RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core fonts-noto-cjk librsvg2-bin poppler-utils && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core fonts-noto-cjk librsvg2-bin poppler-utils util-linux && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV XDG_CACHE_HOME=/tmp/.cache
 COPY deploy/design/package.json deploy/design/package-lock.json ./

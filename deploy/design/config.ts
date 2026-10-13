@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const defaultRenderMemoryBytes = 256 * 1024 * 1024;
+
 export const settingsSchema = z.object({
   userId: z
     .string()
@@ -40,6 +42,12 @@ export const settingsSchema = z.object({
     .max(64 * 1024 * 1024)
     .default(32 * 1024 * 1024),
   maxPdfPages: z.number().int().min(1).max(128).default(32),
+  maxRenderMemoryBytes: z
+    .number()
+    .int()
+    .min(64 * 1024 * 1024)
+    .max(384 * 1024 * 1024)
+    .default(defaultRenderMemoryBytes),
   maxConcurrentJobs: z.number().int().min(1).max(4).default(1),
   requestTimeoutMs: z.number().int().positive().default(180000),
   arkApiKey: z.string().default(''),

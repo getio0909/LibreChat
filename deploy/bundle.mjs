@@ -20,6 +20,10 @@ const maxPdfPages = Number(process.env.CAD_MAX_PDF_PAGES || 32);
 if (!Number.isInteger(maxPdfPages) || maxPdfPages < 1 || maxPdfPages > 128) {
   throw new Error('CAD_MAX_PDF_PAGES must be an integer between 1 and 128.');
 }
+const renderMemoryMb = Number(process.env.CAD_RENDER_MEMORY_MB || 256);
+if (!Number.isInteger(renderMemoryMb) || renderMemoryMb < 64 || renderMemoryMb > 384) {
+  throw new Error('CAD_RENDER_MEMORY_MB must be an integer between 64 and 384.');
+}
 const hostImageLimit = Number(parseEnv(process.env.LIBRECHAT_ENV || '').MCP_IMAGE_DATA_MAX_BYTES);
 const maxImageBytes =
   Number.isSafeInteger(hostImageLimit) && hostImageLimit > 0
@@ -51,6 +55,7 @@ for (const account of ['admin', 'user']) {
       downloadLinkTtlSeconds,
       maxImageBytes,
       maxPdfPages,
+      maxRenderMemoryBytes: renderMemoryMb * 1024 * 1024,
       arkApiKey: process.env.ARK_API_KEY,
       geminiApiKey: process.env.GEMINI_API_KEY,
     }),

@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import { SaxesParser } from 'saxes';
-import { PDFDocument, PDFName, PDFNumber } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFNumber, PDFArray, PDFDict, PDFRef, PDFStream } from 'pdf-lib';
+import type { PDFObject } from 'pdf-lib';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 import { render } from './render.ts';
@@ -57,6 +58,12 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
         throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
     }
     for (const attribute of Object.values(tag.attributes)) {
+      if (
+        attribute.local === 'base' &&
+        attribute.uri === 'http://www.w3.org/XML/1998/namespace' &&
+        attribute.value
+      )
+        unsupported();
       if (attribute.local === 'href' && !/^(#|data:)/i.test(attribute.value)) unsupported();
       checkCss(attribute.value);
     }
@@ -83,9 +90,11 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
 
 async function renderDrawing(
   bytes: Buffer,
-  maxImagePixels: number,
+  settings: Settings,
+  signal: AbortSignal,
   paper?: PaperSize,
 ): Promise<{ bytes: Buffer; width: number; height: number }> {
+  const maxImagePixels = settings.maxImagePixels;
   if (paper) selfContainedSvg(bytes, true);
   const metadata = await sharp(bytes, { density: 72, limitInputPixels: maxImagePixels }).metadata();
   if (metadata.format === 'svg' && !paper) selfContainedSvg(bytes);
@@ -122,6 +131,19 @@ async function renderDrawing(
     }
     density = low;
   }
+  if (metadata.format === 'svg') {
+    const png = await render(
+      'rsvg-convert',
+      ['--format=png', `--dpi-x=${density}`, `--dpi-y=${density}`],
+      bytes,
+      settings.maxFileBytes,
+      signal,
+      settings.maxRenderMemoryBytes,
+    );
+    const size = await sharp(png, { limitInputPixels: maxImagePixels }).metadata();
+    if (!size.width || !size.height) throw new ToolFailure('DRAWING_RENDER_FAILED');
+    return { bytes: png, width: size.width, height: size.height };
+  }
   const rendered = await sharp(bytes, { density, limitInputPixels: maxImagePixels })
     .png()
     .toBuffer({ resolveWithObject: true });
@@ -130,7 +152,8 @@ async function renderDrawing(
 
 export async function drawingRegion(
   bytes: Buffer,
-  maxImagePixels: number,
+  settings: Settings,
+  signal: AbortSignal,
   paper: PaperSize,
   region: DrawingRegion,
 ): Promise<Buffer> {
@@ -139,7 +162,7 @@ export async function drawingRegion(
     region.topMm + region.heightMm > paper.heightMm
   )
     throw new ToolFailure('REGION_OUT_OF_BOUNDS');
-  const rendered = await renderDrawing(bytes, maxImagePixels, paper);
+  const rendered = await renderDrawing(bytes, settings, signal, paper);
   const left = Math.floor((region.leftMm / paper.widthMm) * rendered.width);
   const top = Math.floor((region.topMm / paper.heightMm) * rendered.height);
   const width = Math.min(
@@ -150,7 +173,7 @@ export async function drawingRegion(
     rendered.height - top,
     Math.max(1, Math.ceil((region.heightMm / paper.heightMm) * rendered.height)),
   );
-  return sharp(rendered.bytes, { limitInputPixels: maxImagePixels })
+  return sharp(rendered.bytes, { limitInputPixels: settings.maxImagePixels })
     .extract({ left, top, width, height })
     .flatten({ background: 'white' })
     .png()
@@ -214,9 +237,10 @@ export async function drawingPdf(
       bytes,
       settings.maxFileBytes,
       signal,
+      settings.maxRenderMemoryBytes,
     );
   }
-  const { bytes: png } = await renderDrawing(bytes, settings.maxImagePixels);
+  const { bytes: png } = await renderDrawing(bytes, settings, signal);
   const pdf = await PDFDocument.create();
   const image = await pdf.embedPng(png);
   const page = pdf.addPage(image.width > image.height ? [841.89, 595.28] : [595.28, 841.89]);
@@ -247,11 +271,46 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
     throw new ToolFailure('PDF_PAGE_LIMIT');
   if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
   if (pdf.catalog.has(PDFName.of('AcroForm'))) throw new ToolFailure('PDF_FORMS_UNSUPPORTED');
-  for (const page of pdf.getPages()) {
+  const pages = pdf.getPages();
+  const roots = new Set<PDFObject>(pages.map((page) => page.node));
+  const pending: PDFObject[] = [...roots];
+  for (const page of pages) {
+    const resources = page.node.Resources();
+    if (resources) pending.push(resources);
+  }
+  const inspected = new Set<PDFObject>();
+  while (pending.length) {
+    const object = pending.pop();
+    if (!object || inspected.has(object)) continue;
+    inspected.add(object);
+    if (object instanceof PDFRef) {
+      const value = pdf.context.lookup(object);
+      if (value) pending.push(value);
+    } else if (object instanceof PDFArray) {
+      pending.push(...object.asArray());
+    } else if (object instanceof PDFStream) {
+      pending.push(object.dict);
+    } else if (object instanceof PDFDict) {
+      const type = object.lookup(PDFName.of('Type'));
+      if (
+        object.has(PDFName.of('AF')) ||
+        object.has(PDFName.of('EF')) ||
+        type === PDFName.of('Filespec') ||
+        type === PDFName.of('EmbeddedFile')
+      )
+        throw new ToolFailure('PDF_ATTACHMENTS_UNSUPPORTED');
+      for (const [key, value] of object.entries()) {
+        // 复制页会剥离父节点，继承资源已单独加入检查队列。
+        if (roots.has(object) && key === PDFName.of('Parent')) continue;
+        pending.push(value);
+      }
+    }
+  }
+  for (const page of pages) {
     if (page.node.has(PDFName.of('AF'))) throw new ToolFailure('PDF_ATTACHMENTS_UNSUPPORTED');
     if (page.node.has(PDFName.of('AA')) || (page.node.Annots()?.size() ?? 0) > 0)
       throw new ToolFailure('PDF_ACTIONS_UNSUPPORTED');
-    const unit = page.node.get(PDFName.of('UserUnit'));
+    const unit = page.node.lookup(PDFName.of('UserUnit'));
     if (unit != null && (!(unit instanceof PDFNumber) || unit.asNumber() !== 1))
       throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
     const media = page.getMediaBox();
@@ -337,6 +396,13 @@ export async function pdfPreview(
     const maxSide = Math.min(1600, Math.floor(Math.sqrt(settings.maxImagePixels)));
     args.push('-scale-to', `${maxSide}`);
   }
-  const preview = await render('pdftoppm', [...args, '-'], bytes, settings.maxFileBytes, signal);
+  const preview = await render(
+    'pdftoppm',
+    [...args, '-'],
+    bytes,
+    settings.maxFileBytes,
+    signal,
+    settings.maxRenderMemoryBytes,
+  );
   return { preview, paper, pageCount: pdf.getPageCount() };
 }
