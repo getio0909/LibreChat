@@ -173,6 +173,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
           const pages: { page: number; source_filename: string; source_page: number }[] = [];
           let inputBytes = 0;
           let generatedBytes = 0;
+          let normalizedBytes = 0;
           for (const sheet of sheets) {
             signal.throwIfAborted();
             const type = fileType(sheet.source_filename);
@@ -202,7 +203,14 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             }
             generatedBytes += bytes.length;
             if (generatedBytes > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
-            const pdf = await loadDrawingPdf(bytes, settings, signal);
+            const loaded = await loadDrawingPdf(
+              bytes,
+              settings,
+              signal,
+              settings.maxFileBytes - normalizedBytes,
+            );
+            normalizedBytes += loaded.normalizedBytes;
+            const pdf = loaded.document;
             if (combined.getPageCount() + pdf.getPageCount() > settings.maxPdfPages)
               throw new ToolFailure('PDF_PAGE_LIMIT');
             const copied = await combined.copyPages(pdf, pdf.getPageIndices());

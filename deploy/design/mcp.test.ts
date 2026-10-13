@@ -728,6 +728,71 @@ test('catalog color output intents are rejected without changing the source', as
   await assert.rejects(fs.stat(path.join(f.root, 'managed-set.pdf')), { code: 'ENOENT' });
 });
 
+test('drawing sets omit stale page thumbnails and preserve the original source', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  page.drawLine({ start: { x: 20, y: 20 }, end: { x: 120, y: 20 }, thickness: 1 });
+  const oldImage = await sharp({
+    create: { width: 8, height: 8, channels: 3, background: '#ff0000' },
+  })
+    .png()
+    .toBuffer();
+  const thumbnail = await pdf.embedPng(oldImage);
+  page.node.set(PDFName.of('Thumb'), thumbnail.ref);
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'thumbnail.pdf'), bytes);
+  assert.equal(imageCount(await PDFDocument.load(bytes)), 1);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'current.pdf',
+      sheets: [{ source_filename: 'thumbnail.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const current = await PDFDocument.load(await fs.readFile(path.join(f.root, 'current.pdf')));
+  assert.equal(current.getPage(0).node.has(PDFName.of('Thumb')), false);
+  assert.equal(imageCount(current), 0);
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'thumbnail.pdf')), bytes);
+  assert.equal((await PDFDocument.load(bytes)).getPage(0).node.has(PDFName.of('Thumb')), true);
+});
+
+test('combined drawing sets bound the total expanded object data before copying pages', async () => {
+  const f = await fixture({ maxFileBytes: 300 * 1024 });
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  page.drawLine({ start: { x: 20, y: 20 }, end: { x: 120, y: 20 }, thickness: 1 });
+  page.node.set(PDFName.of('Fixture'), PDFString.of('X'.repeat(200 * 1024)));
+  const bytes = Buffer.from(await pdf.save());
+  assert.ok(bytes.length < 4096);
+  await fs.writeFile(path.join(f.root, 'compressed.pdf'), bytes);
+  const single = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'single.pdf',
+      sheets: [{ source_filename: 'compressed.pdf' }],
+    },
+  });
+  assert.equal(single.isError, undefined);
+  const rejected = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'combined.pdf',
+      sheets: [{ source_filename: 'compressed.pdf' }, { source_filename: 'compressed.pdf' }],
+    },
+  });
+  assert.equal(rejected.isError, true);
+  assert.match(JSON.stringify(rejected), /FILE_TOO_LARGE/);
+  await assert.rejects(fs.stat(path.join(f.root, 'combined.pdf')), { code: 'ENOENT' });
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'compressed.pdf')), bytes);
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
+  assert.equal(
+    (await f.client.callTool({ name: 'workspace_files', arguments: {} })).isError,
+    undefined,
+  );
+});
+
 test('compressed PDF object expansion is bounded outside the long-running service', async () => {
   const f = await fixture({ maxRenderMemoryBytes: 64 * 1024 * 1024 });
   const expanded = Buffer.alloc(80 * 1024 * 1024, 88);

@@ -267,7 +267,9 @@ export async function loadDrawingPdf(
   bytes: Buffer,
   settings: Settings,
   signal: AbortSignal,
-): Promise<PDFDocument> {
+  normalizedLimit = settings.maxFileBytes,
+): Promise<{ document: PDFDocument; normalizedBytes: number }> {
+  if (normalizedLimit < 1) throw new ToolFailure('FILE_TOO_LARGE');
   signal.throwIfAborted();
   const folder = await fs.mkdtemp(path.join(os.tmpdir(), 'cad-pdf-'));
   let normalized: Buffer;
@@ -279,7 +281,7 @@ export async function loadDrawingPdf(
       'qpdf',
       ['--object-streams=disable', '--stream-data=preserve', input, '-'],
       Buffer.alloc(0),
-      settings.maxFileBytes,
+      normalizedLimit,
       signal,
       settings.maxRenderMemoryBytes,
     );
@@ -303,6 +305,10 @@ export async function loadDrawingPdf(
   if (pdf.catalog.has(PDFName.of('OutputIntents')))
     throw new ToolFailure('PDF_COLOR_PROFILE_UNSUPPORTED');
   const pages = pdf.getPages();
+  for (const page of pages) {
+    // 缩略图不参与当前图纸渲染，移除后避免携带旧版本的隐藏画面。
+    page.node.delete(PDFName.of('Thumb'));
+  }
   const roots = new Set<PDFObject>(pages.map((page) => page.node));
   const pending: PDFObject[] = [...roots];
   for (const page of pages) {
@@ -370,7 +376,7 @@ export async function loadDrawingPdf(
     const rotation = ((page.getRotation().angle % 360) + 360) % 360;
     if (![0, 90, 180, 270].includes(rotation)) throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
   }
-  return pdf;
+  return { document: pdf, normalizedBytes: normalized.length };
 }
 
 export async function pdfPreview(
@@ -380,7 +386,7 @@ export async function pdfPreview(
   pageNumber = 1,
   region?: DrawingRegion,
 ): Promise<{ preview: Buffer; paper: PaperSize; pageCount: number }> {
-  const pdf = await loadDrawingPdf(bytes, settings, signal);
+  const { document: pdf } = await loadDrawingPdf(bytes, settings, signal);
   if (pageNumber > pdf.getPageCount()) throw new ToolFailure('PDF_PAGE_NOT_FOUND');
   const page = pdf.getPage(pageNumber - 1);
   const box = page.getCropBox();
