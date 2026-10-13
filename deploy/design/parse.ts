@@ -16,6 +16,7 @@ import type { PDFObject } from 'pdf-lib';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 import { pruneResources } from './prune.ts';
+import { selfContainedSvg } from './svg.ts';
 
 const limitsSchema = z.object({
   maxFileBytes: z
@@ -33,6 +34,17 @@ const pageSchema = z.object({
   source_page: z.number().int().positive(),
 });
 const inputSchema = z.discriminatedUnion('operation', [
+  z.object({
+    operation: z.literal('validateSvg'),
+    bytes: bytesSchema,
+    limits: limitsSchema,
+    paper: z
+      .object({
+        widthMm: z.number().positive().max(1200),
+        heightMm: z.number().positive().max(1200),
+      })
+      .optional(),
+  }),
   z.object({ operation: z.literal('prepare'), bytes: bytesSchema, limits: limitsSchema }),
   z.object({
     operation: z.literal('inspect'),
@@ -47,6 +59,7 @@ const inputSchema = z.discriminatedUnion('operation', [
   }),
 ]);
 const resultSchema = z.discriminatedUnion('operation', [
+  z.object({ operation: z.literal('validateSvg') }),
   z.object({
     operation: z.literal('prepare'),
     bytes: bytesSchema,
@@ -97,6 +110,8 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
     page.node.delete(PDFName.of('Thumb'));
     page.node.delete(PDFName.of('B'));
     if (page.node.has(PDFName.of('PresSteps'))) throw new ToolFailure('PDF_ACTIONS_UNSUPPORTED');
+    if (page.node.has(PDFName.of('SeparationInfo')))
+      throw new ToolFailure('PDF_SEPARATIONS_UNSUPPORTED');
   }
   const roots = new Set<PDFObject>(pages.map((page) => page.node));
   const pending: PDFObject[] = [...roots];
@@ -215,6 +230,10 @@ async function processInput(input: PdfInput): Promise<PdfResult> {
     input.limits.maxFileBytes
   )
     throw new ToolFailure('FILE_TOO_LARGE');
+  if (input.operation === 'validateSvg') {
+    selfContainedSvg(input.bytes, input.paper);
+    return { operation: 'validateSvg' };
+  }
   if (input.operation === 'inspect') {
     const pdf = await readPdf(input.bytes, input.limits);
     if (input.page > pdf.getPageCount()) throw new ToolFailure('PDF_PAGE_NOT_FOUND');
@@ -267,12 +286,24 @@ if (parentPort) {
     .catch((error) => {
       port.postMessage({
         ok: false,
-        error: { code: error instanceof ToolFailure ? error.code : 'INVALID_PDF' },
+        error: {
+          code:
+            error instanceof ToolFailure
+              ? error.code
+              : workerData.operation === 'validateSvg'
+                ? 'INVALID_SVG'
+                : 'INVALID_PDF',
+        },
       });
     })
     .finally(() => port.close());
 }
 
+export function pdfTask(
+  input: Extract<PdfInput, { operation: 'validateSvg' }>,
+  settings: Settings,
+  signal: AbortSignal,
+): Promise<Extract<PdfResult, { operation: 'validateSvg' }>>;
 export function pdfTask(
   input: Extract<PdfInput, { operation: 'prepare' }>,
   settings: Settings,

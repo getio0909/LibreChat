@@ -2,7 +2,7 @@ import { inflateSync } from 'node:zlib';
 import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFObject, PDFNull } from 'pdf-lib';
 import { ToolFailure } from './config.ts';
 
-type Resource = 'XObject' | 'Pattern' | 'ExtGState' | 'Font' | 'Shading';
+type Resource = 'XObject' | 'Pattern' | 'ExtGState' | 'Font' | 'Shading' | 'ColorSpace';
 type References = Map<Resource, Set<PDFName>>;
 const operators: Record<string, Resource> = {
   Do: 'XObject',
@@ -11,8 +11,17 @@ const operators: Record<string, Resource> = {
   gs: 'ExtGState',
   Tf: 'Font',
   sh: 'Shading',
+  cs: 'ColorSpace',
+  CS: 'ColorSpace',
 };
-const resourceKinds: Resource[] = ['XObject', 'Pattern', 'ExtGState', 'Font', 'Shading'];
+const resourceKinds: Resource[] = [
+  'XObject',
+  'Pattern',
+  'ExtGState',
+  'Font',
+  'Shading',
+  'ColorSpace',
+];
 function emptyReferences(): References {
   return new Map(resourceKinds.map((key) => [key, new Set<PDFName>()]));
 }
@@ -99,6 +108,7 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
   const decoded = new Map<PDFRawStream, Uint8Array>();
   const parsed = new Map<PDFObject, References>();
   const scanned = new Map<PDFObject, Set<PDFDict>>();
+  const colors = new Map<PDFObject, Set<PDFDict>>();
   let expanded = 0;
   const streamBytes = (stream: PDFRawStream) => {
     const cached = decoded.get(stream);
@@ -127,6 +137,41 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
     decoded.set(stream, bytes);
     return bytes;
   };
+  const markColor = (value: PDFObject | undefined, resources: PDFDict): void => {
+    const resolved = pdf.context.lookup(value);
+    if (!resolved) return;
+    const scopes = colors.get(resolved) ?? new Set<PDFDict>();
+    if (scopes.has(resources)) return;
+    scopes.add(resources);
+    colors.set(resolved, scopes);
+    if (resolved instanceof PDFName) {
+      const entries = resources.lookup(PDFName.of('ColorSpace'));
+      if (!(entries instanceof PDFDict) || !entries.has(resolved)) return;
+      const names = used.get(resources) ?? emptyReferences();
+      used.set(resources, names);
+      names.get('ColorSpace')!.add(resolved);
+      markColor(entries.lookup(resolved), resources);
+      return;
+    }
+    if (!(resolved instanceof PDFArray)) return;
+    const family = resolved.lookup(0);
+    if (family === PDFName.of('Indexed') || family === PDFName.of('Pattern'))
+      markColor(resolved.get(1), resources);
+    else if (family === PDFName.of('Separation') || family === PDFName.of('DeviceN'))
+      markColor(resolved.get(2), resources);
+    else if (family === PDFName.of('ICCBased')) {
+      const profile = resolved.lookup(1);
+      if (profile instanceof PDFRawStream)
+        markColor(profile.dict.lookup(PDFName.of('Alternate')), resources);
+    }
+  };
+  const preserveColors = (dict: PDFDict, resources: PDFDict): void => {
+    markColor(dict.lookup(PDFName.of('ColorSpace')), resources);
+    const group = dict.lookup(PDFName.of('Group'));
+    if (group instanceof PDFDict) markColor(group.lookup(PDFName.of('CS')), resources);
+    const shading = dict.lookup(PDFName.of('Shading'));
+    if (shading instanceof PDFDict) markColor(shading.lookup(PDFName.of('ColorSpace')), resources);
+  };
   const scan = (content: PDFObject | undefined, resources: PDFDict | undefined): void => {
     if (!content || !resources) return;
     const resolved = pdf.context.lookup(content);
@@ -151,11 +196,24 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
     }
     const names = used.get(resources) ?? emptyReferences();
     used.set(resources, names);
+    if (resolved instanceof PDFRawStream) preserveColors(resolved.dict, resources);
+    // 默认色彩空间和图像、着色、透明组的颜色引用不需要显式 cs/CS 指令。
+    for (const key of ['DefaultGray', 'DefaultRGB', 'DefaultCMYK'])
+      markColor(PDFName.of(key), resources);
     for (const key of resourceKinds) {
       const entries = resources.lookup(PDFName.of(key));
       for (const name of calls.get(key)!) {
         names.get(key)!.add(name);
+        if (key === 'ColorSpace') {
+          markColor(name, resources);
+          continue;
+        }
         const object = entries instanceof PDFDict ? entries.lookup(name) : undefined;
+        const dict = object instanceof PDFRawStream ? object.dict : object;
+        if (dict instanceof PDFDict) {
+          const own = dict.lookup(PDFName.of('Resources'));
+          preserveColors(dict, own instanceof PDFDict ? own : resources);
+        }
         if (
           object instanceof PDFRawStream &&
           (key === 'Pattern' ||
@@ -182,6 +240,7 @@ export function pruneResources(pdf: PDFDocument, limit: number): void {
     const resources = page.node.Resources();
     if (resources) {
       if (!used.has(resources)) used.set(resources, emptyReferences());
+      preserveColors(page.node, resources);
       scan(page.node.Contents(), resources);
     }
   }

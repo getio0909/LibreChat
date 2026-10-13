@@ -1236,6 +1236,112 @@ test('nested shading keeps selected gradients and removes unused function stream
   assert.deepEqual(await fs.readFile(path.join(f.root, 'shading.pdf')), bytes);
 });
 
+test('color-space cleanup preserves selected aliases, image colors and defaults but drops unused ICC data', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const profile = pdf.context.register(
+    pdf.context.flateStream('unused ICC fixture', { N: 3, Alternate: 'DeviceRGB' }),
+  );
+  const image = pdf.context.register(
+    pdf.context.flateStream(Buffer.from([255, 0, 0]), {
+      Type: 'XObject',
+      Subtype: 'Image',
+      Width: 1,
+      Height: 1,
+      ColorSpace: 'ImageRGB',
+      BitsPerComponent: 8,
+    }),
+  );
+  const form = pdf.context.register(
+    pdf.context.flateStream('/Ink cs 0 sc 20 20 100 100 re f q 10 0 0 10 150 20 cm /Raster Do Q', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 180, 150],
+      Group: { S: 'Transparency', CS: 'GroupRGB' },
+      Resources: {
+        XObject: { Raster: image },
+        ColorSpace: {
+          Base: 'DeviceRGB',
+          ImageRGB: 'DeviceRGB',
+          GroupRGB: 'DeviceRGB',
+          Ink: [
+            'Separation',
+            'Spot',
+            'Base',
+            { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
+          ],
+          DefaultGray: ['CalGray', { WhitePoint: [0.9505, 1, 1.089] }],
+          Old: ['ICCBased', profile],
+        },
+      },
+    }),
+  );
+  page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+  page.pushOperators(drawObject('Drawing'));
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'colors.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'colors-set.pdf',
+      sheets: [{ source_filename: 'colors.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'colors-set.pdf')));
+  const objects = output.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'));
+  assert.ok(objects instanceof PDFDict);
+  const current = objects.lookup(PDFName.of('Drawing'));
+  assert.ok(current instanceof PDFRawStream);
+  const resources = current.dict.lookup(PDFName.of('Resources'));
+  assert.ok(resources instanceof PDFDict);
+  const colors = resources.lookup(PDFName.of('ColorSpace'));
+  assert.ok(colors instanceof PDFDict);
+  assert.deepEqual(
+    colors
+      .keys()
+      .map((name) => name.decodeText())
+      .sort(),
+    ['Base', 'DefaultGray', 'GroupRGB', 'ImageRGB', 'Ink'],
+  );
+  assert.equal(
+    output.context
+      .enumerateIndirectObjects()
+      .some(([, object]) => object instanceof PDFRawStream && object.dict.has(PDFName.of('N'))),
+    false,
+  );
+  const block = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(block?.type === 'image');
+  const stats = await sharp(Buffer.from(block.data, 'base64')).stats();
+  assert.ok(stats.channels.some((channel) => channel.min < 30));
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'colors.pdf')), bytes);
+});
+
+test('pre-separated print plates are rejected before static pages can be combined', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const plate = pdf.addPage();
+  page.node.set(
+    PDFName.of('SeparationInfo'),
+    pdf.context.obj({ Pages: [page.ref, plate.ref], DeviceColorant: 'Black' }),
+  );
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'plates.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'plates-set.pdf',
+      sheets: [{ source_filename: 'plates.pdf' }],
+    },
+  });
+  assert.equal(result.isError, true);
+  assert.match(JSON.stringify(result), /PDF_SEPARATIONS_UNSUPPORTED/);
+  await assert.rejects(fs.stat(path.join(f.root, 'plates-set.pdf')), { code: 'ENOENT' });
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'plates.pdf')), bytes);
+});
+
 test('PDF NUL whitespace and null Flate parameters retain visible drawing resources', async () => {
   const f = await fixture();
   for (const [index, params] of [PDFNull, undefined].entries()) {
@@ -1610,6 +1716,69 @@ test('drawing sets omit invisible article beads and thread metadata', async () =
     false,
   );
   assert.deepEqual(await fs.readFile(path.join(f.root, 'article.pdf')), bytes);
+});
+
+test('long SVG validation can be cancelled while the parent remains responsive', async () => {
+  const f = await fixture();
+  const bytes = Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg">' + '<g/>'.repeat(1200000) + '</svg>',
+  );
+  const started = Date.now();
+  const work = pdfTask(
+    { operation: 'validateSvg', bytes: new Uint8Array(bytes), limits: f.settings },
+    f.settings,
+    AbortSignal.timeout(120),
+  );
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
+  await assert.rejects(
+    work,
+    (error: Error) => error instanceof ToolFailure && error.code === 'REQUEST_CANCELLED',
+  );
+  assert.ok(Date.now() - started < 1500);
+  assert.equal(bytes.subarray(0, 4).toString(), '<svg');
+  const next = await pdfTask(
+    {
+      operation: 'validateSvg',
+      bytes: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'),
+      limits: f.settings,
+    },
+    f.settings,
+    new AbortController().signal,
+  );
+  assert.equal(next.operation, 'validateSvg');
+});
+
+test('nested SVG validation exhausts only the bounded worker and leaves the service usable', async () => {
+  const f = await fixture({ maxRenderMemoryBytes: 64 * 1024 * 1024 });
+  const bytes = Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg">' +
+      '<g>'.repeat(250000) +
+      '</g>'.repeat(250000) +
+      '</svg>',
+  );
+  await assert.rejects(
+    pdfTask(
+      { operation: 'validateSvg', bytes: new Uint8Array(bytes), limits: f.settings },
+      f.settings,
+      new AbortController().signal,
+    ),
+    (error: Error) => error instanceof ToolFailure && error.code === 'FILE_TOO_LARGE',
+  );
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
+  assert.equal(
+    (await f.client.callTool({ name: 'workspace_files', arguments: {} })).isError,
+    undefined,
+  );
+  const next = await pdfTask(
+    {
+      operation: 'validateSvg',
+      bytes: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'),
+      limits: f.settings,
+    },
+    f.settings,
+    new AbortController().signal,
+  );
+  assert.equal(next.operation, 'validateSvg');
 });
 
 test('object-heavy PDF parsing stops on cancellation and the parent service stays usable', async () => {

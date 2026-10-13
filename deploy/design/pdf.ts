@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import os from 'node:os';
 import path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { SaxesParser } from 'saxes';
+
 import { PDFDocument, PrintScaling } from 'pdf-lib';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
@@ -12,118 +12,19 @@ import { pdfTask } from './parse.ts';
 export type PaperSize = { widthMm: number; heightMm: number };
 export type DrawingRegion = { leftMm: number; topMm: number; widthMm: number; heightMm: number };
 
-function selfContainedSvg(bytes: Buffer, paper?: PaperSize): void {
-  const parser = new SaxesParser({ xmlns: true });
-  let source: string;
-  try {
-    source = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-  } catch {
-    throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
-  }
-  if (source.includes('\0')) throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
-  let root = true;
-  let inStyle = false;
-  let style = '';
-  const unsupported = () => {
-    throw new ToolFailure('SVG_NOT_SELF_CONTAINED');
-  };
-  const reference = (value: string) => {
-    if (value.startsWith('#')) return;
-    const data = /^data:image\/(png|jpeg|webp);base64,([a-z0-9+/]*={0,2})$/i.exec(value);
-    if (!data) return unsupported();
-    const image = Buffer.from(data[2], 'base64');
-    const raster =
-      data[1].toLowerCase() === 'png'
-        ? image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-        : data[1].toLowerCase() === 'jpeg'
-          ? image.subarray(0, 3).equals(Buffer.from([255, 216, 255]))
-          : image.subarray(0, 4).toString() === 'RIFF' &&
-            image.subarray(8, 12).toString() === 'WEBP';
-    if (!raster) unsupported();
-  };
-  const checkCss = (value: string) => {
-    const css = value.replace(/\/\*[\s\S]*?\*\//g, '');
-    // 外部资源无法在无基准路径的渲染中可靠交付，拒绝而不是静默缺图。
-    if (/@import|\\/i.test(css)) unsupported();
-    for (const match of css.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
-      reference(match[1]);
-    }
-  };
-  parser.on('error', () => {
-    throw new ToolFailure('INVALID_SVG');
-  });
-  parser.on('xmldecl', (declaration) => {
-    if (declaration.encoding && !/^utf-?8$/i.test(declaration.encoding))
-      throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
-  });
-  parser.on('doctype', unsupported);
-  parser.on('processinginstruction', (instruction) => {
-    if (instruction.target === 'xml-stylesheet') unsupported();
-  });
-  parser.on('opentag', (tag) => {
-    if (root) {
-      root = false;
-      if (tag.local !== 'svg' || tag.uri !== 'http://www.w3.org/2000/svg')
-        throw new ToolFailure('INVALID_SVG');
-      if (paper) {
-        const millimeters = (name: string) => {
-          const size =
-            /^\s*(\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(mm|cm|in|pt|pc|q)\s*$/i.exec(
-              tag.attributes[name]?.value ?? '',
-            );
-          if (!size) throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
-          const units: Record<string, number> = {
-            mm: 1,
-            cm: 10,
-            in: 25.4,
-            pt: 25.4 / 72,
-            pc: 25.4 / 6,
-            q: 0.25,
-          };
-          const value = Number(size[1]) * units[size[2].toLowerCase()];
-          if (!Number.isFinite(value) || value <= 0)
-            throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
-          return value;
-        };
-        // 比较物理尺寸并容许单位换算的常见小数取整；0.01 毫米仅用于纸张匹配。
-        if (
-          Math.abs(millimeters('width') - paper.widthMm) > 0.01 ||
-          Math.abs(millimeters('height') - paper.heightMm) > 0.01
-        )
-          throw new ToolFailure('PAGE_SIZE_MISMATCH');
-      }
-    }
-    for (const attribute of Object.values(tag.attributes)) {
-      if (
-        attribute.local === 'base' &&
-        attribute.uri === 'http://www.w3.org/XML/1998/namespace' &&
-        attribute.value
-      )
-        unsupported();
-      if (attribute.local === 'href') reference(attribute.value);
-      checkCss(attribute.value);
-    }
-    if (tag.local === 'style') {
-      inStyle = true;
-      style = '';
-    }
-  });
-  parser.on('closetag', (tag) => {
-    if (tag.local === 'style') {
-      checkCss(style);
-      inStyle = false;
-      style = '';
-    }
-  });
-  parser.on('text', (value) => {
-    if (inStyle) style += value;
-  });
-  parser.on('cdata', (value) => {
-    if (inStyle) style += value;
-  });
-  parser.write(source).close();
+async function validateSvg(
+  bytes: Buffer,
+  settings: Settings,
+  signal: AbortSignal,
+  paper?: PaperSize,
+): Promise<void> {
+  // 验证副本转交有界线程，原始输入保留用于原生渲染；取消等待线程退出。
+  await pdfTask(
+    { operation: 'validateSvg', bytes: new Uint8Array(bytes), paper, limits: settings },
+    settings,
+    signal,
+  );
 }
-
 async function renderDrawing(
   bytes: Buffer,
   settings: Settings,
@@ -131,9 +32,9 @@ async function renderDrawing(
   paper?: PaperSize,
 ): Promise<{ bytes: Buffer; width: number; height: number }> {
   const maxImagePixels = settings.maxImagePixels;
-  if (paper) selfContainedSvg(bytes, paper);
+  if (paper) await validateSvg(bytes, settings, signal, paper);
   const metadata = await sharp(bytes, { density: 72, limitInputPixels: maxImagePixels }).metadata();
-  if (metadata.format === 'svg' && !paper) selfContainedSvg(bytes);
+  if (metadata.format === 'svg' && !paper) await validateSvg(bytes, settings, signal);
   const widthPt = paper ? (paper.widthMm * 72) / 25.4 : undefined;
   const heightPt = paper ? (paper.heightMm * 72) / 25.4 : undefined;
   let density = 150;
@@ -230,7 +131,7 @@ export async function drawingPdf(
       settings.maxImagePixels
   )
     throw new ToolFailure('PAGE_PIXEL_LIMIT');
-  if (svg) selfContainedSvg(bytes, paper);
+  if (svg) await validateSvg(bytes, settings, signal, paper);
   const source = await sharp(bytes, {
     density: 72,
     limitInputPixels: settings.maxImagePixels,
@@ -250,7 +151,7 @@ export async function drawingPdf(
       throw new ToolFailure('PAGE_SIZE_MISMATCH');
   }
   if (source.format === 'svg') {
-    if (!svg) selfContainedSvg(bytes, paper);
+    if (!svg) await validateSvg(bytes, settings, signal, paper);
     const scale = paper
       ? 1
       : Math.min((pageSize.width - 48) / source.width, (pageSize.height - 48) / source.height);
