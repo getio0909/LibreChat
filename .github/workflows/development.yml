@@ -41,7 +41,7 @@ jobs:
       - run: npm run build:packages
       - name: Verify standalone design MCP
         run: |
-          node --test deploy/config.test.cjs
+          node --test deploy/config.test.cjs deploy/bundle.test.cjs
           npm ci --prefix deploy/design --no-audit --no-fund
           npm --prefix deploy/design run check
           npm --prefix deploy/design test
@@ -166,6 +166,7 @@ jobs:
           DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
           DEPLOY_URL: ${{ vars.DEPLOY_URL }}
+          CAD_DOWNLOAD_LINK_TTL_SECONDS: ${{ vars.CAD_DOWNLOAD_LINK_TTL_SECONDS }}
           DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           LIBRECHAT_ENV: ${{ secrets.LIBRECHAT_ENV }}

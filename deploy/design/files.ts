@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { constants } from 'node:fs';
 import * as fs from 'node:fs/promises';
+import { createHash, createHmac } from 'node:crypto';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 
@@ -23,6 +24,7 @@ const types: Record<string, string> = {
   '.dxf': 'application/dxf',
   '.igs': 'model/iges',
   '.iges': 'model/iges',
+  '.csv': 'text/csv',
 };
 
 export function fileType(filename: string): string {
@@ -34,13 +36,63 @@ export function fileType(filename: string): string {
   return type;
 }
 
-export function fileInfo(settings: Settings, filename: string, bytes: number) {
+export function fileInfo(settings: Settings, filename: string, bytes: Buffer | number) {
+  const fallback = `${settings.workspaceUrl.replace(/\/$/, '')}/${encodeURIComponent(filename)}`;
+  let link: {
+    download_url: string;
+    expires_at?: string;
+    download_requires_login?: boolean;
+    direct_download_limit_bytes?: number;
+  } = {
+    download_url: fallback,
+    download_requires_login: true,
+    direct_download_limit_bytes: settings.maxFileBytes,
+  };
+  if (
+    settings.downloadUrl &&
+    settings.downloadSigningKey &&
+    settings.userId &&
+    Buffer.isBuffer(bytes)
+  ) {
+    const expires = Math.floor(Date.now() / 1000) + settings.downloadLinkTtlSeconds;
+    const ticket = Buffer.from(
+      JSON.stringify({
+        filename,
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+        expires,
+      }),
+    ).toString('base64url');
+    const signature = createHmac('sha256', Buffer.from(settings.downloadSigningKey, 'hex'))
+      .update(`${settings.userId}\n${ticket}`)
+      .digest('base64url');
+    const url = new URL(encodeURIComponent(filename), settings.downloadUrl.replace(/\/?$/, '/'));
+    url.searchParams.set('ticket', `${ticket}.${signature}`);
+    link = { download_url: url.href, expires_at: new Date(expires * 1000).toISOString() };
+  }
   return {
     filename,
-    bytes,
+    bytes: Buffer.isBuffer(bytes) ? bytes.length : bytes,
     path: path.join(settings.workspace, filename),
-    download_url: `${settings.workspaceUrl.replace(/\/$/, '')}/${encodeURIComponent(filename)}`,
+    ...link,
   };
+}
+
+async function workspaceFile(settings: Settings, filename: string) {
+  const stat = await fs.lstat(path.join(settings.workspace, filename));
+  if (!stat.isFile()) return null;
+  if (stat.size > settings.maxFileBytes) return fileInfo(settings, filename, stat.size);
+  try {
+    return fileInfo(settings, filename, await readWorkspace(settings, filename));
+  } catch (error) {
+    if (
+      error instanceof ToolFailure &&
+      ['FILE_IS_CHANGING', 'FILE_TOO_LARGE'].includes(error.code)
+    ) {
+      // 变动文件仅降级自己的链接，其他稳定文件仍正常列出。
+      return { ...fileInfo(settings, filename, stat.size), download_status: error.code };
+    }
+    throw error;
+  }
 }
 
 export async function listWorkspace(settings: Settings) {
@@ -53,8 +105,19 @@ export async function listWorkspace(settings: Settings) {
     } catch {
       continue;
     }
-    const stat = await fs.lstat(path.join(settings.workspace, entry.name));
-    if (stat.isFile()) records.push(fileInfo(settings, entry.name, stat.size));
+    try {
+      const file = await workspaceFile(settings, entry.name);
+      if (file) records.push(file);
+    } catch (error) {
+      if (error instanceof ToolFailure && error.code === 'INVALID_FILE') continue;
+      if (
+        error instanceof Error &&
+        'code' in error &&
+        (error.code === 'ENOENT' || error.code === 'ELOOP')
+      )
+        continue;
+      throw error;
+    }
   }
   return {
     upload_url: settings.workspaceUrl,

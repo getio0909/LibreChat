@@ -5,11 +5,13 @@ import assert from 'node:assert/strict';
 import * as fs from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
+import { connect } from 'node:net';
 import { test, afterEach } from 'node:test';
 import { PDFDocument } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Server } from 'node:http';
+import type { FileHandle } from 'node:fs/promises';
 import type { Settings, Request } from './config.ts';
 import { settingsSchema, ToolFailure, boundedBody } from './config.ts';
 import { fileType, readWorkspace } from './files.ts';
@@ -46,7 +48,7 @@ async function fixture(overrides: Partial<Settings> = {}, request?: Request) {
       requestInit: { headers: { 'X-LibreChat-User-ID': settings.userId } },
     }),
   );
-  return { root, settings, client, url };
+  return { root, settings, client, url, server };
 }
 
 test('private workspace rejects other identities and lists only usable filenames', async () => {
@@ -101,6 +103,213 @@ test('exports a real PDF with a download URL and preserves an existing destinati
   });
   assert.equal(repeated.isError, true);
   assert.deepEqual(await fs.readFile(path.join(f.root, 'drawing.pdf')), bytes);
+});
+
+function localDownload(f: { url: URL }, remote: string): URL {
+  const target = new URL(remote);
+  target.host = f.url.host;
+  target.protocol = f.url.protocol;
+  return target;
+}
+
+test('chat download links deliver exact files without login and reject other users or files', async () => {
+  const sharedKey = 'c'.repeat(64);
+  const a = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: sharedKey,
+  });
+  const b = await fixture({
+    userId: 'b'.repeat(24),
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: sharedKey,
+  });
+  await fs.writeFile(path.join(a.root, 'drawing.pdf'), '%PDF-admin');
+  await fs.writeFile(path.join(a.root, 'other.pdf'), '%PDF-other');
+  await fs.writeFile(path.join(a.root, 'cutlist.csv'), 'Part,Qty\nDoor,4\n');
+  await fs.writeFile(path.join(b.root, 'drawing.pdf'), '%PDF-user');
+  const result = await a.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const files = JSON.parse(block.text).files as {
+    filename: string;
+    download_url: string;
+    expires_at: string;
+  }[];
+  assert.ok(files.some((file) => file.filename === 'cutlist.csv'));
+  const file = files.find((file) => file.filename === 'drawing.pdf');
+  assert.ok(file);
+  assert.ok(Date.parse(file.expires_at) > Date.now());
+  const url = localDownload(a, file.download_url);
+  const response = await fetch(url);
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), '%PDF-admin');
+  assert.equal(response.headers.get('cache-control'), 'private, no-store');
+  assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
+  assert.match(response.headers.get('content-disposition') ?? '', /attachment/);
+  const head = await fetch(url, { method: 'HEAD' });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), '');
+  assert.equal((await fetch(url, { method: 'POST' })).status, 405);
+  assert.equal((await fetch(new URL('/download/drawing.pdf', a.url))).status, 403);
+  assert.equal((await fetch(localDownload(b, file.download_url))).status, 403);
+  const differentFile = new URL(url);
+  differentFile.pathname = '/download/other.pdf';
+  assert.equal((await fetch(differentFile)).status, 403);
+  const forged = new URL(url);
+  const ticket = forged.searchParams.get('ticket')!;
+  forged.searchParams.set('ticket', ticket.slice(0, -1) + (ticket.endsWith('A') ? 'Q' : 'A'));
+  assert.equal((await fetch(forged)).status, 403);
+  const traversal = new URL(url);
+  traversal.pathname = '/download/%2e%2e%2fsecret.pdf';
+  assert.equal((await fetch(traversal)).status, 403);
+});
+
+test('download links expire and do not silently deliver changed files', async (context) => {
+  const f = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+    downloadLinkTtlSeconds: 60,
+  });
+  await fs.writeFile(
+    path.join(f.root, 'drawing.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20" fill="black"/></svg>',
+  );
+  const result = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing.pdf' },
+  });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const file = JSON.parse(block.text) as { download_url: string; expires_at: string };
+  const url = localDownload(f, file.download_url);
+  assert.equal((await fetch(url)).status, 200);
+  const original = await fs.readFile(path.join(f.root, 'drawing.pdf'));
+  await fs.writeFile(path.join(f.root, 'drawing.pdf'), '%PDF-replaced');
+  assert.equal((await fetch(url)).status, 409);
+  await fs.writeFile(path.join(f.root, 'drawing.pdf'), original);
+  context.mock.method(Date, 'now', () => Date.parse(file.expires_at) + 1000);
+  assert.equal((await fetch(url)).status, 403);
+});
+
+test('large exports remain visible with authenticated fallback links', async () => {
+  const f = await fixture({
+    maxFileBytes: 4,
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+  });
+  await fs.writeFile(path.join(f.root, 'large.blend'), '12345');
+  const result = await f.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const file = JSON.parse(block.text).files[0];
+  assert.equal(file.filename, 'large.blend');
+  assert.equal(file.bytes, 5);
+  assert.equal(file.download_url, 'https://example.test/cad-files/admin/large.blend');
+  assert.equal(file.download_requires_login, true);
+  assert.equal(file.direct_download_limit_bytes, 4);
+});
+
+test('a real file mutation during reading does not hide other stable exports', async (context) => {
+  const f = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+  });
+  const changing = path.join(f.root, 'changing.step');
+  await fs.writeFile(changing, 'changing');
+  await fs.writeFile(path.join(f.root, 'stable.step'), 'stable');
+  const handle = await fs.open(changing, 'r');
+  const prototype: FileHandle = Object.getPrototypeOf(handle);
+  const original = prototype.read;
+  await handle.close();
+  let mutated = false;
+  context.mock.method(
+    prototype,
+    'read',
+    async function (
+      this: FileHandle,
+      buffer: Buffer,
+      offset: number,
+      length: number,
+      position: number,
+    ) {
+      const result = await original.bind(this)(buffer, offset, length, position);
+      if (!mutated && buffer.subarray(0, 8).toString() === 'changing') {
+        mutated = true;
+        await fs.appendFile(changing, '-in-progress');
+      }
+      return result;
+    },
+  );
+  const result = await f.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.notEqual(result.isError, true);
+  assert.equal(mutated, true);
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const files = JSON.parse(block.text).files as {
+    filename: string;
+    download_url: string;
+    download_status?: string;
+    download_requires_login?: boolean;
+  }[];
+  const transient = files.find((file) => file.filename === 'changing.step');
+  assert.equal(transient?.download_status, 'FILE_IS_CHANGING');
+  assert.equal(transient?.download_requires_login, true);
+  const stable = files.find((file) => file.filename === 'stable.step');
+  assert.ok(stable);
+  assert.equal((await fetch(localDownload(f, stable.download_url))).status, 200);
+});
+
+test('downloads retain their slot until the response finishes or closes', async (context) => {
+  const f = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+  });
+  await fs.writeFile(path.join(f.root, 'large.blend'), Buffer.alloc(16 * 1024 * 1024, 1));
+  const result = await f.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const url = localDownload(f, JSON.parse(block.text).files[0].download_url);
+  const closed = Promise.withResolvers<void>();
+  let finished = false;
+  f.server.on('request', (req, res) => {
+    if (req.method !== 'GET' || !req.url?.startsWith('/download/')) return;
+    res.once('finish', () => {
+      finished = true;
+    });
+    res.once('close', () => closed.resolve());
+  });
+  const socket = connect({ host: url.hostname, port: Number(url.port) });
+  const received = Promise.withResolvers<Buffer>();
+  socket.once('data', (bytes) => {
+    socket.pause();
+    received.resolve(bytes);
+  });
+  socket.once('error', received.reject);
+  socket.write(
+    `GET ${url.pathname}${url.search} HTTP/1.1\r\nHost: ${url.host}\r\nConnection: close\r\n\r\n`,
+  );
+  try {
+    assert.match((await received.promise).toString('latin1'), /^HTTP\/1.1 200/);
+    // 某些系统的回环套接字可先缓冲整个文件；按真实响应状态验证名额。
+    const expected = finished ? 200 : 503;
+    context.diagnostic(
+      finished
+        ? 'Loopback transfer finished before the client paused.'
+        : 'Paused client kept the download response pending.',
+    );
+    assert.equal((await fetch(url, { method: 'HEAD' })).status, expected);
+    socket.destroy();
+    await closed.promise;
+    const retry = await fetch(url, { method: 'HEAD' });
+    assert.equal(retry.status, 200);
+  } finally {
+    socket.destroy();
+  }
 });
 
 test('uses supported Seedream size and does not send credentials to another destination', async () => {

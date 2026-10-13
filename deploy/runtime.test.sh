@@ -15,13 +15,15 @@ cleanup() {
 }
 trap cleanup EXIT
 cp "$source_dir/compose.yml" "$work/compose.yml"
-sed -i -e 's/127.0.0.1:5001/127.0.0.1:15001/' -e 's/127.0.0.1:5002/127.0.0.1:15002/' "$work/compose.yml"
+sed -i -e 's/127.0.0.1:5001/127.0.0.1:15001/' -e 's/127.0.0.1:5002/127.0.0.1:15002/' \
+  -e 's/127.0.0.1:5003/127.0.0.1:15003/' -e 's/127.0.0.1:5004/127.0.0.1:15004/' "$work/compose.yml"
 printf 'LIBRECHAT_IMAGE=unused\nFREECAD_IMAGE=%s\nDESIGN_IMAGE=%s\nMEILI_MASTER_KEY=fixture\nRAG_DB_PASSWORD=fixture\n' \
   "${FREECAD_IMAGE:?}" "${DESIGN_IMAGE:?}" > "$work/.env"
 for account in admin user; do
   id=$(printf 'a%.0s' {1..24})
   if [[ "$account" == user ]]; then id=$(printf 'b%.0s' {1..24}); fi
-  printf '{"userId":"%s","workspaceUrl":"https://example.test/cad-files/%s/"}\n' "$id" "$account" > "$work/design-$account.json"
+  printf '{"userId":"%s","workspaceUrl":"https://example.test/cad-files/%s/","downloadUrl":"http://127.0.0.1:8000/download/","downloadSigningKey":"%s"}\n' \
+    "$id" "$account" "$(printf 'a%.0s' {1..64})" > "$work/design-$account.json"
   printf '{"serve-path":"/data","bind":"0.0.0.0","port":5000,"path-prefix":"/cad-files/%s","auth":["%s:fixture-%s-password@/:rw"],"allow-upload":true,"allow-archive":true,"allow-symlink":false}\n' \
     "$account" "$account" "$account" > "$work/files-$account.yaml"
   chmod 600 "$work/design-$account.json" "$work/files-$account.yaml"
@@ -105,6 +107,12 @@ try {
   const listing = data(await design.callTool({ name: 'workspace_files', arguments: {} }));
   assert.ok(listing.files.some(file => file.filename === 'cube.stl'));
   assert.ok(listing.archive_url.endsWith('/?zip'));
+  const signedUrl = listing.files.find(file => file.filename === 'drawing.pdf').download_url;
+  const direct = await fetch(signedUrl);
+  assert.equal(direct.status, 200);
+  assert.equal(direct.headers.get('cache-control'), 'private, no-store');
+  assert.equal(Buffer.from(await direct.arrayBuffer()).subarray(0, 5).toString(), '%PDF-');
+  assert.equal((await fetch('http://127.0.0.1:8000/download/drawing.pdf')).status, 403);
   const pdf = await fetch(fileUrl + 'drawing.pdf', { headers });
   assert.equal(pdf.status, 200);
   assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).toString(), '%PDF-');
@@ -122,4 +130,12 @@ try {
   await Promise.all(clients.map(client => client.close()));
 }
 NODE
+done
+
+for account in admin user; do
+  port=15003
+  if [[ "$account" == user ]]; then port=15004; fi
+  status=$(curl --silent --show-error -o /dev/null -w '%{http_code}' \
+    "http://127.0.0.1:$port/download/drawing.pdf")
+  test "$status" = 403
 done

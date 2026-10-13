@@ -7,6 +7,18 @@ export const settingsSchema = z.object({
     .or(z.literal(''))
     .default(''),
   workspaceUrl: z.string().url(),
+  downloadUrl: z.string().url().optional(),
+  downloadSigningKey: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .or(z.literal(''))
+    .default(''),
+  downloadLinkTtlSeconds: z
+    .number()
+    .int()
+    .min(60)
+    .max(7 * 86400)
+    .default(86400),
   workspace: z.string().default('/tmp/cad'),
   maxFileBytes: z
     .number()

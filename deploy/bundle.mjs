@@ -1,6 +1,19 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { randomBytes } from 'node:crypto';
 
+const deploymentUrl = new URL(process.env.DEPLOY_URL);
+if (deploymentUrl.protocol !== 'https:' || deploymentUrl.username || deploymentUrl.password) {
+  throw new Error('DEPLOY_URL must be an HTTPS URL without credentials.');
+}
+const downloadLinkTtlSeconds = Number(process.env.CAD_DOWNLOAD_LINK_TTL_SECONDS || 86400);
+if (
+  !Number.isInteger(downloadLinkTtlSeconds) ||
+  downloadLinkTtlSeconds < 60 ||
+  downloadLinkTtlSeconds > 7 * 86400
+) {
+  throw new Error('CAD_DOWNLOAD_LINK_TTL_SECONDS must be an integer between 60 and 604800.');
+}
 const target = path.join(process.env.RUNNER_TEMP, 'bundle');
 const accounts = {};
 for (const account of ['admin', 'user']) {
@@ -23,6 +36,9 @@ for (const account of ['admin', 'user']) {
     path.join(target, `design-${account}.json`),
     JSON.stringify({
       workspaceUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-files/${account}/`,
+      downloadUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-downloads/${account}/`,
+      downloadSigningKey: randomBytes(32).toString('hex'),
+      downloadLinkTtlSeconds,
       arkApiKey: process.env.ARK_API_KEY,
       geminiApiKey: process.env.GEMINI_API_KEY,
     }),

@@ -79,6 +79,11 @@ if [[ "$*" == *'/cad-files/'* ]]; then
   if [[ "$DEPLOY_TEST_FAILURE" == file-port ]]; then exit 7; fi
   exit 0
 fi
+if [[ "$*" == *'/download/'* ]]; then
+  if [[ "$DEPLOY_TEST_FAILURE" == download-port ]]; then exit 7; fi
+  printf '403'
+  exit 0
+fi
 while [[ "$1" != -o ]]; do shift; done
 output=$2
 email=$(jq -r .email)
@@ -103,7 +108,8 @@ printf 'ALLOW_REGISTRATION=true\n' > "$work/previous/.env"
 printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\n' 0 > "$work/previous/image.env"
 cp -r "$work/previous" "$work/previous-cad"
 for account in admin user; do
-  printf '{"fixture":"previous provider settings"}\n' > "$work/previous-cad/design-$account.json"
+  printf '{"fixture":"previous provider settings","downloadSigningKey":"%s"}\n' \
+    "$(printf 'a%.0s' {1..64})" > "$work/previous-cad/design-$account.json"
   printf '{"fixture":"previous file credentials"}\n' > "$work/previous-cad/files-$account.yaml"
 done
 printf 'new compose\n' > "$work/bundle/compose.yml"
@@ -115,12 +121,13 @@ printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\n' "$(printf '
 printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 for account in admin user; do
-  printf '{"workspaceUrl":"https://example.test/cad-files/%s/"}\n' "$account" > "$work/bundle/design-$account.json"
+  printf '{"workspaceUrl":"https://example.test/cad-files/%s/","downloadSigningKey":"%s"}\n' \
+    "$account" "$(printf 'b%.0s' {1..64})" > "$work/bundle/design-$account.json"
   printf '{"fixture":true}\n' > "$work/bundle/files-$account.yaml"
 done
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-for scenario in none health mcp command login role final file-port first-none first-login first-role rotated-mcp rotated-final; do
+for scenario in none health mcp command login role final file-port download-port first-none first-login first-role rotated-none rotated-mcp rotated-final; do
   failure=${scenario#first-}
   failure=${failure#rotated-}
   previous="$work/previous"
@@ -170,6 +177,10 @@ for scenario in none health mcp command login role final file-port first-none fi
     for account in admin user; do
       if [[ "$failure" == none ]]; then
         jq -e '.userId | test("^[a-f0-9]{24}$")' "$root/design-$account.json" >/dev/null
+        key=$(jq -r '.downloadSigningKey' "$root/design-$account.json")
+        expected_key=$(printf 'b%.0s' {1..64})
+        if [[ "$scenario" == rotated-none ]]; then expected_key=$(printf 'a%.0s' {1..64}); fi
+        test "$key" = "$expected_key"
         cmp "$work/bundle/files-$account.yaml" "$root/files-$account.yaml"
         test "$(stat -c '%a' "$root/design-$account.json")" = 600
         test "$(stat -c '%a' "$root/files-$account.yaml")" = 600
