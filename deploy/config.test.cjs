@@ -16,6 +16,8 @@ test('CAD modes enforce effort and output budgets over saved aliases while title
   const { getOpenAILLMConfig } = require('@librechat/api');
   const { ChatOpenRouter } = require('@librechat/agents/llm/openrouter');
   const config = configSchema.parse(yaml.load(fs.readFileSync('librechat.yaml', 'utf8')));
+  assert.equal(config.modelSpecs.enforce, true);
+  assert.equal(config.interface.modelSelect, false);
   for (const spec of config.modelSpecs.list) {
     const endpoint = config.endpoints.custom.find((item) => item.name === spec.preset.endpoint);
     const titleEndpoint = config.endpoints.custom.find(

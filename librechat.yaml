@@ -1,6 +1,6 @@
 version: 1.3.17
 interface:
-  modelSelect: true
+  modelSelect: false
   parameters: false
   presets: false
   prompts: false
