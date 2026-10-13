@@ -44,11 +44,23 @@ install -m 644 "$source_dir/origin.pem" /etc/ssl/librechat-dev/dev.xuqian.io.pem
 install -m 600 "$source_dir/origin.key" /etc/ssl/librechat-dev/dev.xuqian.io.key
 
 if [[ ! -f /etc/nginx/cloudflare-realip.conf ]]; then
+  realip_stage=$(mktemp -d "$source_dir/.realip.XXXXXX")
+  trap 'rm -rf -- "$realip_stage"' EXIT
   for family in v4 v6; do
-    curl -fsSL "https://www.cloudflare.com/ips-$family" |
-      awk '{ print "set_real_ip_from " $0 ";" }'
-  done > /etc/nginx/cloudflare-realip.conf
-  printf 'real_ip_header CF-Connecting-IP;\nreal_ip_recursive on;\n' >> /etc/nginx/cloudflare-realip.conf
+    curl -fsSL "https://www.cloudflare.com/ips-$family" -o "$realip_stage/ips-$family"
+    if [[ ! -s "$realip_stage/ips-$family" ]]; then
+      echo 'The Cloudflare proxy address list is empty.' >&2
+      exit 1
+    fi
+    awk '{ print "set_real_ip_from " $0 ";" }' "$realip_stage/ips-$family" >> "$realip_stage/realip.conf"
+  done
+  printf 'real_ip_header CF-Connecting-IP;\nreal_ip_recursive on;\n' >> "$realip_stage/realip.conf"
+  printf 'events {}\nhttp { include %s; }\n' "$realip_stage/realip.conf" > "$realip_stage/nginx.conf"
+  nginx -t -c "$realip_stage/nginx.conf"
+  install -m 644 "$realip_stage/realip.conf" /etc/nginx/cloudflare-realip.conf.new
+  mv -f /etc/nginx/cloudflare-realip.conf.new /etc/nginx/cloudflare-realip.conf
+  rm -rf -- "$realip_stage"
+  trap - EXIT
 fi
 cat > /etc/nginx/conf.d/librechat-upgrade.conf <<'EOF'
 map $http_upgrade $librechat_connection {

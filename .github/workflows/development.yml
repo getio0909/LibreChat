@@ -41,8 +41,9 @@ jobs:
       - run: npm run test:client-build
       - name: Validate deployment files
         run: |
-          bash -n deploy/deploy.sh deploy/bootstrap.sh
-          shellcheck -x deploy/deploy.sh deploy/bootstrap.sh
+          bash -n deploy/deploy.sh deploy/bootstrap.sh deploy/deploy.test.sh
+          shellcheck -x deploy/deploy.sh deploy/bootstrap.sh deploy/deploy.test.sh
+          bash deploy/deploy.test.sh
           mkdir -p /tmp/compose-check
           cp deploy/compose.yml /tmp/compose-check/compose.yml
           cp librechat.yaml /tmp/compose-check/librechat.yaml
@@ -141,6 +142,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/bootstrap"
           cleanup() {
             rm -rf "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/bootstrap"
+            rm -f "$RUNNER_TEMP/bootstrap.tgz"
           }
           trap cleanup EXIT
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$RUNNER_TEMP/ssh/key"
@@ -155,10 +157,18 @@ jobs:
           cp deploy/bootstrap.sh deploy/deploy.sh deploy/nginx.conf "$RUNNER_TEMP/bootstrap/"
           printf '%s\n' "$ORIGIN_CERT" > "$RUNNER_TEMP/bootstrap/origin.pem"
           printf '%s\n' "$ORIGIN_KEY" > "$RUNNER_TEMP/bootstrap/origin.key"
+          tar -czf "$RUNNER_TEMP/bootstrap.tgz" -C "$RUNNER_TEMP/bootstrap" .
           ssh_options=(-i "$RUNNER_TEMP/ssh/key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/ssh/known_hosts")
-          ssh "${ssh_options[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "install -d -m 700 $DEPLOY_PATH/.bootstrap"
-          scp "${ssh_options[@]}" -P "$DEPLOY_PORT" "$RUNNER_TEMP/bootstrap/"* "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/.bootstrap/"
           ssh "${ssh_options[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "set -e; trap 'rm -rf -- $DEPLOY_PATH/.bootstrap' EXIT; bash $DEPLOY_PATH/.bootstrap/bootstrap.sh $DEPLOY_PATH; SSH_ORIGINAL_COMMAND='deploy $DEPLOY_PATH' /usr/local/lib/librechat/deploy.sh $DEPLOY_PATH < $DEPLOY_PATH/.bootstrap/deploy.tgz"
+            "set -euo pipefail
+             umask 077
+             install -d -m 700 '$DEPLOY_PATH'
+             stage=\$(mktemp -d '$DEPLOY_PATH/.bootstrap.XXXXXX')
+             cleanup() { rm -rf -- \"\$stage\"; }
+             trap cleanup EXIT
+             trap 'exit 1' HUP INT TERM
+             tar -xzf - -C \"\$stage\" --no-same-owner --no-same-permissions
+             bash \"\$stage/bootstrap.sh\" '$DEPLOY_PATH'
+             SSH_ORIGINAL_COMMAND='deploy $DEPLOY_PATH' /usr/local/lib/librechat/deploy.sh '$DEPLOY_PATH' < \"\$stage/deploy.tgz\"" < "$RUNNER_TEMP/bootstrap.tgz"
           curl --fail --silent --show-error --retry 5 --retry-delay 10 "$DEPLOY_URL/health"
           printf 'Deployed commit %s to %s\n' "$GITHUB_SHA" "$DEPLOY_URL" >> "$GITHUB_STEP_SUMMARY"
