@@ -68,7 +68,7 @@ function selfContainedSvg(bytes: Buffer, paper?: PaperSize): void {
       if (paper) {
         const millimeters = (name: string) => {
           const size =
-            /^\s*(\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(mm|cm|in|pt|pc)\s*$/.exec(
+            /^\s*(\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(mm|cm|in|pt|pc|q)\s*$/i.exec(
               tag.attributes[name]?.value ?? '',
             );
           if (!size) throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
@@ -78,8 +78,9 @@ function selfContainedSvg(bytes: Buffer, paper?: PaperSize): void {
             in: 25.4,
             pt: 25.4 / 72,
             pc: 25.4 / 6,
+            q: 0.25,
           };
-          const value = Number(size[1]) * units[size[2]];
+          const value = Number(size[1]) * units[size[2].toLowerCase()];
           if (!Number.isFinite(value) || value <= 0)
             throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
           return value;
@@ -318,7 +319,13 @@ export async function normalizeDrawingPdf(
     // 先在受限进程中展开对象流，再在线程中解析有界普通对象。
     normalized = await render(
       'qpdf',
-      ['--object-streams=disable', '--stream-data=preserve', input, '-'],
+      [
+        '--object-streams=disable',
+        '--stream-data=preserve',
+        '--remove-unreferenced-resources=yes',
+        input,
+        '-',
+      ],
       Buffer.alloc(0),
       normalizedLimit,
       signal,

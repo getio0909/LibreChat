@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Worker, parentPort, workerData } from 'node:worker_threads';
+import { Worker, parentPort, workerData, isMarkedAsUntransferable } from 'node:worker_threads';
 import {
   PDFDocument,
   PDFName,
@@ -15,6 +15,7 @@ import {
 import type { PDFObject } from 'pdf-lib';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
+import { pruneResources } from './prune.ts';
 
 const limitsSchema = z.object({
   maxFileBytes: z
@@ -87,6 +88,7 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
   if (pdf.catalog.has(PDFName.of('OutputIntents')))
     throw new ToolFailure('PDF_COLOR_PROFILE_UNSUPPORTED');
   const pages = pdf.getPages();
+  pruneResources(pdf, settings.maxFileBytes);
   for (const page of pages) {
     // 缩略图不参与当前图纸渲染，移除后避免携带旧版本的隐藏画面。
     page.node.delete(PDFName.of('Thumb'));
@@ -290,9 +292,27 @@ export function pdfTask(
 ): Promise<PdfResult> {
   signal.throwIfAborted();
   return new Promise((resolve, reject) => {
+    const data = inputSchema.parse(input);
+    const transfers = new Set<ArrayBuffer>();
+    const owned = (bytes: Uint8Array<ArrayBufferLike>): Uint8Array<ArrayBuffer> => {
+      if (bytes.buffer instanceof ArrayBuffer && !isMarkedAsUntransferable(bytes.buffer)) {
+        transfers.add(bytes.buffer);
+        return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      }
+      const value = new Uint8Array(bytes);
+      transfers.add(value.buffer);
+      return value;
+    };
+    // 大文件直接转移归属，主线程不再保留规范化输入；小型共享内存池需独立副本。
+    if (data.operation === 'assemble') {
+      data.sources = data.sources.map((source) => ({ ...source, bytes: owned(source.bytes) }));
+    } else {
+      data.bytes = owned(data.bytes);
+    }
     // 线程只解析、检查和复制 PDF，不启动子进程；取消可终止全部解析工作。
     const worker = new Worker(new URL('./parse.ts', import.meta.url), {
-      workerData: inputSchema.parse(input),
+      workerData: data,
+      transferList: [...transfers],
       resourceLimits: {
         maxOldGenerationSizeMb: Math.min(
           128,

@@ -19,6 +19,7 @@ import {
   PDFString,
   PrintScaling,
   degrees,
+  drawObject,
 } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
@@ -243,7 +244,15 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
 
 test('physical SVG dimensions are compared before integer pixel rounding can hide a resize', async () => {
   const f = await fixture();
-  for (const [index, width] of ['49.7mm', '50mm', '5cm', '1.968503937007874in'].entries()) {
+  for (const [index, width] of [
+    '49.7mm',
+    '50mm',
+    '5cm',
+    '1.968503937007874in',
+    '50MM',
+    '200q',
+    '200Q',
+  ].entries()) {
     const filename = 'physical-' + index + '.svg';
     await fs.writeFile(
       path.join(f.root, filename),
@@ -703,6 +712,7 @@ test('associated source files cannot hide in nested or inherited drawing resourc
       }),
     );
     const resources = pdf.context.obj({ XObject: { Drawing: form } });
+    page.pushOperators(drawObject('Drawing'));
     if (inherited) {
       const parent = page.node.Parent();
       assert.ok(parent);
@@ -741,6 +751,7 @@ test('private editing data and external file streams are excluded from copied re
       }),
     );
     page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+    page.pushOperators(drawObject('Drawing'));
     await fs.writeFile(path.join(f.root, 'private.pdf'), await pdf.save());
     const rejected = await f.client.callTool({
       name: 'assemble_drawing_pdf',
@@ -815,6 +826,7 @@ test('external reference and OPI resources, alternate images and resource layers
       ),
     );
     page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: primary } }));
+    page.pushOperators(drawObject('Drawing'));
     const bytes = Buffer.from(await pdf.save());
     await fs.writeFile(path.join(f.root, `${kind}.pdf`), bytes);
     const rejected = await f.client.callTool({
@@ -892,6 +904,95 @@ test('ordinary XObject aliases are not mistaken for control fields', async () =>
   assert.ok(preview?.type === 'image');
   const stats = await sharp(Buffer.from(preview.data, 'base64')).stats();
   assert.ok(stats.channels.some((channel) => channel.min === 0));
+});
+
+test('drawing publication prunes stale unused page and Form resources', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  const image = pdf.context.register(
+    pdf.context.flateStream(Buffer.from([255, 0, 0]), {
+      Type: 'XObject',
+      Subtype: 'Image',
+      Width: 1,
+      Height: 1,
+      ColorSpace: 'DeviceRGB',
+      BitsPerComponent: 8,
+    }),
+  );
+  const stale = pdf.context.register(
+    pdf.context.flateStream('0 0 50 50 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 50, 50],
+    }),
+  );
+  const visible = pdf.context.register(
+    pdf.context.flateStream('0 0 10 10 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 10, 10],
+      Resources: { XObject: { OldImage: image } },
+    }),
+  );
+  page.node.set(
+    PDFName.of('Resources'),
+    pdf.context.obj({
+      XObject: { Drawing: visible, OldImage: image, OldForm: stale },
+    }),
+  );
+  page.node.set(
+    PDFName.of('Contents'),
+    pdf.context.register(
+      pdf.context.flateStream(
+        '% /OldImage Do\n/Span << /ActualText (/OldImage Do) >> BDC /Dr#61wing Do EMC',
+      ),
+    ),
+  );
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'unused.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: { pdf_filename: 'visible.pdf', sheets: [{ source_filename: 'unused.pdf' }] },
+  });
+  assert.equal(result.isError, undefined);
+  const output = await PDFDocument.load(await fs.readFile(path.join(f.root, 'visible.pdf')));
+  assert.equal(imageCount(output), 0);
+  assert.equal(
+    output.context
+      .enumerateIndirectObjects()
+      .filter(
+        ([, object]) =>
+          object instanceof PDFRawStream &&
+          object.dict.get(PDFName.of('Subtype')) === PDFName.of('Form'),
+      ).length,
+    1,
+  );
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'unused.pdf')), bytes);
+});
+
+test('compressed drawing content is bounded before its resource references are scanned', async () => {
+  const f = await fixture({ maxFileBytes: 65536 });
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  page.node.set(
+    PDFName.of('Contents'),
+    pdf.context.register(pdf.context.flateStream(' '.repeat(200000))),
+  );
+  const bytes = Buffer.from(await pdf.save());
+  assert.ok(bytes.length < f.settings.maxFileBytes);
+  await fs.writeFile(path.join(f.root, 'expanded-content.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'expanded-content-set.pdf',
+      sheets: [{ source_filename: 'expanded-content.pdf' }],
+    },
+  });
+  assert.equal(result.isError, true);
+  assert.match(JSON.stringify(result), /FILE_TOO_LARGE/);
+  await assert.rejects(fs.stat(path.join(f.root, 'expanded-content-set.pdf')), { code: 'ENOENT' });
+  assert.equal((await fetch(new URL('/health', f.url))).status, 200);
 });
 
 test('renderer concurrency fits one aggregate budget while permitted concurrent exports work', async () => {
@@ -1050,6 +1151,7 @@ test('drawing sets omit invisible page and resource metadata without modifying s
     }),
   );
   page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+  page.pushOperators(drawObject('Drawing'));
   const bytes = Buffer.from(await pdf.save());
   await fs.writeFile(path.join(f.root, 'metadata.pdf'), bytes);
   const result = await f.client.callTool({
