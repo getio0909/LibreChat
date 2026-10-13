@@ -217,7 +217,11 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             settings,
             signal,
           );
-          const bytes = Buffer.from(result.bytes);
+          const bytes = Buffer.from(
+            result.bytes.buffer,
+            result.bytes.byteOffset,
+            result.bytes.byteLength,
+          );
           const pages = result.pages;
           const { preview } = await pdfPreview(bytes, settings, signal);
           const image = await compactImage(

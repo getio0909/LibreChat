@@ -12,7 +12,7 @@ import { pdfTask } from './parse.ts';
 export type PaperSize = { widthMm: number; heightMm: number };
 export type DrawingRegion = { leftMm: number; topMm: number; widthMm: number; heightMm: number };
 
-function selfContainedSvg(bytes: Buffer, physical = false): void {
+function selfContainedSvg(bytes: Buffer, paper?: PaperSize): void {
   const parser = new SaxesParser({ xmlns: true });
   let source: string;
   try {
@@ -65,15 +65,32 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
       root = false;
       if (tag.local !== 'svg' || tag.uri !== 'http://www.w3.org/2000/svg')
         throw new ToolFailure('INVALID_SVG');
-      if (
-        physical &&
-        !['width', 'height'].every((name) =>
-          /^\s*\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\s*(?:mm|cm|in|pt|pc)\s*$/.test(
-            tag.attributes[name]?.value ?? '',
-          ),
+      if (paper) {
+        const millimeters = (name: string) => {
+          const size =
+            /^\s*(\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(mm|cm|in|pt|pc)\s*$/.exec(
+              tag.attributes[name]?.value ?? '',
+            );
+          if (!size) throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
+          const units: Record<string, number> = {
+            mm: 1,
+            cm: 10,
+            in: 25.4,
+            pt: 25.4 / 72,
+            pc: 25.4 / 6,
+          };
+          const value = Number(size[1]) * units[size[2]];
+          if (!Number.isFinite(value) || value <= 0)
+            throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
+          return value;
+        };
+        // 比较声明的物理尺寸，不能使用渲染器取整后的像素值推断图纸比例。
+        if (
+          Math.abs(millimeters('width') - paper.widthMm) > 0.000001 ||
+          Math.abs(millimeters('height') - paper.heightMm) > 0.000001
         )
-      )
-        throw new ToolFailure('SVG_PHYSICAL_SIZE_REQUIRED');
+          throw new ToolFailure('PAGE_SIZE_MISMATCH');
+      }
     }
     for (const attribute of Object.values(tag.attributes)) {
       if (
@@ -113,7 +130,7 @@ async function renderDrawing(
   paper?: PaperSize,
 ): Promise<{ bytes: Buffer; width: number; height: number }> {
   const maxImagePixels = settings.maxImagePixels;
-  if (paper) selfContainedSvg(bytes, true);
+  if (paper) selfContainedSvg(bytes, paper);
   const metadata = await sharp(bytes, { density: 72, limitInputPixels: maxImagePixels }).metadata();
   if (metadata.format === 'svg' && !paper) selfContainedSvg(bytes);
   const widthPt = paper ? (paper.widthMm * 72) / 25.4 : undefined;
@@ -212,7 +229,7 @@ export async function drawingPdf(
       settings.maxImagePixels
   )
     throw new ToolFailure('PAGE_PIXEL_LIMIT');
-  if (svg) selfContainedSvg(bytes, paper != null);
+  if (svg) selfContainedSvg(bytes, paper);
   const source = await sharp(bytes, {
     density: 72,
     limitInputPixels: settings.maxImagePixels,
@@ -232,7 +249,7 @@ export async function drawingPdf(
       throw new ToolFailure('PAGE_SIZE_MISMATCH');
   }
   if (source.format === 'svg') {
-    if (!svg) selfContainedSvg(bytes, paper != null);
+    if (!svg) selfContainedSvg(bytes, paper);
     const scale = paper
       ? 1
       : Math.min((pageSize.width - 48) / source.width, (pageSize.height - 48) / source.height);
@@ -262,7 +279,7 @@ export async function drawingPdf(
       settings,
       signal,
     );
-    return Buffer.from(result.bytes);
+    return Buffer.from(result.bytes.buffer, result.bytes.byteOffset, result.bytes.byteLength);
   }
   const { bytes: png } = await renderDrawing(bytes, settings, signal);
   const pdf = await PDFDocument.create();
@@ -339,12 +356,15 @@ export async function pdfPreview(
       region.topMm + region.heightMm > paper.heightMm + 0.001
     )
       throw new ToolFailure('REGION_OUT_OF_BOUNDS');
-    let density = 150;
+    let density = Math.min(
+      150,
+      Math.sqrt(settings.maxImagePixels / (region.widthMm * region.heightMm)) * 25.4 * 0.99,
+    );
     while (
-      Math.ceil((widthPt * density) / 72) * Math.ceil((heightPt * density) / 72) >
+      Math.ceil((region.widthMm * density) / 25.4) * Math.ceil((region.heightMm * density) / 25.4) >
       settings.maxImagePixels
     )
-      density -= 1;
+      density *= 0.99;
     const pixelsPerMm = density / 25.4;
     const left = Math.floor(region.leftMm * pixelsPerMm);
     const top = Math.floor(region.topMm * pixelsPerMm);

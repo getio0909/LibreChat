@@ -241,6 +241,39 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   assert.match(JSON.stringify(raster), /SVG_SHEET_REQUIRED/);
 });
 
+test('physical SVG dimensions are compared before integer pixel rounding can hide a resize', async () => {
+  const f = await fixture();
+  for (const [index, width] of ['49.7mm', '50mm', '5cm', '1.968503937007874in'].entries()) {
+    const filename = 'physical-' + index + '.svg';
+    await fs.writeFile(
+      path.join(f.root, filename),
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' +
+        width +
+        '" height="50mm" viewBox="0 0 50 50"><path d="M5 25h40" stroke="black"/></svg>',
+    );
+    const result = await f.client.callTool({
+      name: 'export_drawing_pdf',
+      arguments: {
+        source_filename: filename,
+        pdf_filename: 'physical-' + index + '.pdf',
+        page_width_mm: 50,
+        page_height_mm: 50,
+      },
+    });
+    if (index === 0) {
+      assert.equal(result.isError, true);
+      assert.match(JSON.stringify(result), /PAGE_SIZE_MISMATCH/);
+      await assert.rejects(fs.stat(path.join(f.root, 'physical-0.pdf')), { code: 'ENOENT' });
+    } else {
+      assert.equal(result.isError, undefined);
+      const pdf = await PDFDocument.load(
+        await fs.readFile(path.join(f.root, 'physical-' + index + '.pdf')),
+      );
+      assert.ok(Math.abs(pdf.getPage(0).getWidth() - (50 * 72) / 25.4) < 0.001);
+    }
+  }
+});
+
 function imageCount(pdf: PDFDocument): number {
   return pdf.context
     .enumerateIndirectObjects()
@@ -1502,6 +1535,32 @@ test('large-sheet detail inspection retains readable annotation pixels and bound
   });
   assert.equal(rejected.isError, true);
   assert.match(JSON.stringify(rejected), /REGION_OUT_OF_BOUNDS/);
+});
+
+test('large-sheet PDF detail previews budget the crop and retain readable annotation pixels', async () => {
+  const f = await fixture({ maxImagePixels: 20000 });
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([(841 * 72) / 25.4, (1189 * 72) / 25.4]);
+  page.drawText('M6', { x: (10 * 72) / 25.4, y: page.getHeight() - (15 * 72) / 25.4, size: 12 });
+  await fs.writeFile(path.join(f.root, 'detail.pdf'), await pdf.save());
+  const result = await f.client.callTool({
+    name: 'inspect_pdf',
+    arguments: {
+      pdf_filename: 'detail.pdf',
+      page: 1,
+      region: { left_mm: 9, top_mm: 11, width_mm: 20, height_mm: 10 },
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const image = CallToolResultSchema.parse(result).content.find((item) => item.type === 'image');
+  assert.ok(image?.type === 'image');
+  const bytes = Buffer.from(image.data, 'base64');
+  const metadata = await sharp(bytes).metadata();
+  assert.ok(metadata.width && metadata.width >= 115);
+  assert.ok(metadata.height && metadata.height >= 58);
+  assert.ok(metadata.width * metadata.height <= f.settings.maxImagePixels);
+  const stats = await sharp(bytes).stats();
+  assert.ok(stats.channels.some((channel) => channel.min < 30));
 });
 
 test('a preview exceeding the shared byte cap does not commit a PDF', async () => {
