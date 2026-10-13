@@ -6,6 +6,7 @@ import * as fs from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { connect } from 'node:net';
+import { watch } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { test, afterEach } from 'node:test';
 import { inflateSync } from 'node:zlib';
@@ -17,7 +18,7 @@ import type { Server } from 'node:http';
 import type { FileHandle } from 'node:fs/promises';
 import type { Settings, Request } from './config.ts';
 import { settingsSchema, ToolFailure, boundedBody } from './config.ts';
-import { fileType, readWorkspace } from './files.ts';
+import { fileType, readWorkspace, writePdf } from './files.ts';
 import { createHandler } from './mcp.ts';
 import { imageProviders, compactImage } from './images.ts';
 import { render } from './render.ts';
@@ -355,6 +356,123 @@ test('ordered drawing sets preserve native pages, CJK text, vectors, paper sizes
   assert.deepEqual(await fs.readFile(path.join(f.root, 'set.pdf')), bytes);
 });
 
+test('native CAD page rotations accept negative and non-canonical multiples of 90', async () => {
+  const f = await fixture();
+  const native = await PDFDocument.create();
+  const rotations = [-90, 360, 450];
+  for (const rotation of rotations) {
+    const page = native.addPage([(210 * 72) / 25.4, (297 * 72) / 25.4]);
+    page.setRotation(degrees(rotation));
+    page.drawText(`ROTATION ${rotation}`, { x: 20, y: 20 });
+  }
+  await fs.writeFile(path.join(f.root, 'rotated.pdf'), await native.save());
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'rotations.pdf',
+      sheets: [{ source_filename: 'rotated.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'rotations.pdf')));
+  assert.deepEqual(
+    pdf.getPages().map((page) => page.getRotation().angle),
+    rotations,
+  );
+  for (const [index, rotation] of rotations.entries()) {
+    const inspection = await f.client.callTool({
+      name: 'inspect_pdf',
+      arguments: { pdf_filename: 'rotations.pdf', page: index + 1 },
+    });
+    assert.equal(inspection.isError, undefined);
+    const text = CallToolResultSchema.parse(inspection).content.find(
+      (item) => item.type === 'text',
+    );
+    assert.ok(text?.type === 'text');
+    const [width, height] = JSON.parse(text.text).page_size_mm;
+    assert.ok(Math.abs(width - (rotation % 180 ? 297 : 210)) < 0.001);
+    assert.ok(Math.abs(height - (rotation % 180 ? 210 : 297)) < 0.001);
+  }
+});
+
+test('layered native PDFs are rejected rather than changing hidden geometry', async () => {
+  const f = await fixture();
+  const native = await PDFDocument.create();
+  const page = native.addPage();
+  const layer = native.context.register(
+    native.context.obj({ Type: 'OCG', Name: 'Hidden CAD layer' }),
+  );
+  native.catalog.set(
+    PDFName.of('OCProperties'),
+    native.context.obj({ OCGs: [layer], D: { OFF: [layer] } }),
+  );
+  page.node.set(PDFName.of('Resources'), native.context.obj({ Properties: { Hidden: layer } }));
+  page.node.set(
+    PDFName.of('Contents'),
+    native.context.register(native.context.flateStream('/OC /Hidden BDC 10 10 20 20 re f EMC')),
+  );
+  const bytes = Buffer.from(await native.save());
+  await fs.writeFile(path.join(f.root, 'layered.pdf'), bytes);
+  const rejected = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'flat.pdf',
+      sheets: [{ source_filename: 'layered.pdf' }],
+    },
+  });
+  assert.match(JSON.stringify(rejected), /PDF_LAYERS_UNSUPPORTED/);
+  await assert.rejects(fs.stat(path.join(f.root, 'flat.pdf')), { code: 'ENOENT' });
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'layered.pdf')), bytes);
+});
+
+test('PDF staging rolls back cancellation during writing and permits a clean retry', async () => {
+  const f = await fixture();
+  const controller = new AbortController();
+  const observer = watch(f.root, (_, filename) => {
+    if (filename?.endsWith('.tmp')) controller.abort();
+  });
+  try {
+    await assert.rejects(
+      writePdf(f.settings, 'cancelled.pdf', Buffer.alloc(16 * 1024 * 1024), controller.signal),
+      (error: Error) => error.name === 'AbortError',
+    );
+  } finally {
+    observer.close();
+  }
+  assert.deepEqual(await fs.readdir(f.root), []);
+  await writePdf(
+    f.settings,
+    'cancelled.pdf',
+    Buffer.from('complete replacement'),
+    new AbortController().signal,
+  );
+  assert.equal(
+    (await fs.readFile(path.join(f.root, 'cancelled.pdf'))).toString(),
+    'complete replacement',
+  );
+  assert.deepEqual(await fs.readdir(f.root), ['cancelled.pdf']);
+});
+
+test('atomic PDF publication permits one writer and preserves its exact bytes', async () => {
+  const f = await fixture();
+  const candidates = [Buffer.from('first complete export'), Buffer.from('second complete export')];
+  const results = await Promise.allSettled(
+    candidates.map((bytes) =>
+      writePdf(f.settings, 'same.pdf', bytes, new AbortController().signal),
+    ),
+  );
+  assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1);
+  const failed = results.find((result) => result.status === 'rejected');
+  assert.ok(
+    failed?.status === 'rejected' &&
+      failed.reason instanceof ToolFailure &&
+      failed.reason.code === 'FILE_EXISTS',
+  );
+  const saved = await fs.readFile(path.join(f.root, 'same.pdf'));
+  assert.ok(candidates.some((bytes) => bytes.equals(saved)));
+  assert.deepEqual(await fs.readdir(f.root), ['same.pdf']);
+});
+
 test('drawing assembly rejects page and aggregate byte overflow, malformed and unscaled sources without writing', async () => {
   const f = await fixture({ maxPdfPages: 2 });
   const native = await PDFDocument.create();
@@ -414,6 +532,8 @@ test('SVG exports reject external resources and DTDs instead of silently losing 
     '<image href="&#104;ttps://example.test/private.png" width="40" height="40"/>',
     '<style><![CDATA[@import url(https://example.test/font.css);]]></style>',
     '<rect style="fill:url(file:///run/secrets/design.json)"/>',
+    String.raw`<rect style="fill:u\72l(https://example.test/resource.svg#paint)"/>`,
+    String.raw`<style><![CDATA[.part { fill:u\000072l(https://example.test/resource.svg#paint); }]]></style>`,
   ]) {
     await fs.writeFile(
       path.join(f.root, 'external.svg'),

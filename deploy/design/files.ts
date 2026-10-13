@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { constants } from 'node:fs';
 import * as fs from 'node:fs/promises';
-import { createHash, createHmac } from 'node:crypto';
+import { createHash, createHmac, randomUUID } from 'node:crypto';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 
@@ -149,5 +149,29 @@ export async function readWorkspace(settings: Settings, filename: string): Promi
     return buffer;
   } finally {
     await handle.close();
+  }
+}
+
+export async function writePdf(
+  settings: Settings,
+  filename: string,
+  bytes: Buffer,
+  signal: AbortSignal,
+): Promise<void> {
+  if (fileType(filename) !== 'application/pdf') throw new ToolFailure('PDF_REQUIRED');
+  if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+  signal.throwIfAborted();
+  const staged = path.join(settings.workspace, `.${randomUUID()}.tmp`);
+  try {
+    await fs.writeFile(staged, bytes, { flag: 'wx', mode: 0o644, signal });
+    signal.throwIfAborted();
+    // 同目录硬链接是原子提交点，并且不会像重命名那样覆盖已有目标。
+    await fs.link(staged, path.join(settings.workspace, filename));
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
+      throw new ToolFailure('FILE_EXISTS');
+    throw error;
+  } finally {
+    await fs.rm(staged, { force: true });
   }
 }

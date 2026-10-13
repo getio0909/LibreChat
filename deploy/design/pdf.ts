@@ -11,12 +11,13 @@ export type DrawingRegion = { leftMm: number; topMm: number; widthMm: number; he
 function selfContainedSvg(bytes: Buffer, physical = false): void {
   const parser = new SaxesParser({ xmlns: true });
   let root = true;
+  let inStyle = false;
   const unsupported = () => {
     throw new ToolFailure('SVG_NOT_SELF_CONTAINED');
   };
   const checkCss = (value: string) => {
     // 外部资源无法在无基准路径的渲染中可靠交付，拒绝而不是静默缺图。
-    if (/@import/i.test(value)) unsupported();
+    if (/@import|\\/i.test(value)) unsupported();
     for (const match of value.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
       if (!/^(#|data:)/i.test(match[1])) unsupported();
     }
@@ -47,9 +48,17 @@ function selfContainedSvg(bytes: Buffer, physical = false): void {
       if (attribute.local === 'href' && !/^(#|data:)/i.test(attribute.value)) unsupported();
       checkCss(attribute.value);
     }
+    if (tag.local === 'style') inStyle = true;
   });
-  parser.on('text', checkCss);
-  parser.on('cdata', checkCss);
+  parser.on('closetag', (tag) => {
+    if (tag.local === 'style') inStyle = false;
+  });
+  parser.on('text', (value) => {
+    if (inStyle) checkCss(value);
+  });
+  parser.on('cdata', (value) => {
+    if (inStyle) checkCss(value);
+  });
   parser.write(bytes.toString('utf8')).close();
 }
 
@@ -214,6 +223,7 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
   }
   if (pdf.getPageCount() < 1 || pdf.getPageCount() > maxPages)
     throw new ToolFailure('PDF_PAGE_LIMIT');
+  if (pdf.catalog.has(PDFName.of('OCProperties'))) throw new ToolFailure('PDF_LAYERS_UNSUPPORTED');
   for (const page of pdf.getPages()) {
     const unit = page.node.get(PDFName.of('UserUnit'));
     if (unit != null && (!(unit instanceof PDFNumber) || unit.asNumber() !== 1))
@@ -225,8 +235,8 @@ export async function loadDrawingPdf(bytes: Buffer, maxPages: number): Promise<P
       )
     )
       throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
-    if (![0, 90, 180, 270].includes(page.getRotation().angle))
-      throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
+    const rotation = ((page.getRotation().angle % 360) + 360) % 360;
+    if (![0, 90, 180, 270].includes(rotation)) throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
   }
   return pdf;
 }

@@ -9,7 +9,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { ImageProvider, ImageData } from './images.ts';
 import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
-import { fileType, fileInfo, listWorkspace, readWorkspace } from './files.ts';
+import { fileType, fileInfo, listWorkspace, readWorkspace, writePdf } from './files.ts';
 import { imageInput, compactImage } from './images.ts';
 import { drawingPdf, drawingRegion, loadDrawingPdf, pdfPreview } from './pdf.ts';
 import { serveDownload } from './download.ts';
@@ -70,20 +70,6 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       AbortSignal.timeout(settings.requestTimeoutMs),
     ]);
     const server = new McpServer({ name: 'design-workspace', version: '1.0.0' });
-    async function savePdf(filename: string, bytes: Buffer): Promise<void> {
-      if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
-      signal.throwIfAborted();
-      try {
-        await fs.writeFile(path.join(settings.workspace, filename), bytes, {
-          flag: 'wx',
-          mode: 0o644,
-        });
-      } catch (error) {
-        if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
-          throw new ToolFailure('FILE_EXISTS');
-        throw error;
-      }
-    }
     async function run(operation: () => Promise<CallToolResult>): Promise<CallToolResult> {
       if (activeJobs >= settings.maxConcurrentJobs) {
         return { ...text({ ok: false, error: { code: 'DESIGN_BUSY' } }), isError: true };
@@ -147,7 +133,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             settings.maxImageBytes,
             settings.maxImagePixels,
           );
-          await savePdf(pdf_filename, bytes);
+          await writePdf(settings, pdf_filename, bytes, signal);
           return {
             content: [
               ...text({
@@ -164,7 +150,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
     server.registerTool(
       'assemble_drawing_pdf',
       {
-        description: `Create one ordered drawing-set PDF from self-contained physical SVG sheets and/or existing native CAD PDFs in this user's /tmp/cad workspace. Each SVG requires BOTH matching paper dimensions; existing PDFs retain all pages, vector content, paper sizes, and rotations and must omit the dimensions. Put sheet IDs, revisions, sheet numbers, scale, and reference callouts in the source drawings; this tool combines pages without inventing details, adding page numbers, or rescaling. Input bytes in total and output bytes must each stay under ${settings.maxFileBytes}; the set is limited to ${settings.maxPdfPages} pages. The response lists every page and previews the first finished page. Call inspect_pdf for EVERY page and important detail region before delivery. Keep assumptions and unperformed checks in the chat, not on drawing sheets. FILE_EXISTS requires a new revision filename. Run design operations sequentially and request workspace_files links after all exports are final.`,
+        description: `Create one ordered drawing-set PDF from self-contained physical SVG sheets and/or existing native CAD PDFs in this user's /tmp/cad workspace. Each SVG requires BOTH matching paper dimensions; existing PDFs retain all pages, vector content, paper sizes, and rotations and must omit the dimensions. PDF_LAYERS_UNSUPPORTED means export a flat vector PDF from CAD with the intended layers visible, then retry; layered PDFs are rejected to prevent hidden layers changing visibility. Put sheet IDs, revisions, sheet numbers, scale, and reference callouts in the source drawings; this tool combines pages without inventing details, adding page numbers, or rescaling. Input bytes in total and output bytes must each stay under ${settings.maxFileBytes}; the set is limited to ${settings.maxPdfPages} pages. The response lists every page and previews the first finished page. Call inspect_pdf for EVERY page and important detail region before delivery. Keep assumptions and unperformed checks in the chat, not on drawing sheets. FILE_EXISTS requires a new revision filename. Run design operations sequentially and request workspace_files links after all exports are final.`,
         inputSchema: {
           pdf_filename: z.string().endsWith('.pdf'),
           sheets: z
@@ -230,7 +216,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             settings.maxImageBytes,
             settings.maxImagePixels,
           );
-          await savePdf(pdf_filename, bytes);
+          await writePdf(settings, pdf_filename, bytes, signal);
           return {
             content: [
               ...text({
