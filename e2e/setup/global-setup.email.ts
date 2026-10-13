@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from './language';
 import { chromium } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
 import cleanupUser from './cleanupUser';
@@ -25,6 +26,7 @@ async function globalSetup(config: FullConfig) {
   });
   try {
     const page = await browser.newPage();
+    await setEnglishLanguage(page.context());
     const pageErrors: string[] = [];
     const failedResponses: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));

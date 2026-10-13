@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import type { IThemeRGB } from '../../../../packages/client/src/theme/types';
@@ -246,4 +247,9 @@ test.describe('controlled theme paint', () => {
     expect(roles.qr).toBe(rgb(LINK_THEME.modes[mode].colors['rgb-surface-qr']));
     expect(await themeValue(page, '--surface-qr')).toBe('250 246 230');
   });
+});
+
+// 本文件的控件断言使用英文，空会话不等同于未选择界面语言。
+test.beforeEach(async ({ context }) => {
+  await setEnglishLanguage(context);
 });

@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -41,4 +42,9 @@ test('the SAML sign-in glyph is painted with the button text colour @scenario:sa
     };
   });
   expect(paint.glyph).toBe(paint.text);
+});
+
+// 本文件的控件断言使用英文，空会话不等同于未选择界面语言。
+test.beforeEach(async ({ context }) => {
+  await setEnglishLanguage(context);
 });

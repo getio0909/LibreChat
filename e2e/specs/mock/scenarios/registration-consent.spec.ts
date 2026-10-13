@@ -1,3 +1,4 @@
+import { setEnglishLanguage } from '../../../setup/language';
 import { expect, test } from '@playwright/test';
 import type { TStartupConfig } from 'librechat-data-provider';
 import type { Browser, Page } from '@playwright/test';
@@ -47,6 +48,7 @@ async function openAuthScreen(
   overrides: ConfigOverrides,
 ) {
   const context = await browser.newContext({ storageState: undefined, baseURL });
+  await setEnglishLanguage(context);
   const page = await context.newPage();
   await withConfig(page, overrides);
   await page.goto(path, { timeout: 15000 });
