@@ -31,7 +31,8 @@ cleanup() {
           restored=false
         fi
       done
-      if "$restored" && "${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240; then
+      # 单文件挂载保留旧 inode；强制重建才能恢复已轮换的密钥和文件服务凭据。
+      if "$restored" && "${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
         rm -f -- "$gate"
         echo 'The previous application deployment has been restored.' >&2
       else
@@ -209,8 +210,8 @@ process.stdout.write(yaml.dump(config));
 ' \
   < "$stage/owners.json" > "$stage/configured.yaml"
 install -m 600 "$stage/configured.yaml" "$deploy_root/librechat.yaml"
-"${closed_compose[@]}" up -d --no-deps --force-recreate --wait --wait-timeout 60 files-admin files-user
 "${closed_compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
+"${closed_compose[@]}" up -d --no-deps --force-recreate --wait --wait-timeout 240 files-admin files-user design-admin design-user api
 "${closed_compose[@]}" exec -T api node -e "$(cat "$stage/checks.js")" < "$stage/accounts.json"
 # 账户和角色验证通过后恢复用户配置的注册设置。
 "${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
