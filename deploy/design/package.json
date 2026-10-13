@@ -1,0 +1,21 @@
+{
+  "name": "librechat-design-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.ts",
+    "test": "node --test *.test.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "pdf-lib": "1.17.1",
+    "sharp": "0.35.4",
+    "zod": "3.25.67"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.4",
+    "typescript": "5.8.3"
+  }
+}

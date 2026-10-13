@@ -9,7 +9,6 @@ import type {
 import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
 import type { ScheduleMCPConsentView, ConfirmScheduleMCPConsent } from './types/scheduleConsent';
 import type { TFileConfig } from './file-config';
-import type { CADExport } from './types/cad';
 import type * as tl from './types/tools';
 import type * as t from './types';
 import { TOOL_CALL_PREVIEWS_PARAM, TOOL_CALL_PREVIEWS_VERSION } from './previews';
@@ -29,14 +28,6 @@ import * as config from './config';
 import request from './request';
 import * as s from './schemas';
 import * as r from './roles';
-
-export function getCADExports(): Promise<CADExport[]> {
-  return request.get(endpoints.cadExports());
-}
-
-export function downloadCADExport(filename: string): Promise<Blob> {
-  return request.get(endpoints.cadExportDownload(filename), { responseType: 'blob' });
-}
 
 export function getInsights(params: TInsightsParams = {}): Promise<TInsightsResponse> {
   const query = new URLSearchParams();

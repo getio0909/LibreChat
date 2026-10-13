@@ -144,4 +144,3 @@ export type * from './types';
 export * from './tools/approval';
 
 export * from './mcp/approval';
-export { createCADController, configureCADDeployment } from './cad/files';

@@ -18,13 +18,6 @@ import AgentError from './AgentError';
  * `errorRenderers` instead.
  */
 export const errorCopy: Record<string, TranslationKeys> = {
-  IMAGE_API_KEY_REQUIRED: 'com_error_image_key',
-  IMAGE_PROVIDER_AUTH: 'com_error_image_auth',
-  IMAGE_PROVIDER_QUOTA: 'com_error_image_quota',
-  IMAGE_PROVIDER_REJECTED: 'com_error_image_rejected',
-  IMAGE_PROVIDER_NO_IMAGE: 'com_error_image_missing',
-  IMAGE_PROVIDER_UNAVAILABLE: 'com_error_image_unavailable',
-  IMAGE_TOO_LARGE: 'com_error_image_large',
   [ErrorTypes.MODERATION]: 'com_error_moderation',
   [ErrorTypes.INVALID_ACTION]: 'com_error_invalid_action_error',
   [ErrorTypes.MODELS_NOT_LOADED]: 'com_error_models_not_loaded',

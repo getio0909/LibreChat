@@ -49,7 +49,7 @@ case "$operation" in
     "$closed"
     test -f "$DEPLOY_TEST_GATE"
     cat >/dev/null
-    if [[ "$*" == *'/app/config/configure-cad.js'* ]]; then
+    if [[ "$*" == *'config.mcpSettings.allowedAddresses'* ]]; then
       cat "$root/librechat.yaml"
       exit 0
     fi
@@ -91,6 +91,10 @@ printf 'CAD_ADMIN_USER_ID=%s\nCAD_USER_USER_ID=%s\n' "$(printf 'a%.0s' {1..24})"
 printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\n' "$(printf '1%.0s' {1..64})" > "$work/bundle/image.env"
 printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
+for account in admin user; do
+  printf '{"workspaceUrl":"https://example.test/cad-files/%s/"}\n' "$account" > "$work/bundle/design-$account.json"
+  printf '{"fixture":true}\n' > "$work/bundle/files-$account.yaml"
+done
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
 for scenario in none health mcp command login role final first-none first-login first-role; do
@@ -110,7 +114,7 @@ for scenario in none health mcp command login role final first-none first-login 
     test "$status" != 0
     grep -q 'The failed initial application deployment has been stopped.' "$work/output.log"
     grep -q '^down:' "$DEPLOY_TEST_LOG"
-    for file in compose.yml librechat.yaml .env image.env; do test ! -f "$root/$file"; done
+    for file in compose.yml librechat.yaml .env image.env design-admin.json design-user.json files-admin.yaml files-user.yaml; do test ! -f "$root/$file"; done
     test -f "$DEPLOY_TEST_GATE"
   elif [[ "$failure" == none ]]; then
     test "$status" = 0
@@ -133,6 +137,17 @@ for scenario in none health mcp command login role final first-none first-login 
       test "$(stat -c '%a' "$root/$file")" = 600
     done
     test ! -f "$DEPLOY_TEST_GATE"
+    for account in admin user; do
+      if [[ "$failure" == none ]]; then
+        jq -e '.userId | test("^[a-f0-9]{24}$")' "$root/design-$account.json" >/dev/null
+        cmp "$work/bundle/files-$account.yaml" "$root/files-$account.yaml"
+        test "$(stat -c '%a' "$root/design-$account.json")" = 600
+        test "$(stat -c '%a' "$root/files-$account.yaml")" = 600
+      else
+        test ! -f "$root/design-$account.json"
+        test ! -f "$root/files-$account.yaml"
+      fi
+    done
   fi
   test -z "$(find "$root" -maxdepth 1 -name '.incoming.*' -print -quit)"
   printf 'Deployment recovery test passed: %s\n' "$scenario"

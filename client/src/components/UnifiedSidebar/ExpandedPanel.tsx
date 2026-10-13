@@ -9,7 +9,6 @@ import AgentMarketplaceButton from '~/components/Nav/AgentMarketplaceButton';
 import { CLOSE_SIDEBAR_ID } from '~/components/Chat/Menus/OpenSidebar';
 import { lazyWithRecovery } from '~/lib/assets/lazy';
 import useNewChat from '~/hooks/Chat/useNewChat';
-import CAD from '~/components/Nav/CAD';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -177,7 +176,6 @@ function ExpandedPanel({
       </div>
       <NewChatButton setActive={setActive} switchToHistory={switchToHistory} />
       <AgentMarketplaceButton />
-      <CAD />
       <div className="border-border-inset mx-2 border-b" />
       <div className="flex flex-col gap-1 overflow-y-auto">
         {links.map((link) => (

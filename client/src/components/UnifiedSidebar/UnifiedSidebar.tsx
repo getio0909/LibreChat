@@ -26,7 +26,6 @@ import useSidebarToggle from '~/hooks/Nav/useSidebarToggle';
 import useSidebarState from '~/hooks/Nav/useSidebarState';
 import { useChatHelpers, useLocalize } from '~/hooks';
 import SidePanelNav from '~/components/SidePanel/Nav';
-import CAD from '~/components/Nav/CAD';
 import Sidebar from './Sidebar';
 import { cn } from '~/utils';
 
@@ -260,7 +259,6 @@ function UnifiedSidebar({
               does not scroll away with the chats. */}
           <div className="shrink-0 px-3 pt-2 empty:hidden">
             <AgentMarketplaceButton layout="row" onNavigate={handleCollapse} />
-            <CAD row />
           </div>
           <nav
             id="chat-history-nav"

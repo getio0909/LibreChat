@@ -2647,7 +2647,6 @@ export const interfaceSchema = z
       .optional(),
     termsOfService: termsOfServiceSchema.optional(),
     customWelcome: z.string().optional(),
-    cadFiles: z.boolean().default(false),
     mcpServers: mcpServersSchema.optional(),
     modelSelect: z.boolean().optional(),
     /** Set to false during a rolling upgrade, until every API replica supports title ownership and old title jobs drain. */
@@ -3841,24 +3840,6 @@ export type TToolCallPreviewsConfig = z.infer<typeof toolCallPreviewsConfigSchem
 
 export const configSchema = z.object({
   version: z.string(),
-  imageTools: z
-    .object({
-      maxPromptLength: z.number().int().positive().default(32000),
-      maxImageBytes: z
-        .number()
-        .int()
-        .positive()
-        .max(10 * 1024 * 1024)
-        .default(10 * 1024 * 1024),
-    })
-    .default({}),
-  cadExports: z
-    .object({
-      workspaces: z
-        .record(z.object({ path: z.string(), ownerIds: z.array(z.string()).default([]) }))
-        .default({}),
-    })
-    .default({}),
   permissions: z.object({ maxWriteAttempts: permissionWriteAttemptsSchema }).optional(),
   cache: z.boolean().default(true),
   projects: chatProjectsConfigSchema,
