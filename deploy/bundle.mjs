@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { parseEnv } from 'node:util';
 import { randomBytes } from 'node:crypto';
 
 const deploymentUrl = new URL(process.env.DEPLOY_URL);
@@ -15,6 +16,11 @@ if (
   throw new Error('CAD_DOWNLOAD_LINK_TTL_SECONDS must be an integer between 60 and 604800.');
 }
 const target = path.join(process.env.RUNNER_TEMP, 'bundle');
+const hostImageLimit = Number(parseEnv(process.env.LIBRECHAT_ENV || '').MCP_IMAGE_DATA_MAX_BYTES);
+const maxImageBytes =
+  Number.isSafeInteger(hostImageLimit) && hostImageLimit > 0
+    ? Math.min(10 * 1024 * 1024, hostImageLimit)
+    : 10 * 1024 * 1024;
 const accounts = {};
 for (const account of ['admin', 'user']) {
   const prefix = account.toUpperCase();
@@ -39,6 +45,7 @@ for (const account of ['admin', 'user']) {
       downloadUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-downloads/${account}/`,
       downloadSigningKey: randomBytes(32).toString('hex'),
       downloadLinkTtlSeconds,
+      maxImageBytes,
       arkApiKey: process.env.ARK_API_KEY,
       geminiApiKey: process.env.GEMINI_API_KEY,
     }),

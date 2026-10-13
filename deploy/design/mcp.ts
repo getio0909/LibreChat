@@ -10,7 +10,7 @@ import type { Settings } from './config.ts';
 import { ToolFailure } from './config.ts';
 import { fileType, fileInfo, listWorkspace, readWorkspace } from './files.ts';
 import { imageInput, compactImage } from './images.ts';
-import { drawingPdf } from './pdf.ts';
+import { drawingPdf, drawingRegion } from './pdf.ts';
 import { serveDownload } from './download.ts';
 
 function text(value: object): CallToolResult {
@@ -140,6 +140,56 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
                 ...fileInfo(settings, pdf_filename, bytes),
                 layout: paper ? 'sheet' : 'preview',
                 page_size_mm: paper ? [paper.widthMm, paper.heightMm] : undefined,
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
+        }),
+    );
+    server.registerTool(
+      'inspect_drawing',
+      {
+        description:
+          'Inspect a selected region of a physical SVG drawing sheet in /tmp/cad at the original render resolution. Use this after the overview from export_drawing_pdf to read small annotations and check detail views on large sheets; the overview alone cannot certify every detail. Supply the same paper dimensions as the PDF export. The region is measured in paper millimeters from the upper-left corner. Choose a small region around the text or detail being checked; the returned image is a source-sheet detail, not an independent PDF rendering.',
+        inputSchema: {
+          source_filename: z.string().endsWith('.svg'),
+          page_width_mm: z.number().min(50).max(1200),
+          page_height_mm: z.number().min(50).max(1200),
+          left_mm: z.number().min(0),
+          top_mm: z.number().min(0),
+          width_mm: z.number().min(1).max(1200),
+          height_mm: z.number().min(1).max(1200),
+        },
+      },
+      (input) =>
+        run(async () => {
+          const preview = await drawingRegion(
+            await readWorkspace(settings, input.source_filename),
+            settings.maxImagePixels,
+            { widthMm: input.page_width_mm, heightMm: input.page_height_mm },
+            {
+              leftMm: input.left_mm,
+              topMm: input.top_mm,
+              widthMm: input.width_mm,
+              heightMm: input.height_mm,
+            },
+          );
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
+          return {
+            content: [
+              ...text({
+                source_filename: input.source_filename,
+                page_size_mm: [input.page_width_mm, input.page_height_mm],
+                region_mm: {
+                  left: input.left_mm,
+                  top: input.top_mm,
+                  width: input.width_mm,
+                  height: input.height_mm,
+                },
               }).content,
               { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
             ],
