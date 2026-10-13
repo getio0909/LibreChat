@@ -330,6 +330,8 @@ export async function loadDrawingPdf(
         throw new ToolFailure('PDF_EXTERNAL_STREAM_UNSUPPORTED');
       pending.push(object.dict);
     } else if (object instanceof PDFDict) {
+      // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
+      object.delete(PDFName.of('Metadata'));
       const type = object.lookup(PDFName.of('Type'));
       if (
         object.has(PDFName.of('AF')) ||

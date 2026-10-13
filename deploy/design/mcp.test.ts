@@ -10,7 +10,7 @@ import { watch } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { test, afterEach } from 'node:test';
 import { inflateSync, deflateSync } from 'node:zlib';
-import { PDFArray, PDFDocument, PDFName, PDFRawStream, PDFString, degrees } from 'pdf-lib';
+import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFString, degrees } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -791,6 +791,54 @@ test('combined drawing sets bound the total expanded object data before copying 
     (await f.client.callTool({ name: 'workspace_files', arguments: {} })).isError,
     undefined,
   );
+});
+
+test('drawing sets omit invisible page and resource metadata without modifying sources', async () => {
+  const f = await fixture();
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage();
+  page.drawLine({ start: { x: 20, y: 20 }, end: { x: 120, y: 20 }, thickness: 1 });
+  const metadata = pdf.context.register(
+    pdf.context.flateStream('<fixture>old revision and private path</fixture>', {
+      Type: 'Metadata',
+      Subtype: 'XML',
+    }),
+  );
+  page.node.set(PDFName.of('Metadata'), metadata);
+  const form = pdf.context.register(
+    pdf.context.flateStream('0 0 10 10 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 10, 10],
+      Metadata: metadata,
+    }),
+  );
+  page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
+  const bytes = Buffer.from(await pdf.save());
+  await fs.writeFile(path.join(f.root, 'metadata.pdf'), bytes);
+  const result = await f.client.callTool({
+    name: 'assemble_drawing_pdf',
+    arguments: {
+      pdf_filename: 'published.pdf',
+      sheets: [{ source_filename: 'metadata.pdf' }],
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const current = await PDFDocument.load(await fs.readFile(path.join(f.root, 'published.pdf')));
+  assert.equal(current.getPage(0).node.has(PDFName.of('Metadata')), false);
+  assert.equal(
+    current.context.enumerateIndirectObjects().some(([, object]) => {
+      const dict = object instanceof PDFRawStream ? object.dict : object;
+      return (
+        dict instanceof PDFDict &&
+        (dict.has(PDFName.of('Metadata')) ||
+          dict.get(PDFName.of('Type')) === PDFName.of('Metadata'))
+      );
+    }),
+    false,
+  );
+  assert.deepEqual(await fs.readFile(path.join(f.root, 'metadata.pdf')), bytes);
+  assert.equal((await PDFDocument.load(bytes)).getPage(0).node.has(PDFName.of('Metadata')), true);
 });
 
 test('compressed PDF object expansion is bounded outside the long-running service', async () => {
