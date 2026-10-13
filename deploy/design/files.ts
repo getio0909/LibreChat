@@ -56,7 +56,11 @@ export async function listWorkspace(settings: Settings) {
     const stat = await fs.lstat(path.join(settings.workspace, entry.name));
     if (stat.isFile()) records.push(fileInfo(settings, entry.name, stat.size));
   }
-  return { upload_url: settings.workspaceUrl, files: records };
+  return {
+    upload_url: settings.workspaceUrl,
+    archive_url: `${settings.workspaceUrl.replace(/\/$/, '')}/?zip`,
+    files: records,
+  };
 }
 
 export async function readWorkspace(settings: Settings, filename: string): Promise<Buffer> {

@@ -107,8 +107,27 @@ services:
       vectordb:
         condition: service_healthy
 
+  workspace-init:
+    image: ${DESIGN_IMAGE:?Set DESIGN_IMAGE in image.env}
+    user: '0:0'
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER]
+    security_opt: [no-new-privileges:true]
+    # 沿用 Blender 镜像的非 root 用户，所有 CAD 写入方使用同一 UID。
+    entrypoint:
+      - node
+      - -e
+      - "const fs=require('node:fs'); for(const dir of ['/work/admin','/work/user']) { fs.chownSync(dir,10001,10001); fs.chmodSync(dir,0o700); }"
+    volumes: [cad-admin:/work/admin, cad-user:/work/user]
+
   freecad-admin: &freecad
     image: ${FREECAD_IMAGE:?Set FREECAD_IMAGE in image.env}
+    user: '10001:10001'
+    depends_on:
+      workspace-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     init: true
     cap_drop: [ALL]
@@ -142,13 +161,16 @@ services:
 
   blender-admin: &blender
     image: ghcr.io/hotspoons/blender-agent@sha256:23455350cdfa23be743a999da50e68786ff3edd0415e219cba1fab435ee25c44
+    user: '10001:10001'
+    depends_on:
+      workspace-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     init: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     environment:
       BLENDER_AGENT_MCP_PORT: 10101
-      BLENDER_AGENT_DATA_DIR: /tmp/cad
       BLENDER_MCP_MEDIA_DIR: /tmp/cad
     command: [--spawn-blender]
     networks:
@@ -174,6 +196,10 @@ services:
 
   design-admin: &design
     image: ${DESIGN_IMAGE:?Set DESIGN_IMAGE in image.env}
+    user: '10001:10001'
+    depends_on:
+      workspace-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     init: true
     read_only: true
@@ -212,12 +238,16 @@ services:
 
   files-admin: &files
     image: sigoden/dufs@sha256:8dd3b750015734703e64b55641fb7d2254c112e0ff3967074766177dc15dc982
+    user: '10001:10001'
+    depends_on:
+      workspace-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     read_only: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     command: [--config, /run/secrets/files.yaml]
-    networks: [cad-admin]
+    networks: [cad-admin, design-admin]
     ports: ['127.0.0.1:5001:5000']
     volumes:
       - ./files-admin.yaml:/run/secrets/files.yaml:ro
@@ -226,7 +256,7 @@ services:
 
   files-user:
     <<: *files
-    networks: [cad-user]
+    networks: [cad-user, design-user]
     ports: ['127.0.0.1:5002:5000']
     volumes:
       - ./files-user.yaml:/run/secrets/files.yaml:ro
