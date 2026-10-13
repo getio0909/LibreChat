@@ -31,9 +31,23 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         return;
       }
       activeJobs += 1;
+      const finished = new Promise<void>((resolve) => {
+        function complete() {
+          res.off('finish', complete);
+          res.off('close', complete);
+          resolve();
+        }
+        res.once('finish', complete);
+        res.once('close', complete);
+      });
+      const timeout = setTimeout(() => res.destroy(), settings.requestTimeoutMs);
+      timeout.unref();
       try {
         await serveDownload(settings, req, res);
+        // 下载缓冲区只在响应发送完成或断开后才释放并发名额。
+        await finished;
       } finally {
+        clearTimeout(timeout);
         activeJobs -= 1;
       }
       return;
@@ -78,7 +92,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
       'workspace_files',
       {
         description:
-          "List the current private CAD workspace, including CSV cut lists, and direct download links. After every CAD/3D export, call this tool and include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Request fresh links with this tool when expired. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
+          "List the current private CAD workspace, including CSV cut lists, and download links. After every CAD/3D export, call this tool and include Markdown links using the exact returned download_url in your final chat answer. Signed links expire at expires_at, allow only the exact file version, and need no second login; never expose tickets separately or reuse another file's link. Files above direct_download_limit_bytes remain listed with download_requires_login and an authenticated download URL; explain that these use the user's CAD file-manager credentials. Request fresh links with this tool when expired. Use upload_url for manual uploads and archive_url for manual ZIP transfers into LibreChat Files.",
         inputSchema: {},
       },
       () => run(async () => text(await listWorkspace(settings))),

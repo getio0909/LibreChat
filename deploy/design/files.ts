@@ -36,10 +36,24 @@ export function fileType(filename: string): string {
   return type;
 }
 
-export function fileInfo(settings: Settings, filename: string, bytes: Buffer) {
+export function fileInfo(settings: Settings, filename: string, bytes: Buffer | number) {
   const fallback = `${settings.workspaceUrl.replace(/\/$/, '')}/${encodeURIComponent(filename)}`;
-  let link: { download_url: string; expires_at?: string } = { download_url: fallback };
-  if (settings.downloadUrl && settings.downloadSigningKey && settings.userId) {
+  let link: {
+    download_url: string;
+    expires_at?: string;
+    download_requires_login?: boolean;
+    direct_download_limit_bytes?: number;
+  } = {
+    download_url: fallback,
+    download_requires_login: true,
+    direct_download_limit_bytes: settings.maxFileBytes,
+  };
+  if (
+    settings.downloadUrl &&
+    settings.downloadSigningKey &&
+    settings.userId &&
+    Buffer.isBuffer(bytes)
+  ) {
     const expires = Math.floor(Date.now() / 1000) + settings.downloadLinkTtlSeconds;
     const ticket = Buffer.from(
       JSON.stringify({
@@ -57,7 +71,7 @@ export function fileInfo(settings: Settings, filename: string, bytes: Buffer) {
   }
   return {
     filename,
-    bytes: bytes.length,
+    bytes: Buffer.isBuffer(bytes) ? bytes.length : bytes,
     path: path.join(settings.workspace, filename),
     ...link,
   };
@@ -74,8 +88,14 @@ export async function listWorkspace(settings: Settings) {
       continue;
     }
     const stat = await fs.lstat(path.join(settings.workspace, entry.name));
-    if (stat.isFile() && stat.size <= settings.maxFileBytes)
-      records.push(fileInfo(settings, entry.name, await readWorkspace(settings, entry.name)));
+    if (stat.isFile())
+      records.push(
+        fileInfo(
+          settings,
+          entry.name,
+          stat.size > settings.maxFileBytes ? stat.size : await readWorkspace(settings, entry.name),
+        ),
+      );
   }
   return {
     upload_url: settings.workspaceUrl,

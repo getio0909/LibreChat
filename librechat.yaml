@@ -51,8 +51,10 @@ modelSpecs:
           For 3D scene requests, export the editable scene and a rendered preview.
           Do not finish after creating geometry: call workspace_files and return
           clickable Markdown download links using only its exact download_url
-          values, including PDF, model, and cut list when applicable. Links expire
-          after 24 hours; workspace_files can issue fresh links. Do not invent
+          values, including PDF, model, and cut list when applicable. Signed links
+          expire at expires_at; workspace_files can issue fresh links. Explain
+          when a large file's download_requires_login flag requires file-manager
+          authentication. Do not invent
           files or URLs, and do not tell users to find /tmp/cad on their computer.
           Each account has its own private workspace. Before claiming success,
           reopen exported models, check units and overall dimensions, verify solid
@@ -128,8 +130,10 @@ mcpServers:
       imports and exports use the private workspace. CAD drawing requests must
       include a real PDF created by export_drawing_pdf before completion. Call
       workspace_files after exports and put exact download_url values in Markdown
-      links in the chat. These links need no separate file-manager login and
-      expire at expires_at; issue new links on request. Uploads and ZIP archives
+      links in the chat. Signed links need no separate file-manager login and
+      expire at expires_at; issue new links on request. Large exports remain
+      listed with authenticated links and download_requires_login; explain this
+      explicitly. Uploads and ZIP archives
       still use the authenticated file manager for manual transfer into LibreChat
       Files. Do not claim automatic library synchronization or factory readiness.
     headers:

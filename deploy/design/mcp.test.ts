@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import * as fs from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
+import { connect } from 'node:net';
 import { test, afterEach } from 'node:test';
 import { PDFDocument } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -46,7 +47,7 @@ async function fixture(overrides: Partial<Settings> = {}, request?: Request) {
       requestInit: { headers: { 'X-LibreChat-User-ID': settings.userId } },
     }),
   );
-  return { root, settings, client, url };
+  return { root, settings, client, url, server };
 }
 
 test('private workspace rejects other identities and lists only usable filenames', async () => {
@@ -189,6 +190,74 @@ test('download links expire and do not silently deliver changed files', async (c
   await fs.writeFile(path.join(f.root, 'drawing.pdf'), original);
   context.mock.method(Date, 'now', () => Date.parse(file.expires_at) + 1000);
   assert.equal((await fetch(url)).status, 403);
+});
+
+test('large exports remain visible with authenticated fallback links', async () => {
+  const f = await fixture({
+    maxFileBytes: 4,
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+  });
+  await fs.writeFile(path.join(f.root, 'large.blend'), '12345');
+  const result = await f.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const file = JSON.parse(block.text).files[0];
+  assert.equal(file.filename, 'large.blend');
+  assert.equal(file.bytes, 5);
+  assert.equal(file.download_url, 'https://example.test/cad-files/admin/large.blend');
+  assert.equal(file.download_requires_login, true);
+  assert.equal(file.direct_download_limit_bytes, 4);
+});
+
+test('downloads retain their slot until the response finishes or closes', async (context) => {
+  const f = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+  });
+  await fs.writeFile(path.join(f.root, 'large.blend'), Buffer.alloc(16 * 1024 * 1024, 1));
+  const result = await f.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const url = localDownload(f, JSON.parse(block.text).files[0].download_url);
+  const closed = Promise.withResolvers<void>();
+  let finished = false;
+  f.server.on('request', (req, res) => {
+    if (req.method !== 'GET' || !req.url?.startsWith('/download/')) return;
+    res.once('finish', () => {
+      finished = true;
+    });
+    res.once('close', () => closed.resolve());
+  });
+  const socket = connect({ host: url.hostname, port: Number(url.port) });
+  const received = Promise.withResolvers<Buffer>();
+  socket.once('data', (bytes) => {
+    socket.pause();
+    received.resolve(bytes);
+  });
+  socket.once('error', received.reject);
+  socket.write(
+    `GET ${url.pathname}${url.search} HTTP/1.1\r\nHost: ${url.host}\r\nConnection: close\r\n\r\n`,
+  );
+  try {
+    assert.match((await received.promise).toString('latin1'), /^HTTP\/1.1 200/);
+    // 某些系统的回环套接字可先缓冲整个文件；按真实响应状态验证名额。
+    const expected = finished ? 200 : 503;
+    context.diagnostic(
+      finished
+        ? 'Loopback transfer finished before the client paused.'
+        : 'Paused client kept the download response pending.',
+    );
+    assert.equal((await fetch(url, { method: 'HEAD' })).status, expected);
+    socket.destroy();
+    await closed.promise;
+    const retry = await fetch(url, { method: 'HEAD' });
+    assert.equal(retry.status, 200);
+  } finally {
+    socket.destroy();
+  }
 });
 
 test('uses supported Seedream size and does not send credentials to another destination', async () => {
