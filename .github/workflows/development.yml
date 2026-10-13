@@ -168,6 +168,7 @@ jobs:
              trap cleanup EXIT
              trap 'exit 1' HUP INT TERM
              tar -xzf - -C \"\$stage\" --no-same-owner --no-same-permissions
+             rm -rf -- '$DEPLOY_PATH/.bootstrap'
              bash \"\$stage/bootstrap.sh\" '$DEPLOY_PATH'
              SSH_ORIGINAL_COMMAND='deploy $DEPLOY_PATH' /usr/local/lib/librechat/deploy.sh '$DEPLOY_PATH' < \"\$stage/deploy.tgz\"" < "$RUNNER_TEMP/bootstrap.tgz"
           curl --fail --silent --show-error --retry 5 --retry-delay 10 "$DEPLOY_URL/health"

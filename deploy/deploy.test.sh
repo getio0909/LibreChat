@@ -7,6 +7,8 @@ trap 'rm -rf -- "$work"' EXIT
 mkdir -p "$work/bin" "$work/bundle" "$work/previous"
 export PATH="$work/bin:$PATH"
 export DEPLOY_TEST_LOG="$work/operations.log"
+export DEPLOY_TEST_GATE="$work/provisioning"
+sed "s|^gate=.*|gate='$DEPLOY_TEST_GATE'|" "$source_dir/deploy.sh" > "$work/deploy.sh"
 
 # 保留真实的归档、文件权限和回滚逻辑，只替代会影响服务的外部命令。
 cat > "$work/bin/docker" <<'EOF'
@@ -28,7 +30,7 @@ while (( $# > 0 )); do
       fi
       shift 2
       ;;
-    up|exec|config|pull|ps) operation=$1; shift; break ;;
+    up|exec|config|pull|ps|down) operation=$1; shift; break ;;
     *) shift ;;
   esac
 done
@@ -37,6 +39,7 @@ printf '%s:%s:%s\n' "$operation" "$closed" "$image" >> "$DEPLOY_TEST_LOG"
 case "$operation" in
   up)
     if [[ "$image" == *11111111* ]]; then
+      test -f "$DEPLOY_TEST_GATE"
       if [[ "$DEPLOY_TEST_FAILURE" == health || ( "$DEPLOY_TEST_FAILURE" == final && "$closed" == false ) ]]; then
         exit 1
       fi
@@ -44,6 +47,7 @@ case "$operation" in
     ;;
   exec)
     "$closed"
+    test -f "$DEPLOY_TEST_GATE"
     cat >/dev/null
     if [[ "$DEPLOY_TEST_FAILURE" == command ]]; then
       exit 1
@@ -77,16 +81,26 @@ printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-for failure in none health command login role final; do
-  root="$work/$failure"
+for scenario in none health command login role final first-none first-login first-role; do
+  failure=${scenario#first-}
+  root="$work/$scenario"
   mkdir "$root"
-  cp "$work/previous/"* "$work/previous/.env" "$root/"
+  if [[ "$scenario" != first-* ]]; then
+    cp "$work/previous/"* "$work/previous/.env" "$root/"
+    chmod 600 "$root/"* "$root/.env"
+  fi
   : > "$DEPLOY_TEST_LOG"
   export DEPLOY_TEST_FAILURE="$failure"
   status=0
-  SSH_ORIGINAL_COMMAND="deploy $root" bash "$source_dir/deploy.sh" "$root" \
+  SSH_ORIGINAL_COMMAND="deploy $root" bash "$work/deploy.sh" "$root" \
     < "$work/bundle.tgz" > "$work/output.log" 2>&1 || status=$?
-  if [[ "$failure" == none ]]; then
+  if [[ "$scenario" == first-* && "$failure" != none ]]; then
+    test "$status" != 0
+    grep -q 'The failed initial application deployment has been stopped.' "$work/output.log"
+    grep -q '^down:' "$DEPLOY_TEST_LOG"
+    for file in compose.yml librechat.yaml .env image.env; do test ! -f "$root/$file"; done
+    test -f "$DEPLOY_TEST_GATE"
+  elif [[ "$failure" == none ]]; then
     test "$status" = 0
     expected="$work/bundle"
     grep -q '^up:false:.*11111111' "$DEPLOY_TEST_LOG"
@@ -97,17 +111,20 @@ for failure in none health command login role final; do
     grep -q '^up:false:.*00000000' "$DEPLOY_TEST_LOG"
   fi
   grep -q '^up:true:.*11111111' "$DEPLOY_TEST_LOG"
-  for file in compose.yml librechat.yaml .env image.env; do
-    cmp "$expected/$file" "$root/$file"
-    test "$(stat -c '%a' "$root/$file")" = 600
-  done
+  if [[ "$scenario" != first-* || "$failure" == none ]]; then
+    for file in compose.yml librechat.yaml .env image.env; do
+      cmp "$expected/$file" "$root/$file"
+      test "$(stat -c '%a' "$root/$file")" = 600
+    done
+    test ! -f "$DEPLOY_TEST_GATE"
+  fi
   test -z "$(find "$root" -maxdepth 1 -name '.incoming.*' -print -quit)"
-  printf 'Deployment recovery test passed: %s\n' "$failure"
+  printf 'Deployment recovery test passed: %s\n' "$scenario"
 done
 
 printf 'unexpected\n' > "$work/bundle/unexpected.txt"
 tar -czf "$work/invalid.tgz" -C "$work/bundle" .
-if SSH_ORIGINAL_COMMAND="deploy $root" bash "$source_dir/deploy.sh" "$root" \
+if SSH_ORIGINAL_COMMAND="deploy $root" bash "$work/deploy.sh" "$root" \
   < "$work/invalid.tgz" > "$work/output.log" 2>&1; then
   echo 'An unexpected archive member was accepted.' >&2
   exit 1

@@ -14,22 +14,31 @@ flock -w 300 9
 stage=$(mktemp -d "$deploy_root/.incoming.XXXXXX")
 had_previous=false
 activated=false
+gate=/etc/nginx/librechat-dev.provisioning
 compose=(docker compose -p librechat-dev --project-directory "$deploy_root" \
   --env-file "$deploy_root/.env" --env-file "$deploy_root/image.env" -f "$deploy_root/compose.yml")
 cleanup() {
   status=$?
   trap - EXIT
-  if (( status != 0 )) && "$activated" && "$had_previous"; then
-    restored=true
-    for file in compose.yml librechat.yaml .env image.env; do
-      if ! cp "$deploy_root/.previous/$file" "$deploy_root/$file"; then
-        restored=false
+  if (( status != 0 )) && "$activated"; then
+    if "$had_previous"; then
+      restored=true
+      for file in compose.yml librechat.yaml .env image.env; do
+        if ! cp "$deploy_root/.previous/$file" "$deploy_root/$file"; then
+          restored=false
+        fi
+      done
+      if "$restored" && "${compose[@]}" up -d --wait --wait-timeout 240; then
+        rm -f -- "$gate"
+        echo 'The previous application deployment has been restored.' >&2
+      else
+        echo 'Restoring the previous application deployment failed.' >&2
       fi
-    done
-    if "$restored" && "${compose[@]}" up -d --wait --wait-timeout 240; then
-      echo 'The previous application deployment has been restored.' >&2
+    elif "${compose[@]}" down; then
+      rm -f -- "$deploy_root/compose.yml" "$deploy_root/librechat.yaml" "$deploy_root/.env" "$deploy_root/image.env"
+      echo 'The failed initial application deployment has been stopped.' >&2
     else
-      echo 'Restoring the previous application deployment failed.' >&2
+      echo 'Stopping the failed initial application deployment failed.' >&2
     fi
   fi
   rm -rf -- "$stage"
@@ -83,6 +92,8 @@ if [[ -f "$deploy_root/image.env" ]]; then
   had_previous=true
 fi
 activated=true
+# 从代理入口隔离所有登录方式，首个管理员验证通过后才恢复公开访问。
+: > "$gate"
 for file in compose.yml librechat.yaml .env image.env; do
   install -m 600 "$stage/$file" "$deploy_root/$file"
 done
@@ -130,4 +141,5 @@ for account in admin user; do
 done
 # 账户和角色验证通过后恢复用户配置的注册设置。
 "${compose[@]}" up -d --wait --wait-timeout 240
+rm -f -- "$gate"
 echo 'Development deployment passed health checks.'
