@@ -11,7 +11,10 @@ export async function drawingPdf(
 ): Promise<Buffer> {
   const widthPt = paper ? (paper.widthMm * 72) / 25.4 : undefined;
   const heightPt = paper ? (paper.heightMm * 72) / 25.4 : undefined;
+  let density = 150;
   if (widthPt != null && heightPt != null) {
+    if (Math.ceil(widthPt) * Math.ceil(heightPt) > maxImagePixels)
+      throw new ToolFailure('PAGE_PIXEL_LIMIT');
     const source = await sharp(bytes, { density: 72, limitInputPixels: maxImagePixels }).metadata();
     if (source.format !== 'svg') throw new ToolFailure('SVG_SHEET_REQUIRED');
     // 使用渲染器解析的物理尺寸，拒绝改变纸张大小而悄悄缩放图纸。
@@ -23,10 +26,23 @@ export async function drawingPdf(
     ) {
       throw new ToolFailure('PAGE_SIZE_MISMATCH');
     }
+    // 根据渲染器实际解析的像素预算选择分辨率，纸张尺寸和标注比例不变。
+    let low = 72;
+    let high = density;
+    while (low < high) {
+      const candidate = Math.ceil((low + high) / 2);
+      try {
+        await sharp(bytes, { density: candidate, limitInputPixels: maxImagePixels }).metadata();
+        low = candidate;
+      } catch (error) {
+        if (!(error instanceof Error) || error.message !== 'Input image exceeds pixel limit')
+          throw error;
+        high = candidate - 1;
+      }
+    }
+    density = low;
   }
-  const png = await sharp(bytes, { density: 150, limitInputPixels: maxImagePixels })
-    .png()
-    .toBuffer();
+  const png = await sharp(bytes, { density, limitInputPixels: maxImagePixels }).png().toBuffer();
   const pdf = await PDFDocument.create();
   const image = await pdf.embedPng(png);
   if (widthPt != null && heightPt != null) {

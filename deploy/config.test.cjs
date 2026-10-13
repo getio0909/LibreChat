@@ -17,6 +17,9 @@ test('CAD requests send maximum adaptive effort even with saved low-effort or sa
   const { ChatOpenRouter } = require('@librechat/agents/llm/openrouter');
   const config = configSchema.parse(yaml.load(fs.readFileSync('librechat.yaml', 'utf8')));
   const endpoint = config.endpoints.custom.find((item) => item.name === 'OpenRouter');
+  const titleEndpoint = config.endpoints.custom.find(
+    (item) => item.name === endpoint.titleEndpoint,
+  );
   const spec = config.modelSpecs.list.find((item) => item.default);
   for (const saved of [{}, { reasoning_effort: 'low', temperature: 0.7, top_p: 0.9 }]) {
     const { llmConfig } = getOpenAILLMConfig({
@@ -37,6 +40,20 @@ test('CAD requests send maximum adaptive effort even with saved low-effort or sa
     assert.equal(request.top_p, undefined);
     assert.equal(request.include_reasoning, undefined);
     assert.equal(request.tool_choice, undefined);
+    const { llmConfig: titleConfig } = getOpenAILLMConfig({
+      apiKey: 'fixture-only',
+      streaming: false,
+      endpoint: titleEndpoint.name,
+      baseURL: titleEndpoint.baseURL,
+      useOpenRouter: true,
+      modelOptions: llmConfig,
+      addParams: titleEndpoint.addParams,
+      dropParams: titleEndpoint.dropParams,
+    });
+    assert.deepEqual(new ChatOpenRouter(titleConfig).invocationParams().reasoning, {
+      effort: 'low',
+      enabled: false,
+    });
   }
 });
 

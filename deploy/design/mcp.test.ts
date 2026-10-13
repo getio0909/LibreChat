@@ -8,7 +8,7 @@ import { createServer } from 'node:http';
 import { connect } from 'node:net';
 import { test, afterEach } from 'node:test';
 import { inflateSync } from 'node:zlib';
-import { PDFArray, PDFDocument, PDFRawStream } from 'pdf-lib';
+import { PDFArray, PDFDocument, PDFName, PDFNumber, PDFRawStream } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -172,6 +172,53 @@ test('scaled SVG sheets preserve A3 paper and reject implicit resizing or incomp
   });
   assert.equal(raster.isError, true);
   assert.match(JSON.stringify(raster), /SVG_SHEET_REQUIRED/);
+});
+
+test('large CAD sheets retain A0 size while rasterization stays within its configured pixel budget', async () => {
+  const f = await fixture();
+  await fs.writeFile(
+    path.join(f.root, 'large.svg'),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="841mm" height="1189mm" viewBox="0 0 841 1189"><rect width="841" height="1189" fill="white"/><rect x="10" y="10" width="821" height="1169" fill="none" stroke="black" stroke-width="0.3"/></svg>',
+  );
+  const result = await f.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'large.svg',
+      pdf_filename: 'large.pdf',
+      page_width_mm: 841,
+      page_height_mm: 1189,
+    },
+  });
+  assert.equal(result.isError, undefined);
+  const pdf = await PDFDocument.load(await fs.readFile(path.join(f.root, 'large.pdf')));
+  assert.ok(Math.abs(pdf.getPage(0).getWidth() - (841 * 72) / 25.4) < 0.001);
+  assert.ok(Math.abs(pdf.getPage(0).getHeight() - (1189 * 72) / 25.4) < 0.001);
+  let images = 0;
+  for (const [, object] of pdf.context.enumerateIndirectObjects()) {
+    if (
+      !(object instanceof PDFRawStream) ||
+      object.dict.get(PDFName.of('Subtype'))?.toString() !== '/Image'
+    )
+      continue;
+    const width = object.dict.lookup(PDFName.of('Width'), PDFNumber).asNumber();
+    const height = object.dict.lookup(PDFName.of('Height'), PDFNumber).asNumber();
+    assert.ok(width * height <= f.settings.maxImagePixels);
+    images += 1;
+  }
+  assert.ok(images > 0);
+  const limited = await fixture({ maxImagePixels: 10000 });
+  await fs.copyFile(path.join(f.root, 'large.svg'), path.join(limited.root, 'large.svg'));
+  const rejected = await limited.client.callTool({
+    name: 'export_drawing_pdf',
+    arguments: {
+      source_filename: 'large.svg',
+      pdf_filename: 'large.pdf',
+      page_width_mm: 841,
+      page_height_mm: 1189,
+    },
+  });
+  assert.equal(rejected.isError, true);
+  assert.match(JSON.stringify(rejected), /PAGE_PIXEL_LIMIT/);
 });
 
 function localDownload(f: { url: URL }, remote: string): URL {

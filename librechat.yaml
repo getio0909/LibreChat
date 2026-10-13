@@ -25,6 +25,7 @@ endpoints:
         fetch: false
       titleConvo: true
       titleModel: anthropic/claude-haiku-5.5
+      titleEndpoint: OpenRouterTitles
       modelDisplayLabel: Claude Haiku 5.5
       addParams:
         # 清空标量映射，防止旧会话参数覆盖 OpenRouter 的完整推理配置。
@@ -33,6 +34,19 @@ endpoints:
           effort: max
           enabled: true
         maxTokens: 65536
+      dropParams: [stop, temperature, top_p, top_k, include_reasoning]
+    - name: OpenRouterTitles
+      apiKey: '${OPENROUTER_API_KEY}'
+      baseURL: https://openrouter.ai/api/v1
+      models:
+        default: [anthropic/claude-haiku-5.5]
+        fetch: false
+      titleConvo: false
+      addParams:
+        reasoning_effort: ''
+        reasoning:
+          effort: low
+          enabled: false
       dropParams: [stop, temperature, top_p, top_k, include_reasoning]
   agents:
     disableBuilder: true
