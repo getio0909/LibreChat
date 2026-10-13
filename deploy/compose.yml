@@ -115,13 +115,13 @@ services:
     network_mode: none
     read_only: true
     cap_drop: [ALL]
-    cap_add: [CHOWN, FOWNER]
+    cap_add: [CHOWN, FOWNER, DAC_READ_SEARCH]
     security_opt: [no-new-privileges:true]
-    # 沿用 Blender 镜像的非 root 用户，所有 CAD 写入方使用同一 UID。
+    # 迁移已有文件且不跟随符号链接；所有 CAD 写入方沿用 Blender 的非 root UID。
     entrypoint:
-      - node
-      - -e
-      - "const fs=require('node:fs'); for(const dir of ['/work/admin','/work/user']) { fs.chownSync(dir,10001,10001); fs.chmodSync(dir,0o700); }"
+      - /bin/sh
+      - -c
+      - chown -hRP 10001:10001 /work/admin /work/user && chmod 700 /work/admin /work/user
     volumes: [cad-admin:/work/admin, cad-user:/work/user]
 
   freecad-admin: &freecad

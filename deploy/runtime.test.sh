@@ -30,6 +30,17 @@ for account in admin user; do
   else
     sudo chown 10001:10001 "$work/design-$account.json" "$work/files-$account.yaml"
   fi
+  docker volume create --label "com.docker.compose.project=$project" \
+    --label "com.docker.compose.volume=cad-$account" "${project}_cad-$account" >/dev/null
+  docker run --rm --network none --user 0:0 --entrypoint /bin/sh \
+    -v "${project}_cad-$account:/work" "$DESIGN_IMAGE" -c '
+      mkdir -p /work/legacy
+      printf "legacy model" > /work/legacy/model.step
+      chmod 700 /work/legacy
+      chmod 600 /work/legacy/model.step
+      ln -s /usr/local/bin/node /work/no-follow.step
+      ln -s /run/secrets/files.yaml /work/private-config.yaml
+    ' < /dev/null
 done
 "${compose[@]}" up -d --wait --wait-timeout 180 \
   freecad-admin freecad-user blender-admin blender-user design-admin design-user files-admin files-user
@@ -41,7 +52,13 @@ for account in admin user; do
     -o /dev/null "http://127.0.0.1:$port/cad-files/$account/?json"
   "${compose[@]}" exec -T "freecad-$account" node -e '
     if (process.getuid() !== 10001) process.exit(1);
-    require("node:fs").writeFileSync("/tmp/cad/native-write.step", "fixture");
+    const fs = require("node:fs"), assert = require("node:assert/strict");
+    assert.equal(fs.readFileSync("/tmp/cad/legacy/model.step", "utf8"), "legacy model");
+    fs.writeFileSync("/tmp/cad/legacy/model.step", "edited model");
+    fs.writeFileSync("/tmp/cad/legacy/new.step", "new model");
+    assert.equal(fs.statSync("/usr/local/bin/node").uid, 0);
+    assert.equal(fs.lstatSync("/tmp/cad/no-follow.step").isSymbolicLink(), true);
+    fs.writeFileSync("/tmp/cad/native-write.step", "fixture");
   ' < /dev/null
   "${compose[@]}" exec -T -e "ACCOUNT=$account" "design-$account" node --input-type=module <<'NODE'
 import assert from 'node:assert/strict';
@@ -96,6 +113,8 @@ try {
   assert.equal(Buffer.from(await zip.arrayBuffer()).subarray(0, 2).toString(), 'PK');
   const denied = await fetch(fileUrl + 'drawing.pdf');
   assert.equal(denied.status, 401);
+  const escaped = await fetch(fileUrl + 'private-config.yaml', { headers });
+  assert.ok([403, 404].includes(escaped.status));
   const wrong = await fetch(fileUrl + 'drawing.pdf', { headers: { Authorization: 'Basic ' + Buffer.from(`${other}:fixture-${other}-password`).toString('base64') } });
   assert.equal(wrong.status, 401);
   console.log(`${account}: private native import/export, PDF, ZIP, and file authentication passed.`);
