@@ -77,6 +77,24 @@ export function fileInfo(settings: Settings, filename: string, bytes: Buffer | n
   };
 }
 
+async function workspaceFile(settings: Settings, filename: string) {
+  const stat = await fs.lstat(path.join(settings.workspace, filename));
+  if (!stat.isFile()) return null;
+  if (stat.size > settings.maxFileBytes) return fileInfo(settings, filename, stat.size);
+  try {
+    return fileInfo(settings, filename, await readWorkspace(settings, filename));
+  } catch (error) {
+    if (
+      error instanceof ToolFailure &&
+      ['FILE_IS_CHANGING', 'FILE_TOO_LARGE'].includes(error.code)
+    ) {
+      // 变动文件仅降级自己的链接，其他稳定文件仍正常列出。
+      return { ...fileInfo(settings, filename, stat.size), download_status: error.code };
+    }
+    throw error;
+  }
+}
+
 export async function listWorkspace(settings: Settings) {
   const entries = await fs.readdir(settings.workspace, { withFileTypes: true });
   const records = [];
@@ -87,15 +105,19 @@ export async function listWorkspace(settings: Settings) {
     } catch {
       continue;
     }
-    const stat = await fs.lstat(path.join(settings.workspace, entry.name));
-    if (stat.isFile())
-      records.push(
-        fileInfo(
-          settings,
-          entry.name,
-          stat.size > settings.maxFileBytes ? stat.size : await readWorkspace(settings, entry.name),
-        ),
-      );
+    try {
+      const file = await workspaceFile(settings, entry.name);
+      if (file) records.push(file);
+    } catch (error) {
+      if (error instanceof ToolFailure && error.code === 'INVALID_FILE') continue;
+      if (
+        error instanceof Error &&
+        'code' in error &&
+        (error.code === 'ENOENT' || error.code === 'ELOOP')
+      )
+        continue;
+      throw error;
+    }
   }
   return {
     upload_url: settings.workspaceUrl,

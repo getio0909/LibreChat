@@ -11,6 +11,7 @@ import { PDFDocument } from 'pdf-lib';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Server } from 'node:http';
+import type { FileHandle } from 'node:fs/promises';
 import type { Settings, Request } from './config.ts';
 import { settingsSchema, ToolFailure, boundedBody } from './config.ts';
 import { fileType, readWorkspace } from './files.ts';
@@ -209,6 +210,57 @@ test('large exports remain visible with authenticated fallback links', async () 
   assert.equal(file.download_url, 'https://example.test/cad-files/admin/large.blend');
   assert.equal(file.download_requires_login, true);
   assert.equal(file.direct_download_limit_bytes, 4);
+});
+
+test('a real file mutation during reading does not hide other stable exports', async (context) => {
+  const f = await fixture({
+    downloadUrl: 'https://example.test/download/',
+    downloadSigningKey: 'a'.repeat(64),
+  });
+  const changing = path.join(f.root, 'changing.step');
+  await fs.writeFile(changing, 'changing');
+  await fs.writeFile(path.join(f.root, 'stable.step'), 'stable');
+  const handle = await fs.open(changing, 'r');
+  const prototype: FileHandle = Object.getPrototypeOf(handle);
+  const original = prototype.read;
+  await handle.close();
+  let mutated = false;
+  context.mock.method(
+    prototype,
+    'read',
+    async function (
+      this: FileHandle,
+      buffer: Buffer,
+      offset: number,
+      length: number,
+      position: number,
+    ) {
+      const result = await original.bind(this)(buffer, offset, length, position);
+      if (!mutated && buffer.subarray(0, 8).toString() === 'changing') {
+        mutated = true;
+        await fs.appendFile(changing, '-in-progress');
+      }
+      return result;
+    },
+  );
+  const result = await f.client.callTool({ name: 'workspace_files', arguments: {} });
+  assert.notEqual(result.isError, true);
+  assert.equal(mutated, true);
+  assert.ok(Array.isArray(result.content));
+  const block = result.content.find((item) => item.type === 'text');
+  assert.ok(block && block.type === 'text');
+  const files = JSON.parse(block.text).files as {
+    filename: string;
+    download_url: string;
+    download_status?: string;
+    download_requires_login?: boolean;
+  }[];
+  const transient = files.find((file) => file.filename === 'changing.step');
+  assert.equal(transient?.download_status, 'FILE_IS_CHANGING');
+  assert.equal(transient?.download_requires_login, true);
+  const stable = files.find((file) => file.filename === 'stable.step');
+  assert.ok(stable);
+  assert.equal((await fetch(localDownload(f, stable.download_url))).status, 200);
 });
 
 test('downloads retain their slot until the response finishes or closes', async (context) => {
