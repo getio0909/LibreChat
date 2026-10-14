@@ -15,6 +15,8 @@ RUN groupadd --gid 10001 cad && useradd --uid 10001 --gid 10001 --create-home ca
 ENV HOME=/home/cad
 # 原镜像遗漏了桥接依赖；每个 MCP 会话复用容器入口维护的同一个 CAD 进程。
 RUN sed -i '/^"${FREECAD_MCP_FREECAD_BIN}" /d; /^FC_PID=/d' /usr/local/bin/docker-entrypoint.sh
+COPY deploy/cad_check.py /opt/freecad-mcp/cad_check.py
+RUN printf '\nimport cad_check\nNOTES = cad_check.extend_notes(NOTES)\n' >> /opt/freecad-mcp/usage_guidance.py
 COPY deploy/freecad.sh /opt/freecad-mcp/start.sh
 USER 10001:10001
 ENTRYPOINT ["bash", "/opt/freecad-mcp/start.sh"]

@@ -8,6 +8,10 @@ export const imageInput = z.object({
   aspect_ratio: z.enum(['1:1', '3:2', '2:3', '16:9', '9:16']).default('1:1'),
   size: z.enum(['1K', '2K', '4K']).default('2K'),
   reference_filenames: z.array(z.string()).max(4).default([]),
+  save_filename: z
+    .string()
+    .regex(/\.(png|jpg|jpeg|webp)$/i)
+    .optional(),
 });
 type ImageInput = z.infer<typeof imageInput>;
 export interface ImageData {

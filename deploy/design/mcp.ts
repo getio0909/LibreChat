@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import path from 'node:path';
-import * as fs from 'node:fs/promises';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { RequestListener } from 'node:http';
@@ -9,9 +7,19 @@ import type { ImageProvider, ImageData } from './images.ts';
 import type { Settings } from './config.ts';
 import type { PdfSource } from './parse.ts';
 import { ToolFailure } from './config.ts';
-import { fileType, fileInfo, listWorkspace, readWorkspace, writePdf } from './files.ts';
+import {
+  ensureAvailable,
+  fileType,
+  fileInfo,
+  listWorkspace,
+  readWorkspace,
+  writeImage,
+  writePdf,
+  writeSvg,
+} from './files.ts';
 import { imageInput, compactImage } from './images.ts';
 import { drawingPdf, drawingRegion, normalizeDrawingPdf, pdfPreview } from './pdf.ts';
+import { compileDrawingSheet, drawingSheetInputSchema } from './sheet.ts';
 import { serveDownload } from './download.ts';
 import { pdfTask } from './parse.ts';
 
@@ -85,7 +93,11 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             : signal.aborted
               ? 'REQUEST_CANCELLED'
               : 'DESIGN_TOOL_UNAVAILABLE';
-        return { ...text({ ok: false, error: { code } }), isError: true };
+        const message = error instanceof ToolFailure ? error.detail : undefined;
+        return {
+          ...text({ ok: false, error: message ? { code, message } : { code } }),
+          isError: true,
+        };
       } finally {
         activeJobs -= 1;
       }
@@ -98,6 +110,60 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         inputSchema: {},
       },
       () => run(async () => text(await listWorkspace(settings))),
+    );
+    server.registerTool(
+      'compile_drawing_sheet',
+      {
+        description:
+          'Compile a deterministic, production-grade CAD engineering drawing sheet (A3 420x297mm default) into a self-contained physical UTF-8 SVG in /tmp/cad (and optionally export a vector PDF in the same step), with automatic dimension-chain closure verification, standard ISO/GB lineweights, 45°/135° section hatching, traditional fretwork/meander motifs, 1:1 joinery/hardware detail blocks, BOM/hardware schedule tables, and factory title blocks. Prefer this tool over hand-writing raw SVG markup whenever preparing production drawing sets (such as ZG-01 General Arrangement, ZG-02 Carcass Dimensions & Sections, ZG-03 Part Fabrication & Joinery Details, ZG-04 BOM, Hardware Schedule & Technical Requirements). If a chain_dim with expected_total does not sum to expected_total, DIMENSION_CHAIN_MISMATCH is returned so you can fix the dimensions before publishing. Existing files are preserved (FILE_EXISTS requires a new revision filename). After compiling all sheets in a multi-sheet set, combine them with assemble_drawing_pdf.',
+        inputSchema: drawingSheetInputSchema,
+      },
+      (raw) =>
+        run(async () => {
+          if (fileType(raw.svg_filename) !== 'image/svg+xml') {
+            throw new ToolFailure('SVG_SHEET_REQUIRED');
+          }
+          await ensureAvailable(settings, raw.svg_filename);
+          if (raw.pdf_filename) {
+            if (fileType(raw.pdf_filename) !== 'application/pdf') {
+              throw new ToolFailure('PDF_REQUIRED');
+            }
+            await ensureAvailable(settings, raw.pdf_filename);
+          }
+          const compiled = compileDrawingSheet(raw);
+          const pdfBytes = await drawingPdf(
+            compiled.svgBytes,
+            settings,
+            signal,
+            compiled.paper,
+            true,
+          );
+          if (pdfBytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+          const { preview } = await pdfPreview(pdfBytes, settings, signal);
+          const image = await compactImage(
+            { bytes: preview, mimeType: 'image/png' },
+            settings.maxImageBytes,
+            settings.maxImagePixels,
+          );
+          await writeSvg(settings, raw.svg_filename, compiled.svgBytes, signal);
+          const pdfInfo = raw.pdf_filename
+            ? (await writePdf(settings, raw.pdf_filename, pdfBytes, signal),
+              fileInfo(settings, raw.pdf_filename, pdfBytes))
+            : undefined;
+          return {
+            content: [
+              ...text({
+                ...fileInfo(settings, raw.svg_filename, compiled.svgBytes),
+                pdf: pdfInfo,
+                layout: 'sheet',
+                page_size_mm: [compiled.paper.widthMm, compiled.paper.heightMm],
+                verification: compiled.verification,
+                preview_source: 'finished_pdf',
+              }).content,
+              { type: 'image', data: image.bytes.toString('base64'), mimeType: image.mimeType },
+            ],
+          };
+        }),
     );
     server.registerTool(
       'export_drawing_pdf',
@@ -356,6 +422,9 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         (raw) =>
           run(async () => {
             const input = imageInput.parse(raw);
+            if (input.save_filename) {
+              await ensureAvailable(settings, input.save_filename);
+            }
             const references: ImageData[] = [];
             for (const filename of input.reference_filenames) {
               const mimeType = fileType(filename);
@@ -363,11 +432,25 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
                 throw new ToolFailure('IMAGE_REQUIRED');
               references.push({ bytes: await readWorkspace(settings, filename), mimeType });
             }
+            const generated = await provider.generate(input, references, signal);
             const result = await compactImage(
-              await provider.generate(input, references, signal),
+              generated,
               settings.maxImageBytes,
               settings.maxImagePixels,
             );
+            if (input.save_filename) {
+              await writeImage(settings, input.save_filename, result.bytes, signal);
+              return {
+                content: [
+                  ...text(fileInfo(settings, input.save_filename, result.bytes)).content,
+                  {
+                    type: 'image',
+                    data: result.bytes.toString('base64'),
+                    mimeType: result.mimeType,
+                  },
+                ],
+              };
+            }
             // 标准 MCP 图片输出由 LibreChat 自身保存并展示，避免重复上传图片。
             return {
               content: [

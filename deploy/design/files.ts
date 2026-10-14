@@ -179,3 +179,70 @@ export async function writePdf(
     await fs.rm(staged, { force: true });
   }
 }
+
+export async function ensureAvailable(settings: Settings, filename: string): Promise<void> {
+  fileType(filename);
+  const target = path.join(settings.workspace, filename);
+  try {
+    await fs.lstat(target);
+    throw new ToolFailure('FILE_EXISTS');
+  } catch (error) {
+    if (error instanceof ToolFailure) throw error;
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return;
+    throw error;
+  }
+}
+
+export async function writeSvg(
+  settings: Settings,
+  filename: string,
+  bytes: Buffer,
+  signal: AbortSignal,
+  publish: typeof fs.link = fs.link,
+): Promise<void> {
+  if (fileType(filename) !== 'image/svg+xml') throw new ToolFailure('SVG_SHEET_REQUIRED');
+  if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+  signal.throwIfAborted();
+  const staged = path.join(settings.workspace, `.${randomUUID()}.tmp`);
+  const target = path.join(settings.workspace, filename);
+  try {
+    await fs.writeFile(staged, bytes, { flag: 'wx', mode: 0o644, signal });
+    signal.throwIfAborted();
+    await publish(staged, target);
+    signal.throwIfAborted();
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
+      throw new ToolFailure('FILE_EXISTS');
+    throw error;
+  } finally {
+    await fs.rm(staged, { force: true });
+  }
+}
+
+export async function writeImage(
+  settings: Settings,
+  filename: string,
+  bytes: Buffer,
+  signal: AbortSignal,
+  publish: typeof fs.link = fs.link,
+): Promise<void> {
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(fileType(filename))) {
+    throw new ToolFailure('IMAGE_REQUIRED');
+  }
+  if (bytes.length > settings.maxFileBytes) throw new ToolFailure('FILE_TOO_LARGE');
+  signal.throwIfAborted();
+  const staged = path.join(settings.workspace, `.${randomUUID()}.tmp`);
+  const target = path.join(settings.workspace, filename);
+  try {
+    await fs.writeFile(staged, bytes, { flag: 'wx', mode: 0o644, signal });
+    signal.throwIfAborted();
+    await publish(staged, target);
+    signal.throwIfAborted();
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'EEXIST')
+      throw new ToolFailure('FILE_EXISTS');
+    throw error;
+  } finally {
+    await fs.rm(staged, { force: true });
+  }
+}

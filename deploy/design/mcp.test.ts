@@ -2937,3 +2937,239 @@ test('pdfTask enforces shared resource isolation, color spaces, metadata cleanup
     );
   }
 });
+
+test('compile_drawing_sheet compiles verified A3 production sheets and rejects unclosed dimension chains', async () => {
+  const f = await fixture();
+  const mismatch = await f.client.callTool({
+    name: 'compile_drawing_sheet',
+    arguments: {
+      svg_filename: 'bad-chain.svg',
+      title_block: {
+        project_name: '中式禅意背柜',
+        sheet_title: '柜体尺寸与剖面图',
+        drawing_no: 'ZG-02',
+      },
+      views: [
+        {
+          id: 'front',
+          title: '正立面尺寸图',
+          scale: '1:15',
+          origin_mm: [28, 42],
+          rects: [{ x: 0, y: 0, w: 2000, h: 2200, style: 'solid' }],
+          chain_dims: [
+            {
+              orientation: 'horizontal',
+              start: 0,
+              anchor: 0,
+              offset_mm: -8,
+              segments: [18, 646, 18, 636, 18, 646, 18],
+              expected_total: 2050,
+            },
+          ],
+        },
+      ],
+    },
+  });
+  assert.equal(mismatch.isError, true);
+  assert.match(JSON.stringify(mismatch), /DIMENSION_CHAIN_MISMATCH/);
+  await assert.rejects(fs.stat(path.join(f.root, 'bad-chain.svg')), { code: 'ENOENT' });
+
+  const sheet1 = await f.client.callTool({
+    name: 'compile_drawing_sheet',
+    arguments: {
+      svg_filename: 'ZG-01.svg',
+      pdf_filename: 'ZG-01.pdf',
+      title_block: {
+        project_name: '佛堂供奉背柜 2000×350×2200',
+        sheet_title: '总体布置图与立面剖面',
+        drawing_no: 'ZG-01',
+        revision: 'A',
+        scale: '1:15 / 1:1',
+        sheet_index: 1,
+        sheet_total: 2,
+      },
+      views: [
+        {
+          id: 'front',
+          title: '正立面图 (FRONT)',
+          subtitle: '外廓 2000×2200 mm · 中轴对称',
+          scale: '1:15',
+          origin_mm: [24, 42],
+          rects: [
+            { x: 0, y: 0, w: 2000, h: 2200, style: 'solid' },
+            { x: 18, y: 18, w: 1964, h: 120, style: 'hatch45', label: 'P01 顶帽檐' },
+          ],
+          fretwork: [{ x: 18, y: 140, w: 1964, h: 80, cells: 12, motif: 'meander' }],
+          lines: [{ x1: 1000, y1: -40, x2: 1000, y2: 2240, style: 'center' }],
+          circles: [{ cx: 500, cy: 1800, r: 18, crosshair: true, label: 'Ø35杯孔' }],
+          ellipses: [
+            { cx: 1000, cy: 700, rx: 320, ry: 280, crosshair: true, label: '月洞门椭圆拱' },
+          ],
+          arcs: [{ cx: 18, cy: 1800, r: 450, start_deg: 0, end_deg: 90, style: 'hidden' }],
+          paths: [{ d: 'M 40 220 Q 1000 60 1960 220', style: 'solid' }],
+          radial_dims: [{ cx: 1000, cy: 700, r: 320, angle_deg: 45, mode: 'radius' }],
+          section_marks: [
+            {
+              orientation: 'vertical',
+              position_model: 1000,
+              start_model: 0,
+              end_model: 2200,
+              label: 'A',
+              direction: 'right',
+            },
+          ],
+          linear_dims: [
+            {
+              orientation: 'horizontal',
+              start: 0,
+              end: 2000,
+              anchor: 2200,
+              offset_mm: 10,
+              value: 2000,
+            },
+          ],
+          chain_dims: [
+            {
+              orientation: 'horizontal',
+              start: 0,
+              anchor: 0,
+              offset_mm: -7,
+              segments: [18, 646, 18, 636, 18, 646, 18],
+              expected_total: 2000,
+              show_total: true,
+            },
+          ],
+          elevation_ladders: [
+            {
+              x_model: 2000,
+              datum_y_model: 2200,
+              direction: 'up',
+              offset_mm: 12,
+              levels: [
+                { elevation: 0 },
+                { elevation: 124 },
+                { elevation: 950 },
+                { elevation: 2200 },
+              ],
+            },
+          ],
+          part_tags: [{ x: 18, y: 500, tag: 'P02', label: '外侧板 δ18' }],
+        },
+      ],
+      details: [
+        {
+          id: 'd1',
+          type: 'dowel_cam_joint',
+          title: '节点 A：侧板—层板三合一与木榫连接',
+          scale_label: '1:1',
+          x_mm: 215,
+          y_mm: 32,
+          w_mm: 190,
+          h_mm: 68,
+        },
+        {
+          id: 'd2',
+          type: 'custom_profile_detail',
+          title: '节点 B：飞檐翘头异形线脚 1:1 截面',
+          scale_label: '1:1',
+          x_mm: 215,
+          y_mm: 104,
+          w_mm: 190,
+          h_mm: 68,
+          polylines: [
+            {
+              points: [
+                [4, 4],
+                [46, 4],
+                [54, 14],
+                [42, 26],
+                [4, 26],
+              ],
+              closed: true,
+              style: 'hatch45',
+            },
+          ],
+          paths: [{ d: 'M 4 26 Q 28 34 54 14', style: 'solid' }],
+          notes: ['飞檐翘头 R18 弧形线脚截面，按 STEP 曲面精雕'],
+        },
+      ],
+      tables: [
+        {
+          title: '零件明细表 (BOM) 与五金汇总',
+          subtitle: '净尺寸 顺纹长×宽×厚 (mm)',
+          x_mm: 215,
+          y_mm: 176,
+          columns: [
+            { header: '代号', width_mm: 18, align: 'center' },
+            { header: '名称', width_mm: 42, align: 'left' },
+            { header: '净尺寸 (长×宽×厚)', width_mm: 52, align: 'center' },
+            { header: '数量', width_mm: 18, align: 'center' },
+            { header: '封边及工艺备注', width_mm: 60, align: 'left' },
+          ],
+          rows: [
+            ['P01', '顶底板', '2000×350×25', '2', '四边1mm胡桃木皮封边'],
+            ['P02', '左右外侧板', '2026×350×18', '2', '后缘8×9止口槽，32mm系统排孔'],
+          ],
+          footer_note: '注：表中尺寸为成品净尺寸，开料另加加工余量。',
+        },
+      ],
+      note_boxes: [
+        {
+          title: '技术要求与尺寸深化基准',
+          x_mm: 14,
+          y_mm: 242,
+          w_mm: 192,
+          items: [
+            '1. 客户给定基准：外廓总尺 2000×350×2200 mm；板厚、止口及门缝为工程闭合推演值。',
+            '2. 未注线性公差 ±0.5mm，框体对角线差 ≤1.5mm；出厂前须完成厂内试组装校核。',
+          ],
+        },
+      ],
+    },
+  });
+  assert.equal(sheet1.isError, undefined);
+  const info = JSON.parse(
+    CallToolResultSchema.parse(sheet1).content.find((item) => item.type === 'text')?.text ?? '{}',
+  );
+  assert.deepEqual(info.page_size_mm, [420, 297]);
+  assert.equal(info.verification.verified_dimension_chains.length, 1);
+  assert.equal(info.verification.verified_dimension_chains[0].sum_mm, 2000);
+  assert.equal(info.verification.verified_linear_dims, 2);
+  assert.ok(info.pdf?.download_url);
+});
+
+test('image generation supports save_filename and subsequent reference_filenames image-to-image chaining', async () => {
+  const png = await sharp({ create: { width: 16, height: 16, channels: 3, background: 'white' } })
+    .png()
+    .toBuffer();
+  const requests: { url: string; body: Record<string, unknown> }[] = [];
+  const request: Request = async (url, options) => {
+    requests.push({ url: String(url), body: JSON.parse(String(options?.body ?? '{}')) });
+    return Response.json({ data: [{ b64_json: png.toString('base64') }] });
+  };
+  const f = await fixture({ arkApiKey: 'provider-secret' }, request);
+  const first = await f.client.callTool({
+    name: 'seedream_image',
+    arguments: {
+      prompt: 'Buddhist altar cabinet base concept',
+      size: '2K',
+      save_filename: 'concept-v1.png',
+    },
+  });
+  assert.equal(first.isError, undefined);
+  const savedStat = await fs.stat(path.join(f.root, 'concept-v1.png'));
+  assert.ok(savedStat.size > 0);
+
+  const second = await f.client.callTool({
+    name: 'seedream_image',
+    arguments: {
+      prompt: 'Add carved lotus pedestal and moon-gate lattice',
+      size: '2K',
+      reference_filenames: ['concept-v1.png'],
+      save_filename: 'concept-v2.png',
+    },
+  });
+  assert.equal(second.isError, undefined);
+  assert.ok(Array.isArray(requests[1].body.image));
+  assert.equal((requests[1].body.image as string[]).length, 1);
+});

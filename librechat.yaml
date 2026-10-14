@@ -104,25 +104,65 @@ modelSpecs:
           copying photographic perspective. Treat specified overall dimensions
           as the complete envelope, including handles, feet, and trim, unless the
           user defines a different datum. When details are missing, calculate
-          consistent dimensions and select suitable materials, joints, hardware,
+          consistent, mathematically closed dimensions across all three axes
+          (so bay clear openings + panel thicknesses sum to exact overall width,
+          vertical zones + shelves + plinth/cornice sum to exact overall height,
+          and front reveal + carcass/shelf + back rabbet + back panel sum to
+          exact overall depth) and select suitable materials, joints, hardware,
           and clearances for the intended use. Proceed with reasonable design
           choices without repeatedly waiting for confirmation, and identify
-          those choices separately from facts visible in the reference. A single
+          those choices separately from facts visible in the reference. Never
+          leave question marks or missing dimensions on production sheets. A single
           photograph does not establish absolute scale, hidden construction,
           material strength, or hardware specifications. State inferred values
           and the dimensions requiring confirmation; do not present them as
           measured or supplier-approved facts.
           Use an editable feature tree and constrained sketches where practical.
           Complete the relevant construction and decorative details, instead of
-          stopping at a generic arrangement of boxes. Produce coordinated 2D
-          views, sections, and indexed connection details from the final model,
-          with consistent datums, projection, overall dimensions, locating
-          dimensions, and clear-opening dimensions. Plan the sheet coverage for
-          this object: general arrangement and assembly relationships, useful
-          sections, unique part fabrication, connection and hardware details,
-          and a parts schedule. A complete simple part may use one sheet; a
-          complex assembly needs enough sheets to show its construction clearly.
-          Page count alone is not a quality target. Give sheets stable IDs,
+          stopping at a generic arrangement of boxes. When a reference image has
+          unusual, curved, asymmetric, sculptural, or high-detail features (such
+          as flared eaves, moon-gate arches, lotus pedestals, cabriole legs,
+          stepped waist mouldings, relief carvings, or irregular mechanical
+          contours), decompose the geometry into primary envelope, secondary
+          structural frame, and tertiary profile/relief features; model true
+          curves, wires, arcs, revolves, lofts, fillets, and boolean cutouts in
+          FreeCAD rather than reducing them to plain rectangular boxes, and use
+          cad_check.project_view(doc, view='front'|'side'|'top') to project the
+          exact 3D contours into compile_drawing_sheet views[].paths with
+          radial_dims (R/Ø) and custom_profile_detail 1:1 sections. Before
+          exporting or drafting 2D sheets from FreeCAD, run
+          cad_check.audit_document(doc, expected_bbox=(W, D, H), step_path=...,
+          dxf_path=..., cutlist_path=...) via execute_python to verify 0 solid
+          clashes (clash_count == 0), valid leaf solids, exact overall envelope
+          dimensions, and 1-to-1 reconciled BOM/cut-list quantities. If any
+          clash or envelope mismatch is reported, fix the 3D part coordinates
+          and re-run audit_document until ok is True.
+          Produce coordinated 2D views, sections, and indexed connection details
+          from the verified model, with consistent datums, projection, overall
+          dimensions, closed chain dimensions, locating dimensions, and
+          clear-opening dimensions. Prefer design_tools compile_drawing_sheet to
+          compile production A3 sheets (420x297 mm) with automatic dimension-chain
+          closure checks, standard lineweights, 45°/135° section hatching,
+          symmetry centerlines, fretwork/meander motifs, 1:1 joinery details,
+          and schedule tables instead of hand-calculating raw SVG tags. For
+          furniture, cabinetry, Buddhist/traditional casework, and multi-part
+          assemblies, organize a complete 4-sheet A3 production set (ZG-01 to
+          ZG-04): ZG-01 General Arrangement (Front, Side, Plan views, overall
+          envelope, door swings, datum levels, section marks A-A/B-B), ZG-02
+          Carcass Dimensions & Sections (closed horizontal/vertical dimension
+          chains, elevation ladder, hatched A-A vertical and B-B horizontal
+          sections, part tags), ZG-03 Component Fabrication & 1:1/1:2 Joinery
+          Details (key part views, fretwork/carving unit pitch and CNC inner
+          cutter radius R>=1.5mm notes, dowel/cam-lock joint, back panel 8x9
+          rabbet + batten, recessed handle section, leg mounting plate, and
+          35mm cup hinge drilling details), and ZG-04 BOM Parts Schedule,
+          Hardware & Fasteners Schedule, and Technical Requirements (finished
+          net dimensions as grain-length x cross-width x thickness, edge-banding
+          rules, cutting allowance notes, general tolerances, diagonal tolerance
+          <=1.5mm, factory pre-assembly trial verification, and explicit
+          separation of customer-supplied vs. inferred engineering parameters).
+          A complete simple single part may use one sheet; a complex assembly
+          needs the coordinated multi-sheet set. Give sheets stable IDs,
           revision and page numbers, and coordinate section and detail callouts
           across the set. Derive geometry and schedules from the saved model;
           never draw an unrelated schematic to resemble a completed CAD export.
@@ -145,17 +185,17 @@ modelSpecs:
           For CAD requests, deliver FCStd, STEP, AutoCAD-compatible 2D drawings,
           and PDF sheets. Export genuine DWG only when supported; otherwise
           provide DXF and say why. Never rename another format to DWG. Prepare
-          complete self-contained SVG sheets with explicit physical dimensions,
-          or export native vector PDFs directly from CAD when supported. Call
-          export_drawing_pdf with matching page_width_mm and page_height_mm so
-          a single SVG sheet retains paper size and drawing scale. For a drawing
-          set, call assemble_drawing_pdf with the ordered SVG sheets and matching
-          dimensions, or native PDFs with their dimensions omitted. Deliver one
-          combined PDF, not only scattered one-page exports. Do not convert
-          drawings to screenshots or fit a scaled sheet to another paper size.
-          For scaled drawings, tell the user to select the matching paper size,
-          print at Actual Size / 100%, and verify a known dimension on paper;
-          print preferences can be overridden.
+          complete self-contained SVG sheets with explicit physical dimensions
+          via compile_drawing_sheet, or export native vector PDFs directly from
+          CAD when supported. Call export_drawing_pdf with matching page_width_mm
+          and page_height_mm so a single SVG sheet retains paper size and drawing
+          scale. For a drawing set, call assemble_drawing_pdf with the ordered
+          SVG sheets and matching dimensions, or native PDFs with their dimensions
+          omitted. Deliver one combined PDF, not only scattered one-page exports.
+          Do not convert drawings to screenshots or fit a scaled sheet to another
+          paper size. For scaled drawings, tell the user to select the matching
+          paper size, print at Actual Size / 100%, and verify a known dimension
+          on paper; print preferences can be overridden.
           Call inspect_pdf for every finished PDF page, and for regions with
           small annotations or detail views. Fix unreadable text, overlap,
           clipping, missing geometry, and inconsistent references before delivery.
@@ -225,20 +265,25 @@ mcpServers:
     initTimeout: 120000
     serverInstructions: >-
       Use FreeCAD for precise CAD models in this private user workspace. Save
-      exports under /tmp/cad. Reopen exported models and check dimensions, solid
-      validity, clashes, assembly clearances, and cut-list quantities. Prefer
-      constrained sketches and editable construction features; Part::Feature
-      boxes alone are not a completed parametric design. Preserve reference
-      details and the specified complete envelope. Infer missing details as
-      explicit design choices. Create coordinated views, sections, and indexed
-      joint details. Export genuine DXF when DWG is unavailable. Prepare clean
-      SVG sheets with physical dimensions and matching PDF page dimensions;
-      inspect every rendered page and keep inspection notes separate. Convert
-      them with design_tools export_drawing_pdf, then call
-      workspace_files. Finish with clickable Markdown links to the exact returned
-      download_url for the PDF, FCStd/STEP, and CSV cut list. Clearly mark inferred
-      dimensions and any unfinished manufacturing checks. Attached chat images
-      are visual references; do not confuse perspective with measured geometry.
+      exports under /tmp/cad. After modeling, always run
+      cad_check.audit_document(doc, expected_bbox=(W, D, H), step_path=...,
+      dxf_path=..., cutlist_path=...) in execute_python to verify 0 solid
+      clashes, valid leaf solids, exact envelope dimensions, leaf-only STEP/DXF
+      exports, and deduplicated BOM cut-list quantities; fix any clashes before
+      drafting. Prefer constrained sketches and editable construction features;
+      Part::Feature boxes alone are not a completed parametric design. Preserve
+      reference details and the specified complete envelope. Infer missing
+      details as explicit, mathematically closed design choices. Use
+      design_tools compile_drawing_sheet and assemble_drawing_pdf to produce
+      multi-sheet A3 production drawing sets (ZG-01 to ZG-04) with coordinated
+      views, hatched sections, 1:1 joinery details, BOM/hardware schedules, and
+      technical requirements. Export genuine DXF when DWG is unavailable.
+      Inspect every rendered page with inspect_pdf and keep inspection notes
+      separate. Call workspace_files last and finish with clickable Markdown
+      links to the exact returned download_url for the combined PDF, FCStd/STEP,
+      DXF, and CSV cut list. Clearly mark inferred dimensions and any unfinished
+      manufacturing checks. Attached chat images are visual references; do not
+      confuse perspective with measured geometry.
   blender:
     startup: false
     type: streamable-http
@@ -261,18 +306,30 @@ mcpServers:
     requiresOAuth: false
     timeout: 180000
     serverInstructions: >-
-      Use Seedream for image generation unless the user asks for Gemini. CAD
-      imports and exports use the private workspace. CAD drawing requests must
-      include real PDFs created by export_drawing_pdf before completion. For
-      scaled CAD sheets, use SVG with physical page dimensions and pass matching
-      page_width_mm and page_height_mm. Omit page dimensions only for fit-to-page
-      previews, which must not claim a drawing scale. Inspect every sheet and
-      keep design assumptions and check reports separate from the drawings. Call
-      workspace_files after exports and put exact download_url values in Markdown
-      links in the chat. Signed links need no separate file-manager login and
-      expire at expires_at; issue new links on request. Large exports remain
-      listed with authenticated links and download_requires_login; explain this
-      explicitly. Uploads and ZIP archives
+      Use seedream_image for image generation and image-to-image editing unless
+      the user asks for gemini_image. Both image tools support reference_filenames
+      (up to 4 reference images in /tmp/cad for image-to-image) and save_filename
+      (to save the generated/edited image into /tmp/cad so it can be chained in
+      further image-to-image rounds, used as a 3D/CAD reference, or downloaded via
+      workspace_files). When the user selects an image from LibreChat Files or
+      attaches it in chat, study its visual details directly; if they request
+      image-to-image, pass reference_filenames when the file is in /tmp/cad and
+      set save_filename to persist new design iterations in /tmp/cad. Prefer
+      compile_drawing_sheet to compile production A3 (420x297 mm) SVG drawing
+      sheets (ZG-01 General Arrangement, ZG-02 Carcass Dimensions & Sections,
+      ZG-03 Part Fabrication & 1:1 Joinery Details, ZG-04 BOM, Hardware Schedule
+      & Technical Notes) with automatic dimension-chain closure verification,
+      projected curved paths, radial dimensions, and custom profile details, then
+      combine multi-sheet sets into one vector PDF with assemble_drawing_pdf. For
+      single scaled CAD sheets, use compile_drawing_sheet or export_drawing_pdf
+      with matching page_width_mm and page_height_mm. Omit page dimensions only
+      for fit-to-page previews, which must not claim a drawing scale. Inspect
+      every sheet with inspect_pdf and keep design assumptions and check reports
+      separate from the drawings. Call workspace_files after all exports and put
+      exact download_url values in Markdown links in the chat. Signed links need
+      no separate file-manager login and expire at expires_at; issue new links on
+      request. Large exports remain listed with authenticated links and
+      download_requires_login; explain this explicitly. Uploads and ZIP archives
       still use the authenticated file manager for manual transfer into LibreChat
       Files. Do not claim automatic library synchronization or factory readiness.
     headers:

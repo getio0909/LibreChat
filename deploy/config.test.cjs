@@ -125,5 +125,10 @@ test('CAD MCP transports use streamable-http and single-replica deployment arms 
 
   const dockerfile = fs.readFileSync('deploy/freecad.Dockerfile', 'utf8');
   assert.match(dockerfile, /"--outputTransport",\s*"streamableHttp",\s*"--stateful"/);
-});
+  assert.match(dockerfile, /COPY deploy\/cad_check\.py \/opt\/freecad-mcp\/cad_check\.py/);
 
+  const designDockerfile = fs.readFileSync('deploy/design.Dockerfile', 'utf8');
+  assert.match(designDockerfile, /deploy\/design\/sheet\.ts/);
+  assert.match(config.mcpServers.freecad.serverInstructions, /cad_check\.audit_document/);
+  assert.match(config.mcpServers.design_tools.serverInstructions, /compile_drawing_sheet/);
+});

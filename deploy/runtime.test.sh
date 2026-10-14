@@ -91,6 +91,8 @@ try {
   const cad = await connect('FreeCAD', new StreamableHTTPClientTransport(new URL(`http://freecad-${account}:8000/mcp`)));
   const native = data(await cad.callTool({ name: 'check_freecad_connection', arguments: {} }));
   assert.ok(native.instances.some(instance => instance.available));
+  const guidance = await cad.callTool({ name: 'get_usage_guidance', arguments: {} });
+  assert.match(JSON.stringify(guidance), /cad_check\.audit_document/);
   const blender = await connect('Blender', new StreamableHTTPClientTransport(new URL(`http://blender-${account}:10101/`)));
   await blender.callTool({ name: 'welcome', arguments: {} });
   const exported = data(await blender.callTool({ name: 'media_io', arguments: { verb: 'export', args: { format: 'stl', filename: 'cube.stl', objects: ['Cube'] } } }));
@@ -111,8 +113,9 @@ try {
   const upload = await fetch(fileUrl + 'drawing.svg', { method: 'PUT', headers, body: '<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect x="40" y="40" width="200" height="100" fill="none" stroke="black" stroke-width="0.3"/><text x="40" y="30" font-family="Noto Sans CJK SC" font-size="5">连接详图</text></svg>' });
   assert.ok(upload.ok);
   const design = await connect('Design', new StreamableHTTPClientTransport(new URL('http://127.0.0.1:8000/mcp'), { requestInit: { headers: { 'X-LibreChat-User-ID': settings.userId } } }));
+  data(await design.callTool({ name: 'compile_drawing_sheet', arguments: { svg_filename: 'compiled-sheet.svg', title_block: { project_name: '禅意博古柜', sheet_title: '总体布置图', drawing_no: 'ZG-01' }, views: [{ id: 'front', title: '正立面图', scale: '1:15', origin_mm: [24, 42], rects: [{ x: 0, y: 0, w: 2000, h: 2200 }], chain_dims: [{ orientation: 'horizontal', start: 0, anchor: 0, offset_mm: -8, segments: [18, 1964, 18], expected_total: 2000 }] }] } }));
   data(await design.callTool({ name: 'export_drawing_pdf', arguments: { source_filename: 'drawing.svg', pdf_filename: 'drawing.pdf', page_width_mm: 420, page_height_mm: 297 } }));
-  const set = data(await design.callTool({ name: 'assemble_drawing_pdf', arguments: { pdf_filename: 'set.pdf', sheets: [{ source_filename: 'drawing.pdf' }, { source_filename: 'drawing.svg', page_width_mm: 420, page_height_mm: 297 }] } }));
+  const set = data(await design.callTool({ name: 'assemble_drawing_pdf', arguments: { pdf_filename: 'set.pdf', sheets: [{ source_filename: 'drawing.pdf' }, { source_filename: 'compiled-sheet.svg', page_width_mm: 420, page_height_mm: 297 }] } }));
   assert.equal(set.page_count, 2);
   const document = await PDFDocument.load(await fs.readFile('/tmp/cad/set.pdf'));
   assert.equal(document.getPageCount(), 2);

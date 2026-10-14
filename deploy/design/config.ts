@@ -86,9 +86,11 @@ export type Request = typeof fetch;
 
 export class ToolFailure extends Error {
   readonly code: string;
-  constructor(code: string) {
-    super(code);
+  readonly detail?: string;
+  constructor(code: string, detail?: string) {
+    super(detail ? `${code}: ${detail}` : code);
     this.code = code;
+    this.detail = detail;
   }
 }
 
