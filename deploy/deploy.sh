@@ -140,14 +140,13 @@ fi
 # 验证真实协议握手和工具发现，避免代理正常但 CAD 服务实际不可用。
 cat > "$stage/checks.js" <<'NODE'
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { SSEClientTransport } = require('@modelcontextprotocol/sdk/client/sse.js');
 const { StreamableHTTPClientTransport } = require('@modelcontextprotocol/sdk/client/streamableHttp.js');
 (async () => {
   const accounts = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));
   for (const account of ['admin', 'user']) {
    const id = process.env[`CAD_${account.toUpperCase()}_USER_ID`];
    for (const [name, transport] of [
-    [`FreeCAD ${account}`, new SSEClientTransport(new URL(`http://freecad-${account}:8000/sse`))],
+    [`FreeCAD ${account}`, new StreamableHTTPClientTransport(new URL(`http://freecad-${account}:8000/mcp`))],
     [`Blender ${account}`, new StreamableHTTPClientTransport(new URL(`http://blender-${account}:10101/`))],
     [`Design ${account}`, new StreamableHTTPClientTransport(new URL(`http://design-${account}:8000/mcp`), { requestInit: { headers: { 'X-LibreChat-User-ID': id } } })],
    ]) {

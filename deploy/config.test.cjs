@@ -111,3 +111,19 @@ test('manual CAD uploads are stored without parsing binary files as model contex
     );
   }
 });
+
+test('CAD MCP transports use streamable-http and single-replica deployment arms schedules cleanly', () => {
+  const config = configSchema.parse(yaml.load(fs.readFileSync('librechat.yaml', 'utf8')));
+  assert.equal(config.mcpServers.freecad.type, 'streamable-http');
+  assert.equal(config.mcpServers.freecad.url, 'http://freecad-{{LIBRECHAT_USER_ID}}:8000/mcp');
+  assert.ok(config.mcpServers.freecad.sseReadTimeout >= 600000);
+  assert.equal(config.mcpServers.blender.type, 'streamable-http');
+  assert.equal(config.mcpServers.design_tools.type, 'streamable-http');
+
+  const compose = yaml.load(fs.readFileSync('deploy/compose.yml', 'utf8'));
+  assert.equal(compose.services.api.environment.SCHEDULES_SINGLE_PROCESS, 'true');
+
+  const dockerfile = fs.readFileSync('deploy/freecad.Dockerfile', 'utf8');
+  assert.match(dockerfile, /"--outputTransport",\s*"streamableHttp",\s*"--stateful"/);
+});
+

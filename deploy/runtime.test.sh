@@ -67,7 +67,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import dns from 'node:dns/promises';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
 const account = process.env.ACCOUNT;
@@ -89,7 +88,7 @@ function data(result) {
   return JSON.parse(result.content.find(item => item.type === 'text').text);
 }
 try {
-  const cad = await connect('FreeCAD', new SSEClientTransport(new URL(`http://freecad-${account}:8000/sse`)));
+  const cad = await connect('FreeCAD', new StreamableHTTPClientTransport(new URL(`http://freecad-${account}:8000/mcp`)));
   const native = data(await cad.callTool({ name: 'check_freecad_connection', arguments: {} }));
   assert.ok(native.instances.some(instance => instance.available));
   const blender = await connect('Blender', new StreamableHTTPClientTransport(new URL(`http://blender-${account}:10101/`)));

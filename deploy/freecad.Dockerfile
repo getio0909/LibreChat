@@ -18,4 +18,4 @@ RUN sed -i '/^"${FREECAD_MCP_FREECAD_BIN}" /d; /^FC_PID=/d' /usr/local/bin/docke
 COPY deploy/freecad.sh /opt/freecad-mcp/start.sh
 USER 10001:10001
 ENTRYPOINT ["bash", "/opt/freecad-mcp/start.sh"]
-CMD ["--stdio", "docker-entrypoint.sh", "--outputTransport", "sse", "--port", "8000", "--healthEndpoint", "/health"]
+CMD ["--stdio", "docker-entrypoint.sh", "--outputTransport", "streamableHttp", "--stateful", "--port", "8000", "--healthEndpoint", "/health"]

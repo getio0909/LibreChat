@@ -217,10 +217,11 @@ mcpSettings:
 mcpServers:
   freecad:
     startup: false
-    type: sse
-    url: http://freecad-{{LIBRECHAT_USER_ID}}:8000/sse
+    type: streamable-http
+    url: http://freecad-{{LIBRECHAT_USER_ID}}:8000/mcp
     requiresOAuth: false
     timeout: 180000
+    sseReadTimeout: 600000
     initTimeout: 120000
     serverInstructions: >-
       Use FreeCAD for precise CAD models in this private user workspace. Save
