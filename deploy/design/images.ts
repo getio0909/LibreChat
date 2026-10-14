@@ -40,14 +40,49 @@ export async function compactImage(
   image: ImageData,
   limit: number,
   maxImagePixels: number,
+  targetMimeType?: string,
 ): Promise<ImageData> {
   if (!image.bytes.length) throw new ToolFailure('IMAGE_PROVIDER_NO_IMAGE');
   const decoded = sharp(image.bytes, { limitInputPixels: maxImagePixels });
-  await decoded.metadata();
-  if (image.bytes.length <= limit) return image;
-  const bytes = await decoded.jpeg().toBuffer();
-  if (bytes.length > limit) throw new ToolFailure('IMAGE_TOO_LARGE');
-  return { bytes, mimeType: 'image/jpeg' };
+  const meta = await decoded.metadata();
+  const actualMime =
+    meta.format === 'jpeg'
+      ? 'image/jpeg'
+      : meta.format === 'webp'
+        ? 'image/webp'
+        : meta.format === 'png'
+          ? 'image/png'
+          : image.mimeType;
+  if (targetMimeType && targetMimeType !== actualMime) {
+    const converted =
+      targetMimeType === 'image/png'
+        ? await decoded.png().toBuffer()
+        : targetMimeType === 'image/webp'
+          ? await decoded.webp().toBuffer()
+          : await decoded.jpeg().toBuffer();
+    if (converted.length > limit) {
+      if (targetMimeType === 'image/png') {
+        const quantized = await decoded.png({ compressionLevel: 9, palette: true }).toBuffer();
+        if (quantized.length <= limit) return { bytes: quantized, mimeType: 'image/png' };
+      }
+      throw new ToolFailure('IMAGE_TOO_LARGE');
+    }
+    return { bytes: converted, mimeType: targetMimeType };
+  }
+  if (image.bytes.length <= limit) return { bytes: image.bytes, mimeType: actualMime };
+  if (targetMimeType === 'image/png') {
+    const quantized = await decoded.png({ compressionLevel: 9, palette: true }).toBuffer();
+    if (quantized.length <= limit) return { bytes: quantized, mimeType: 'image/png' };
+    throw new ToolFailure('IMAGE_TOO_LARGE');
+  }
+  const fallbackMime = targetMimeType === 'image/webp' ? 'image/webp' : 'image/jpeg';
+  const bytes =
+    fallbackMime === 'image/webp'
+      ? await decoded.webp().toBuffer()
+      : await decoded.jpeg().toBuffer();
+  if (bytes.length > limit || (targetMimeType && targetMimeType !== fallbackMime))
+    throw new ToolFailure('IMAGE_TOO_LARGE');
+  return { bytes, mimeType: fallbackMime };
 }
 
 export function imageProviders(settings: Settings, request: Request = fetch): ImageProvider[] {

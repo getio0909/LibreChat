@@ -17,7 +17,18 @@ export function render(
     const child = execFile(
       'prlimit',
       [`--as=${maxMemoryBytes}`, '--', command, ...args],
-      { encoding: 'buffer', maxBuffer: maxBytes, signal, killSignal: 'SIGKILL' },
+      {
+        encoding: 'buffer',
+        maxBuffer: maxBytes,
+        signal,
+        killSignal: 'SIGKILL',
+        env: {
+          ...process.env,
+          MALLOC_ARENA_MAX: '1',
+          RAYON_NUM_THREADS: '1',
+          OMP_NUM_THREADS: '1',
+        },
+      },
       (error, stdout) => {
         result = { error, stdout };
       },

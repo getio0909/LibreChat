@@ -3005,8 +3005,11 @@ test('compile_drawing_sheet compiles verified A3 production sheets and rejects u
           ellipses: [
             { cx: 1000, cy: 700, rx: 320, ry: 280, crosshair: true, label: '月洞门椭圆拱' },
           ],
-          arcs: [{ cx: 18, cy: 1800, r: 450, start_deg: 0, end_deg: 90, style: 'hidden' }],
-          paths: [{ d: 'M 40 220 Q 1000 60 1960 220', style: 'solid' }],
+          arcs: [
+            { cx: 18, cy: 1800, r: 450, start_deg: 0, end_deg: 90, style: 'hidden' },
+            { cx: 1000, cy: 700, r: 300, start_deg: 0, end_deg: 360, style: 'thin' },
+          ],
+          paths: [{ d: 'M 40 220 Q 1000 60 1960 220 Z', style: 'hatch45' }],
           radial_dims: [{ cx: 1000, cy: 700, r: 320, angle_deg: 45, mode: 'radius' }],
           section_marks: [
             {
@@ -3136,6 +3139,27 @@ test('compile_drawing_sheet compiles verified A3 production sheets and rejects u
   assert.equal(info.verification.verified_dimension_chains[0].sum_mm, 2000);
   assert.equal(info.verification.verified_linear_dims, 2);
   assert.ok(info.pdf?.download_url);
+
+  const compiledSvg = await fs.readFile(path.join(f.root, 'ZG-01.svg'), 'utf8');
+  assert.ok(!compiledSvg.includes('scale(0.07)'));
+  assert.match(
+    compiledSvg,
+    /<path d="M 26\.67 56\.67 Q 90\.67 46 154\.67 56\.67 Z" fill="url\(#hatch45\)"/,
+  );
+
+  const inspectedSheet = await f.client.callTool({
+    name: 'inspect_drawing',
+    arguments: {
+      source_filename: 'ZG-01.svg',
+      page_width_mm: 420,
+      page_height_mm: 297,
+      left_mm: 210,
+      top_mm: 30,
+      width_mm: 195,
+      height_mm: 145,
+    },
+  });
+  assert.equal(inspectedSheet.isError, undefined);
 });
 
 test('image generation supports save_filename and subsequent reference_filenames image-to-image chaining', async () => {
@@ -3166,10 +3190,12 @@ test('image generation supports save_filename and subsequent reference_filenames
       prompt: 'Add carved lotus pedestal and moon-gate lattice',
       size: '2K',
       reference_filenames: ['concept-v1.png'],
-      save_filename: 'concept-v2.png',
+      save_filename: 'concept-v2.jpg',
     },
   });
   assert.equal(second.isError, undefined);
   assert.ok(Array.isArray(requests[1].body.image));
   assert.equal((requests[1].body.image as string[]).length, 1);
+  const savedJpgMeta = await sharp(path.join(f.root, 'concept-v2.jpg')).metadata();
+  assert.equal(savedJpgMeta.format, 'jpeg');
 });

@@ -90,9 +90,13 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         const code =
           error instanceof ToolFailure
             ? error.code
-            : signal.aborted
-              ? 'REQUEST_CANCELLED'
-              : 'DESIGN_TOOL_UNAVAILABLE';
+            : error instanceof Error &&
+                'code' in error &&
+                (error as NodeJS.ErrnoException).code === 'ENOENT'
+              ? 'FILE_NOT_FOUND'
+              : signal.aborted
+                ? 'REQUEST_CANCELLED'
+                : 'DESIGN_TOOL_UNAVAILABLE';
         const message = error instanceof ToolFailure ? error.detail : undefined;
         return {
           ...text({ ok: false, error: message ? { code, message } : { code } }),
@@ -145,11 +149,11 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
             settings.maxImageBytes,
             settings.maxImagePixels,
           );
-          await writeSvg(settings, raw.svg_filename, compiled.svgBytes, signal);
           const pdfInfo = raw.pdf_filename
             ? (await writePdf(settings, raw.pdf_filename, pdfBytes, signal),
               fileInfo(settings, raw.pdf_filename, pdfBytes))
             : undefined;
+          await writeSvg(settings, raw.svg_filename, compiled.svgBytes, signal);
           return {
             content: [
               ...text({
@@ -422,6 +426,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
         (raw) =>
           run(async () => {
             const input = imageInput.parse(raw);
+            const targetMime = input.save_filename ? fileType(input.save_filename) : undefined;
             if (input.save_filename) {
               await ensureAvailable(settings, input.save_filename);
             }
@@ -437,6 +442,7 @@ export function createHandler(settings: Settings, providers: ImageProvider[]): R
               generated,
               settings.maxImageBytes,
               settings.maxImagePixels,
+              targetMime,
             );
             if (input.save_filename) {
               await writeImage(settings, input.save_filename, result.bytes, signal);

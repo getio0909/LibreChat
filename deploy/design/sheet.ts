@@ -218,9 +218,10 @@ export const drawingSheetInputSchema = {
               start: z.number(),
               anchor: z.number(),
               offset_mm: z.number(),
-              segments: z.array(z.number().positive()).min(2),
+              segments: z.array(z.number().positive()).min(1),
               labels: z.array(z.string()).optional(),
               expected_total: z.number().positive().optional(),
+              total: z.number().positive().optional(),
               show_total: z.boolean().optional(),
               total_offset_mm: z.number().optional(),
             }),
@@ -263,15 +264,17 @@ export const drawingSheetInputSchema = {
     .array(
       z.object({
         id: z.string().min(1),
-        type: z.enum([
-          'dowel_cam_joint',
-          'back_rabbet_joint',
-          'recessed_handle_section',
-          'fretwork_panel_joint',
-          'mounting_plate_detail',
-          'hinge_cup_detail',
-          'custom_profile_detail',
-        ]),
+        type: z
+          .enum([
+            'dowel_cam_joint',
+            'back_rabbet_joint',
+            'recessed_handle_section',
+            'fretwork_panel_joint',
+            'mounting_plate_detail',
+            'hinge_cup_detail',
+            'custom_profile_detail',
+          ])
+          .default('custom_profile_detail'),
         title: z.string().min(1),
         scale_label: z.string().default('1:1'),
         x_mm: z.number(),
@@ -279,6 +282,40 @@ export const drawingSheetInputSchema = {
         w_mm: z.number().min(30),
         h_mm: z.number().min(25),
         params: z.record(z.string(), z.union([z.number(), z.string()])).optional(),
+        rects: z
+          .array(
+            z.object({
+              x: z.number(),
+              y: z.number(),
+              w: z.number().positive(),
+              h: z.number().positive(),
+              style: rectStyleSchema.optional(),
+              rx: z.number().min(0).optional(),
+              label: z.string().optional(),
+            }),
+          )
+          .optional(),
+        lines: z
+          .array(
+            z.object({
+              x1: z.number(),
+              y1: z.number(),
+              x2: z.number(),
+              y2: z.number(),
+              style: lineStyleSchema.optional(),
+            }),
+          )
+          .optional(),
+        circles: z
+          .array(
+            z.object({
+              cx: z.number(),
+              cy: z.number(),
+              r: z.number().positive(),
+              style: lineStyleSchema.optional(),
+            }),
+          )
+          .optional(),
         polylines: z
           .array(
             z.object({
@@ -365,11 +402,21 @@ export interface CompiledSheetResult {
 
 function esc(raw: string | number): string {
   return String(raw)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+}
+
+function numParam(val: string | number | undefined, fallback: number): number {
+  if (typeof val === 'number' && Number.isFinite(val)) return val;
+  if (typeof val === 'string') {
+    const parsed = Number.parseFloat(val);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return fallback;
 }
 
 function fmt(n: number): string {
@@ -631,17 +678,17 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
   const bh = h - 14;
 
   if (type === 'dowel_cam_joint') {
-    const sideT = Number(params.side_thickness_mm ?? 18);
-    const shelfT = Number(params.shelf_thickness_mm ?? 22);
-    const dowelD = Number(params.dowel_diameter_mm ?? 8);
-    const dowelL = Number(params.dowel_length_mm ?? 30);
+    const sideT = numParam(params.side_thickness_mm, 18);
+    const shelfT = numParam(params.shelf_thickness_mm, 22);
+    const dowelD = numParam(params.dowel_diameter_mm, 8);
+    const dowelL = numParam(params.dowel_length_mm, 30);
     const sx = bx + Math.min(14, bw * 0.18);
     const sy = by + 2;
     const sideW = Math.min(20, Math.max(12, sideT));
-    const sideH = Math.min(bh - 8, 42);
+    const sideH = Math.max(12, Math.min(bh - 8, 42));
     const shelfY = sy + sideH * 0.36;
     const shelfH = Math.min(22, Math.max(12, shelfT));
-    const shelfW = Math.min(bw - (sx - bx) - sideW - 8, 52);
+    const shelfW = Math.max(12, Math.min(bw - (sx - bx) - sideW - 8, 52));
     out.push(
       `<rect x="${fmt(sx)}" y="${fmt(sy)}" width="${fmt(sideW)}" height="${fmt(sideH)}" ${rectAttrs('hatch45')}/>`,
       `<rect x="${fmt(sx + sideW)}" y="${fmt(shelfY)}" width="${fmt(shelfW)}" height="${fmt(shelfH)}" ${rectAttrs('hatch135')}/>`,
@@ -663,19 +710,19 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
       `<text x="${fmt(sx)}" y="${fmt(sy + sideH + 4.2)}" font-size="2.1" fill="#222222">注：接触面涂 D3 木工白胶，止口预留 0.5mm 胶缝间隙</text>`,
     );
   } else if (type === 'back_rabbet_joint') {
-    const sideT = Number(params.side_thickness_mm ?? 18);
-    const backT = Number(params.back_thickness_mm ?? 9);
-    const rabbetW = Number(params.rabbet_width_mm ?? 8);
-    const rabbetD = Number(params.rabbet_depth_mm ?? 9);
+    const sideT = numParam(params.side_thickness_mm, 18);
+    const backT = numParam(params.back_thickness_mm, 9);
+    const rabbetW = numParam(params.rabbet_width_mm, 8);
+    const rabbetD = numParam(params.rabbet_depth_mm, 9);
     const sx = bx + 10;
     const sy = by + 4;
-    const panelW = Math.min(bw - 24, 54);
+    const panelW = Math.max(18, Math.min(bw - 24, 54));
     const panelH = Math.min(18, Math.max(12, sideT));
     out.push(
       // 带止口的侧板后缘截面
       `<polygon points="${fmt(sx)},${fmt(sy)} ${fmt(sx + panelW)},${fmt(sy)} ${fmt(sx + panelW)},${fmt(sy + panelH - rabbetW)} ${fmt(sx + panelW - rabbetD)},${fmt(sy + panelH - rabbetW)} ${fmt(sx + panelW - rabbetD)},${fmt(sy + panelH)} ${fmt(sx)},${fmt(sy + panelH)}" ${rectAttrs('hatch45')}/>`,
       // 9mm 背板
-      `<rect x="${fmt(sx + panelW - rabbetD)}" y="${fmt(sy + panelH - rabbetW)}" width="${fmt(rabbetD)}" height="${fmt(Math.min(bh - 16, 30))}" ${rectAttrs('hatch135')}/>`,
+      `<rect x="${fmt(sx + panelW - rabbetD)}" y="${fmt(sy + panelH - rabbetW)}" width="${fmt(rabbetD)}" height="${fmt(Math.max(10, Math.min(bh - 16, 30)))}" ${rectAttrs('hatch135')}/>`,
       // 30×15 防潮加固背带
       `<rect x="${fmt(sx + panelW - rabbetD - 13)}" y="${fmt(sy + panelH + 1.5)}" width="13" height="16" ${rectAttrs('fill_light')}/>`,
       drawHorizontalDim(sx + panelW - rabbetD, sx + panelW, sy, sy - 2.5, `止口深 ${fmt(rabbetD)}`),
@@ -684,15 +731,15 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
       `<text x="${fmt(sx + 2)}" y="${fmt(sy + panelH + 11.5)}" font-size="2.1" fill="#222222">后背加 30×15 实木防潮背带，Ø3.5×25 螺钉 @200 固定</text>`,
     );
   } else if (type === 'recessed_handle_section') {
-    const doorT = Number(params.door_thickness_mm ?? 22);
-    const grooveW = Number(params.groove_height_mm ?? 35);
-    const grooveD = Number(params.groove_depth_mm ?? 14);
+    const doorT = numParam(params.door_thickness_mm, 22);
+    const grooveW = numParam(params.groove_height_mm, 35);
+    const grooveD = numParam(params.groove_depth_mm, 14);
     const sx = bx + 12;
     const sy = by + 4;
-    const dh = Math.min(bh - 12, 38);
+    const dh = Math.max(18, Math.min(bh - 12, 38));
     const dw = Math.min(24, Math.max(14, doorT));
     const gy = sy + 6;
-    const gh = Math.min(dh - 12, 18);
+    const gh = Math.max(8, Math.min(dh - 12, 18));
     const gd = Math.min(dw * 0.62, 12);
     out.push(
       `<polygon points="${fmt(sx)},${fmt(sy)} ${fmt(sx + dw)},${fmt(sy)} ${fmt(sx + dw)},${fmt(gy)} ${fmt(sx + dw - gd)},${fmt(gy)} ${fmt(sx + dw - gd)},${fmt(gy + gh)} ${fmt(sx + dw)},${fmt(gy + gh)} ${fmt(sx + dw)},${fmt(sy + dh)} ${fmt(sx)},${fmt(sy + dh)}" ${rectAttrs('hatch45')}/>`,
@@ -704,27 +751,27 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
       `<text x="${fmt(sx + dw + 10)}" y="${fmt(sy + 19.0)}" font-size="2.1" fill="#222222">双门对缝预留 2.5mm 均匀门缝</text>`,
     );
   } else if (type === 'fretwork_panel_joint') {
-    const frameT = Number(params.frame_thickness_mm ?? 18);
-    const reliefD = Number(params.relief_depth_mm ?? 4);
-    const innerR = Number(params.cutter_radius_mm ?? 1.5);
+    const frameT = numParam(params.frame_thickness_mm, 18);
+    const reliefD = numParam(params.relief_depth_mm, 4);
+    const innerR = numParam(params.cutter_radius_mm, 1.5);
     const sx = bx + 8;
     const sy = by + 4;
-    const pw = Math.min(bw - 18, 58);
-    const ph = Math.min(bh - 14, 24);
+    const pw = Math.max(18, Math.min(bw - 18, 58));
+    const ph = Math.max(10, Math.min(bh - 14, 24));
     out.push(
       `<rect x="${fmt(sx)}" y="${fmt(sy)}" width="${fmt(pw)}" height="${fmt(ph)}" ${rectAttrs('solid')}/>`,
-      drawFretworkBand(sx + 3, sy + 3, pw - 6, ph - 6, 4, 'meander'),
+      drawFretworkBand(sx + 3, sy + 3, Math.max(8, pw - 6), Math.max(4, ph - 6), 4, 'meander'),
       `<text x="${fmt(sx)}" y="${fmt(sy + ph + 4.5)}" font-size="2.2" fill="#111111">中式回纹/雕花构件：板厚 ${fmt(frameT)}mm，浮雕深 ${fmt(reliefD)}mm</text>`,
       `<text x="${fmt(sx)}" y="${fmt(sy + ph + 8.5)}" font-size="2.1" fill="#222222">CNC 精雕清角内圆角 R≥${fmt(innerR)}mm，框料格肩榫拼合，顺纹水平通长</text>`,
     );
   } else if (type === 'mounting_plate_detail') {
-    const plateW = Number(params.plate_width_mm ?? 100);
-    const plateH = Number(params.plate_depth_mm ?? 80);
-    const holePitchX = Number(params.pitch_x_mm ?? 76);
-    const holePitchY = Number(params.pitch_y_mm ?? 56);
-    const holeD = Number(params.hole_diameter_mm ?? 6.5);
-    const pw = Math.min(bw - 24, 46);
-    const ph = Math.min(bh - 16, 32);
+    const plateW = numParam(params.plate_width_mm, 100);
+    const plateH = numParam(params.plate_depth_mm, 80);
+    const holePitchX = numParam(params.pitch_x_mm, 76);
+    const holePitchY = numParam(params.pitch_y_mm, 56);
+    const holeD = numParam(params.hole_diameter_mm, 6.5);
+    const pw = Math.max(16, Math.min(bw - 24, 46));
+    const ph = Math.max(12, Math.min(bh - 16, 32));
     const px = bx + 10;
     const py = by + 4;
     const insetX = pw * 0.14;
@@ -768,13 +815,13 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
       `<text x="${fmt(px + pw + 10)}" y="${fmt(py + 17.0)}" font-size="2.1" fill="#222222">Q235 钢板 δ=4mm 哑光黑烤漆</text>`,
     );
   } else if (type === 'hinge_cup_detail') {
-    const cupD = Number(params.cup_diameter_mm ?? 35);
-    const cupDepth = Number(params.cup_depth_mm ?? 12.5);
-    const edgeK = Number(params.edge_offset_mm ?? 5);
-    const pitch = Number(params.screw_pitch_mm ?? 48);
+    const cupD = numParam(params.cup_diameter_mm, 35);
+    const cupDepth = numParam(params.cup_depth_mm, 12.5);
+    const edgeK = numParam(params.edge_offset_mm, 5);
+    const pitch = numParam(params.screw_pitch_mm, 48);
     const hx = bx + 14;
     const hy = by + 4;
-    const doorH = Math.min(bh - 14, 32);
+    const doorH = Math.max(16, Math.min(bh - 14, 32));
     const cupCy = hy + doorH / 2;
     const cupCx = hx + 14;
     out.push(
@@ -790,14 +837,38 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
     );
   } else {
     // custom_profile_detail: 支持异形线脚、飞檐翘头、束腰莲座、特殊雕刻截面 1:1 / 1:2 大样
+    const detailRatio = parseScale(scale_label).ratio;
+    for (const r of detail.rects ?? []) {
+      const rxAttr = r.rx ? ` rx="${fmt(r.rx * detailRatio)}"` : '';
+      out.push(
+        `<rect x="${fmt(bx + r.x * detailRatio)}" y="${fmt(by + r.y * detailRatio)}" width="${fmt(r.w * detailRatio)}" height="${fmt(r.h * detailRatio)}"${rxAttr} ${rectAttrs(r.style ?? 'solid')}/>`,
+      );
+      if (r.label) {
+        out.push(
+          `<text x="${fmt(bx + (r.x + r.w / 2) * detailRatio)}" y="${fmt(by + (r.y + r.h / 2) * detailRatio + 0.8)}" font-size="2.1" text-anchor="middle" fill="#111111">${esc(r.label)}</text>`,
+        );
+      }
+    }
+    for (const l of detail.lines ?? []) {
+      out.push(
+        `<line x1="${fmt(bx + l.x1 * detailRatio)}" y1="${fmt(by + l.y1 * detailRatio)}" x2="${fmt(bx + l.x2 * detailRatio)}" y2="${fmt(by + l.y2 * detailRatio)}" ${lineAttrs(l.style ?? 'solid')}/>`,
+      );
+    }
+    for (const c of detail.circles ?? []) {
+      out.push(
+        `<circle cx="${fmt(bx + c.cx * detailRatio)}" cy="${fmt(by + c.cy * detailRatio)}" r="${fmt(Math.max(0.45, c.r * detailRatio))}" fill="none" ${lineAttrs(c.style ?? 'solid')}/>`,
+      );
+    }
     for (const p of detail.polylines ?? []) {
-      const pts = p.points.map(([px, py]) => `${fmt(bx + px)},${fmt(by + py)}`).join(' ');
+      const pts = p.points
+        .map(([px, py]) => `${fmt(bx + px * detailRatio)},${fmt(by + py * detailRatio)}`)
+        .join(' ');
       const tag = p.closed ? 'polygon' : 'polyline';
       out.push(`<${tag} points="${pts}" ${rectAttrs(p.style ?? 'hatch45')}/>`);
     }
     for (const pathItem of detail.paths ?? []) {
       out.push(
-        `<g transform="translate(${fmt(bx)}, ${fmt(by)})"><path d="${esc(pathItem.d)}" ${rectAttrs(pathItem.style ?? 'solid')}/></g>`,
+        `<path d="${esc(transformSvgPath(pathItem.d, bx, by, detailRatio))}" ${rectAttrs(pathItem.style ?? 'solid')}/>`,
       );
     }
     const detailNotes = detail.notes ?? [
@@ -813,6 +884,83 @@ function renderDetailBlock(detail: DrawingSheetInput['details'][number]): string
 
   out.push('</g>');
   return out.join('\n');
+}
+
+function transformSvgPath(d: string, ox: number, oy: number, ratio: number): string {
+  const tokens = d.match(/[MmLlHhVvCcSsQqTtAaZz]|[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g);
+  if (!tokens || tokens.length === 0) return d;
+  const out: string[] = [];
+  let cmd = 'M';
+  let argIdx = 0;
+  let seenFirstMove = false;
+  const mx = (x: number) => fmt(ox + x * ratio);
+  const my = (y: number) => fmt(oy + y * ratio);
+  const ms = (v: number) => fmt(v * ratio);
+
+  for (const tok of tokens) {
+    if (/^[MmLlHhVvCcSsQqTtAaZz]$/.test(tok)) {
+      cmd = tok;
+      argIdx = 0;
+      out.push(tok);
+      continue;
+    }
+    const val = Number(tok);
+    switch (cmd) {
+      case 'M':
+      case 'L':
+      case 'T':
+      case 'C':
+      case 'S':
+      case 'Q':
+        out.push(argIdx % 2 === 0 ? mx(val) : my(val));
+        if (cmd === 'M' && argIdx === 1) seenFirstMove = true;
+        break;
+      case 'm':
+        if (!seenFirstMove && argIdx < 2) {
+          out.push(argIdx === 0 ? mx(val) : my(val));
+          if (argIdx === 1) seenFirstMove = true;
+        } else {
+          out.push(ms(val));
+        }
+        break;
+      case 'l':
+      case 't':
+      case 'c':
+      case 's':
+      case 'q':
+        out.push(ms(val));
+        break;
+      case 'H':
+        out.push(mx(val));
+        break;
+      case 'V':
+        out.push(my(val));
+        break;
+      case 'h':
+      case 'v':
+        out.push(ms(val));
+        break;
+      case 'A': {
+        const m = argIdx % 7;
+        if (m === 0 || m === 1) out.push(ms(val));
+        else if (m === 2 || m === 3 || m === 4) out.push(fmt(val));
+        else if (m === 5) out.push(mx(val));
+        else out.push(my(val));
+        break;
+      }
+      case 'a': {
+        const m = argIdx % 7;
+        if (m === 0 || m === 1 || m === 5 || m === 6) out.push(ms(val));
+        else out.push(fmt(val));
+        break;
+      }
+      default:
+        out.push(tok);
+        break;
+    }
+    argIdx += 1;
+  }
+  return out.join(' ');
 }
 
 function renderTable(table: DrawingSheetInput['tables'][number]): string {
@@ -966,10 +1114,10 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
     `<svg xmlns="http://www.w3.org/2000/svg" width="${fmt(paper.widthMm)}mm" height="${fmt(paper.heightMm)}mm" viewBox="0 0 ${fmt(paper.widthMm)} ${fmt(paper.heightMm)}" font-family="Noto Sans CJK SC, WenQuanYi Micro Hei, DejaVu Sans, Arial, sans-serif">`,
     `<defs>`,
     `  <pattern id="hatch45" width="2.4" height="2.4" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">`,
-    `    <line x1="0" y1="0" x2="0" y2="2.4" stroke="#333333" stroke-width="0.14"/>`,
+    `    <line x1="1.2" y1="0" x2="1.2" y2="2.4" stroke="#333333" stroke-width="0.14"/>`,
     `  </pattern>`,
     `  <pattern id="hatch135" width="2.4" height="2.4" patternTransform="rotate(135 0 0)" patternUnits="userSpaceOnUse">`,
-    `    <line x1="0" y1="0" x2="0" y2="2.4" stroke="#333333" stroke-width="0.14"/>`,
+    `    <line x1="1.2" y1="0" x2="1.2" y2="2.4" stroke="#333333" stroke-width="0.14"/>`,
     `  </pattern>`,
     `</defs>`,
     `<rect x="0" y="0" width="${fmt(paper.widthMm)}" height="${fmt(paper.heightMm)}" fill="#ffffff"/>`,
@@ -1015,7 +1163,10 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
     }
 
     for (const f of view.fretwork ?? []) {
-      const cells = f.cells ?? Math.max(2, Math.round(f.w / Math.max(f.h, 40)));
+      const cells = Math.min(
+        64,
+        Math.max(1, f.cells ?? Math.max(2, Math.round(f.w / Math.max(f.h, 40)))),
+      );
       lines.push(drawFretworkBand(mx(f.x), my(f.y), ms(f.w), ms(f.h), cells, f.motif));
     }
 
@@ -1077,13 +1228,20 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
       const cx = mx(a.cx);
       const cy = my(a.cy);
       const r = ms(a.r);
+      const spanDeg = Math.abs(a.end_deg - a.start_deg);
+      if (spanDeg >= 359.99) {
+        lines.push(
+          `<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(r)}" fill="none" ${lineAttrs(a.style ?? 'thin')}/>`,
+        );
+        continue;
+      }
       const sRad = (a.start_deg * Math.PI) / 180;
       const eRad = (a.end_deg * Math.PI) / 180;
       const x1 = cx + r * Math.cos(sRad);
       const y1 = cy + r * Math.sin(sRad);
       const x2 = cx + r * Math.cos(eRad);
       const y2 = cy + r * Math.sin(eRad);
-      const largeArc = Math.abs(a.end_deg - a.start_deg) > 180 ? 1 : 0;
+      const largeArc = spanDeg > 180 ? 1 : 0;
       const sweep = a.end_deg >= a.start_deg ? 1 : 0;
       lines.push(
         `<path d="M ${fmt(x1)} ${fmt(y1)} A ${fmt(r)} ${fmt(r)} 0 ${largeArc} ${sweep} ${fmt(x2)} ${fmt(y2)}" fill="none" ${lineAttrs(a.style ?? 'thin')}/>`,
@@ -1091,27 +1249,8 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
     }
 
     for (const p of view.paths ?? []) {
-      const st = p.style ?? 'solid';
-      const baseStroke = st === 'solid' ? 0.35 : st === 'medium' ? 0.25 : 0.18;
-      const scaledStroke = fmt(baseStroke / ratio);
-      const dashAttr =
-        st === 'hidden'
-          ? ` stroke-dasharray="${fmt(1.8 / ratio)},${fmt(1.0 / ratio)}"`
-          : st === 'center'
-            ? ` stroke-dasharray="${fmt(4.0 / ratio)},${fmt(1.2 / ratio)},${fmt(0.8 / ratio)},${fmt(1.2 / ratio)}"`
-            : '';
-      const fillAttr =
-        st === 'hatch45'
-          ? 'fill="url(#hatch45)"'
-          : st === 'hatch135'
-            ? 'fill="url(#hatch135)"'
-            : st === 'fill_light'
-              ? 'fill="#f5f5f5"'
-              : st === 'fill_dark'
-                ? 'fill="#e2e2e2"'
-                : 'fill="none"';
       lines.push(
-        `<g transform="translate(${fmt(ox)}, ${fmt(oy)}) scale(${fmt(ratio)})"><path d="${esc(p.d)}" ${fillAttr} stroke="#111111" stroke-width="${scaledStroke}"${dashAttr}/></g>`,
+        `<path d="${esc(transformSvgPath(p.d, ox, oy, ratio))}" ${rectAttrs(p.style ?? 'solid')}/>`,
       );
     }
 
@@ -1196,10 +1335,11 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
 
     for (const cd of view.chain_dims ?? []) {
       const sum = cd.segments.reduce((acc, s) => acc + s, 0);
-      if (cd.expected_total != null && Math.abs(sum - cd.expected_total) > 0.5) {
+      const expectedTotal = cd.expected_total ?? cd.total;
+      if (expectedTotal != null && Math.abs(sum - expectedTotal) > 0.5) {
         throw new ToolFailure(
           'DIMENSION_CHAIN_MISMATCH',
-          `View "${view.id}" ${cd.orientation} chain_dim segments [${cd.segments.join(', ')}] sum to ${sum}, expected ${cd.expected_total}`,
+          `View "${view.id}" ${cd.orientation} chain_dim segments [${cd.segments.join(', ')}] sum to ${sum}, expected ${expectedTotal}`,
         );
       }
       verifiedChains.push({
@@ -1207,7 +1347,7 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
         orientation: cd.orientation,
         segments: cd.segments,
         sum_mm: sum,
-        expected_total_mm: cd.expected_total,
+        expected_total_mm: expectedTotal,
       });
 
       let cursor = cd.start;
@@ -1230,7 +1370,7 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
       }
 
       if (cd.show_total) {
-        const totalVal = cd.expected_total ?? sum;
+        const totalVal = expectedTotal ?? sum;
         const sign = cd.offset_mm >= 0 ? 1 : -1;
         const totalOff = cd.total_offset_mm ?? cd.offset_mm + sign * 6.2;
         if (cd.orientation === 'horizontal') {
@@ -1264,7 +1404,13 @@ export function compileDrawingSheet(raw: DrawingSheetInput): CompiledSheetResult
       const datumY = my(el.datum_y_model);
       for (const lv of el.levels) {
         const ly = el.direction === 'up' ? datumY - ms(lv.elevation) : datumY + ms(lv.elevation);
-        const txt = lv.label ?? (lv.elevation === 0 ? '±0.00 (基准)' : `+${fmt(lv.elevation)}`);
+        const txt =
+          lv.label ??
+          (lv.elevation === 0
+            ? '±0.00 (基准)'
+            : lv.elevation < 0
+              ? fmt(lv.elevation)
+              : `+${fmt(lv.elevation)}`);
         lines.push(
           `<line x1="${fmt(baseX - 2.2)}" y1="${fmt(ly)}" x2="${fmt(baseX + 5.5)}" y2="${fmt(ly)}" stroke="#222222" stroke-width="0.16"/>`,
           `<polygon points="${fmt(baseX)},${fmt(ly)} ${fmt(baseX - 1.4)},${fmt(ly - 1.5)} ${fmt(baseX + 1.4)},${fmt(ly - 1.5)}" fill="none" stroke="#111111" stroke-width="0.18"/>`,
