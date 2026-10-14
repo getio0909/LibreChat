@@ -12,6 +12,67 @@ const {
   resolveUploadLLMDeliveryPath,
 } = require('librechat-data-provider');
 
+test('drawing-sheet tool schema remains valid for Claude after LibreChat conversion', async () => {
+  const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
+  const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
+  const { InMemoryTransport } = require('@modelcontextprotocol/sdk/inMemory.js');
+  const { formatMCPServerTools } = require('@librechat/api');
+  const sdkRequire = require('node:module').createRequire(
+    require.resolve('@modelcontextprotocol/sdk/client/index.js'),
+  );
+  const Ajv2020 = sdkRequire('ajv/dist/2020').default;
+  const { drawingSheetInputSchema } = await import('./design/sheet.ts');
+  const server = new McpServer({ name: 'schema-regression', version: '1' });
+  server.registerTool(
+    'compile_drawing_sheet',
+    { inputSchema: drawingSheetInputSchema },
+    async () => ({ content: [] }),
+  );
+  const client = new Client({ name: 'schema-regression', version: '1' });
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  try {
+    await server.connect(serverTransport);
+    await client.connect(clientTransport);
+    const { tools } = await client.listTools();
+    const normalized = Object.values(formatMCPServerTools('design_tools', tools));
+    const validator = new Ajv2020({ strict: false, allErrors: true });
+    for (const tool of normalized) {
+      assert.equal(
+        validator.validateSchema(tool.function.parameters),
+        true,
+        `${tool.function.name}: ${JSON.stringify(validator.errors)}`,
+      );
+    }
+    const view = { id: 'front', title: 'Front', scale: 1, origin_mm: [10, 20] };
+    const detail = { id: 'joint', title: 'Joint', x_mm: 10, y_mm: 20, w_mm: 30, h_mm: 25 };
+    for (const { point, valid } of [
+      { point: [10, 20], valid: true },
+      { point: [10], valid: false },
+      { point: [10, 20, 30], valid: false },
+      { point: ['10', 20], valid: false },
+      { point: [10, '20'], valid: false },
+      { point: null, valid: false },
+    ]) {
+      assert.equal(
+        drawingSheetInputSchema.views.safeParse([{ ...view, origin_mm: point }]).success,
+        valid,
+      );
+      const polylines = [{ points: [point, [30, 40]] }];
+      assert.equal(
+        drawingSheetInputSchema.views.safeParse([{ ...view, polylines }]).success,
+        valid,
+      );
+      assert.equal(
+        drawingSheetInputSchema.details.safeParse([{ ...detail, polylines }]).success,
+        valid,
+      );
+    }
+  } finally {
+    await client.close();
+    await server.close();
+  }
+});
+
 test('CAD modes enforce effort and output budgets over saved aliases while titles stay lightweight', () => {
   const { getOpenAILLMConfig } = require('@librechat/api');
   const { ChatOpenRouter } = require('@librechat/agents/llm/openrouter');

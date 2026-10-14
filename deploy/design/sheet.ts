@@ -29,6 +29,12 @@ const lineStyleSchema = z
   .enum(['solid', 'medium', 'thin', 'hidden', 'center', 'pitch'])
   .default('solid');
 
+// 同质数组兼容新版 JSON Schema，避免 LibreChat 移除方言标记后产生无效的元组 items。
+const pointSchema = z
+  .array(z.number())
+  .length(2)
+  .transform((point): [number, number] => [point[0], point[1]]);
+
 export const drawingSheetInputSchema = {
   svg_filename: z.string().regex(/\.svg$/i),
   pdf_filename: z
@@ -65,7 +71,7 @@ export const drawingSheetInputSchema = {
         title: z.string().min(1),
         subtitle: z.string().optional(),
         scale: z.union([z.number().positive(), z.string().min(1)]),
-        origin_mm: z.tuple([z.number(), z.number()]),
+        origin_mm: pointSchema,
         width_model_mm: z.number().positive().optional(),
         height_model_mm: z.number().positive().optional(),
         rects: z
@@ -95,7 +101,7 @@ export const drawingSheetInputSchema = {
         polylines: z
           .array(
             z.object({
-              points: z.array(z.tuple([z.number(), z.number()])).min(2),
+              points: z.array(pointSchema).min(2),
               closed: z.boolean().optional(),
               style: rectStyleSchema.optional(),
             }),
@@ -319,7 +325,7 @@ export const drawingSheetInputSchema = {
         polylines: z
           .array(
             z.object({
-              points: z.array(z.tuple([z.number(), z.number()])).min(2),
+              points: z.array(pointSchema).min(2),
               closed: z.boolean().optional(),
               style: rectStyleSchema.optional(),
             }),
