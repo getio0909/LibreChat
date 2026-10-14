@@ -13,13 +13,14 @@ export function selfContainedSvg(
   }
   if (source.includes('\0')) throw new ToolFailure('SVG_ENCODING_UNSUPPORTED');
   let root = true;
-  let inStyle = false;
+  let styleDepth = 0;
   let style = '';
   const unsupported = () => {
     throw new ToolFailure('SVG_NOT_SELF_CONTAINED');
   };
-  const reference = (value: string) => {
-    if (value.startsWith('#')) return;
+  const reference = (raw: string) => {
+    const value = raw.trim();
+    if (/^#[^\s'"]*$/.test(value)) return;
     const data = /^data:image\/(png|jpeg|webp);base64,([a-z0-9+/]*={0,2})$/i.exec(value);
     if (!data) return unsupported();
     const image = Buffer.from(data[2], 'base64');
@@ -36,8 +37,16 @@ export function selfContainedSvg(
     const css = value.replace(/\/\*[\s\S]*?\*\//g, '');
     // 外部资源无法在无基准路径的渲染中可靠交付，拒绝而不是静默缺图。
     if (/@import|\\/i.test(css)) unsupported();
-    for (const match of css.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
-      reference(match[1]);
+    for (const match of css.matchAll(/url\s*\(([^)]*)\)?/gi)) {
+      if (!match[0].endsWith(')')) unsupported();
+      const target = match[1].trim();
+      const unquoted =
+        (target.startsWith('"') && target.endsWith('"')) ||
+        (target.startsWith("'") && target.endsWith("'"))
+          ? target.slice(1, -1)
+          : target;
+      if (/['"]/.test(unquoted)) unsupported();
+      reference(unquoted);
     }
   };
   parser.on('error', () => {
@@ -94,23 +103,19 @@ export function selfContainedSvg(
       if (attribute.local === 'href') reference(attribute.value);
       checkCss(attribute.value);
     }
-    if (tag.local === 'style') {
-      inStyle = true;
-      style = '';
-    }
+    if (tag.local === 'style') styleDepth++;
   });
   parser.on('closetag', (tag) => {
     if (tag.local === 'style') {
       checkCss(style);
-      inStyle = false;
-      style = '';
+      if (--styleDepth === 0) style = '';
     }
   });
   parser.on('text', (value) => {
-    if (inStyle) style += value;
+    if (styleDepth > 0) style += value;
   });
   parser.on('cdata', (value) => {
-    if (inStyle) style += value;
+    if (styleDepth > 0) style += value;
   });
   parser.write(source).close();
 }

@@ -1254,28 +1254,62 @@ test('color-space cleanup preserves selected aliases, image colors and defaults 
     }),
   );
   const form = pdf.context.register(
-    pdf.context.flateStream('/Ink cs 0 sc 20 20 100 100 re f q 10 0 0 10 150 20 cm /Raster Do Q', {
-      Type: 'XObject',
-      Subtype: 'Form',
-      BBox: [0, 0, 180, 150],
-      Group: { S: 'Transparency', CS: 'GroupRGB' },
-      Resources: {
-        XObject: { Raster: image },
-        ColorSpace: {
-          Base: 'DeviceRGB',
-          ImageRGB: 'DeviceRGB',
-          GroupRGB: 'DeviceRGB',
-          Ink: [
-            'Separation',
-            'Spot',
-            'Base',
-            { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
-          ],
-          DefaultGray: ['CalGray', { WhitePoint: [0.9505, 1, 1.089] }],
-          Old: ['ICCBased', profile],
+    pdf.context.flateStream(
+      '/Ink cs 0 sc 20 20 100 100 re f /Pattern cs /MeshPattern scn 0 0 10 10 re f q 10 0 0 10 150 20 cm /Raster Do Q',
+      {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, 180, 150],
+        Group: { S: 'Transparency', CS: 'GroupRGB' },
+        Resources: {
+          XObject: { Raster: image },
+          ColorSpace: {
+            Base: 'DeviceRGB',
+            ProcessRGB: 'DeviceRGB',
+            ColorantRGB: 'DeviceRGB',
+            MeshRGB: 'DeviceRGB',
+            ImageRGB: 'DeviceRGB',
+            GroupRGB: 'DeviceRGB',
+            Ink: [
+              'DeviceN',
+              ['Spot'],
+              'Base',
+              { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
+              {
+                Subtype: 'NChannel',
+                Process: { ColorSpace: 'ProcessRGB', Components: ['Red', 'Green', 'Blue'] },
+                Colorants: {
+                  Spot: [
+                    'Separation',
+                    'Spot',
+                    'ColorantRGB',
+                    { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
+                  ],
+                },
+              },
+            ],
+            DefaultGray: ['CalGray', { WhitePoint: [0.9505, 1, 1.089] }],
+            Old: ['ICCBased', profile],
+          },
+          Pattern: {
+            MeshPattern: {
+              Type: 'Pattern',
+              PatternType: 2,
+              Shading: pdf.context.register(
+                pdf.context.flateStream(Buffer.alloc(16), {
+                  ShadingType: 4,
+                  ColorSpace: 'MeshRGB',
+                  BitsPerCoordinate: 8,
+                  BitsPerComponent: 8,
+                  BitsPerFlag: 8,
+                  Decode: [0, 100, 0, 100, 0, 1, 0, 1, 0, 1],
+                }),
+              ),
+            },
+          },
         },
       },
-    }),
+    ),
   );
   page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
   page.pushOperators(drawObject('Drawing'));
@@ -1303,7 +1337,7 @@ test('color-space cleanup preserves selected aliases, image colors and defaults 
       .keys()
       .map((name) => name.decodeText())
       .sort(),
-    ['Base', 'DefaultGray', 'GroupRGB', 'ImageRGB', 'Ink'],
+    ['Base', 'ColorantRGB', 'DefaultGray', 'GroupRGB', 'ImageRGB', 'Ink', 'MeshRGB', 'ProcessRGB'],
   );
   assert.equal(
     output.context
@@ -1346,6 +1380,14 @@ test('marked-content resources keep selected properties and omit old unused revi
   const f = await fixture();
   const pdf = await PDFDocument.create();
   const page = pdf.addPage();
+  const sharedProperties = pdf.context.register(
+    pdf.context.obj({
+      Current: { ActualText: PDFString.of('current drawing') },
+      Marker: { Lang: PDFString.of('en') },
+      Sibling: { ActualText: PDFString.of('sibling drawing') },
+      Old: { ActualText: PDFString.of('old private source path and revision') },
+    }),
+  );
   const form = pdf.context.register(
     pdf.context.flateStream(
       '/Span /Current BDC 20 20 100 100 re f EMC /Point /Marker DP /Span << /ActualText (/Old BDC) >> BDC EMC',
@@ -1353,18 +1395,23 @@ test('marked-content resources keep selected properties and omit old unused revi
         Type: 'XObject',
         Subtype: 'Form',
         BBox: [0, 0, 150, 150],
-        Resources: {
-          Properties: {
-            Current: { ActualText: PDFString.of('current drawing') },
-            Marker: { Lang: PDFString.of('en') },
-            Old: { ActualText: PDFString.of('old private source path and revision') },
-          },
-        },
+        Resources: { Properties: sharedProperties },
       },
     ),
   );
-  page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
-  page.pushOperators(drawObject('Drawing'));
+  const sibling = pdf.context.register(
+    pdf.context.flateStream('/Span /Sibling BDC 10 10 20 20 re f EMC', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 50, 50],
+      Resources: { Properties: sharedProperties },
+    }),
+  );
+  page.node.set(
+    PDFName.of('Resources'),
+    pdf.context.obj({ XObject: { Drawing: form, Sibling: sibling } }),
+  );
+  page.pushOperators(drawObject('Drawing'), drawObject('Sibling'));
   const bytes = Buffer.from(await pdf.save());
   await fs.writeFile(path.join(f.root, 'properties.pdf'), bytes);
   const result = await f.client.callTool({
@@ -1396,6 +1443,16 @@ test('marked-content resources keep selected properties and omit old unused revi
   const text = selected.lookup(PDFName.of('ActualText'));
   assert.ok(text instanceof PDFString);
   assert.equal(text.decodeText(), 'current drawing');
+  const siblingForm = objects.lookup(PDFName.of('Sibling'));
+  assert.ok(siblingForm instanceof PDFRawStream);
+  const siblingResources = siblingForm.dict.lookup(PDFName.of('Resources'));
+  assert.ok(siblingResources instanceof PDFDict);
+  const siblingProperties = siblingResources.lookup(PDFName.of('Properties'));
+  assert.ok(siblingProperties instanceof PDFDict);
+  assert.deepEqual(
+    siblingProperties.keys().map((name) => name.decodeText()),
+    ['Sibling'],
+  );
   assert.deepEqual(await fs.readFile(path.join(f.root, 'properties.pdf')), bytes);
 });
 
@@ -1704,11 +1761,12 @@ test('drawing sets omit invisible page and resource metadata without modifying s
   );
   page.node.set(PDFName.of('Metadata'), metadata);
   const form = pdf.context.register(
-    pdf.context.flateStream('0 0 10 10 re f', {
+    pdf.context.flateStream('/Span /PrivateTag BDC 0 0 10 10 re f EMC', {
       Type: 'XObject',
       Subtype: 'Form',
       BBox: [0, 0, 10, 10],
       Metadata: metadata,
+      Resources: { Properties: { PrivateTag: metadata } },
     }),
   );
   page.node.set(PDFName.of('Resources'), pdf.context.obj({ XObject: { Drawing: form } }));
@@ -2065,6 +2123,8 @@ test('SVG exports reject external resources and DTDs instead of silently losing 
     String.raw`<style><![CDATA[.part { fill:u\000072l(https://example.test/resource.svg#paint); }]]></style>`,
     '<style>rect{fill:u<![CDATA[rl(https://example.test/p.svg#paint)]]>}</style>',
     '<style>@im<![CDATA[port url(https://example.test/font.css);]]></style>',
+    '<rect style="fill:url(\' https://example.test/resource.svg#paint\')"/>',
+    '<style>@im<style/>port url(https://example.test/font.css);</style>',
     '<g xml:base="https://example.test/external.svg"><use href="#part"/></g>',
   ]) {
     await fs.writeFile(
@@ -2592,4 +2652,288 @@ test('bounds concurrent jobs and releases capacity after provider timeout', asyn
   assert.match(JSON.stringify(cancelled), /REQUEST_CANCELLED/);
   const retry = await f.client.callTool({ name: 'workspace_files', arguments: {} });
   assert.equal(retry.isError, undefined);
+});
+
+test('pdfTask enforces shared resource isolation, color spaces, metadata cleanup, stream limits, and SVG CSS rules', async () => {
+  const f = await fixture();
+  const signal = new AbortController().signal;
+
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([200, 200]);
+  const sharedProps = pdf.context.register(
+    pdf.context.obj({
+      First: { ActualText: PDFString.of('first') },
+      Second: { ActualText: PDFString.of('second') },
+      Unused: { ActualText: PDFString.of('unused') },
+    }),
+  );
+  const metadata = pdf.context.register(
+    pdf.context.flateStream('<x:xmpmeta/>', { Type: 'Metadata', Subtype: 'XML' }),
+  );
+  const maskForm = pdf.context.register(
+    pdf.context.flateStream('0 0 10 10 re f', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 10, 10],
+      Group: { S: 'Transparency', CS: 'EnclosingGroupRGB' },
+      Resources: { ColorSpace: { UnusedMaskColor: 'DeviceRGB' } },
+    }),
+  );
+  const firstForm = pdf.context.register(
+    pdf.context.flateStream(
+      '/Span /First BDC /Span /MetaProp BDC /Ink cs 0 sc /Pattern cs /Pat scn 0 0 10 10 re f EMC EMC',
+      {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, 50, 50],
+        Group: { S: 'Transparency', CS: 'OwnGroupRGB' },
+        Resources: {
+          Properties: sharedProps,
+          ColorSpace: {
+            BaseRGB: 'DeviceRGB',
+            ProcessRGB: 'DeviceRGB',
+            ColorantRGB: 'DeviceRGB',
+            MeshRGB: 'DeviceRGB',
+            EnclosingGroupRGB: 'DeviceRGB',
+            OwnGroupRGB: 'DeviceRGB',
+            Ink: [
+              'DeviceN',
+              ['Spot'],
+              'BaseRGB',
+              { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
+              {
+                Subtype: 'NChannel',
+                Process: { ColorSpace: 'ProcessRGB', Components: ['R', 'G', 'B'] },
+                Colorants: {
+                  Spot: [
+                    'Separation',
+                    'Spot',
+                    'ColorantRGB',
+                    { FunctionType: 2, Domain: [0, 1], C0: [0, 0, 0], C1: [1, 1, 1], N: 1 },
+                  ],
+                },
+              },
+            ],
+          },
+          Pattern: {
+            Pat: {
+              Type: 'Pattern',
+              PatternType: 2,
+              ExtGState: { SMask: { S: 'Alpha', G: maskForm } },
+              Shading: pdf.context.register(
+                pdf.context.flateStream(Buffer.alloc(16), {
+                  ShadingType: 4,
+                  ColorSpace: 'MeshRGB',
+                }),
+              ),
+            },
+          },
+        },
+      },
+    ),
+  );
+  const sharedResources = pdf.context.register(pdf.context.obj({ Properties: sharedProps }));
+  const secondForm = pdf.context.register(
+    pdf.context.flateStream('/Span /Second BDC 0 0 10 10 re f EMC', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 50, 50],
+      Resources: sharedResources,
+    }),
+  );
+  const thirdForm = pdf.context.register(
+    pdf.context.flateStream('/Span /First BDC 0 0 10 10 re f EMC', {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 50, 50],
+      Resources: sharedResources,
+    }),
+  );
+  page.node.set(
+    PDFName.of('Resources'),
+    pdf.context.obj({
+      ColorSpace: { OwnGroupRGB: 'DeviceRGB' },
+      Properties: { MetaProp: metadata },
+      XObject: { FirstForm: firstForm, SecondForm: secondForm, ThirdForm: thirdForm },
+    }),
+  );
+  page.pushOperators(drawObject('FirstForm'), drawObject('SecondForm'), drawObject('ThirdForm'));
+
+  const assembled = await pdfTask(
+    {
+      operation: 'assemble',
+      sources: [{ bytes: await pdf.save(), source_filename: 'sheet.pdf' }],
+      limits: f.settings,
+    },
+    f.settings,
+    signal,
+  );
+  assert.equal(assembled.operation, 'assemble');
+  const out = await PDFDocument.load(assembled.bytes);
+  const outPageRes = out.getPage(0).node.Resources();
+  assert.ok(outPageRes instanceof PDFDict);
+  assert.equal(
+    outPageRes.lookup(PDFName.of('ColorSpace'), PDFDict).has(PDFName.of('OwnGroupRGB')),
+    false,
+  );
+  assert.equal(
+    out.context.enumerateIndirectObjects().some(([, obj]) => {
+      const dict = obj instanceof PDFRawStream ? obj.dict : obj;
+      return dict instanceof PDFDict && dict.get(PDFName.of('Type')) === PDFName.of('Metadata');
+    }),
+    false,
+  );
+  const outXObjects = outPageRes.lookup(PDFName.of('XObject'));
+  assert.ok(outXObjects instanceof PDFDict);
+  const outFirst = outXObjects.lookup(PDFName.of('FirstForm'));
+  const outSecond = outXObjects.lookup(PDFName.of('SecondForm'));
+  const outThird = outXObjects.lookup(PDFName.of('ThirdForm'));
+  assert.ok(
+    outFirst instanceof PDFRawStream &&
+      outSecond instanceof PDFRawStream &&
+      outThird instanceof PDFRawStream,
+  );
+  const firstProps = outFirst.dict
+    .lookup(PDFName.of('Resources'), PDFDict)
+    .lookup(PDFName.of('Properties'), PDFDict);
+  const secondProps = outSecond.dict
+    .lookup(PDFName.of('Resources'), PDFDict)
+    .lookup(PDFName.of('Properties'), PDFDict);
+  const thirdProps = outThird.dict
+    .lookup(PDFName.of('Resources'), PDFDict)
+    .lookup(PDFName.of('Properties'), PDFDict);
+  assert.deepEqual(
+    firstProps.keys().map((k) => k.decodeText()),
+    ['First'],
+  );
+  assert.deepEqual(
+    secondProps.keys().map((k) => k.decodeText()),
+    ['Second'],
+  );
+  assert.deepEqual(
+    thirdProps.keys().map((k) => k.decodeText()),
+    ['First'],
+  );
+  const firstColors = outFirst.dict
+    .lookup(PDFName.of('Resources'), PDFDict)
+    .lookup(PDFName.of('ColorSpace'), PDFDict);
+  assert.deepEqual(
+    firstColors
+      .keys()
+      .map((k) => k.decodeText())
+      .sort(),
+    ['BaseRGB', 'ColorantRGB', 'EnclosingGroupRGB', 'Ink', 'MeshRGB', 'OwnGroupRGB', 'ProcessRGB'],
+  );
+
+  for (const [build, code] of [
+    [
+      (doc: PDFDocument) => ({
+        XObject: {
+          Legacy: doc.context.register(doc.context.flateStream('', { Subtype: 'PS' })),
+        },
+      }),
+      'PDF_XOBJECT_UNSUPPORTED',
+    ],
+    [
+      (doc: PDFDocument) => ({
+        Font: {
+          F1: doc.context.register(doc.context.obj({ Subtype: 'Type3' })),
+        },
+      }),
+      'PDF_TYPE3_FONT_UNSUPPORTED',
+    ],
+  ] as const) {
+    const doc = await PDFDocument.create();
+    const p = doc.addPage([100, 100]);
+    p.node.set(
+      PDFName.of('Contents'),
+      doc.context.register(doc.context.flateStream('/Legacy Do BT /F1 12 Tf ET')),
+    );
+    p.node.set(PDFName.of('Resources'), doc.context.obj(build(doc)));
+    await assert.rejects(
+      pdfTask(
+        { operation: 'prepare', bytes: await doc.save(), limits: f.settings },
+        f.settings,
+        signal,
+      ),
+      { code },
+    );
+  }
+
+  const corruptDoc = await PDFDocument.create();
+  const corruptPage = corruptDoc.addPage([100, 100]);
+  corruptPage.node.set(
+    PDFName.of('Contents'),
+    corruptDoc.context.register(
+      corruptDoc.context.stream(Buffer.from('not-valid-deflate'), { Filter: 'FlateDecode' }),
+    ),
+  );
+  await assert.rejects(
+    pdfTask(
+      {
+        operation: 'assemble',
+        sources: [{ bytes: await corruptDoc.save(), source_filename: 'corrupt.pdf' }],
+        limits: f.settings,
+      },
+      f.settings,
+      signal,
+    ),
+    { code: 'INVALID_PDF' },
+  );
+
+  const streamDoc = await PDFDocument.create();
+  const streamPage = streamDoc.addPage([100, 100]);
+  const sharedChunk = streamDoc.context.register(
+    streamDoc.context.flateStream('0 0 10 10 re f '.repeat(600)),
+  );
+  streamPage.node.set(PDFName.of('Contents'), sharedChunk);
+  const streamBytes = await streamDoc.save();
+  const smallLimits = { ...f.settings, maxFileBytes: 12000 };
+  await assert.rejects(
+    pdfTask(
+      {
+        operation: 'assemble',
+        sources: [
+          { bytes: streamBytes, source_filename: 'first.pdf' },
+          { bytes: streamBytes, source_filename: 'second.pdf' },
+        ],
+        limits: smallLimits,
+      },
+      smallLimits,
+      signal,
+    ),
+    { code: 'FILE_TOO_LARGE' },
+  );
+  streamPage.node.set(PDFName.of('Contents'), streamDoc.context.obj([sharedChunk, sharedChunk]));
+  await assert.rejects(
+    pdfTask(
+      {
+        operation: 'prepare',
+        bytes: await streamDoc.save(),
+        limits: smallLimits,
+      },
+      smallLimits,
+      signal,
+    ),
+    { code: 'FILE_TOO_LARGE' },
+  );
+
+  for (const snippet of [
+    '<rect style="fill:url(\' https://example.test/p.svg#paint\')"/>',
+    '<rect style="fill:url(https://example.test/p.svg#paint"/>',
+    '<style>@im<style/>port url(https://example.test/font.css);</style>',
+  ]) {
+    await assert.rejects(
+      pdfTask(
+        {
+          operation: 'validateSvg',
+          bytes: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg">${snippet}</svg>`),
+          limits: f.settings,
+        },
+        f.settings,
+        signal,
+      ),
+      { code: 'SVG_NOT_SELF_CONTAINED' },
+    );
+  }
 });

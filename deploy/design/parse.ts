@@ -90,7 +90,11 @@ type PdfLimits = z.infer<typeof limitsSchema>;
 type Packet = z.infer<typeof packetSchema>;
 export type PdfSource = z.infer<typeof sourceSchema>;
 
-async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocument> {
+async function readPdf(
+  bytes: Uint8Array,
+  settings: PdfLimits,
+  maxExpandedBytes = settings.maxFileBytes,
+): Promise<{ pdf: PDFDocument; expanded: number }> {
   let pdf: PDFDocument;
   try {
     pdf = await PDFDocument.load(bytes, { throwOnInvalidObject: true });
@@ -104,7 +108,7 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
   if (pdf.catalog.has(PDFName.of('OutputIntents')))
     throw new ToolFailure('PDF_COLOR_PROFILE_UNSUPPORTED');
   const pages = pdf.getPages();
-  pruneResources(pdf, settings.maxFileBytes);
+  const expanded = pruneResources(pdf, maxExpandedBytes);
   for (const page of pages) {
     // 缩略图不参与当前图纸渲染，移除后避免携带旧版本的隐藏画面。
     page.node.delete(PDFName.of('Thumb'));
@@ -138,19 +142,20 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
       const subtype = object.lookup(PDFName.of('Subtype'));
       const image = subtype === PDFName.of('Image');
       const form = subtype === PDFName.of('Form');
-      if (type === PDFName.of('XObject') && !image && !form)
+      if ((type === PDFName.of('XObject') && !image && !form) || subtype === PDFName.of('PS'))
         throw new ToolFailure('PDF_XOBJECT_UNSUPPORTED');
+      if (subtype === PDFName.of('Type3')) throw new ToolFailure('PDF_TYPE3_FONT_UNSUPPORTED');
       // 元数据不参与图纸渲染，发布副本不携带源文件的隐私或旧版本信息。
-      const metadata = object.lookup(PDFName.of('Metadata'));
-      if (
-        type === PDFName.of('Page') ||
-        image ||
-        form ||
-        (metadata instanceof PDFStream &&
-          (metadata.dict.lookup(PDFName.of('Type')) === PDFName.of('Metadata') ||
-            metadata.dict.lookup(PDFName.of('Subtype')) === PDFName.of('XML')))
-      )
-        object.delete(PDFName.of('Metadata'));
+      for (const [key, entry] of object.entries()) {
+        const value = pdf.context.lookup(entry);
+        if (
+          (key === PDFName.of('Metadata') && (type === PDFName.of('Page') || image || form)) ||
+          (value instanceof PDFStream &&
+            (value.dict.lookup(PDFName.of('Type')) === PDFName.of('Metadata') ||
+              value.dict.lookup(PDFName.of('Subtype')) === PDFName.of('XML')))
+        )
+          object.delete(key);
+      }
       if (
         (form && object.has(PDFName.of('Ref'))) ||
         ((image || form) && object.has(PDFName.of('OPI')))
@@ -219,7 +224,7 @@ async function readPdf(bytes: Uint8Array, settings: PdfLimits): Promise<PDFDocum
     const rotation = ((page.getRotation().angle % 360) + 360) % 360;
     if (![0, 90, 180, 270].includes(rotation)) throw new ToolFailure('PDF_PAGE_UNSUPPORTED');
   }
-  return pdf;
+  return { pdf, expanded };
 }
 
 async function processInput(input: PdfInput): Promise<PdfResult> {
@@ -235,7 +240,7 @@ async function processInput(input: PdfInput): Promise<PdfResult> {
     return { operation: 'validateSvg' };
   }
   if (input.operation === 'inspect') {
-    const pdf = await readPdf(input.bytes, input.limits);
+    const { pdf } = await readPdf(input.bytes, input.limits);
     if (input.page > pdf.getPageCount()) throw new ToolFailure('PDF_PAGE_NOT_FOUND');
     const page = pdf.getPage(input.page - 1);
     const rotated = page.getRotation().angle % 180 !== 0;
@@ -251,8 +256,14 @@ async function processInput(input: PdfInput): Promise<PdfResult> {
   const combined = await PDFDocument.create();
   combined.catalog.getOrCreateViewerPreferences().setPrintScaling(PrintScaling.None);
   const pages: z.infer<typeof pageSchema>[] = [];
+  let expandedBytes = 0;
   for (const source of sources) {
-    const pdf = await readPdf(source.bytes, input.limits);
+    const { pdf, expanded } = await readPdf(
+      source.bytes,
+      input.limits,
+      input.limits.maxFileBytes - expandedBytes,
+    );
+    expandedBytes += expanded;
     if (combined.getPageCount() + pdf.getPageCount() > input.limits.maxPdfPages)
       throw new ToolFailure('PDF_PAGE_LIMIT');
     const copied = await combined.copyPages(pdf, pdf.getPageIndices());
@@ -356,6 +367,7 @@ export function pdfTask(
         stackSizeMb: 2,
       },
     });
+    const invalid = input.operation === 'validateSvg' ? 'INVALID_SVG' : 'INVALID_PDF';
     let packet: Packet | undefined;
     let failure: ToolFailure | undefined;
     const cancel = () => {
@@ -366,14 +378,14 @@ export function pdfTask(
     worker.on('message', (message: unknown) => {
       const result = packetSchema.safeParse(message);
       if (!result.success || (result.data.ok && result.data.value.operation !== input.operation)) {
-        failure = new ToolFailure('INVALID_PDF');
+        failure = new ToolFailure(invalid);
         return;
       }
       packet = result.data;
     });
     worker.on('error', (error: Error & { code?: string }) => {
       failure = new ToolFailure(
-        error.code === 'ERR_WORKER_OUT_OF_MEMORY' ? 'FILE_TOO_LARGE' : 'INVALID_PDF',
+        error.code === 'ERR_WORKER_OUT_OF_MEMORY' ? 'FILE_TOO_LARGE' : invalid,
       );
     });
     // 线程退出后才释放调用方的工作名额，避免取消后继续消耗内存和 CPU。
@@ -381,7 +393,7 @@ export function pdfTask(
       signal.removeEventListener('abort', cancel);
       if (signal.aborted) return reject(new ToolFailure('REQUEST_CANCELLED'));
       if (failure) return reject(failure);
-      if (code !== 0 || !packet) return reject(new ToolFailure('INVALID_PDF'));
+      if (code !== 0 || !packet) return reject(new ToolFailure(invalid));
       if (!packet.ok) return reject(new ToolFailure(packet.error.code));
       resolve(packet.value);
     });
