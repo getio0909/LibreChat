@@ -24,6 +24,7 @@ derivatives:
     width: 512
     height: 384
 library_type: 材质纹理
+region: 未知
 studio_roles:
 - 材质
 - 参考

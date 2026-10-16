@@ -24,6 +24,7 @@ derivatives:
     width: 512
     height: 289
 library_type: 建筑景观
+region: 中国南方
 studio_roles:
 - 风格
 - 造型

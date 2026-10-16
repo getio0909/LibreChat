@@ -24,6 +24,7 @@ derivatives:
     width: 287
     height: 512
 library_type: 法器供器
+region: 未知
 studio_roles:
 - 物件
 - 造型

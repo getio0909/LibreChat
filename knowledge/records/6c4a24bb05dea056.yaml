@@ -24,6 +24,7 @@ derivatives:
     width: 322
     height: 512
 library_type: 造像雕塑
+region: 未知
 studio_roles:
 - 造型
 - 物件

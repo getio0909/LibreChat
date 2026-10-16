@@ -24,6 +24,7 @@ derivatives:
     width: 512
     height: 229
 library_type: 矿山车间
+region: 未知
 studio_roles:
 - 参考
 category_l1: 常用石材大板

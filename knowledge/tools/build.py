@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
@@ -79,6 +80,7 @@ def build_index_jsonl(
             "original": rec["original"],
             "derivatives": rec["derivatives"],
             "library_type": rec["library_type"],
+            "region": rec["region"],
             "studio_roles": rec["studio_roles"],
             "category_l1": rec["category_l1"],
             "category_l2": rec["category_l2"],
@@ -89,6 +91,7 @@ def build_index_jsonl(
             "style": rec["style"],
             "ai_design_usage": rec["ai_design_usage"],
             "prompt_zh": rec["prompt_zh"],
+            "prompt_en": rec.get("prompt_en", ""),
             "tags": rec.get("tags", []),
             "material_ids": rec["material_ids"],
             "material_aliases": sorted(set(material_names)),
@@ -161,6 +164,7 @@ def build_markdown_views(
                     f"- **Original Path**: `{orig['path']}` (`{orig['width']}x{orig['height']}`, `{orig['color_mode']}`, `{orig['bytes']}` bytes)",
                     f"- **Library Type**: `{lt}` | **Studio Roles**: `{roles_str}` | **Entity Type**: `{rec['entity_type']}`",
                     f"- **Category**: `{rec['category_l1']}` / `{rec['category_l2']}`",
+                    f"- **Cultural Region**: `{rec['region']}`",
                     f"- **Catalog Stones (`material_ids`)**: `{mat_ids_str}`",
                     f"- **Materials**: {mats_str}",
                     f"- **Colors**: {colors_str}",
@@ -183,6 +187,7 @@ def build_originals_archive(
     records: list[dict[str, Any]],
     dist_dir: Path,
     wiki_root: Path,
+    delta: bool = False,
 ) -> Path:
     dist_dir.mkdir(parents=True, exist_ok=True)
     manifest_entries: list[dict[str, Any]] = []
@@ -193,7 +198,21 @@ def build_originals_archive(
         rel_path = orig["path"]
         src_file = wiki_root / rel_path
         if not src_file.is_file():
-            raise FileNotFoundError(f"Original source file missing in wiki root: {src_file}")
+            raise FileNotFoundError(
+                f"Original source file missing in wiki root: {src_file}"
+            )
+        if (
+            Path(rel_path).is_absolute()
+            or ".." in Path(rel_path).parts
+            or not src_file.resolve().is_relative_to(wiki_root.resolve())
+        ):
+            raise ValueError("Original archive path escapes wiki root")
+        raw = src_file.read_bytes()
+        if (
+            len(raw) != orig["bytes"]
+            or hashlib.sha256(raw).hexdigest() != orig["sha256"]
+        ):
+            raise ValueError(f"Original SHA256/size mismatch: {rec['id']}")
         manifest_entries.append(
             {
                 "id": rec["id"],
@@ -208,21 +227,27 @@ def build_originals_archive(
         )
         sha256_lines.append(f"{orig['sha256']}  {rel_path}")
 
-    manifest_path = dist_dir / "originals-manifest.json"
+    prefix = "originals-delta" if delta else "originals"
+    manifest_path = dist_dir / f"{prefix}-manifest.json"
     manifest_path.write_text(
         json.dumps(
-            {"version": "v1", "count": len(manifest_entries), "files": manifest_entries},
+            {
+                "version": "v1",
+                "kind": "delta" if delta else "full",
+                "count": len(manifest_entries),
+                "files": manifest_entries,
+            },
             ensure_ascii=False,
             indent=2,
         ),
         encoding="utf-8",
     )
 
-    sums_path = dist_dir / "SHA256SUMS"
+    sums_path = dist_dir / ("originals-delta-SHA256SUMS" if delta else "SHA256SUMS")
     sums_path.write_text("\n".join(sha256_lines) + "\n", encoding="utf-8")
 
     use_zstd = shutil.which("zstd") is not None
-    archive_name = "originals-v1.tar.zst" if use_zstd else "originals-v1.tar.gz"
+    archive_name = f"{prefix}-v1.tar.zst" if use_zstd else f"{prefix}-v1.tar.gz"
     archive_path = dist_dir / archive_name
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -231,7 +256,7 @@ def build_originals_archive(
         shutil.copy2(sums_path, tmp_p / "SHA256SUMS")
         file_list_path = tmp_p / "files.txt"
         rel_paths = [r["original"]["path"] for r in records]
-        file_list_path.write_text("\n".join(rel_paths) + "\n", encoding="utf-8")
+        file_list_path.write_bytes("\0".join(rel_paths).encode("utf-8") + b"\0")
 
         cmd: list[str] = ["tar"]
         if use_zstd:
@@ -248,6 +273,8 @@ def build_originals_archive(
                 "SHA256SUMS",
                 "-C",
                 str(wiki_root),
+                "--null",
+                "--verbatim-files-from",
                 "-T",
                 str(file_list_path),
             ]
@@ -257,10 +284,28 @@ def build_originals_archive(
     return archive_path
 
 
+# 显式选择增量原图集合，拒绝空集合、重复或不存在的资产标识
+def select_archive_records(
+    records: list[dict[str, Any]], ids: list[str]
+) -> list[dict[str, Any]]:
+    wanted = set(ids)
+    if not wanted or len(wanted) != len(ids):
+        raise ValueError("Archive IDs must be nonempty and unique")
+    existing = {record["id"] for record in records}
+    if not wanted.issubset(existing):
+        raise ValueError("Archive IDs include unknown assets")
+    return [record for record in records if record["id"] in wanted]
+
+
 # 命令行入口：执行dist目录下的索引、视图和原图归档构建
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Build dist/index.jsonl, dist/views/*.md, and dist/originals-v1.tar.zst."
+    )
+    parser.add_argument(
+        "--archive-ids",
+        type=Path,
+        help="Text file with one asset ID per line; package only those originals as a delta.",
     )
     parser.add_argument(
         "--repo-root",
@@ -278,6 +323,8 @@ def main(argv: list[str] | None = None) -> int:
         help="Skip building the originals tar.zst archive.",
     )
     args = parser.parse_args(argv)
+    if args.archive_ids and args.skip_archive:
+        parser.error("--archive-ids cannot be combined with --skip-archive.")
 
     repo_root = Path(args.repo_root).resolve()
     dist_dir = repo_root / "dist"
@@ -286,6 +333,16 @@ def main(argv: list[str] | None = None) -> int:
         print("Error: No records found in records/.", file=sys.stderr)
         return 1
 
+    archive_records = records
+    if args.archive_ids:
+        try:
+            archive_records = select_archive_records(
+                records, args.archive_ids.read_text(encoding="utf-8").splitlines()
+            )
+        except (OSError, ValueError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
     index_path = build_index_jsonl(repo_root, records, dist_dir)
     views = build_markdown_views(records, dist_dir)
     print(f"Built {index_path.relative_to(repo_root)} ({len(records)} records)")
@@ -293,9 +350,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.skip_archive:
         wiki_root = Path(args.wiki_root).resolve()
-        archive_path = build_originals_archive(records, dist_dir, wiki_root)
+        archive_path = build_originals_archive(
+            archive_records, dist_dir, wiki_root, delta=bool(args.archive_ids)
+        )
         size_mb = archive_path.stat().st_size / (1024 * 1024)
-        print(f"Built {archive_path.relative_to(repo_root)} ({size_mb:.2f} MB)")
+        print(
+            f"Built {archive_path.relative_to(repo_root)} ({len(archive_records)} originals, {size_mb:.2f} MiB)"
+        )
 
     return 0
 

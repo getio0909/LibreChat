@@ -193,6 +193,8 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
     seen_orig_shas: set[str] = set()
     expected_refs: set[str] = set()
     expected_thumbs: set[str] = set()
+    import_manifests: dict[str, dict[str, Any]] = {}
+    referenced_imports: dict[str, set[str]] = {}
 
     for rec_file in record_files:
         rel_rec = f"records/{rec_file.name}"
@@ -219,15 +221,19 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
             errors.append(f"{rel_rec}: schema error at {loc}: {v_err.message}")
 
         for field_path, str_val in _iter_strings(data):
-            is_web_url = field_path == "provenance.url" and str_val.startswith(
-                ("https://", "http://")
-            )
+            is_web_url = field_path in (
+                "provenance.url",
+                "provenance.download_url",
+                "provenance.license_url",
+            ) and str_val.startswith(("https://", "http://"))
             if str_val.startswith("wiki/") or (not is_web_url and "/wiki/" in str_val):
                 errors.append(
                     f"{rel_rec}: forbidden 'wiki/' prefix in {field_path}: {str_val}"
                 )
             if field_path in (
                 "source.original_path",
+                "source.wiki_doc",
+                "source.import_manifest",
                 "original.path",
                 "derivatives.ref2048.path",
                 "derivatives.thumb512.path",
@@ -261,6 +267,69 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
             seen_orig_shas.add(orig_sha)
 
         src_obj = data.get("source") or {}
+        manifest_rel = src_obj.get("import_manifest")
+        if isinstance(manifest_rel, str):
+            manifest_path = root / manifest_rel
+            if (
+                not manifest_path.resolve().is_relative_to(root.resolve())
+                or not manifest_path.is_file()
+            ):
+                errors.append(f"{rel_rec}: missing or invalid import manifest")
+            else:
+                # 每个导入批次只解析一次，并校验原始侧录与规范记录的对应关系
+                if manifest_rel not in import_manifests:
+                    import_manifests[manifest_rel] = {}
+                    try:
+                        manifest_raw = manifest_path.read_bytes()
+                        manifest_text = manifest_raw.decode("utf-8")
+                        errors.extend(
+                            _scan_text_security_and_paths(manifest_text, manifest_rel)
+                        )
+                        if (
+                            hashlib.sha256(manifest_raw).hexdigest()[:16]
+                            != manifest_path.stem
+                        ):
+                            errors.append(
+                                f"{manifest_rel}: import manifest hash mismatch"
+                            )
+                        items = [
+                            json.loads(line)
+                            for line in manifest_text.splitlines()
+                            if line.strip()
+                        ]
+                        for item in items:
+                            aid = item["id"]
+                            if aid in import_manifests[manifest_rel]:
+                                errors.append(
+                                    f"{manifest_rel}: duplicate import asset ID"
+                                )
+                            import_manifests[manifest_rel][aid] = item
+                    except (
+                        OSError,
+                        UnicodeDecodeError,
+                        ValueError,
+                        KeyError,
+                        TypeError,
+                    ):
+                        errors.append(f"{manifest_rel}: invalid import manifest")
+                referenced_imports.setdefault(manifest_rel, set()).add(rec_id)
+                try:
+                    item = import_manifests[manifest_rel][rec_id]
+                    audit = item["provenance"]
+                    entry = item["index"]
+                    if (
+                        audit["status"] != "accepted"
+                        or audit["sha256"] != orig_sha
+                        or audit["bytes"] != orig.get("bytes")
+                        or entry["id"] != src_obj.get("original_path")
+                        or entry["wiki_doc"].removeprefix("wiki/")
+                        != src_obj.get("wiki_doc")
+                    ):
+                        errors.append(f"{rel_rec}: import manifest metadata mismatch")
+                except (KeyError, TypeError, AttributeError):
+                    errors.append(
+                        f"{rel_rec}: missing or invalid import manifest entry"
+                    )
         if src_obj.get("original_path") != orig.get("path"):
             errors.append(
                 f"{rel_rec}: source.original_path '{src_obj.get('original_path')}' != original.path '{orig.get('path')}'"
@@ -370,6 +439,10 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
                             )
                 except (OSError, ValueError, SyntaxError) as exc:
                     errors.append(f"{rel_rec}: failed to open {exp_thumb_rel}: {exc}")
+
+    for manifest_rel, imported in import_manifests.items():
+        if set(imported) != referenced_imports.get(manifest_rel, set()):
+            errors.append(f"{manifest_rel}: unreferenced import manifest entries")
 
     if ref_dir.is_dir():
         actual_refs = {p.name for p in ref_dir.iterdir() if p.is_file()}

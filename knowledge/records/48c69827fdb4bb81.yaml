@@ -24,6 +24,7 @@ derivatives:
     width: 512
     height: 277
 library_type: 家具木作
+region: 中国南方
 studio_roles:
 - 纹样
 - 造型

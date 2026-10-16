@@ -24,6 +24,7 @@ derivatives:
     width: 512
     height: 154
 library_type: 家具木作
+region: 未知
 studio_roles:
 - 纹样
 - 参考
