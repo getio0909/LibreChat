@@ -100,10 +100,10 @@ def source_dimensions(
     return width, height
 
 
-# 规范化参考图片：校验目录、限制40MP、EXIF方向转置并剥离、ICC/CMYK转sRGB、长边缩放至2048以内
-def normalize_reference(
+# 规范化参考图片并返回Data URI与EXIF方向校正后的像素尺寸
+def normalize_reference_with_size(
     path: str | Path, allowed_roots: tuple[Path, ...], *, linework: bool = False
-) -> str:
+) -> tuple[str, tuple[int, int]]:
     candidate = Path(path)
     matched_root: Path | None = None
     for root in allowed_roots:
@@ -132,6 +132,7 @@ def normalize_reference(
                         "Reference image exceeds 40 MP maximum resolution limit"
                     )
                 im = ImageOps.exif_transpose(source)
+                oriented_size = (im.width, im.height)
                 has_alpha = "A" in im.getbands() or "transparency" in im.info
                 alpha = im.convert("RGBA").getchannel("A") if has_alpha else None
                 icc_bytes = source.info.get("icc_profile")
@@ -178,7 +179,16 @@ def normalize_reference(
         raise ValueError("Reference image cannot be safely decoded") from None
     finally:
         Image.MAX_IMAGE_PIXELS = previous_max
-    return prefix + base64.b64encode(output.getvalue()).decode("ascii")
+    data_uri = prefix + base64.b64encode(output.getvalue()).decode("ascii")
+    return data_uri, oriented_size
+
+
+# 规范化参考图片：校验目录、限制40MP、EXIF方向转置并剥离、ICC/CMYK转sRGB、长边缩放至2048以内
+def normalize_reference(
+    path: str | Path, allowed_roots: tuple[Path, ...], *, linework: bool = False
+) -> str:
+    data_uri, _ = normalize_reference_with_size(path, allowed_roots, linework=linework)
+    return data_uri
 
 
 # 将商业石材名称与别名替换为图N所示石材

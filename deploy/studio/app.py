@@ -39,6 +39,7 @@ from .images import (
     generate_seedream,
     neutralize_stone_names,
     normalize_reference,
+    normalize_reference_with_size,
 )
 from .planner import plan_concepts
 from .store import (
@@ -373,7 +374,9 @@ def build_mcp_server(
                     )
 
                 base_resolved = resolve_image(settings, user_id, base_id)
-                base_uri = normalize_reference(base_resolved.path, allowed_roots)
+                base_uri, base_size = normalize_reference_with_size(
+                    base_resolved.path, allowed_roots
+                )
 
                 resolved_refs = []
                 for item in raw_refs:
@@ -411,7 +414,7 @@ def build_mcp_server(
                         all_uris,
                         size=size,
                         aspect="source",
-                        source_size=(base_resolved.width, base_resolved.height),
+                        source_size=base_size,
                         destination=job_dir,
                         transport=ark_transport,
                     )

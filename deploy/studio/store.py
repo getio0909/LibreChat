@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .config import StudioSettings
 
@@ -138,11 +138,11 @@ def read_bytes_no_follow(
         os.close(fd)
 
 
-# 安全读取图片宽高尺寸
+# 安全读取经EXIF方向校正后的图片宽高尺寸
 def _read_image_dimensions(path: Path, root: Path) -> tuple[int, int]:
     raw = read_bytes_no_follow(path, root)
     with Image.open(io.BytesIO(raw)) as img:
-        return img.size
+        return ImageOps.exif_transpose(img).size
 
 
 # 将纳秒时间戳格式化为UTC ISO8601字符串
@@ -337,12 +337,9 @@ def _collect_user_images(
                     if original_path.is_symlink() or not original_path.is_file():
                         continue
                     stat_info = original_path.stat(follow_symlinks=False)
-                    width = int(receipt_data.get("width") or 0)
-                    height = int(receipt_data.get("height") or 0)
-                    if width <= 0 or height <= 0:
-                        width, height = _read_image_dimensions(
-                            original_path, studio_dir
-                        )
+                    width, height = _read_image_dimensions(
+                        original_path, studio_dir
+                    )
                     results.append(
                         ResolvedImage(
                             id=job_dir.name,
@@ -426,12 +423,9 @@ def resolve_image(
                     original_path = job_dir / original_name
                     ensure_safe_subpath(original_path, studio_dir)
                     stat_info = original_path.stat(follow_symlinks=False)
-                    width = int(receipt_data.get("width") or 0)
-                    height = int(receipt_data.get("height") or 0)
-                    if width <= 0 or height <= 0:
-                        width, height = _read_image_dimensions(
-                            original_path, studio_dir
-                        )
+                    width, height = _read_image_dimensions(
+                        original_path, studio_dir
+                    )
                     return ResolvedImage(
                         id=cleaned_id,
                         kind="studio",

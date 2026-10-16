@@ -1248,6 +1248,81 @@ def test_stone_neutralization_only_for_matching_references(
     assert "图2所示石材" in mixed_prompt
 
 
+# 校验EXIF Orientation 6与8的4000x3000底图在edit_image中旋转像素尺寸与请求输出比例一致（竖幅）
+def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+
+    id_orient_6 = "66666666-1111-2222-3333-444444444444"
+    id_orient_8 = "88888888-1111-2222-3333-444444444444"
+
+    (user_lc / f"{id_orient_6}__photo6.jpg").write_bytes(
+        _make_image_bytes(4000, 3000, fmt="JPEG", exif_orientation=6)
+    )
+    (user_lc / f"{id_orient_8}__photo8.jpg").write_bytes(
+        _make_image_bytes(4000, 3000, fmt="JPEG", exif_orientation=8)
+    )
+
+    # 验证store解析与列表尺寸均为EXIF转置后的竖幅3000x4000
+    for fid in (id_orient_6, id_orient_8):
+        resolved = resolve_image(studio_env, USER_A, fid)
+        assert (resolved.width, resolved.height) == (3000, 4000)
+
+    captured_requests: list[dict[str, Any]] = []
+    out_jpg = _make_image_bytes(1776, 2368, fmt="JPEG")
+
+    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+        captured_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(
+            200,
+            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_ark_handler),
+    )
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            for idx, fid in enumerate((id_orient_6, id_orient_8), start=1):
+                res = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": idx,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "edit_image",
+                            "arguments": {
+                                "base_id": fid,
+                                "instruction": "微调边角倒角",
+                                "size": "2K",
+                            },
+                        },
+                    },
+                )
+                assert res.status_code == 200
+                assert res.json()["result"]["isError"] is False
+                req_body = captured_requests[-1]
+                assert req_body["size"] == "1776x2368"
+                sent_b64 = req_body["image"].split(",", 1)[1]
+                with Image.open(io.BytesIO(base64.b64decode(sent_b64))) as sent_im:
+                    assert sent_im.width < sent_im.height
+                    assert sent_im.size == (1536, 2048)
+
+    asyncio.run(_run())
+
+
+
 
 
 
