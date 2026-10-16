@@ -1,0 +1,9 @@
+{
+  "provider": "deepseek",
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-v4-pro",
+  "key_file": "/Users/ipd/.config/zyb-design/deepseek.api",
+  "reasoning_effort": "max",
+  "max_tokens": 16000,
+  "timeout_seconds": 540
+}
