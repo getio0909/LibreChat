@@ -21,7 +21,7 @@ from deploy.studio.images import (
     normalize_reference,
     source_dimensions,
 )
-from deploy.studio.planner import plan_concepts
+from deploy.studio.planner import build_planner_system_prompt, plan_concepts
 from deploy.studio.store import list_user_images, resolve_image
 
 # 测试固定常量定义
@@ -517,9 +517,9 @@ def test_planner_gemini_rest_payload_and_no_retry(studio_env: StudioSettings) ->
         assert gen_cfg["responseMimeType"] == "application/json"
         assert "responseSchema" in gen_cfg
         sys_text = captured[0]["systemInstruction"]["parts"][0]["text"]
-        assert rules.planner_system in sys_text
-        assert rules.planner_rules in sys_text
-        assert rules.no_reference_rules in sys_text
+        assert rules.planner_system.replace("{count}", "3") in sys_text
+        assert rules.planner_rules.replace("{count}", "3") in sys_text
+        assert rules.no_reference_rules.replace("{count}", "3") in sys_text
 
         # 验证超时不自动重试
         fail_calls = 0
@@ -1412,8 +1412,111 @@ def test_concept_rendering_includes_binding_design_constraints(
     asyncio.run(_run())
 
 
+# 校验count=1/2/3时组装的systemInstruction与user提示词中无冲突数量指令，且仅引用responseSchema定义的6个字段
+def test_planner_instructions_consistent_for_counts_1_to_3(
+    studio_env: StudioSettings,
+) -> None:
+    rules = load_rules()
+    forbidden_count_tokens = ("exactly 4", "3–4", "3-4", "4 个", "4个", "{count}")
+    forbidden_legacy_fields = (
+        '"summary"',
+        "material_notes",
+        '"silhouette"',
+        "key_features",
+        '"craftsmanship"',
+        '"styling"',
+        "render_prompt",
+    )
+    expected_schema_fields = (
+        "title",
+        "positioning",
+        "description",
+        "materials",
+        "key_details",
+        "image_prompt",
+    )
 
+    async def _run() -> None:
+        for count in (1, 2, 3):
+            sys_no_ref = build_planner_system_prompt(
+                rules, has_references=False, count=count
+            )
+            sys_with_ref = build_planner_system_prompt(
+                rules, has_references=True, count=count
+            )
+            for sys_text in (sys_no_ref, sys_with_ref):
+                assert f"围绕当前品类和目标提出 {count} 个不同" in sys_text
+                assert f"concepts长度严格为 {count}" in sys_text
+                assert f"在全部 {count} 个方向中均须保留" in sys_text
+                for bad_tok in forbidden_count_tokens:
+                    assert bad_tok not in sys_text
+                for legacy_field in forbidden_legacy_fields:
+                    assert legacy_field not in sys_text
+                for valid_field in expected_schema_fields:
+                    assert valid_field in sys_text
+            assert f"完成既定 JSON 格式的 {count} 个完整设计方向" in sys_no_ref
 
+            captured: list[dict[str, Any]] = []
 
+            async def _gemini_handler(
+                request: httpx.Request,
+                target_count: int = count,
+                bucket: list[dict[str, Any]] = captured,
+            ) -> httpx.Response:
+                body = json.loads(request.content.decode("utf-8"))
+                bucket.append(body)
+                concepts = [
+                    {
+                        "title": f"方案{i}",
+                        "positioning": "禅意定位",
+                        "description": "造型说明",
+                        "materials": "石材（待确认）",
+                        "key_details": "工艺收口",
+                        "image_prompt": f"Concept {i} render prompt.",
+                    }
+                    for i in range(1, target_count + 1)
+                ]
+                return httpx.Response(
+                    200,
+                    json={
+                        "candidates": [
+                            {
+                                "content": {
+                                    "parts": [
+                                        {
+                                            "text": json.dumps(
+                                                {"concepts": concepts},
+                                                ensure_ascii=False,
+                                            )
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                )
 
+            result = await plan_concepts(
+                studio_env,
+                rules,
+                brief="设计寺庙供桌",
+                count=count,
+                transport=httpx.MockTransport(_gemini_handler),
+            )
+            assert len(result) == count
+            sent_body = captured[0]
+            sent_sys = sent_body["systemInstruction"]["parts"][0]["text"]
+            sent_user = sent_body["contents"][0]["parts"][0]["text"]
+            schema_props = (
+                sent_body["generationConfig"]["responseSchema"]["properties"][
+                    "concepts"
+                ]["items"]["properties"]
+            )
+            assert set(schema_props.keys()) == set(expected_schema_fields)
+            for text_part in (sent_sys, sent_user):
+                for bad_tok in forbidden_count_tokens:
+                    assert bad_tok not in text_part
+                for legacy_field in forbidden_legacy_fields:
+                    assert legacy_field not in text_part
 
+    asyncio.run(_run())

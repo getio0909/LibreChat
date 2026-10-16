@@ -36,17 +36,16 @@ CONCEPT_RESPONSE_SCHEMA: dict[str, Any] = {
 }
 
 
-# 组装概念规划器的系统提示词（合并planner_system、planner_rules与无参考策略）
+# 组装概念规划器的系统提示词（按请求方案数渲染planner_system、planner_rules与无参考策略）
 def build_planner_system_prompt(
     rules: StudioRules, count: int, has_references: bool
 ) -> str:
-    sections = [rules.planner_system, rules.planner_rules]
+    sections = [
+        rules.planner_system.replace("{count}", str(count)),
+        rules.planner_rules.replace("{count}", str(count)),
+    ]
     if not has_references:
-        sections.append(rules.no_reference_rules)
-    sections.append(
-        f"本次请求需严格输出 {count} 个在形态和构思上明显不同的概念方案，所有公开说明字段均使用简体中文，"
-        "并严格按照 responseSchema 输出包含 title、positioning、description、materials、key_details、image_prompt 的 JSON 对象。"
-    )
+        sections.append(rules.no_reference_rules.replace("{count}", str(count)))
     return "\n".join(sections)
 
 
@@ -54,18 +53,12 @@ def build_planner_system_prompt(
 def _normalize_concept_item(raw_item: Any, index: int) -> dict[str, str]:
     if not isinstance(raw_item, dict):
         raise TypeError(f"Concept item at index {index} must be an object")
-    title = str(raw_item.get("title") or raw_item.get("name") or "").strip()
-    positioning = str(
-        raw_item.get("positioning") or raw_item.get("rationale") or ""
-    ).strip()
-    description = str(
-        raw_item.get("description") or raw_item.get("concept") or ""
-    ).strip()
+    title = str(raw_item.get("title") or "").strip()
+    positioning = str(raw_item.get("positioning") or "").strip()
+    description = str(raw_item.get("description") or "").strip()
     materials = str(raw_item.get("materials") or "").strip()
-    key_details = str(raw_item.get("key_details") or raw_item.get("form") or "").strip()
-    image_prompt = str(
-        raw_item.get("image_prompt") or raw_item.get("image_description_en") or ""
-    ).strip()
+    key_details = str(raw_item.get("key_details") or "").strip()
+    image_prompt = str(raw_item.get("image_prompt") or "").strip()
 
     if not all((title, positioning, description, materials, key_details, image_prompt)):
         raise ValueError(f"Concept item at index {index} is missing required fields")
