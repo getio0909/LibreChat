@@ -18,6 +18,7 @@ from deploy.studio.images import (
     GenerationUncertain,
     build_edit_prompt,
     build_generate_prompt,
+    comparison_target,
     generate_seedream,
     normalize_reference,
     source_dimensions,
@@ -1779,7 +1780,7 @@ def test_search_library_ranking_filters_aliases_and_flagged_handling(
     studio_env: StudioSettings,
 ) -> None:
     kb_index = load_kb_index(studio_env.kb_root)
-    assert len(kb_index.records) == 9
+    assert len(kb_index.records) == 12
 
     # 1. 石材别名展开：查询“天川金”命中“敦煌金”关联记录，标题与材质均匹配的样板排在前面
     alias_hits = kb_index.search(query="天川金", limit=6, include_flagged=False)
@@ -2994,5 +2995,565 @@ def test_seed3d_per_user_and_global_concurrency_limits(
                 _call_3d(client, user_c, 16),
             )
             assert max_seed3d_observed == 3
+
+    asyncio.run(_run())
+
+
+# 回归测试Finding 1：compare_materials自动选择材质样图时排除带标记样图，若某材质仅剩带标记样图则拒绝并发起零请求
+def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_upload_id = "f1111111-1111-2222-3333-444444444444"
+    base_path = user_lc / f"{base_upload_id}__hall_base.jpg"
+    base_path.write_bytes(_make_image_bytes(160, 120, color=(100, 90, 80), fmt="JPEG"))
+
+    rules = load_rules()
+    allowed_roots = (
+        studio_env.librechat_images_dir,
+        studio_env.data_dir,
+        studio_env.kb_root,
+    )
+    expected_base_uri = normalize_reference(base_path, allowed_roots)
+    expected_gold_jade_unflagged_uri = normalize_reference(
+        studio_env.kb_root / "assets" / "ref2048" / "3333333333333331.jpg",
+        allowed_roots,
+    )
+    expected_blue_grey_unflagged_uri = normalize_reference(
+        studio_env.kb_root / "assets" / "ref2048" / "4444444444444441.jpg",
+        allowed_roots,
+    )
+
+    ark_requests: list[dict[str, Any]] = []
+    out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
+
+    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+        ark_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(
+            200,
+            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=rules,
+        ark_transport=httpx.MockTransport(_ark_handler),
+    )
+
+    async def _run_fixture_kb() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 401,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "compare_materials",
+                        "arguments": {
+                            "base_id": base_upload_id,
+                            "target": "佛像背后的墙板",
+                            "materials": ["金镶玉", "蓝金灰"],
+                        },
+                    },
+                },
+            )
+            assert res.status_code == 200
+            result = res.json()["result"]
+            assert result.get("isError") is False
+            payload = json.loads(result["content"][0]["text"])
+            assert payload["comparisons"][0]["reference_ids"] == ["kb_3333333333333331"]
+            assert payload["comparisons"][1]["reference_ids"] == [
+                "kb_3333333333333331"[:3] + "4444444444444441"
+            ]
+            assert payload["warnings"] == []
+            assert len(ark_requests) == 2
+            assert ark_requests[0]["image"] == [
+                expected_base_uri,
+                expected_gold_jade_unflagged_uri,
+            ]
+            assert ark_requests[1]["image"] == [
+                expected_base_uri,
+                expected_blue_grey_unflagged_uri,
+            ]
+
+    asyncio.run(_run_fixture_kb())
+
+    # 验证生产环境真实knowledge/知识库：金镶玉排除3311484f73d6569f，蓝金灰排除4160a59fa255db3e
+    real_kb_root = Path(__file__).resolve().parents[3] / "knowledge"
+    if (real_kb_root / "catalog" / "materials.yaml").is_file():
+        real_env = studio_env.model_copy(update={"kb_root": real_kb_root})
+        real_allowed = (
+            real_env.librechat_images_dir,
+            real_env.data_dir,
+            real_env.kb_root,
+        )
+        expected_real_gold = normalize_reference(
+            real_kb_root / "assets" / "ref2048" / "d2149859ecaf18f1.jpg",
+            real_allowed,
+        )
+        expected_real_blue = normalize_reference(
+            real_kb_root / "assets" / "ref2048" / "68d94ad9e998ccc2.jpg",
+            real_allowed,
+        )
+        ark_requests.clear()
+        real_app = create_app(
+            settings=real_env,
+            rules=rules,
+            ark_transport=httpx.MockTransport(_ark_handler),
+        )
+
+        async def _run_real_kb() -> None:
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=real_app),
+                base_url="http://studio:8000",
+            ) as client:
+                res = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 402,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "compare_materials",
+                            "arguments": {
+                                "base_id": base_upload_id,
+                                "target": "佛像背后的墙板",
+                                "materials": ["金镶玉", "蓝金灰"],
+                            },
+                        },
+                    },
+                )
+                assert res.status_code == 200
+                result = res.json()["result"]
+                assert result.get("isError") is False
+                payload = json.loads(result["content"][0]["text"])
+                assert payload["comparisons"][0]["reference_ids"] == [
+                    "kb_d2149859ecaf18f1"
+                ]
+                assert payload["comparisons"][1]["reference_ids"] == [
+                    "kb_68d94ad9e998ccc2"
+                ]
+                assert payload["warnings"] == []
+                assert len(ark_requests) == 2
+                assert ark_requests[0]["image"] == [
+                    expected_base_uri,
+                    expected_real_gold,
+                ]
+                assert ark_requests[1]["image"] == [
+                    expected_base_uri,
+                    expected_real_blue,
+                ]
+
+        asyncio.run(_run_real_kb())
+
+    # 验证当某材质的所有目录样图均带质量或审核标记时，compare_materials拒绝调用且不派发任何图像请求
+    all_flagged_kb = _populate_fixture_kb(tmp_path / "kb_all_flagged")
+    mat_yaml_path = all_flagged_kb / "catalog" / "materials.yaml"
+    mat_yaml_text = mat_yaml_path.read_text(encoding="utf-8").replace(
+        '- "3333333333333331"\n      - "3333333333333332"',
+        '- "3333333333333332"',
+    )
+    mat_yaml_path.write_text(mat_yaml_text, encoding="utf-8")
+    flagged_env = studio_env.model_copy(update={"kb_root": all_flagged_kb})
+    ark_requests.clear()
+    flagged_app = create_app(
+        settings=flagged_env,
+        rules=rules,
+        ark_transport=httpx.MockTransport(_ark_handler),
+    )
+
+    async def _run_all_flagged() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=flagged_app),
+            base_url="http://studio:8000",
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 403,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "compare_materials",
+                        "arguments": {
+                            "base_id": base_upload_id,
+                            "target": "供桌台面",
+                            "materials": ["敦煌金", "金镶玉"],
+                        },
+                    },
+                },
+            )
+            assert res.status_code == 200
+            result = res.json()["result"]
+            assert result.get("isError") is True
+            assert "no usable unflagged sample assets" in result["content"][0]["text"]
+            assert len(ark_requests) == 0
+
+    asyncio.run(_run_all_flagged())
+
+
+# 回归测试Finding 2：LibreChat持久化的search_library缩略图不污染list_images或@latest，且显式传入其UUID时映射回ref2048与KB标记警告
+def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metadata(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+
+    upload_id = "aaaa1111-2222-3333-4444-555555555555"
+    upload_file = user_lc / f"{upload_id}__room_upload.jpg"
+    upload_file.write_bytes(
+        _make_image_bytes(240, 180, color=(120, 110, 100), fmt="JPEG")
+    )
+    os.utime(upload_file, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000_000))
+
+    rules = load_rules()
+    allowed_roots = (
+        studio_env.librechat_images_dir,
+        studio_env.data_dir,
+        studio_env.kb_root,
+    )
+    expected_upload_uri = normalize_reference(upload_file, allowed_roots)
+    expected_flagged_gold_ref2048_uri = normalize_reference(
+        studio_env.kb_root / "assets" / "ref2048" / "3333333333333332.jpg",
+        allowed_roots,
+    )
+
+    ark_requests: list[dict[str, Any]] = []
+    out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
+
+    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+        ark_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(
+            200,
+            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=rules,
+        ark_transport=httpx.MockTransport(_ark_handler),
+    )
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 1. 调用search_library（含include_flagged=True检索带low_res标记的金镶玉样图kb_3333333333333332）
+            search_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 410,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "search_library",
+                        "arguments": {
+                            "query": "金镶玉",
+                            "include_flagged": True,
+                            "limit": 6,
+                        },
+                    },
+                },
+            )
+            assert search_res.status_code == 200
+            search_result = search_res.json()["result"]
+            assert search_result.get("isError") is False
+            s_blocks = search_result["content"]
+            s_payload = json.loads(s_blocks[0]["text"])
+            result_ids = [item["id"] for item in s_payload["results"]]
+            assert "kb_3333333333333331" in result_ids
+            assert "kb_3333333333333332" in result_ids
+
+            idx_unflagged = result_ids.index("kb_3333333333333331")
+            idx_flagged = result_ids.index("kb_3333333333333332")
+            thumb_unflagged_raw = base64.b64decode(s_blocks[1 + idx_unflagged]["data"])
+            thumb_flagged_raw = base64.b64decode(s_blocks[1 + idx_flagged]["data"])
+
+            # 2. 模拟LibreChat将MCP返回的ImageContent保存至/librechat/images/<userId>/<uuid>-search_library_img_*.webp
+            # 其中一张模拟sharp重新编码为WebP，另一张直接写入原始WebP字节，时间戳均晚于用户上传图
+            preview_uuid_1 = "bbbb1111-2222-3333-4444-555555555555"
+            preview_file_1 = (
+                user_lc / f"{preview_uuid_1}-search_library_img_AbCdEf01.webp"
+            )
+            with Image.open(io.BytesIO(thumb_unflagged_raw)) as im:
+                reencoded = io.BytesIO()
+                im.save(reencoded, format="WEBP", quality=85)
+                preview_file_1.write_bytes(reencoded.getvalue())
+            os.utime(
+                preview_file_1,
+                ns=(1_700_000_050_000_000_000, 1_700_000_050_000_000_000),
+            )
+
+            preview_uuid_2 = "cccc1111-2222-3333-4444-555555555555"
+            preview_file_2 = (
+                user_lc / f"{preview_uuid_2}-search_library_img_AbCdEf02.webp"
+            )
+            preview_file_2.write_bytes(thumb_flagged_raw)
+            os.utime(
+                preview_file_2,
+                ns=(1_700_000_060_000_000_000, 1_700_000_060_000_000_000),
+            )
+
+            # 3. 验证list_images不会将search_library预览缩略图列为generated
+            list_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 411,
+                    "method": "tools/call",
+                    "params": {"name": "list_images", "arguments": {"limit": 20}},
+                },
+            )
+            assert list_res.status_code == 200
+            listed_payload = json.loads(list_res.json()["result"]["content"][0]["text"])
+            listed_ids = [item["id"] for item in listed_payload["images"]]
+            assert listed_ids == [upload_id]
+            assert preview_uuid_1 not in listed_ids
+            assert preview_uuid_2 not in listed_ids
+
+            # 4. 验证@latest跳过search_library预览缩略图，准确选中早先的上传底图upload_id
+            edit_latest_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 412,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "edit_image",
+                        "arguments": {
+                            "base_id": "@latest",
+                            "instruction": "将背景墙调亮",
+                        },
+                    },
+                },
+            )
+            assert edit_latest_res.status_code == 200
+            edit_latest_meta = json.loads(
+                edit_latest_res.json()["result"]["content"][0]["text"]
+            )
+            assert edit_latest_meta["base_id"] == upload_id
+            assert ark_requests[-1]["image"] == expected_upload_uri
+
+            # 5. 验证显式传入带标记预览图的UUID时，自动映射回kb_3333333333333332的ref2048高清图、保留石材名中性化并返回low_res警告
+            edit_with_preview_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 413,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "edit_image",
+                        "arguments": {
+                            "base_id": upload_id,
+                            "instruction": "将供桌台面替换为金镶玉",
+                            "references": [
+                                {"id": preview_uuid_2, "use": "材质"},
+                            ],
+                        },
+                    },
+                },
+            )
+            assert edit_with_preview_res.status_code == 200
+            edit_preview_result = edit_with_preview_res.json()["result"]
+            assert edit_preview_result.get("isError") is False
+            edit_preview_meta = json.loads(edit_preview_result["content"][0]["text"])
+            assert any(
+                "kb_3333333333333332" in w and "low_res" in w
+                for w in edit_preview_meta["warnings"]
+            )
+            assert ark_requests[-1]["image"] == [
+                expected_upload_uri,
+                expected_flagged_gold_ref2048_uri,
+            ]
+            assert "金镶玉" not in ark_requests[-1]["prompt"]
+            assert "图2所示石材" in ark_requests[-1]["prompt"]
+
+    asyncio.run(_run())
+
+
+# 回归测试Finding 3：“敦煌壁画”不误关联“敦煌壁”石材，检索“敦煌壁”不混入壁画空间或金镶玉样板，检索“敦煌壁画”正常命中
+def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
+    studio_env: StudioSettings,
+) -> None:
+    kb_index = load_kb_index(studio_env.kb_root)
+
+    # 1. 校验fixture知识库：金镶玉样板3333333333333331（含标签“敦煌壁画感奢石”）仅绑定gold-jade，壁画空间案例9999999999999991不绑定任何石材
+    rec_gold = kb_index.get("3333333333333331")
+    assert rec_gold is not None
+    assert rec_gold.material_ids == ("gold-jade",)
+    assert "dunhuang-wall" not in rec_gold.material_ids
+
+    rec_mural = kb_index.get("9999999999999991")
+    assert rec_mural is not None
+    assert rec_mural.material_ids == ()
+
+    hits_wall = [r.id for r in kb_index.search("敦煌壁", limit=12)]
+    assert "2222222222222221" in hits_wall
+    assert "3333333333333331" not in hits_wall
+    assert "9999999999999991" not in hits_wall
+
+    hits_mural = [r.id for r in kb_index.search("敦煌壁画", limit=12)]
+    assert "9999999999999991" in hits_mural
+    assert "3333333333333331" in hits_mural
+
+    # 2. 校验生产环境真实knowledge/知识库中的d2149859ecaf18f1与7243258cbd656d7c
+    real_kb_root = Path(__file__).resolve().parents[3] / "knowledge"
+    if (real_kb_root / "catalog" / "materials.yaml").is_file():
+        real_index = load_kb_index(real_kb_root)
+        real_gold = real_index.get("d2149859ecaf18f1")
+        assert real_gold is not None
+        assert real_gold.material_ids == ("gold-jade",)
+        assert "dunhuang-wall" not in real_gold.material_ids
+
+        real_mural = real_index.get("7243258cbd656d7c")
+        assert real_mural is not None
+        assert real_mural.material_ids == ()
+
+        real_wall_hits = [r.id for r in real_index.search("敦煌壁", limit=12)]
+        assert "d2149859ecaf18f1" not in real_wall_hits
+        assert "7243258cbd656d7c" not in real_wall_hits
+        assert "49099ce47597b227" in real_wall_hits
+
+        real_mural_hits = [r.id for r in real_index.search("敦煌壁画", limit=12)]
+        assert "7243258cbd656d7c" in real_mural_hits
+        assert "d2149859ecaf18f1" in real_mural_hits
+
+    # 3. 校验使用kb_3333333333333331或kb_9999999999999991生图时，绝不会把提示词中的“敦煌壁”或“梵高皇”误中性化
+    rules = load_rules()
+    resolved_gold = resolve_image(
+        studio_env, USER_A, "kb_3333333333333331", kb_index=kb_index
+    )
+    resolved_mural = resolve_image(
+        studio_env, USER_A, "kb_9999999999999991", kb_index=kb_index
+    )
+    prompt_with_gold, _ = build_generate_prompt(
+        "用金镶玉做供桌，墙面保留敦煌壁与梵高皇装饰及敦煌壁画",
+        [
+            {
+                "id": resolved_gold.id,
+                "path": resolved_gold.path,
+                "use": "材质",
+                "note": "敦煌壁画感奢石",
+                "material_ids": resolved_gold.material_ids,
+            }
+        ],
+        rules,
+    )
+    assert "金镶玉" not in prompt_with_gold
+    assert "图1所示石材" in prompt_with_gold
+    assert "敦煌壁" in prompt_with_gold
+    assert "梵高皇" in prompt_with_gold
+    assert "敦煌壁画" in prompt_with_gold
+
+    prompt_with_mural, _ = build_generate_prompt(
+        "参考敦煌壁画方柱设计展厅，采用敦煌壁与梵高皇背景墙",
+        [
+            {
+                "id": resolved_mural.id,
+                "path": resolved_mural.path,
+                "use": "风格",
+                "note": "敦煌重彩壁画包柱",
+                "material_ids": resolved_mural.material_ids,
+            }
+        ],
+        rules,
+    )
+    assert "敦煌壁" in prompt_with_mural
+    assert "梵高皇" in prompt_with_mural
+
+
+# 回归测试Finding 4：compare_materials严格对齐Mac端comparison_target()校验，拒绝增删改否定词、石材名及超过40字符输入
+def test_compare_materials_target_validation_matches_mac_comparison_target(
+    studio_env: StudioSettings,
+) -> None:
+    rules = load_rules()
+    assert comparison_target("佛像背后的背光墙", rules) == "佛像背后的背光墙"
+    assert comparison_target("  供桌台面  ", rules) == "供桌台面"
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_upload_id = "f4444444-1111-2222-3333-444444444444"
+    (user_lc / f"{base_upload_id}__altar.jpg").write_bytes(
+        _make_image_bytes(160, 120, fmt="JPEG")
+    )
+
+    ark_requests: list[dict[str, Any]] = []
+
+    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+        ark_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json={"data": []})
+
+    app = create_app(
+        settings=studio_env,
+        rules=rules,
+        ark_transport=httpx.MockTransport(_ark_handler),
+    )
+
+    invalid_targets = (
+        "墙板，去掉旁边的柜子",
+        "不改佛像只改背景墙",
+        "别动两侧木作的背光墙",
+        "除了底座之外的供桌台面",
+        "背景墙并移除左侧香炉",
+        "取消灯带后的佛龛背板",
+        "把墙面换成浅色",
+        "供桌台面改成圆角",
+        "敦煌金背景墙",
+        "天川金供桌台面",
+        "梵高皇背光墙",
+        "梦幻庄园墙面",
+        "蓝金灰台面",
+        "阿利坦背景墙",
+        "庄严宝刹背光墙",
+        "佛" * 41,
+    )
+
+    for bad_target in invalid_targets:
+        with pytest.raises(ValueError):
+            comparison_target(bad_target, rules)
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            for idx, bad_target in enumerate(invalid_targets, start=500):
+                res = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": idx,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "compare_materials",
+                            "arguments": {
+                                "base_id": base_upload_id,
+                                "target": bad_target,
+                                "materials": ["敦煌金", "梵高皇"],
+                            },
+                        },
+                    },
+                )
+                assert res.status_code == 200
+                result = res.json()["result"]
+                assert result.get("isError") is True
+            assert len(ark_requests) == 0
 
     asyncio.run(_run())

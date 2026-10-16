@@ -191,6 +191,50 @@ def normalize_reference(
     return data_uri
 
 
+# 校验材质对比部位名称：限制40字符以内，拒绝石材名称/别名/检索词以及附加的增删改否定指令
+def comparison_target(value: Any, catalog: Any) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) > 40
+        or "\x00" in value
+        or not value.strip()
+    ):
+        raise ValueError("target must be a non-empty string of at most 40 characters")
+    cleaned = value.strip()
+    if hasattr(catalog, "materials"):
+        products = catalog.materials
+    elif isinstance(catalog, dict):
+        products = catalog.values()
+    else:
+        products = catalog or ()
+
+    names: set[str] = set()
+    for product in products:
+        if isinstance(product, dict):
+            candidates = (
+                product.get("name", ""),
+                *(product.get("aliases") or ()),
+                *(product.get("search_terms") or ()),
+            )
+        else:
+            candidates = (
+                getattr(product, "name", ""),
+                *(getattr(product, "aliases", ()) or ()),
+                *(getattr(product, "search_terms", ()) or ()),
+            )
+        for name in candidates:
+            if name:
+                names.add(str(name))
+
+    if any(name in cleaned for name in names) or re.search(
+        r"不|别|除了|去掉|移除|取消|换成|改成", cleaned
+    ):
+        raise ValueError(
+            "target must only name the surface or part to replace (e.g. 背景墙, 佛像背后的背光墙) without material names or extra editing instructions"
+        )
+    return cleaned
+
+
 # 将商业石材名称与别名替换为图N所示石材
 def neutralize_stone_names(text: str, replacements: dict[str, str]) -> str:
     result = text
@@ -230,7 +274,15 @@ def build_stone_replacements(
                 *product.sample_asset_ids,
                 *product.all_slab_asset_ids,
             ]
-            if any(key and key in note_text for key in match_keys):
+            if any(
+                key
+                and re.search(
+                    re.escape(key) + ("(?!画)" if key == "敦煌壁" else ""),
+                    note_text,
+                )
+                is not None
+                for key in match_keys
+            ):
                 samples = product_samples.setdefault(product.id, [])
                 if sample not in samples:
                     samples.append(sample)

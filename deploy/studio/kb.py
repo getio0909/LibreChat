@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,6 +26,18 @@ STUDIO_ROLES: tuple[str, ...] = ("参考", "物件", "造型", "材质", "纹样
 ASSET_ID_RE = re.compile(r"^[0-9a-f]{16}$")
 KB_ID_RE = re.compile(r"^kb_([0-9a-f]{16})$")
 TOKEN_RE = re.compile(r"[a-z0-9]+|[\u4e00-\u9fff]+")
+
+
+# 构建石材名称或别名的正则匹配表达式（防止“敦煌壁画”误匹配为“敦煌壁”石材）
+def _stone_alias_regex(alias: str) -> str:
+    return re.escape(alias) + ("(?!画)" if alias == "敦煌壁" else "")
+
+
+# 判断检索词元是否命中目标文本（防止“敦煌壁”词元误匹配“敦煌壁画”）
+def _token_matches(token: str, text: str) -> bool:
+    if token == "敦煌壁":
+        return re.search(_stone_alias_regex(token), text) is not None
+    return token in text
 
 
 # 将长摘要压缩并截断至最多120个字符
@@ -73,6 +86,7 @@ class KBRecord:
     search_all: str
     is_catalog_sample: bool = False
     is_catalog_slab: bool = False
+    thumb_sha256: str = ""
 
     # 返回导致默认排除的质量或审核标记名称元组
     @property
@@ -152,9 +166,12 @@ class KnowledgeBaseIndex:
             remaining = tok
             sub_tokens: list[str] = []
             for known in self._split_terms:
-                if known and known in remaining and known != remaining:
+                if not known or known == remaining:
+                    continue
+                pattern = _stone_alias_regex(known)
+                if re.search(pattern, remaining):
                     sub_tokens.append(known)
-                    remaining = remaining.replace(known, " ")
+                    remaining = re.sub(pattern, " ", remaining)
             if sub_tokens:
                 leftovers = [p for p in remaining.split() if p]
                 for item in (*sub_tokens, *leftovers):
@@ -220,18 +237,18 @@ class KnowledgeBaseIndex:
                 continue
             if clean_role and clean_role not in rec.studio_roles:
                 continue
-            if tokens and not all(t in rec.search_all for t in tokens):
+            if tokens and not all(_token_matches(t, rec.search_all) for t in tokens):
                 continue
 
             score = 0
             for t in tokens:
-                if t in rec.search_title:
+                if _token_matches(t, rec.search_title):
                     score += 10
-                if t in rec.search_primary:
+                if _token_matches(t, rec.search_primary):
                     score += 8
-                if t in rec.search_secondary:
+                if _token_matches(t, rec.search_secondary):
                     score += 4
-                if t in rec.search_summary:
+                if _token_matches(t, rec.search_summary):
                     score += 2
             if rec.material_ids and (has_stone_token or not tokens):
                 score += 20
@@ -375,14 +392,17 @@ def load_kb_index(
         tags = tuple(str(t).strip() for t in (data.get("tags") or []) if str(t).strip())
         ai_design_usage = str(data.get("ai_design_usage") or "").strip()
 
-        # 根据记录关联的石材ID或石材名称/别名自动扩展目录中的所有同款石材别名与检索词
-        combined_mat_text = " ".join((title_zh, *raw_materials, *tags, category_l1))
-        for mat in materials:
-            if mat.id not in raw_mat_ids and any(
-                alias and alias in combined_mat_text
-                for alias in (mat.name, *mat.aliases)
-            ):
-                raw_mat_ids.append(mat.id)
+        # 仅当记录未显式绑定石材ID且不属于目录样图/大板时，按石材名称或别名（排除“敦煌壁画”误匹配）推断关联石材
+        if not raw_mat_ids:
+            combined_mat_text = " ".join((title_zh, *raw_materials, *tags, category_l1))
+            for mat in materials:
+                if mat.id not in raw_mat_ids and any(
+                    alias
+                    and re.search(_stone_alias_regex(alias), combined_mat_text)
+                    is not None
+                    for alias in (mat.name, *mat.aliases)
+                ):
+                    raw_mat_ids.append(mat.id)
 
         material_ids = tuple(raw_mat_ids)
         expanded_set: list[str] = list(raw_materials)
@@ -421,11 +441,20 @@ def load_kb_index(
         ref_meta = (
             derivs.get("ref2048") if isinstance(derivs.get("ref2048"), dict) else {}
         )
+        thumb_meta = (
+            derivs.get("thumb512") if isinstance(derivs.get("thumb512"), dict) else {}
+        )
         ref_width = int(ref_meta.get("width") or 0)
         ref_height = int(ref_meta.get("height") or 0)
 
         ref2048_path = root / "assets" / "ref2048" / f"{rec_id}.jpg"
         thumb512_path = root / "assets" / "thumb512" / f"{rec_id}.webp"
+        thumb_sha256 = str(thumb_meta.get("sha256") or "").strip().lower()
+        if thumb512_path.is_file() and not thumb512_path.is_symlink():
+            try:
+                thumb_sha256 = hashlib.sha256(thumb512_path.read_bytes()).hexdigest()
+            except OSError:
+                pass
 
         search_title = title_zh.casefold()
         search_primary = " ".join(
@@ -490,6 +519,7 @@ def load_kb_index(
             search_all=search_all,
             is_catalog_sample=(rec_id in sample_ids_to_mat),
             is_catalog_slab=(rec_id in slab_ids_to_mat),
+            thumb_sha256=thumb_sha256,
         )
 
     return KnowledgeBaseIndex(root, records, materials)

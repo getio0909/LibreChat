@@ -1,3 +1,4 @@
+import hashlib
 import io
 import json
 import os
@@ -12,7 +13,7 @@ from typing import Any
 from PIL import Image, ImageOps
 
 from .config import StudioSettings
-from .kb import KB_ID_RE, KnowledgeBaseIndex, load_kb_index
+from .kb import KB_ID_RE, KBRecord, KnowledgeBaseIndex, load_kb_index
 
 # 用户编号与图像编号的格式校验正则
 USER_ID_RE = re.compile(r"^[a-f0-9]{24}$")
@@ -221,8 +222,8 @@ def allocate_model_job(settings: StudioSettings, user_id: str) -> tuple[str, Pat
     return model_id, model_dir
 
 
-# 解析LibreChat图片文件名中的UUID file_id与类型（仅接受<uuid>__或<uuid>-前缀）
-def _parse_librechat_filename(filename: str) -> tuple[str, str] | None:
+# 解析LibreChat图片文件名中的UUID file_id、类型与工具后缀（仅接受<uuid>__或<uuid>-前缀）
+def _parse_librechat_filename_with_rest(filename: str) -> tuple[str, str, str] | None:
     lower = filename.lower()
     suffix = next((ext for ext in IMAGE_SUFFIXES if lower.endswith(ext)), None)
     if suffix is None:
@@ -231,8 +232,229 @@ def _parse_librechat_filename(filename: str) -> tuple[str, str] | None:
     match = LIBRECHAT_FILE_RE.match(stem)
     if match is None:
         return None
-    file_id, sep, _ = match.groups()
-    return file_id, ("upload" if sep == "__" else "generated")
+    file_id, sep, rest = match.groups()
+    return file_id, ("upload" if sep == "__" else "generated"), rest
+
+
+# 解析LibreChat图片文件名中的UUID file_id与类型（仅接受<uuid>__或<uuid>-前缀）
+def _parse_librechat_filename(filename: str) -> tuple[str, str] | None:
+    parsed = _parse_librechat_filename_with_rest(filename)
+    if parsed is None:
+        return None
+    return parsed[0], parsed[1]
+
+
+# 计算图片的宽高尺寸与8x8 RGB缩略感知签名（用于匹配LibreChat重编码后的search_library缩略图）
+def _compute_rgb_signature(raw_bytes: bytes) -> tuple[int, int, str]:
+    with Image.open(io.BytesIO(raw_bytes)) as img:
+        oriented = ImageOps.exif_transpose(img)
+        width, height = oriented.size
+        sig_bytes = (
+            oriented.convert("RGB").resize((8, 8), Image.Resampling.BILINEAR).tobytes()
+        )
+        return width, height, sig_bytes.hex()
+
+
+# 计算两个8x8 RGB感知签名之间的平均像素通道绝对误差
+def _rgb_sig_distance(sig_hex_a: str, sig_hex_b: str) -> float:
+    if not sig_hex_a or not sig_hex_b or len(sig_hex_a) != len(sig_hex_b):
+        return 999.0
+    try:
+        bytes_a = bytes.fromhex(sig_hex_a)
+        bytes_b = bytes.fromhex(sig_hex_b)
+    except ValueError:
+        return 999.0
+    if not bytes_a or len(bytes_a) != len(bytes_b):
+        return 999.0
+    return sum(abs(a - b) for a, b in zip(bytes_a, bytes_b)) / len(bytes_a)
+
+
+# 以0600权限原子记录当前用户最近一次search_library返回的缩略图指纹映射
+def record_search_previews(
+    settings: StudioSettings,
+    user_id: str,
+    records: list[KBRecord],
+    kb_root: Path,
+) -> None:
+    if not records:
+        return
+    studio_dir = user_studio_dir(settings, user_id, create=True)
+    previews_file = studio_dir / "search_previews.json"
+    existing = _load_search_previews(settings, user_id)
+    now = time.time()
+    new_entries: list[dict[str, Any]] = []
+    seen_keys: set[tuple[str, str]] = set()
+
+    for rec in records:
+        if not rec.thumb512_path.is_file() or rec.thumb512_path.is_symlink():
+            continue
+        try:
+            thumb_bytes = read_bytes_no_follow(rec.thumb512_path, kb_root)
+            sha256_hex = hashlib.sha256(thumb_bytes).hexdigest()
+            width, height, rgb_sig = _compute_rgb_signature(thumb_bytes)
+        except (OSError, ValueError):
+            continue
+        key = (rec.kb_id, sha256_hex)
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        new_entries.append(
+            {
+                "kb_id": rec.kb_id,
+                "asset_id": rec.id,
+                "sha256": sha256_hex,
+                "width": width,
+                "height": height,
+                "rgb_sig": rgb_sig,
+                "recorded_at": now,
+            }
+        )
+
+    if not new_entries:
+        return
+
+    for item in existing:
+        if not isinstance(item, dict):
+            continue
+        kb_id = str(item.get("kb_id") or "")
+        sha = str(item.get("sha256") or "")
+        if not kb_id or not sha or (kb_id, sha) in seen_keys:
+            continue
+        seen_keys.add((kb_id, sha))
+        new_entries.append(item)
+        if len(new_entries) >= 200:
+            break
+
+    temporary = studio_dir / "search_previews.tmp"
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+        json.dump(new_entries, stream, ensure_ascii=False)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, previews_file)
+
+
+# 读取当前用户已记录的search_library缩略图指纹列表
+def _load_search_previews(
+    settings: StudioSettings, user_id: str
+) -> list[dict[str, Any]]:
+    try:
+        studio_dir = user_studio_dir(settings, user_id, create=False)
+        previews_file = studio_dir / "search_previews.json"
+        if not previews_file.is_file() or previews_file.is_symlink():
+            return []
+        raw = read_bytes_no_follow(previews_file, studio_dir)
+        parsed = json.loads(raw.decode("utf-8"))
+        if isinstance(parsed, list):
+            return [item for item in parsed if isinstance(item, dict)]
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        pass
+    return []
+
+
+# 判断LibreChat持久化的工具输出图片是否为search_library预览缩略图，并映射回规范的kb_<id>
+def _resolve_persisted_kb_preview(
+    settings: StudioSettings,
+    user_id: str,
+    entry: Path,
+    lc_dir: Path,
+    rest: str,
+    *,
+    kb_index: KnowledgeBaseIndex | None = None,
+) -> tuple[bool, str | None]:
+    explicit_kb = re.search(r"kb_([0-9a-f]{16})", rest, re.IGNORECASE)
+    if explicit_kb is not None:
+        return True, f"kb_{explicit_kb.group(1).lower()}"
+
+    raw_bytes = read_bytes_no_follow(entry, lc_dir)
+    file_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+    previews = _load_search_previews(settings, user_id)
+
+    for item in previews:
+        kb_id = str(item.get("kb_id") or "")
+        if item.get("sha256") == file_sha256 and KB_ID_RE.fullmatch(kb_id):
+            return True, kb_id
+
+    kb_root = Path(settings.kb_root)
+    active_kb = kb_index
+    if active_kb is None and kb_root.is_dir() and not kb_root.is_symlink():
+        try:
+            active_kb = load_kb_index(kb_root)
+        except (OSError, ValueError):
+            active_kb = None
+
+    if active_kb is not None:
+        for rec in active_kb.records.values():
+            if rec.thumb_sha256 and rec.thumb_sha256 == file_sha256:
+                return True, rec.kb_id
+
+    rest_lower = rest.lower()
+    is_search_tool = "search_library" in rest_lower
+    is_other_tool = any(
+        tool_name in rest_lower
+        for tool_name in (
+            "generate_image",
+            "edit_image",
+            "compare_materials",
+            "design_concepts",
+            "create_3d_model",
+            "check_3d_model",
+        )
+    )
+    if not is_search_tool and is_other_tool:
+        return False, None
+
+    if is_search_tool or previews or active_kb is not None:
+        try:
+            width, height, file_sig = _compute_rgb_signature(raw_bytes)
+        except (OSError, ValueError):
+            width, height, file_sig = 0, 0, ""
+
+        if file_sig and max(width, height) <= 512:
+            best_kb_id: str | None = None
+            best_dist = 10.0
+            for item in previews:
+                kb_id = str(item.get("kb_id") or "")
+                if not KB_ID_RE.fullmatch(kb_id):
+                    continue
+                if (item.get("width"), item.get("height")) != (width, height):
+                    continue
+                dist = _rgb_sig_distance(file_sig, str(item.get("rgb_sig") or ""))
+                if dist <= best_dist:
+                    best_dist = dist
+                    best_kb_id = kb_id
+            if best_kb_id is not None:
+                return True, best_kb_id
+
+            if active_kb is not None and kb_root.is_dir() and not kb_root.is_symlink():
+                for rec in active_kb.records.values():
+                    if (
+                        not rec.thumb512_path.is_file()
+                        or rec.thumb512_path.is_symlink()
+                    ):
+                        continue
+                    try:
+                        t_bytes = read_bytes_no_follow(rec.thumb512_path, kb_root)
+                        tw, th, t_sig = _compute_rgb_signature(t_bytes)
+                    except (OSError, ValueError):
+                        continue
+                    if (tw, th) != (width, height):
+                        continue
+                    dist = _rgb_sig_distance(file_sig, t_sig)
+                    if dist <= best_dist:
+                        best_dist = dist
+                        best_kb_id = rec.kb_id
+                if best_kb_id is not None:
+                    return True, best_kb_id
+
+        if is_search_tool:
+            for item in previews:
+                kb_id = str(item.get("kb_id") or "")
+                if KB_ID_RE.fullmatch(kb_id):
+                    return True, kb_id
+            return True, None
+
+    return False, None
 
 
 # 以0600权限原子写入receipt.json文件
@@ -304,24 +526,34 @@ def reconcile_pending_receipts(settings: StudioSettings) -> int:
     return reconciled_count
 
 
-# 扫描用户目录中的全部可用图像记录（可选包含uncertain状态任务）
+# 扫描用户目录中的全部可用图像记录（排除search_library预览缩略图，可选包含uncertain状态任务）
 def _collect_user_images(
-    settings: StudioSettings, user_id: str, *, include_uncertain: bool = False
+    settings: StudioSettings,
+    user_id: str,
+    *,
+    include_uncertain: bool = False,
+    kb_index: KnowledgeBaseIndex | None = None,
 ) -> list[ResolvedImage]:
     uid = validate_user_id(user_id)
     results: list[ResolvedImage] = []
 
-    # 扫描LibreChat挂载目录中的上传图与生成图
+    # 扫描LibreChat挂载目录中的上传图与生成图（过滤知识库检索预览缩略图）
     lc_dir = user_librechat_images_dir(settings, uid)
     if lc_dir.is_dir() and not lc_dir.is_symlink():
         for entry in lc_dir.iterdir():
             if entry.is_symlink() or not entry.is_file():
                 continue
-            parsed = _parse_librechat_filename(entry.name)
+            parsed = _parse_librechat_filename_with_rest(entry.name)
             if parsed is None:
                 continue
-            file_id, kind = parsed
+            file_id, kind, rest = parsed
             try:
+                if kind == "generated":
+                    is_preview, _ = _resolve_persisted_kb_preview(
+                        settings, uid, entry, lc_dir, rest, kb_index=kb_index
+                    )
+                    if is_preview:
+                        continue
                 stat_info = entry.stat(follow_symlinks=False)
                 width, height = _read_image_dimensions(entry, lc_dir)
             except (OSError, ValueError):
@@ -424,14 +656,16 @@ def resolve_image(
     cleaned_id = validate_image_id(image_id)
 
     if cleaned_id == "@latest":
-        all_images = _collect_user_images(settings, uid)
+        all_images = _collect_user_images(settings, uid, kb_index=kb_index)
         if not all_images:
             raise ValueError("No images found for current user")
         return all_images[0]
 
     if cleaned_id == "@latest_upload":
         uploads = [
-            img for img in _collect_user_images(settings, uid) if img.kind == "upload"
+            img
+            for img in _collect_user_images(settings, uid, kb_index=kb_index)
+            if img.kind == "upload"
         ]
         if not uploads:
             raise ValueError("No uploaded images found for current user")
@@ -507,17 +741,31 @@ def resolve_image(
         lc_dir = user_librechat_images_dir(settings, uid)
         if lc_dir.is_dir() and not lc_dir.is_symlink():
             matches: list[ResolvedImage] = []
+            preview_kb_ids: list[tuple[int, str]] = []
+            saw_unmapped_preview = False
             for entry in lc_dir.iterdir():
                 if entry.is_symlink() or not entry.is_file():
                     continue
-                parsed = _parse_librechat_filename(entry.name)
+                parsed = _parse_librechat_filename_with_rest(entry.name)
                 if parsed is None:
                     continue
-                file_id, kind = parsed
+                file_id, kind, rest = parsed
                 if file_id != cleaned_id:
                     continue
                 ensure_safe_subpath(entry, lc_dir)
                 stat_info = entry.stat(follow_symlinks=False)
+                if kind == "generated":
+                    is_preview, canonical_kb_id = _resolve_persisted_kb_preview(
+                        settings, uid, entry, lc_dir, rest, kb_index=kb_index
+                    )
+                    if is_preview:
+                        if canonical_kb_id is not None:
+                            preview_kb_ids.append(
+                                (stat_info.st_mtime_ns, canonical_kb_id)
+                            )
+                        else:
+                            saw_unmapped_preview = True
+                        continue
                 width, height = _read_image_dimensions(entry, lc_dir)
                 matches.append(
                     ResolvedImage(
@@ -530,6 +778,15 @@ def resolve_image(
                         height=height,
                     )
                 )
+            if preview_kb_ids:
+                preview_kb_ids.sort(key=lambda item: item[0], reverse=True)
+                return resolve_image(
+                    settings, uid, preview_kb_ids[0][1], kb_index=kb_index
+                )
+            if saw_unmapped_preview and not matches:
+                raise ValueError(
+                    f"Search preview {cleaned_id} cannot be used as a standalone image; use its kb_<id> from search_library"
+                )
             if matches:
                 matches.sort(key=lambda item: item.mtime_ns, reverse=True)
                 return matches[0]
@@ -539,9 +796,15 @@ def resolve_image(
 
 # 按时间倒序返回当前用户的最近图片列表（含uncertain状态警告项）
 def list_user_images(
-    settings: StudioSettings, user_id: str, limit: int = 20
+    settings: StudioSettings,
+    user_id: str,
+    limit: int = 20,
+    *,
+    kb_index: KnowledgeBaseIndex | None = None,
 ) -> list[dict[str, Any]]:
     if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 50:
         raise ValueError("limit must be an integer between 1 and 50")
-    images = _collect_user_images(settings, user_id, include_uncertain=True)
+    images = _collect_user_images(
+        settings, user_id, include_uncertain=True, kb_index=kb_index
+    )
     return [item.to_public_dict() for item in images[:limit]]

@@ -40,8 +40,10 @@ materials:
     group: 梦幻庄园金镶玉大板自家产品
     sample_asset_ids:
       - "3333333333333331"
+      - "3333333333333332"
     all_slab_asset_ids:
       - "3333333333333331"
+      - "3333333333333332"
   - id: blue-gold-grey
     name: 蓝金灰
     aliases:
@@ -52,5 +54,7 @@ materials:
     group: 蓝金灰大板自家产品
     sample_asset_ids:
       - "4444444444444441"
+      - "4444444444444442"
     all_slab_asset_ids:
       - "4444444444444441"
+      - "4444444444444442"

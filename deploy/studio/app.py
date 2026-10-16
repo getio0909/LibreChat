@@ -36,6 +36,7 @@ from .images import (
     build_edit_prompt,
     build_generate_prompt,
     build_stone_replacements,
+    comparison_target,
     encode_display_image,
     generate_seedream,
     neutralize_stone_names,
@@ -63,6 +64,7 @@ from .store import (
     normalize_conversation_id,
     read_bytes_no_follow,
     reconcile_pending_receipts,
+    record_search_previews,
     resolve_image,
     user_librechat_images_dir,
     user_studio_dir,
@@ -513,7 +515,9 @@ def build_mcp_server(
 
             if name == "list_images":
                 limit = int(args.get("limit", 20))
-                images = list_user_images(settings, user_id, limit=limit)
+                images = list_user_images(
+                    settings, user_id, limit=limit, kb_index=active_kb
+                )
                 warnings = [
                     f"Image job {item['id']} is in uncertain state (the request may have been billed)."
                     for item in images
@@ -555,6 +559,7 @@ def build_mcp_server(
                     limit=raw_limit,
                     include_flagged=include_flagged,
                 )
+                record_search_previews(settings, user_id, matched, kb_root)
                 result_items: list[dict[str, Any]] = []
                 thumb_blocks: list[types.ImageContent] = []
                 for rec in matched:
@@ -762,9 +767,9 @@ def build_mcp_server(
 
             if name == "compare_materials":
                 base_id = str(args.get("base_id") or "").strip()
-                target = str(args.get("target") or "").strip()
-                if not base_id or not target or "\x00" in target or len(target) > 120:
-                    raise ValueError("base_id and target are required")
+                if not base_id:
+                    raise ValueError("base_id is required")
+                target = comparison_target(args.get("target"), active_rules)
                 raw_materials = args.get("materials")
                 if (
                     not isinstance(raw_materials, list)
@@ -777,7 +782,7 @@ def build_mcp_server(
                 if size not in NATIVE:
                     raise ValueError("Invalid size parameter")
 
-                # 先解析所有请求的石材名称/别名与样图，未知名称直接抛出含已知石材列表的明确错误
+                # 先解析所有请求的石材名称/别名与无标记样图，拒绝自动选用带标记样图；若某石材无可用样图则报错
                 resolved_materials = []
                 all_resolved_assets: list[ResolvedImage] = []
                 for raw_mat_name in raw_materials:
@@ -791,11 +796,18 @@ def build_mcp_server(
                             f"Material '{mat_obj.name}' has no sample assets configured"
                         )
                     sample_images = [
-                        resolve_image(
-                            settings, user_id, f"kb_{sid}", kb_index=active_kb
-                        )
+                        img
                         for sid in mat_obj.sample_asset_ids
+                        if not (
+                            img := resolve_image(
+                                settings, user_id, f"kb_{sid}", kb_index=active_kb
+                            )
+                        ).warning
                     ]
+                    if not sample_images:
+                        raise ValueError(
+                            f"Material '{mat_obj.name}' has no usable unflagged sample assets"
+                        )
                     all_resolved_assets.extend(sample_images)
                     resolved_materials.append(
                         (raw_mat_name.strip(), mat_obj, sample_images)
