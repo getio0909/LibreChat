@@ -1878,6 +1878,8 @@ def create_app(
                             active_segmenter.segment,
                             resolved.path,
                             payload.get("points"),
+                            payload.get("existing"),
+                            str(payload.get("operation") or "add"),
                         )
                         return JSONResponse(
                             seg_out,

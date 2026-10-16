@@ -63,7 +63,7 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
-    mem_limit: 1g
+    mem_limit: 3g
     environment:
       STUDIO_SETTINGS_FILE: /run/secrets/studio.json
     volumes:

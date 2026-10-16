@@ -19,8 +19,12 @@ from PIL import Image, ImageDraw
 from deploy.studio.app import create_app
 from deploy.studio.config import StudioSettings, load_rules, load_settings
 from deploy.studio.regions import (
-    DEFAULT_SAM2_ONNX_DIR,
-    OnnxSamSegmenter,
+    DEFAULT_SAM2_MODEL_DIR,
+    MODEL_REPO,
+    MODEL_REVISION,
+    MODEL_SHA256,
+    Segmenter,
+    build_selection_editor_html,
     composite_local,
     count_outside_changes,
     is_editor_token,
@@ -39,6 +43,7 @@ from deploy.studio.regions import (
     source_dimensions,
     verify_editor_token,
     verify_onnx_model_dir,
+    verify_sam2_model_dir,
 )
 from deploy.studio.store import list_user_images, resolve_image
 
@@ -674,70 +679,135 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
     asyncio.run(_run())
 
 
-# 校验OnnxSamSegmenter的SHA256清单验证、首次懒加载、单图编码缓存、串行推理与点选分割路由
+# 校验Segmenter（SAM 2.1 hiera-tiny PyTorch CPU + transformers Sam2Model）的SHA256校验、safetensors限制、懒加载、单图embedding缓存、串行推理与点选分割路由
 def test_segmentation_adapter_mocked_and_endpoint(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
-    model_dir = tmp_path / "sam2_onnx"
+    import torch
+
+    assert MODEL_REPO == "facebook/sam2.1-hiera-tiny"
+    assert MODEL_REVISION == "de431c4043854a71d8101e17995dfe596bf101a5"
+    assert (
+        MODEL_SHA256
+        == "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7"
+    )
+
+    model_dir = tmp_path / "sam2_safetensors"
     model_dir.mkdir(parents=True, mode=0o700)
-    enc_bytes = b"mock-onnx-encoder-weights-v1"
-    dec_bytes = b"mock-onnx-decoder-weights-v1"
-    (model_dir / "encoder.onnx").write_bytes(enc_bytes)
-    (model_dir / "decoder.onnx").write_bytes(dec_bytes)
+    weights_bytes = b"mock-sam2.1-hiera-tiny-safetensors-v1"
+    cfg_bytes = b'{"model_type": "sam2"}'
+    pre_bytes = b'{"do_resize": true}'
+    proc_bytes = b'{"processor_class": "Sam2Processor"}'
+    (model_dir / "model.safetensors").write_bytes(weights_bytes)
+    (model_dir / "config.json").write_bytes(cfg_bytes)
+    (model_dir / "preprocessor_config.json").write_bytes(pre_bytes)
+    (model_dir / "processor_config.json").write_bytes(proc_bytes)
     manifest = {
-        "source": "pinned-test-sam2.1-hiera-tiny-onnx",
-        "revision": "0123456789abcdef0123456789abcdef01234567",
+        "source": MODEL_REPO,
+        "revision": MODEL_REVISION,
         "files": {
-            "encoder.onnx": {"sha256": hashlib.sha256(enc_bytes).hexdigest()},
-            "decoder.onnx": {"sha256": hashlib.sha256(dec_bytes).hexdigest()},
+            "model.safetensors": {
+                "sha256": hashlib.sha256(weights_bytes).hexdigest()
+            },
+            "config.json": {"sha256": hashlib.sha256(cfg_bytes).hexdigest()},
+            "preprocessor_config.json": {
+                "sha256": hashlib.sha256(pre_bytes).hexdigest()
+            },
+            "processor_config.json": {
+                "sha256": hashlib.sha256(proc_bytes).hexdigest()
+            },
         },
     }
     (model_dir / "manifest.json").write_text(
         json.dumps(manifest), encoding="utf-8"
     )
 
+    # 1. 验证严禁目录中存在任何非safetensors的pickle权重文件（.bin/.pt/.pth/.ckpt/.pkl）
+    bad_pickle_weight = model_dir / "pytorch_model.bin"
+    bad_pickle_weight.write_bytes(b"disallow-pickle")
+    with pytest.raises(ValueError, match="Disallowed non-safetensors weight"):
+        verify_sam2_model_dir(model_dir)
+    bad_pickle_weight.unlink()
+
     stats = {"loaded": 0, "encoder_runs": 0, "decoder_runs": 0}
 
-    class _MockNodeArg:
-        def __init__(self, name: str) -> None:
-            self.name = name
+    class _MockOutputs:
+        def __init__(
+            self,
+            pred_masks: torch.Tensor,
+            iou_scores: torch.Tensor,
+            image_embeddings: torch.Tensor,
+        ) -> None:
+            self.pred_masks = pred_masks
+            self.iou_scores = iou_scores
+            self.image_embeddings = image_embeddings
 
-    class _MockSession:
-        def __init__(self, model_path: str) -> None:
-            stats["loaded"] += 1
-            self.is_encoder = model_path.endswith("encoder.onnx")
+    class _MockProcessor:
+        def __call__(
+            self,
+            *,
+            images: Image.Image,
+            input_points: Any | None = None,
+            input_labels: Any | None = None,
+            return_tensors: str = "pt",
+        ) -> dict[str, Any]:
+            assert return_tensors == "pt"
+            w, h = images.size
+            return {
+                "pixel_values": torch.ones((1, 3, 64, 64), dtype=torch.float32),
+                "original_sizes": torch.tensor([[h, w]], dtype=torch.int64),
+                "input_points": torch.tensor(input_points, dtype=torch.float32),
+                "input_labels": torch.tensor(input_labels, dtype=torch.int64),
+            }
 
-        def get_inputs(self) -> list[_MockNodeArg]:
-            if self.is_encoder:
-                return [_MockNodeArg("image")]
-            return [
-                _MockNodeArg("image_embed"),
-                _MockNodeArg("point_coords"),
-                _MockNodeArg("point_labels"),
-            ]
+        def post_process_masks(
+            self,
+            pred_masks: torch.Tensor,
+            original_sizes: torch.Tensor,
+        ) -> list[torch.Tensor]:
+            del pred_masks
+            h = int(original_sizes[0, 0].item())
+            w = int(original_sizes[0, 1].item())
+            # 构造一个带中心镂空孔洞的环形掩码，以验证RETR_TREE同时提取外轮廓add与内孔subtract
+            mask = torch.zeros((1, 3, h, w), dtype=torch.bool)
+            mask[0, 1, h // 6 : h * 5 // 6, w // 6 : w * 5 // 6] = True
+            mask[0, 1, h * 2 // 5 : h * 3 // 5, w * 2 // 5 : w * 3 // 5] = False
+            return [mask]
 
-        def get_outputs(self) -> list[_MockNodeArg]:
-            if self.is_encoder:
-                return [_MockNodeArg("image_embed")]
-            return [_MockNodeArg("masks"), _MockNodeArg("iou_predictions")]
+    class _MockSam2Model:
+        device = "cpu"
 
-        def run(
-            self, output_names: list[str], feeds: dict[str, Any]
-        ) -> list[np.ndarray]:
-            if self.is_encoder:
+        def __call__(
+            self,
+            *,
+            pixel_values: torch.Tensor | None = None,
+            image_embeddings: torch.Tensor | None = None,
+            input_points: torch.Tensor,
+            input_labels: torch.Tensor,
+            original_sizes: torch.Tensor | None = None,
+            multimask_output: bool = True,
+        ) -> _MockOutputs:
+            assert multimask_output is True
+            del input_points, input_labels, original_sizes
+            if image_embeddings is None:
+                assert pixel_values is not None
                 stats["encoder_runs"] += 1
-                return [np.ones((1, 256, 64, 64), dtype=np.float32)]
+                emb = pixel_values[:, :1, :16, :16].clone()
+            else:
+                emb = image_embeddings
             stats["decoder_runs"] += 1
-            mask = np.zeros((1, 1, 256, 256), dtype=np.float32)
-            mask[0, 0, 64:192, 64:192] = 5.0
-            scores = np.array([[0.94]], dtype=np.float32)
-            return [mask, scores]
+            pred = torch.zeros((1, 1, 3, 64, 64), dtype=torch.float32)
+            scores = torch.tensor([[[0.42, 0.94, 0.71]]], dtype=torch.float32)
+            return _MockOutputs(pred, scores, emb)
 
-    segmenter = OnnxSamSegmenter(
-        model_dir=model_dir, session_factory=_MockSession
-    )
+    def _mock_loader(verified_dir: Path) -> tuple[Any, Any]:
+        assert verified_dir == model_dir
+        stats["loaded"] += 1
+        return _MockProcessor(), _MockSam2Model()
+
+    segmenter = Segmenter(model_dir=model_dir, model_loader=_mock_loader)
     assert segmenter.ready() is True
-    # 首次调用前不应提前加载ONNX会话（懒加载）
+    # 首次调用前不应提前加载模型（懒加载）
     assert stats["loaded"] == 0
 
     img1_path = tmp_path / "img1.png"
@@ -745,29 +815,34 @@ def test_segmentation_adapter_mocked_and_endpoint(
     save_exact(Image.new("RGB", (200, 160), (100, 120, 140)), img1_path)
     save_exact(Image.new("RGB", (200, 160), (140, 120, 100)), img2_path)
 
-    res1 = segmenter.segment(img1_path, [{"x": 500, "y": 500, "label": 1}])
-    assert stats["loaded"] == 2
+    res1 = segmenter.segment(img1_path, [{"x": 250, "y": 250, "label": 1}])
+    assert stats["loaded"] == 1
     assert stats["encoder_runs"] == 1
     assert stats["decoder_runs"] == 1
     assert res1["score"] == pytest.approx(0.94, rel=1e-2)
-    assert len(res1["shapes"]) >= 1
+    assert len(res1["shapes"]) >= 2
+    assert any(s["op"] == "add" for s in res1["shapes"])
+    assert any(s["op"] == "subtract" for s in res1["shapes"])
     assert res1["selected_pixels"] > 100
 
-    # 对同一张图再次发起点选分割，应复用单图编码器缓存（encoder_runs保持为1）
+    # 对同一张图再次发起点选分割，应复用单图embedding缓存（encoder_runs保持为1）
     res2 = segmenter.segment(
         img1_path,
-        [{"x": 500, "y": 500, "label": 1}, {"x": 100, "y": 100, "label": 0}],
+        [{"x": 250, "y": 250, "label": 1}, {"x": 500, "y": 500, "label": 0}],
     )
+    assert stats["loaded"] == 1
     assert stats["encoder_runs"] == 1
     assert stats["decoder_runs"] == 2
     assert res2["selected_pixels"] > 100
 
-    # 切换到第二张图片时，重新编码并替换单图缓存
-    segmenter.segment(img2_path, [{"x": 450, "y": 450, "label": 1}])
+    # 切换到第二张图片时，重新编码并替换单图缓存（仅缓存1张图的embedding）
+    segmenter.segment(img2_path, [{"x": 300, "y": 300, "label": 1}])
     assert stats["encoder_runs"] == 2
     assert stats["decoder_runs"] == 3
+    assert segmenter._cache_key is not None
+    assert segmenter._cache_key[0] == str(img2_path.resolve())
 
-    # 验证通过 /files/<token> POST action=segment 端到端调用
+    # 验证通过 /files/<token> POST action=segment 端到端调用（含existing与operation参数）
     user_a_lc = studio_env.librechat_images_dir / USER_A
     user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
     upload_id = "33333333-4444-5555-6666-777777777777"
@@ -790,22 +865,37 @@ def test_segmentation_adapter_mocked_and_endpoint(
                 f"/files/{token}",
                 json={
                     "action": "segment",
-                    "points": [{"x": 500, "y": 500, "label": 1}],
+                    "points": [{"x": 250, "y": 250, "label": 1}],
+                    "operation": "add",
+                    "existing": {
+                        "version": 1,
+                        "shapes": [
+                            {
+                                "type": "rect",
+                                "op": "add",
+                                "points": [
+                                    {"x": 10, "y": 10},
+                                    {"x": 80, "y": 80},
+                                ],
+                            }
+                        ],
+                    },
                 },
             )
             assert seg_http.status_code == 200
             data = seg_http.json()
-            assert len(data["shapes"]) >= 1
+            assert all(s["type"] == "polygon" for s in data["shapes"])
+            assert len(data["shapes"]) >= 2
             assert data["selected_pixels"] > 100
 
     asyncio.run(_run_http())
 
-    # 验证若manifest中的SHA256与实际模型文件不匹配，verify_onnx_model_dir拒绝加载
+    # 验证若manifest中的SHA256与实际模型文件不匹配，verify_sam2_model_dir拒绝加载
     bad_manifest = {
         "source": "tampered",
         "files": {
-            "encoder.onnx": {"sha256": "0" * 64},
-            "decoder.onnx": {"sha256": hashlib.sha256(dec_bytes).hexdigest()},
+            "model.safetensors": {"sha256": "0" * 64},
+            "config.json": {"sha256": hashlib.sha256(cfg_bytes).hexdigest()},
         },
     }
     (model_dir / "manifest.json").write_text(
@@ -815,24 +905,51 @@ def test_segmentation_adapter_mocked_and_endpoint(
         verify_onnx_model_dir(model_dir)
 
 
-# 若本地已安装通过SHA256校验的真实SAM 2.1 Tiny ONNX模型则执行真实CPU冒烟推理，否则跳过
-def test_real_onnx_sam_segmenter_smoke_if_available(tmp_path: Path) -> None:
-    candidate_dir = Path(
-        os.environ.get("STUDIO_SAM2_ONNX_DIR") or DEFAULT_SAM2_ONNX_DIR
-    )
-    segmenter = OnnxSamSegmenter(model_dir=candidate_dir)
-    if not segmenter.ready():
-        pytest.skip(
-            f"Verified local SAM 2.1 Tiny ONNX model not present at {candidate_dir}; skipping real ONNX smoke test"
+# 若本地已存在通过SHA256校验的真实facebook/sam2.1-hiera-tiny safetensors权重，则执行真实PyTorch CPU冒烟推理（绝不触发下载）
+def test_real_sam2_hiera_tiny_smoke_if_available(tmp_path: Path) -> None:
+    candidate_dirs = [
+        Path(p)
+        for p in (
+            os.environ.get("STUDIO_SAM2_MODEL_DIR"),
+            os.environ.get("STUDIO_SAM2_ONNX_DIR"),
+            str(DEFAULT_SAM2_MODEL_DIR),
+            "/home/wangtinghu/.local/share/Trash/files/zyb-multiimage-20260928.69hb9m/sam2.1-hiera-tiny",
         )
-    sample_path = tmp_path / "real_smoke.png"
-    img = Image.new("RGB", (256, 256), (40, 40, 40))
+        if p
+    ]
+    verified_dir: Path | None = None
+    for cand in candidate_dirs:
+        if cand.is_dir():
+            try:
+                verify_sam2_model_dir(cand, expected_sha256=MODEL_SHA256)
+                verified_dir = cand
+                break
+            except ValueError:
+                continue
+
+    if verified_dir is None:
+        pytest.skip(
+            "Verified local facebook/sam2.1-hiera-tiny safetensors weights not present; skipping real-model smoke test"
+        )
+
+    segmenter = Segmenter(model_dir=verified_dir)
+    assert segmenter.ready() is True
+
+    sample_path = tmp_path / "real_sam2_smoke.png"
+    img = Image.new("RGB", (256, 256), (35, 38, 42))
     draw = ImageDraw.Draw(img)
-    draw.rectangle((64, 64, 192, 192), fill=(230, 220, 200))
+    draw.rectangle((64, 64, 192, 192), fill=(235, 220, 190))
     save_exact(img, sample_path)
+
     out = segmenter.segment(sample_path, [{"x": 500, "y": 500, "label": 1}])
+    assert out["version"] == 1
     assert len(out["shapes"]) >= 1
-    assert out["selected_pixels"] >= 16
+    assert out["score"] > 0.5
+    assert out["selected_pixels"] >= 1000
+    mask = mask_for({"version": 1, "shapes": out["shapes"]}, (256, 256))
+    # 中心亮块像素被选中，四角背景像素未被选中
+    assert mask.getpixel((128, 128)) == 255
+    assert mask.getpixel((8, 8)) == 0
 
 
 # 回归测试（Finding #1）：调色板P模式含tRNS透明像素的PNG底图经局部合回后，选区外RGBA四通道（含Alpha）100%一致
@@ -1465,5 +1582,115 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             assert saved_img.getpixel((160, 120)) == (215, 185, 125)
 
     asyncio.run(_run())
+
+
+# 回归测试（Finding #7）：选区编辑器中subtract区域在Canvas上的Alpha必须擦除至0，且当subtract完全擦空选区时confirmBtn必须禁用
+def test_selection_editor_subtract_renders_zero_alpha_and_disables_confirm_on_full_erase(
+    tmp_path: Path,
+) -> None:
+    from playwright.sync_api import sync_playwright
+
+    base_img = Image.new("RGB", (300, 200), (150, 130, 110))
+    buf = io.BytesIO()
+    base_img.save(buf, format="PNG")
+    data_uri = (
+        "data:image/png;base64,"
+        + base64.b64encode(buf.getvalue()).decode("ascii")
+    )
+    editor_html = build_selection_editor_html(
+        image_id="img_subtract_test",
+        signed_url=data_uri,
+        expires_at="2026-12-31T00:00:00Z",
+        width=300,
+        height=200,
+        segment_ready=False,
+    )
+    host_html = (
+        "<!DOCTYPE html><html><body>"
+        '<iframe id="ed" sandbox="allow-scripts" style="width:760px;height:640px;border:0"></iframe>'
+        "</body></html>"
+    )
+    del tmp_path
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            executable_path="/usr/bin/chromium",
+            headless=True,
+        )
+        try:
+            page = browser.new_page(viewport={"width": 840, "height": 720})
+            page.set_content(host_html)
+            page.eval_on_selector(
+                "#ed",
+                "(el, html) => { el.srcdoc = html; }",
+                editor_html,
+            )
+            frame = page.frame_locator("#ed")
+            frame.locator("#confirmBtn").wait_for(state="visible")
+            page.wait_for_timeout(150)
+
+            canvas_box = frame.locator("#overlayCanvas").bounding_box()
+            assert canvas_box is not None
+            cx = canvas_box["x"]
+            cy = canvas_box["y"]
+            cw = canvas_box["width"]
+            ch = canvas_box["height"]
+
+            # 1. 绘制加选矩形 [0.20, 0.20] -> [0.80, 0.80]
+            page.mouse.move(cx + cw * 0.20, cy + ch * 0.20)
+            page.mouse.down()
+            page.mouse.move(cx + cw * 0.80, cy + ch * 0.80, steps=6)
+            page.mouse.up()
+
+            # 2. 切换“减选擦除”，在右半部分 [0.50, 0.20] -> [0.80, 0.80] 绘制减选矩形
+            frame.locator('[data-op="subtract"]').click()
+            page.mouse.move(cx + cw * 0.50, cy + ch * 0.20)
+            page.mouse.down()
+            page.mouse.move(cx + cw * 0.80, cy + ch * 0.80, steps=6)
+            page.mouse.up()
+
+            # 读取左半保留区 (0.35, 0.50) 与右半擦除区 (0.65, 0.50) 的Canvas RGBA像素
+            alpha_state = frame.locator("#overlayCanvas").evaluate(
+                """(canvas) => {
+                    const ctx = canvas.getContext('2d');
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const kept = ctx.getImageData(Math.round(w * 0.35), Math.round(h * 0.50), 1, 1).data;
+                    const erased = ctx.getImageData(Math.round(w * 0.65), Math.round(h * 0.50), 1, 1).data;
+                    const confirmDisabled = document.getElementById('confirmBtn').disabled;
+                    return {
+                        keptAlpha: kept[3],
+                        erasedAlpha: erased[3],
+                        confirmDisabled
+                    };
+                }"""
+            )
+            assert alpha_state["keptAlpha"] > 60
+            assert alpha_state["erasedAlpha"] == 0
+            assert alpha_state["confirmDisabled"] is False
+
+            # 3. 再绘制一个覆盖剩余全部选区的subtract矩形 [0.10, 0.10] -> [0.90, 0.90]，此时confirmBtn必须自动禁用
+            page.mouse.move(cx + cw * 0.10, cy + ch * 0.10)
+            page.mouse.down()
+            page.mouse.move(cx + cw * 0.90, cy + ch * 0.90, steps=6)
+            page.mouse.up()
+
+            full_erased_state = frame.locator("#overlayCanvas").evaluate(
+                """(canvas) => {
+                    const ctx = canvas.getContext('2d');
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const keptAfter = ctx.getImageData(Math.round(w * 0.35), Math.round(h * 0.50), 1, 1).data;
+                    return {
+                        keptAlphaAfter: keptAfter[3],
+                        confirmDisabled: document.getElementById('confirmBtn').disabled
+                    };
+                }"""
+            )
+            assert full_erased_state["keptAlphaAfter"] == 0
+            assert full_erased_state["confirmDisabled"] is True
+        finally:
+            browser.close()
+
 
 

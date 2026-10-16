@@ -280,7 +280,7 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.deepEqual(studio.tmpfs, ['/tmp']);
   assert.deepEqual(studio.cap_drop, ['ALL']);
   assert.deepEqual(studio.security_opt, ['no-new-privileges:true']);
-  assert.equal(studio.mem_limit, '1g');
+  assert.equal(studio.mem_limit, '3g');
   assert.deepEqual(studio.ports, ['127.0.0.1:8000:8000']);
   assert.doesNotMatch(rawCompose, /STUDIO_PORT/);
   assert.ok(studio.volumes.includes('./studio.json:/run/secrets/studio.json:ro'));
@@ -319,6 +319,12 @@ test('studio Dockerfile copies knowledge/ to /kb while LibreChat app image exclu
     /COPY --chmod=0555 knowledge\/assets\/thumb512 \/kb\/assets\/thumb512/,
   );
   assert.match(studioDockerfile, /COPY --chmod=0555 knowledge\/catalog \/kb\/catalog/);
+  assert.match(studioDockerfile, /facebook\/sam2\.1-hiera-tiny/);
+  assert.match(studioDockerfile, /de431c4043854a71d8101e17995dfe596bf101a5/);
+  assert.match(
+    studioDockerfile,
+    /48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7/,
+  );
   assert.doesNotMatch(studioDockerfile, /kb\.lock|zybc-knowledge|git clone|curl|wget/i);
 
   const studioDockerignore = fs.readFileSync('deploy/studio/Dockerfile.dockerignore', 'utf8');

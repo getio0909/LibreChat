@@ -37,7 +37,20 @@ JOB_ID_RE = re.compile(r"^img_[0-9a-f]{32}$")
 REGION_TOKEN_RE = re.compile(r"^([A-Za-z0-9_-]{16,512})\.([0-9a-f]{64})$")
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 SIZES: dict[str, int] = {"1K": 1024, "2K": 2048}
-DEFAULT_SAM2_ONNX_DIR = Path("/opt/studio-models/sam2.1-hiera-tiny-onnx")
+
+# 与Mac插件保持完全一致的SAM 2.1 hiera-tiny模型仓库、固定revision与safetensors权重SHA256
+MODEL_REPO = "facebook/sam2.1-hiera-tiny"
+MODEL_REVISION = "de431c4043854a71d8101e17995dfe596bf101a5"
+MODEL_SHA256 = "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7"
+MODEL_FILE_SHA256S: dict[str, str] = {
+    "model.safetensors": MODEL_SHA256,
+    "config.json": "bfdc695acbd97dc36ff8c2c525faaf25ccdbff2b9c3176fe1323acfa5fb9cf11",
+    "preprocessor_config.json": "2de8ffca4ebddc7fb3efeefcc86fe9327a272a76524e6bbab42f59fa32f55e9c",
+    "processor_config.json": "f1aa5beebdb6e95b5924f5eb1c0fa007ba3e0a7e4a6d491c4e98b16a3d5a5828",
+}
+DEFAULT_SAM2_MODEL_DIR = Path("/opt/studio-models/sam2.1-hiera-tiny")
+DEFAULT_SAM2_ONNX_DIR = DEFAULT_SAM2_MODEL_DIR
+DISALLOWED_WEIGHT_SUFFIXES = (".bin", ".pt", ".pth", ".ckpt", ".pkl", ".pickle")
 
 
 # 校验归一化选区坐标值是否位于0到999之间并四舍五入为整数
@@ -786,94 +799,156 @@ def finish_region_edit(
     }
 
 
-# 校验已固定SHA256清单的本地SAM 2.1 Tiny ONNX模型目录（绝不触发运行时网络下载）
-def verify_onnx_model_dir(model_dir: str | Path | None = None) -> dict[str, Any]:
+# 校验已固定revision与SHA256的本地SAM 2.1 hiera-tiny safetensors模型目录（严禁pickle权重与运行时网络下载）
+def verify_sam2_model_dir(
+    model_dir: str | Path | None = None,
+    *,
+    expected_sha256: str | None = None,
+) -> dict[str, Any]:
     base = Path(
         model_dir
+        or os.environ.get("STUDIO_SAM2_MODEL_DIR")
         or os.environ.get("STUDIO_SAM2_ONNX_DIR")
-        or DEFAULT_SAM2_ONNX_DIR
+        or DEFAULT_SAM2_MODEL_DIR
     )
     if not base.exists() or base.is_symlink() or not base.is_dir():
-        raise ValueError(f"Verified ONNX segmentation model directory not found: {base}")
-    manifest_path = base / "manifest.json"
-    if (
-        not manifest_path.exists()
-        or manifest_path.is_symlink()
-        or not manifest_path.is_file()
-    ):
-        raise ValueError("ONNX segmentation model manifest.json is missing")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if type(manifest) is not dict:
-        raise ValueError("ONNX segmentation model manifest must be a JSON object")
-    files = manifest.get("files")
-    if type(files) is not dict:
-        raise ValueError("ONNX segmentation manifest is missing files mapping")
-    verified_paths: dict[str, Path] = {}
-    for required_name in ("encoder.onnx", "decoder.onnx"):
-        entry = files.get(required_name)
-        expected_sha = (
-            entry.get("sha256")
-            if isinstance(entry, dict)
-            else entry
-            if isinstance(entry, str)
-            else ""
-        )
-        if not isinstance(expected_sha, str) or not SHA256_HEX_RE.fullmatch(
-            expected_sha.strip().lower()
-        ):
+        raise ValueError(f"Verified SAM 2.1 model directory not found: {base}")
+
+    for child in base.iterdir():
+        if child.is_symlink():
+            raise ValueError(f"Symlink file is not allowed in SAM 2.1 model directory: {child}")
+        if child.suffix.lower() in DISALLOWED_WEIGHT_SUFFIXES:
             raise ValueError(
-                f"ONNX manifest entry for {required_name} is missing a pinned 64-hex sha256"
+                f"Disallowed non-safetensors weight file in SAM 2.1 model directory: {child.name}"
             )
+
+    manifest_path = base / "manifest.json"
+    file_hashes: dict[str, str] = {"model.safetensors": MODEL_SHA256}
+    if expected_sha256 is not None:
+        file_hashes["model.safetensors"] = expected_sha256.strip().lower()
+    elif manifest_path.is_file() and not manifest_path.is_symlink():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if type(manifest) is not dict or type(manifest.get("files")) is not dict:
+            raise ValueError("SAM 2.1 model manifest.json must contain a files mapping")
+        file_hashes = {}
+        for name, entry in manifest["files"].items():
+            sha = (
+                entry.get("sha256")
+                if isinstance(entry, dict)
+                else entry
+                if isinstance(entry, str)
+                else ""
+            )
+            if not isinstance(sha, str) or not SHA256_HEX_RE.fullmatch(sha.strip().lower()):
+                raise ValueError(
+                    f"SAM 2.1 manifest entry for {name} is missing a pinned 64-hex sha256"
+                )
+            file_hashes[name] = sha.strip().lower()
+        if "model.safetensors" not in file_hashes:
+            raise ValueError("SAM 2.1 model manifest must include model.safetensors")
+
+    verified_paths: dict[str, Path] = {}
+    for required_name, pinned_sha in file_hashes.items():
+        if not SHA256_HEX_RE.fullmatch(pinned_sha):
+            raise ValueError(f"Invalid pinned SHA-256 for {required_name}")
         file_path = base / required_name
         if not file_path.exists() or file_path.is_symlink() or not file_path.is_file():
-            raise ValueError(f"ONNX model file not found: {file_path}")
+            raise ValueError(f"SAM 2.1 model file not found: {file_path}")
         actual_sha = hashlib.sha256(file_path.read_bytes()).hexdigest()
-        if actual_sha != expected_sha.strip().lower():
-            raise ValueError(f"ONNX model SHA-256 mismatch for {required_name}")
+        if actual_sha != pinned_sha:
+            raise ValueError(f"SAM 2.1 model SHA-256 mismatch for {required_name}")
         verified_paths[required_name] = file_path
+
+    for cfg_name in ("config.json", "preprocessor_config.json", "processor_config.json"):
+        cfg_path = base / cfg_name
+        if not cfg_path.exists() or cfg_path.is_symlink() or not cfg_path.is_file():
+            raise ValueError(f"SAM 2.1 config file not found: {cfg_path}")
+        parsed_cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+        if type(parsed_cfg) is not dict:
+            raise ValueError(f"SAM 2.1 config file must be a JSON object: {cfg_name}")
+        verified_paths[cfg_name] = cfg_path
+
     return {
         "model_dir": base,
-        "encoder_path": verified_paths["encoder.onnx"],
-        "decoder_path": verified_paths["decoder.onnx"],
-        "manifest": manifest,
+        "weights_path": verified_paths["model.safetensors"],
+        "files": verified_paths,
+        "repo": MODEL_REPO,
+        "revision": MODEL_REVISION,
+        "sha256": file_hashes["model.safetensors"],
     }
 
 
-# 将二值分割掩码矩阵转换为0到999归一化多边形顶点列表
-def mask_array_to_shapes(mask_img: Image.Image) -> list[dict[str, Any]]:
-    w, h = mask_img.size
-    box = mask_img.getbbox()
-    if box is None or sum(mask_img.histogram()[1:]) < MIN_SELECTED_PIXELS:
+# 兼容旧函数名别名
+verify_onnx_model_dir = verify_sam2_model_dir
+
+
+# 使用OpenCV RETR_TREE提取多边形外轮廓与内部孔洞（与Mac studio_regions.py一致）
+def _mask_shapes(
+    mask: Any, size: tuple[int, int], *, op: str = "add"
+) -> list[dict[str, Any]]:
+    if op not in ("add", "subtract"):
+        raise ValueError("Invalid segmentation operation")
+    width, height = size
+    arr = np.asarray(mask)
+    binary = (arr > 0).astype(np.uint8) * 255
+    if int((binary > 0).sum()) < MIN_SELECTED_PIXELS:
         raise ValueError("Point segmentation did not match a valid region")
 
-    # 优先使用OpenCV提取平滑轮廓，若未安装OpenCV则按行扫描提取多边形包络
     try:
         import cv2
-        import numpy as np
 
-        arr = (np.asarray(mask_img) > 0).astype(np.uint8) * 255
-        contours, _ = cv2.findContours(arr, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        shapes: list[dict[str, Any]] = []
-        for contour in sorted(contours, key=cv2.contourArea, reverse=True)[:8]:
-            if cv2.contourArea(contour) < MIN_SELECTED_PIXELS:
+        contours, hierarchy = cv2.findContours(
+            binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        )
+        if not contours or hierarchy is None:
+            raise ValueError("Point segmentation did not match a valid region")
+        tree = hierarchy[0]
+
+        def _depth(index: int) -> int:
+            level = 0
+            parent = int(tree[index][3])
+            while parent >= 0:
+                level += 1
+                parent = int(tree[parent][3])
+            return level
+
+        hole_op = "subtract" if op == "add" else "add"
+        items: list[tuple[int, float, dict[str, Any]]] = []
+        for idx, contour in enumerate(contours):
+            area = float(cv2.contourArea(contour))
+            if area < 24:
                 continue
-            epsilon = max(1.2, 0.003 * cv2.arcLength(contour, True))
-            approx = cv2.approxPolyDP(contour, epsilon, True)
+            perimeter = float(cv2.arcLength(contour, True))
+            approx = cv2.approxPolyDP(contour, max(1.2, perimeter * 0.0025), True)
             pts = [
                 {
-                    "x": round(float(pt[0][0]) / max(1, w - 1) * 999),
-                    "y": round(float(pt[0][1]) / max(1, h - 1) * 999),
+                    "x": round(int(pt[0][0]) / max(1, width - 1) * 999),
+                    "y": round(int(pt[0][1]) / max(1, height - 1) * 999),
                 }
                 for pt in approx[:256]
             ]
             if len(pts) >= 3:
-                shapes.append({"type": "polygon", "op": "add", "points": pts})
+                depth = _depth(idx)
+                shape_op = op if depth % 2 == 0 else hole_op
+                items.append(
+                    (depth, -area, {"type": "polygon", "op": shape_op, "points": pts})
+                )
+        items.sort(key=lambda item: (item[0], item[1]))
+        shapes = [item[2] for item in items[:16]]
         if shapes:
             return selection_value({"version": 1, "shapes": shapes})["shapes"]
     except ImportError:
         pass
 
     # 无OpenCV环境下的纯Pillow轮廓提取回退：按行采样左右边界构造闭合多边形
+    mask_img = (
+        mask
+        if isinstance(mask, Image.Image)
+        else Image.fromarray(binary, mode="L")
+    )
+    box = mask_img.getbbox()
+    if box is None:
+        raise ValueError("Point segmentation did not match a valid region")
     raw = mask_img.load()
     left_pts: list[dict[str, int]] = []
     right_pts: list[dict[str, int]] = []
@@ -887,99 +962,109 @@ def mask_array_to_shapes(mask_img: Image.Image) -> list[dict[str, Any]]:
         if row_xs:
             left_pts.append(
                 {
-                    "x": round(row_xs[0] / max(1, w - 1) * 999),
-                    "y": round(y / max(1, h - 1) * 999),
+                    "x": round(row_xs[0] / max(1, width - 1) * 999),
+                    "y": round(y / max(1, height - 1) * 999),
                 }
             )
             right_pts.append(
                 {
-                    "x": round(row_xs[-1] / max(1, w - 1) * 999),
-                    "y": round(y / max(1, h - 1) * 999),
+                    "x": round(row_xs[-1] / max(1, width - 1) * 999),
+                    "y": round(y / max(1, height - 1) * 999),
                 }
             )
     polygon_pts = left_pts + list(reversed(right_pts))
     if len(polygon_pts) < 3:
-        polygon_pts = [
-            {
-                "x": round(x1 / max(1, w - 1) * 999),
-                "y": round(y1 / max(1, h - 1) * 999),
-            },
-            {
-                "x": round(max(x1 + 1, x2 - 1) / max(1, w - 1) * 999),
-                "y": round(y1 / max(1, h - 1) * 999),
-            },
-            {
-                "x": round(max(x1 + 1, x2 - 1) / max(1, w - 1) * 999),
-                "y": round(max(y1 + 1, y2 - 1) / max(1, h - 1) * 999),
-            },
-            {
-                "x": round(x1 / max(1, w - 1) * 999),
-                "y": round(max(y1 + 1, y2 - 1) / max(1, h - 1) * 999),
-            },
-        ]
+        raise ValueError("Point segmentation did not match a valid region")
     return selection_value(
-        {"version": 1, "shapes": [{"type": "polygon", "op": "add", "points": polygon_pts}]}
+        {"version": 1, "shapes": [{"type": "polygon", "op": op, "points": polygon_pts}]}
     )["shapes"]
 
 
-# 基于ONNX Runtime CPU的SAM 2.1 Tiny服务端点选分割器（首次使用时懒加载、单图编码缓存、串行推理）
-class OnnxSamSegmenter:
+# 将二值分割掩码图像转换为0到999归一化多边形顶点列表
+def mask_array_to_shapes(
+    mask_img: Image.Image | np.ndarray,
+    size: tuple[int, int] | None = None,
+    *,
+    op: str = "add",
+) -> list[dict[str, Any]]:
+    resolved_size = (
+        size
+        if size is not None
+        else mask_img.size
+        if isinstance(mask_img, Image.Image)
+        else (int(mask_img.shape[1]), int(mask_img.shape[0]))
+    )
+    return _mask_shapes(mask_img, resolved_size, op=op)
+
+
+# 基于PyTorch CPU + transformers（Sam2Model）的SAM 2.1 hiera-tiny点选分割器（首次使用时懒加载、单图embedding缓存、串行推理）
+class Segmenter:
     def __init__(
         self,
         model_dir: str | Path | None = None,
         *,
-        session_factory: Any | None = None,
+        model_loader: Any | None = None,
     ) -> None:
         self._model_dir = model_dir
-        self._session_factory = session_factory
+        self._model_loader = model_loader
         self._lock = threading.Lock()
-        self._encoder_session: Any | None = None
-        self._decoder_session: Any | None = None
-        self._cache_key: tuple[str, int, int] | None = None
-        self._cache_embedding: dict[str, Any] | None = None
+        self._processor: Any | None = None
+        self._model: Any | None = None
+        self._cache_key: tuple[str, int, int, tuple[int, int]] | None = None
+        self._embedding: Any | None = None
 
-    # 检查本地是否已具备通过SHA256校验的ONNX模型与运行时环境
+    # 检查本地是否已具备通过SHA256校验的SAM 2.1 hiera-tiny safetensors模型与PyTorch/transformers运行时
     def ready(self) -> bool:
         try:
-            if self._session_factory is None:
-                import onnxruntime as _ort  # noqa: F401
-            verify_onnx_model_dir(self._model_dir)
+            if self._model_loader is None:
+                import safetensors  # noqa: F401
+                import torch  # noqa: F401
+                from transformers import Sam2Model, Sam2Processor  # noqa: F401
+            verify_sam2_model_dir(self._model_dir)
             return True
         except (ImportError, ValueError, OSError):
             return False
 
-    # 在首次调用时校验SHA256清单并懒加载CPU推理会话
+    # 在首次调用时校验safetensors SHA256并懒加载Sam2Processor与Sam2Model（仅限本地文件与CPU）
     def _ensure_loaded_locked(self) -> tuple[Any, Any]:
-        if self._encoder_session is not None and self._decoder_session is not None:
-            return self._encoder_session, self._decoder_session
-        verified = verify_onnx_model_dir(self._model_dir)
-        if self._session_factory is not None:
-            self._encoder_session = self._session_factory(str(verified["encoder_path"]))
-            self._decoder_session = self._session_factory(str(verified["decoder_path"]))
-        else:
-            import onnxruntime as ort
+        if self._processor is not None and self._model is not None:
+            return self._processor, self._model
+        verified = verify_sam2_model_dir(self._model_dir)
+        if self._model_loader is not None:
+            self._processor, self._model = self._model_loader(verified["model_dir"])
+            return self._processor, self._model
 
-            opts = ort.SessionOptions()
-            opts.intra_op_num_threads = 2
-            opts.inter_op_num_threads = 1
-            self._encoder_session = ort.InferenceSession(
-                str(verified["encoder_path"]),
-                sess_options=opts,
-                providers=["CPUExecutionProvider"],
-            )
-            self._decoder_session = ort.InferenceSession(
-                str(verified["decoder_path"]),
-                sess_options=opts,
-                providers=["CPUExecutionProvider"],
-            )
-        return self._encoder_session, self._decoder_session
+        import torch
+        from transformers import Sam2Model, Sam2Processor
 
-    # 对指定图片执行点提示分割并返回归一化多边形选区形状（单图编码器缓存+串行锁）
+        torch.set_num_threads(min(4, max(1, os.cpu_count() or 2)))
+        model_path_str = str(verified["model_dir"])
+        self._processor = Sam2Processor.from_pretrained(
+            model_path_str,
+            local_files_only=True,
+        )
+        self._model = Sam2Model.from_pretrained(
+            model_path_str,
+            local_files_only=True,
+            use_safetensors=True,
+            dtype=torch.float32,
+        )
+        self._model.to("cpu")
+        self._model.eval()
+        return self._processor, self._model
+
+    # 对指定图片执行点提示分割并返回归一化多边形选区形状（单图embedding缓存+串行锁）
     def segment(
-        self, image_path: str | Path, points: list[dict[str, Any]]
+        self,
+        image_path: str | Path,
+        points: list[dict[str, Any]],
+        existing: dict[str, Any] | None = None,
+        operation: str = "add",
     ) -> dict[str, Any]:
-        if not isinstance(points, list) or not 1 <= len(points) <= 16:
-            raise ValueError("Point segmentation requires between 1 and 16 points")
+        if not isinstance(points, list) or not 1 <= len(points) <= 24:
+            raise ValueError("Point segmentation requires between 1 and 24 points")
+        if operation not in ("add", "subtract"):
+            raise ValueError("Segmentation operation must be 'add' or 'subtract'")
         normalized_pts: list[tuple[int, int, int]] = []
         for point in points:
             if type(point) is not dict:
@@ -990,90 +1075,91 @@ class OnnxSamSegmenter:
             normalized_pts.append((_coord(point.get("x")), _coord(point.get("y")), label))
         if not any(label == 1 for _, _, label in normalized_pts):
             raise ValueError("At least one foreground point (label=1) is required")
+        if operation == "subtract" and not existing:
+            raise ValueError("Cannot subtract without an existing selection")
+
+        import torch
 
         resolved = Path(image_path).resolve()
         stat = resolved.stat()
-        key = (str(resolved), stat.st_mtime_ns, stat.st_size)
 
         with self._lock:
-            encoder_sess, decoder_sess = self._ensure_loaded_locked()
-            import numpy as np
-
-            if self._cache_key != key or self._cache_embedding is None:
-                image = open_image(resolved)
-                w, h = image.size
-                resized = image.resize((1024, 1024), Image.Resampling.BILINEAR)
-                arr = np.asarray(resized, dtype=np.float32) / 255.0
-                mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
-                std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-                chw = np.transpose((arr - mean) / std, (2, 0, 1))[None, ...]
-                enc_in_name = encoder_sess.get_inputs()[0].name
-                enc_out_names = [o.name for o in encoder_sess.get_outputs()]
-                enc_outputs = encoder_sess.run(enc_out_names, {enc_in_name: chw})
-                # 单图编码器缓存：新图片编码后立即替换旧图片缓存
-                self._cache_key = key
-                self._cache_embedding = {
-                    "size": (w, h),
-                    "outputs": dict(zip(enc_out_names, enc_outputs, strict=False)),
-                }
-
-            w, h = self._cache_embedding["size"]
-            enc_map = self._cache_embedding["outputs"]
-            coords = np.array(
+            processor, model = self._ensure_loaded_locked()
+            image = open_image(resolved)
+            full_size = image.size
+            image.thumbnail((1600, 1600), Image.Resampling.LANCZOS)
+            w, h = image.size
+            key = (str(resolved), stat.st_mtime_ns, stat.st_size, (w, h))
+            coords = [
                 [
-                    [[x / 999.0 * 1024.0, y / 999.0 * 1024.0] for x, y, _ in normalized_pts]
-                ],
-                dtype=np.float32,
+                    [
+                        [
+                            round(x / 999.0 * max(1, w - 1), 2),
+                            round(y / 999.0 * max(1, h - 1), 2),
+                        ]
+                        for x, y, _ in normalized_pts
+                    ]
+                ]
+            ]
+            labels = [[[label for _, _, label in normalized_pts]]]
+            inputs = processor(
+                images=image,
+                input_points=coords,
+                input_labels=labels,
+                return_tensors="pt",
             )
-            labels = np.array(
-                [[label for _, _, label in normalized_pts]],
-                dtype=np.float32,
-            )
-            dec_inputs: dict[str, Any] = {}
-            for inp in decoder_sess.get_inputs():
-                if inp.name in enc_map:
-                    dec_inputs[inp.name] = enc_map[inp.name]
-                elif "coord" in inp.name:
-                    dec_inputs[inp.name] = coords
-                elif "label" in inp.name:
-                    dec_inputs[inp.name] = labels
-                elif "mask_input" in inp.name:
-                    dec_inputs[inp.name] = np.zeros((1, 1, 256, 256), dtype=np.float32)
-                elif "has_mask" in inp.name:
-                    dec_inputs[inp.name] = np.zeros((1,), dtype=np.float32)
-                elif "orig_im_size" in inp.name:
-                    dec_inputs[inp.name] = np.array([h, w], dtype=np.int64)
-            if not dec_inputs and enc_map:
-                first_enc = next(iter(enc_map.values()))
-                dec_inputs = {
-                    "image_embeddings": first_enc,
-                    "point_coords": coords,
-                    "point_labels": labels,
-                }
-            dec_out_names = [o.name for o in decoder_sess.get_outputs()]
-            dec_outputs = decoder_sess.run(dec_out_names, dec_inputs)
-            masks_arr = np.asarray(dec_outputs[0])
-            scores_arr = (
-                np.asarray(dec_outputs[1]).reshape(-1)
-                if len(dec_outputs) > 1
-                else np.array([1.0], dtype=np.float32)
-            )
-            best_idx = int(np.argmax(scores_arr))
-            best_score = float(scores_arr[best_idx])
-            squeezed = np.squeeze(masks_arr)
-            mask_2d = squeezed[best_idx] if squeezed.ndim == 3 else squeezed
-            binary_uint8 = ((mask_2d > 0.0).astype(np.uint8)) * 255
-            mask_img = Image.fromarray(binary_uint8, mode="L")
-            if mask_img.size != (w, h):
-                mask_img = mask_img.resize((w, h), Image.Resampling.NEAREST)
+            if hasattr(inputs, "to") and hasattr(model, "device"):
+                inputs = inputs.to(model.device)
+            with torch.inference_mode():
+                if self._cache_key == key and self._embedding is not None:
+                    cached_inputs = dict(inputs)
+                    cached_inputs.pop("pixel_values", None)
+                    output = model(
+                        **cached_inputs,
+                        image_embeddings=self._embedding,
+                        multimask_output=True,
+                    )
+                else:
+                    output = model(**inputs, multimask_output=True)
+                    self._cache_key = key
+                    self._embedding = output.image_embeddings
 
-        shapes = mask_array_to_shapes(mask_img)
-        final_mask = mask_for({"version": 1, "shapes": shapes}, (w, h))
+            masks = processor.post_process_masks(
+                output.pred_masks.cpu(),
+                inputs["original_sizes"].cpu(),
+            )[0]
+            scores_flat = output.iou_scores.detach().cpu().reshape(-1)
+            best_idx = int(scores_flat.argmax().item())
+            best_score = float(scores_flat[best_idx].item())
+            mask_2d = (masks[0, best_idx].detach().cpu().numpy() > 0).astype(
+                np.uint8
+            ) * 255
+
+        if existing:
+            previous = np.asarray(mask_for(existing, (w, h)))
+            combined_mask = (
+                np.maximum(previous, mask_2d)
+                if operation == "add"
+                else np.where(mask_2d > 0, 0, previous).astype(np.uint8)
+            )
+        else:
+            combined_mask = mask_2d
+
+        shapes = _mask_shapes(combined_mask, (w, h), op="add")
+        final_mask = mask_for({"version": 1, "shapes": shapes}, full_size)
+        selected_pixels = int(sum(final_mask.histogram()[1:]))
+        if selected_pixels < MIN_SELECTED_PIXELS:
+            raise ValueError("Point segmentation did not leave a valid active selection")
         return {
+            "version": 1,
             "shapes": shapes,
             "score": round(best_score, 3),
-            "selected_pixels": int(sum(final_mask.histogram()[1:])),
+            "selected_pixels": selected_pixels,
         }
+
+
+# 保持旧类名兼容
+OnnxSamSegmenter = Segmenter
 
 
 # 选区编辑器令牌最短/最大有效时长（秒）、单次确认随机数正则与重放异常类型
@@ -1717,8 +1803,11 @@ def build_selection_editor_html(
     brushRadius: 22,
     zoom: 1,
     shapes: [],
+    baseShapes: [],
     points: [],
+    pointOp: 'add',
     draft: null,
+    activeMaskPixels: 0,
     confirmedId: null,
     busy: false
   }};
@@ -1822,7 +1911,7 @@ def build_selection_editor_html(
   }}
 
   function hasAdditiveShape() {{
-    return state.shapes.some(s => s.op === 'add');
+    return state.shapes.some(s => s.op === 'add') && state.activeMaskPixels > 0;
   }}
 
   function updateToolbarUI() {{
@@ -1857,32 +1946,33 @@ def build_selection_editor_html(
       : state.shapes;
 
     allShapes.forEach(shape => {{
-      mctx.globalCompositeOperation = shape.op === 'subtract' ? 'destination-out' : 'source-over';
-      mctx.fillStyle = 'rgba(37, 99, 235, 0.36)';
-      mctx.strokeStyle = 'rgba(37, 99, 235, 0.36)';
+      const isSubtract = shape.op === 'subtract';
+      mctx.globalCompositeOperation = isSubtract ? 'destination-out' : 'source-over';
+      mctx.fillStyle = isSubtract ? 'rgba(0, 0, 0, 1)' : 'rgba(37, 99, 235, 1)';
+      mctx.strokeStyle = isSubtract ? 'rgba(0, 0, 0, 1)' : 'rgba(37, 99, 235, 1)';
       traceShape(mctx, shape, w, h);
     }});
+
+    const maskData = mctx.getImageData(0, 0, w, h).data;
+    let activePixels = 0;
+    for (let i = 3; i < maskData.length; i += 4) {{
+      if (maskData[i] > 0) activePixels += 1;
+    }}
+    state.activeMaskPixels = activePixels;
+
+    ctx.save();
+    ctx.globalAlpha = 0.36;
     ctx.drawImage(maskCanvas, 0, 0);
+    ctx.restore();
 
     ctx.save();
     ctx.strokeStyle = '#60a5fa';
     ctx.lineWidth = 2;
-    state.shapes.forEach(shape => {{
-      if (shape.type === 'rect' && shape.points.length === 2) {{
-        const [x1, y1] = toPx(shape.points[0], w, h);
-        const [x2, y2] = toPx(shape.points[1], w, h);
-        ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
-      }} else if (shape.type === 'polygon' && shape.points.length >= 3) {{
-        ctx.beginPath();
-        shape.points.forEach((pt, idx) => {{
-          const [x, y] = toPx(pt, w, h);
-          if (idx === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }});
-        ctx.closePath();
-        ctx.stroke();
-      }}
-    }});
+    if (state.draft && state.draft.type === 'rect' && state.draft.points.length === 2) {{
+      const [x1, y1] = toPx(state.draft.points[0], w, h);
+      const [x2, y2] = toPx(state.draft.points[1], w, h);
+      ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+    }}
 
     if (state.draft && state.draft.type === 'polygon') {{
       ctx.setLineDash([5, 4]);
@@ -1931,7 +2021,14 @@ def build_selection_editor_html(
       const res = await fetch(SIGNED_URL, {{
         method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
-        body: JSON.stringify({{ action: 'segment', points: state.points }})
+        body: JSON.stringify({{
+          action: 'segment',
+          points: state.points,
+          operation: state.pointOp || 'add',
+          existing: state.baseShapes && state.baseShapes.length
+            ? {{ version: 1, shapes: state.baseShapes }}
+            : null
+        }})
       }});
       const data = await res.json();
       if (!res.ok) {{
@@ -1957,6 +2054,7 @@ def build_selection_editor_html(
       points: state.draft.points.slice(0, 1024)
     }});
     state.draft = null;
+    state.points = [];
     state.confirmedId = null;
     setStatus('已添加多边形选区，可继续加选/减选或点击“确认选区”。', '');
     renderOverlay();
@@ -1970,12 +2068,22 @@ def build_selection_editor_html(
         setStatus('当前环境使用手动选区工具，请使用框选、多边形套索或画笔涂抹。', 'err');
         return;
       }}
-      const label = (ev.altKey || state.op === 'subtract') ? 0 : 1;
-      if (label === 0 && !state.points.some(p => p.label === 1)) {{
-        setStatus('请先点击要修改的目标区域（加选），再点不需要的部分（减选）。', 'err');
-        return;
+      if (state.points.length === 0) {{
+        if (ev.altKey) {{
+          setStatus('请先点击要修改的目标区域（加选），再按住 Alt 点击不需要的部分。', 'err');
+          return;
+        }}
+        if (state.op === 'subtract' && !state.shapes.some(s => s.op === 'add')) {{
+          setStatus('请先点击要修改的目标区域（加选），再点不需要的部分（减选）。', 'err');
+          return;
+        }}
+        state.baseShapes = state.shapes.slice();
+        state.pointOp = state.op;
+        state.points.push({{ x: pt.x, y: pt.y, label: 1 }});
+      }} else {{
+        const label = (ev.altKey || (state.op === 'subtract' && state.pointOp === 'add')) ? 0 : 1;
+        state.points.push({{ x: pt.x, y: pt.y, label }});
       }}
-      state.points.push({{ x: pt.x, y: pt.y, label }});
       renderOverlay();
       runPointSegment();
       return;
@@ -2035,6 +2143,7 @@ def build_selection_editor_html(
       const x2 = Math.max(a.x, b.x), y2 = Math.max(a.y, b.y);
       if (x2 - x1 >= 6 && y2 - y1 >= 6) {{
         state.shapes.push({{ type: 'rect', op: draft.op, points: [{{ x: x1, y: y1 }}, {{ x: x2, y: y2 }}] }});
+        state.points = [];
         state.confirmedId = null;
         setStatus('已更新选区，完成后请点击“确认选区”。', '');
       }}
@@ -2045,6 +2154,7 @@ def build_selection_editor_html(
         radius: draft.radius,
         points: draft.points.slice(0, 1024)
       }});
+      state.points = [];
       state.confirmedId = null;
       setStatus('已更新画笔选区，完成后请点击“确认选区”。', '');
     }}
@@ -2062,6 +2172,7 @@ def build_selection_editor_html(
       if (btn.disabled) return;
       state.tool = btn.dataset.tool;
       state.draft = null;
+      state.points = [];
       renderOverlay();
     }});
   }});
@@ -2101,7 +2212,7 @@ def build_selection_editor_html(
         runPointSegment();
         return;
       }}
-      state.shapes = [];
+      state.shapes = state.baseShapes ? state.baseShapes.slice() : [];
     }} else {{
       state.shapes.pop();
     }}
@@ -2111,6 +2222,7 @@ def build_selection_editor_html(
 
   clearBtn.addEventListener('click', () => {{
     state.shapes = [];
+    state.baseShapes = [];
     state.points = [];
     state.draft = null;
     state.confirmedId = null;
