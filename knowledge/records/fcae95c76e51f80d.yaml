@@ -1,0 +1,79 @@
+id: fcae95c76e51f80d
+title_zh: 印度九曜神像横列砂岩浮雕
+source:
+  original_path: 石刻纹样开放授权实物参考/东南亚与南亚-印度九曜神像横列砂岩浮雕-cma146165.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/02-东南亚与南亚石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/东南亚与南亚-印度九曜神像横列砂岩浮雕-cma146165.jpg
+  sha256: fcae95c76e51f80db16759732e042ccf35b102dc8094e4d9e3dee5486fa25990
+  bytes: 1320397
+  width: 3400
+  height: 1682
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fcae95c76e51f80d.jpg
+    sha256: 3b5711187c2368af3686aaa43d0fde258af30a5b22b51a4148a646db97e2a8d7
+    bytes: 269997
+    width: 2048
+    height: 1013
+  thumb512:
+    path: assets/thumb512/fcae95c76e51f80d.webp
+    sha256: 0bf18be1cd5927b46b0163e7267f0e1c10243852fedd374f9d082685b7e5a200
+    bytes: 13302
+    width: 512
+    height: 253
+library_type: 石刻纹样
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 印度九曜神像横列砂岩浮雕
+entity_type: 实物对象写实
+summary_zh: 【图中可见】横长石板上排列多位戴冠人物，身体弯曲姿态重复，部分手持小器物；右侧有一颗体量较大的正面人头和末端坐姿人物。【来源著录】Nine Celestial Bodies (Navagraha)；文化或地点依据：克利夫兰艺术博物馆著录为
+  Central India、700s，题名 Nine Celestial Bodies (Navagraha)；具体神名排列按馆方说明，不由本图独立断定。
+materials:
+- 砂岩（馆方著录）
+colors:
+- 红褐色
+- 灰褐色
+style: 东南亚/南亚传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，横长石板上排列多位戴冠人物，身体弯曲姿态重复，部分手持小器物；右侧有一颗体量较大的正面人头和末端坐姿人物。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Nine Celestial Bodies (Navagraha). Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 石刻纹样
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 印度九曜神像横列砂岩浮雕
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1971.61
+  download_url: https://openaccess-cdn.clevelandart.org/1971.61/1971.61_print.jpg
+  credit: Gift of Doris and Ed Wiener
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1682
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

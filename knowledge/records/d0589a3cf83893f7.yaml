@@ -1,0 +1,77 @@
+id: d0589a3cf83893f7
+title_zh: 辽代鎏金合掌观音立像
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-辽代鎏金合掌观音立像-aic28128.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-辽代鎏金合掌观音立像-aic28128.jpg
+  sha256: d0589a3cf83893f76fd78636758994ada5a423f8787e795c531ef9a102c3c244
+  bytes: 264208
+  width: 1168
+  height: 2268
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d0589a3cf83893f7.jpg
+    sha256: 117e88294ee494dd6798589ce089703ed287a7b4e2cd07105599d7e99f240cc4
+    bytes: 171390
+    width: 1055
+    height: 2048
+  thumb512:
+    path: assets/thumb512/d0589a3cf83893f7.webp
+    sha256: 1d2039d9c376813ee19942a5ddd7964fa28fa3cffc4178b4fec719534421a1c0
+    bytes: 9460
+    width: 264
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 辽代鎏金合掌观音立像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】金色冠饰立像双手合掌，璎珞与披帛垂于两侧，下承莲瓣座，表面有绿色斑驳。【来源著录】Guanyin (Avalokitesvara)；文化或地点依据：馆方著录辽代；按辽文化体系归入中国北方，未补写制作地点。
+materials:
+- 鎏金铜合金
+colors:
+- 金色
+- 绿色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，金色冠饰立像双手合掌，璎珞与披帛垂于两侧，下承莲瓣座，表面有绿色斑驳。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Guanyin (Avalokitesvara). Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 辽代鎏金合掌观音立像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.artic.edu/artworks/28128
+  download_url: https://www.artic.edu/iiif/2/41c37384-d473-a4c8-c73c-29fd3400bd2b/full/1168,/0/default.jpg
+  credit: Lucy Maud Buckingham Collection
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1168
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

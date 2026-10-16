@@ -1,0 +1,77 @@
+id: 360c3bedd9620e32
+title_zh: 晚商安阳文化喇叭口兽面纹青铜觚
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-晚商安阳文化喇叭口兽面纹青铜觚-cma136466.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-晚商安阳文化喇叭口兽面纹青铜觚-cma136466.jpg
+  sha256: 360c3bedd9620e329bdf21558916751586fb42999fb961d2e50d1bb5c217599e
+  bytes: 634335
+  width: 2662
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/360c3bedd9620e32.jpg
+    sha256: 5b3b51e367f0797a03333f5077fffeb1fb357ef2bf11fb10cbb801fd931125f9
+    bytes: 250939
+    width: 1603
+    height: 2048
+  thumb512:
+    path: assets/thumb512/360c3bedd9620e32.webp
+    sha256: b109a0d73fed21ac9526831d4676396ac700213464fcacea05628f12d759687a
+    bytes: 8466
+    width: 401
+    height: 512
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 晚商安阳文化喇叭口兽面纹青铜觚
+entity_type: 实物对象写实
+summary_zh: 【图中可见】瘦高酒器为喇叭形大口、细长颈、凸出的中部纹带和外撇圈足；纹带以成对圆目与方折线构成兽面。【来源著录】Wine Beaker (Gu)；文化或地点依据：馆方文化著录为商代安阳期，按河南安阳为中心的北方中原礼制传统归类；具体出土地未注明。
+materials:
+- 青铜
+colors:
+- 灰绿
+- 黄褐
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，瘦高酒器为喇叭形大口、细长颈、凸出的中部纹带和外撇圈足；纹带以成对圆目与方折线构成兽面。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Wine Beaker (Gu). Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 晚商安阳文化喇叭口兽面纹青铜觚
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1960.43
+  download_url: https://openaccess-cdn.clevelandart.org/1960.43/1960.43_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2662
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

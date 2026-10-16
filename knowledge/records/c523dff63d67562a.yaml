@@ -1,0 +1,78 @@
+id: c523dff63d67562a
+title_zh: 晚商安阳文化双柱流尾青铜爵
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-晚商安阳文化双柱流尾青铜爵-cma136506.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-晚商安阳文化双柱流尾青铜爵-cma136506.jpg
+  sha256: c523dff63d67562a19ce0d14599b361d3c3a7f36ca84ab4cf98f6a8b5501e02e
+  bytes: 723789
+  width: 2728
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c523dff63d67562a.jpg
+    sha256: 3260cddcf5ce8020bc2ff2b073aa09301f3d3484f98c8fa0cf7c63fc44c7f5c3
+    bytes: 296865
+    width: 1643
+    height: 2048
+  thumb512:
+    path: assets/thumb512/c523dff63d67562a.webp
+    sha256: 3479c5f86cd674157c77c1448a63da006288332bf66c2066d32c35ca7dcef573
+    bytes: 12238
+    width: 411
+    height: 512
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 晚商安阳文化双柱流尾青铜爵
+entity_type: 实物对象写实
+summary_zh: 【图中可见】细腰三足酒器前端伸长流、后端尖尾上翘，口边有两根伞帽状立柱，一侧有环形鋬，器腹饰方折兽面纹。【来源著录】Wine Cups (Jue)；文化或地点依据：馆方文化著录为商代安阳期，按河南安阳为中心的北方中原礼制传统归类；具体出土地未注明。
+materials:
+- 青铜
+colors:
+- 浅绿
+- 黄褐
+- 深褐
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，细腰三足酒器前端伸长流、后端尖尾上翘，口边有两根伞帽状立柱，一侧有环形鋬，器腹饰方折兽面纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Wine Cups (Jue). Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 晚商安阳文化双柱流尾青铜爵
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1960.78
+  download_url: https://openaccess-cdn.clevelandart.org/1960.78/1960.78_print.jpg
+  credit: Norman O. Stone and Ella A. Stone Memorial Fund and Edward L. Whittemore Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2728
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

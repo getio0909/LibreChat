@@ -1,0 +1,88 @@
+id: 9e9580f0d5422e2d
+title_zh: 可能苏州制百宝嵌博古花果盖盒
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-可能苏州制百宝嵌博古花果盖盒-commons77595989.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-可能苏州制百宝嵌博古花果盖盒-commons77595989.jpg
+  sha256: 9e9580f0d5422e2df8a089f3adacba2c9aba19333266d29ba1721229e95e080a
+  bytes: 1510579
+  width: 3840
+  height: 3132
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9e9580f0d5422e2d.jpg
+    sha256: 95cd85201d698154d58a5c104c2ee5c03f75ae68f1dd1b8dde748bf7b210e2ff
+    bytes: 519772
+    width: 2048
+    height: 1670
+  thumb512:
+    path: assets/thumb512/9e9580f0d5422e2d.webp
+    sha256: eadb44b53755450da7a8a3149439c0ca245c2b1162c8ca6343efecb9711012e5
+    bytes: 36172
+    width: 512
+    height: 418
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 可能苏州制百宝嵌博古花果盖盒
+entity_type: 实物对象写实
+summary_zh: 【图中可见】多边形红褐色盖盒上嵌彩色花果和器物，中央为带字葫芦形器，周围有盆花、葡萄与剖开的石榴，侧壁为金色连续小纹。【来源著录】Lidded box with plants, flowers, fruits, vessels,
+  and stone chime, China, probably Suzhou, Qianlong period, 1736-1795 AD, lacquer on wood, jade, turquoise, amber, coral,
+  etc - Peabody Essex Museum - DSC07998.jpg；文化或地点依据：Commons题名记为中国、可能苏州，乾隆时期1736–1795；按传统木胎漆作器具收录，不将推测产地写成确证。
+materials:
+- 漆木
+- 玉
+- 绿松石
+- 琥珀
+- 珊瑚等（Commons题名著录）
+colors:
+- 红褐色
+- 绿色
+- 黄色
+- 蓝色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，多边形红褐色盖盒上嵌彩色花果和器物，中央为带字葫芦形器，周围有盆花、葡萄与剖开的石榴，侧壁为金色连续小纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Lidded box with plants, flowers, fruits, vessels, and
+  stone chime, China, probably Suzhou, Qianlong period, 1736-1795 AD, lacquer on wood, jade, turquoise, amber, coral, etc
+  - Peabody Essex Museum - DSC07998.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the
+  image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 可能苏州制百宝嵌博古花果盖盒
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Lidded box with plants, flowers, fruits, vessels, and stone chime, China, probably
+    Suzhou, Qianlong period, 1736-1795 AD, lacquer on wood, jade, turquoise, amber, coral, etc - Peabody Essex Museum - DSC07998.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Lidded_box_with_plants%2C_flowers%2C_fruits%2C_vessels%2C_and_stone_chime%2C_China%2C_probably_Suzhou%2C_Qianlong_period%2C_1736-1795_AD%2C_lacquer_on_wood%2C_jade%2C_turquoise%2C_amber%2C_coral%2C_etc_-_Peabody_Essex_Museum_-_DSC07998.jpg/3840px-thumbnail.jpg
+  credit: Daderot; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 3132
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

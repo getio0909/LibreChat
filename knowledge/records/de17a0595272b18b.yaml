@@ -1,0 +1,80 @@
+id: de17a0595272b18b
+title_zh: 西藏彩绘三折便携木佛龛
+source:
+  original_path: 家具木作开放授权实物参考/中国藏区·藏传佛教-西藏彩绘三折便携木佛龛-cma143777.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/05-中国藏区·藏传佛教家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国藏区·藏传佛教-西藏彩绘三折便携木佛龛-cma143777.jpg
+  sha256: de17a0595272b18b25baf8a1cadc6d488f052f3a67ff08a82a7a201e6527e3e8
+  bytes: 1435515
+  width: 3400
+  height: 2679
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/de17a0595272b18b.jpg
+    sha256: 75dac921308bc0570a296d6db59bdd7565b2e6eb7584c7b4d54fc815fb7f6068
+    bytes: 561447
+    width: 2048
+    height: 1614
+  thumb512:
+    path: assets/thumb512/de17a0595272b18b.webp
+    sha256: f1a084e76a1bf327cd8a58a69fb73200ff9ef486fc22f4f335df29b932128c90
+    bytes: 28568
+    width: 512
+    height: 403
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 西藏彩绘三折便携木佛龛
+entity_type: 实物对象写实
+summary_zh: 【图中可见】三联木龛打开后正中与双翼均为三层密集坐姿人物，人物下方有莲瓣边，基部饰珠和花形带。【来源著录】Portable Shrine；文化或地点依据：馆方著录为Tibet；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 木材
+- 矿物颜料
+- 金属
+colors:
+- 红棕色
+- 暗绿色
+- 金黄色
+style: 中国藏区·藏传佛教传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，三联木龛打开后正中与双翼均为三层密集坐姿人物，人物下方有莲瓣边，基部饰珠和花形带。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Portable Shrine. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏彩绘三折便携木佛龛
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1968.214
+  download_url: https://openaccess-cdn.clevelandart.org/1968.214/1968.214_print.jpg
+  credit: Andrew R. and Martha Holden Jennings Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2679
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

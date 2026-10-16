@@ -11,6 +11,7 @@
     "original",
     "derivatives",
     "library_type",
+    "region",
     "studio_roles",
     "category_l1",
     "category_l2",
@@ -42,6 +43,14 @@
       "additionalProperties": false,
       "required": ["original_path"],
       "properties": {
+        "wiki_doc": {
+          "type": "string",
+          "pattern": "^text_wiki/.+\\.md$"
+        },
+        "import_manifest": {
+          "type": "string",
+          "pattern": "^imports/[0-9a-f]{16}\\.jsonl$"
+        },
         "original_path": {
           "type": "string",
           "minLength": 1,
@@ -77,7 +86,7 @@
         },
         "format": {
           "type": "string",
-          "enum": ["JPEG", "PNG", "WEBP"]
+          "enum": ["JPEG", "PNG", "WEBP", "MPO"]
         },
         "color_mode": {
           "type": "string",
@@ -112,6 +121,10 @@
         "工程图纸",
         "矿山车间"
       ]
+    },
+    "region": {
+      "type": "string",
+      "enum": ["西方", "南亚东南亚", "中国北方", "中国南方", "中国藏区", "未知"]
     },
     "studio_roles": {
       "type": "array",
@@ -163,6 +176,9 @@
     "prompt_zh": {
       "type": "string"
     },
+    "prompt_en": {
+      "type": "string"
+    },
     "tags": {
       "type": "array",
       "items": {
@@ -190,6 +206,14 @@
         "url": {
           "type": ["string", "null"]
         },
+        "license_url": {
+          "type": "string",
+          "pattern": "^https?://"
+        },
+        "download_url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
         "credit": {
           "type": ["string", "null"]
         },
@@ -199,6 +223,10 @@
             "unknown",
             "own",
             "cc0",
+            "public-domain",
+            "cc-by-2.0",
+            "cc-by-4.0",
+            "cc-by-sa-2.0",
             "cc-by-3.0",
             "cc-by-sa-3.0",
             "cc-by-sa-4.0",

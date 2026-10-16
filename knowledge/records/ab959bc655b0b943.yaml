@@ -24,6 +24,7 @@ derivatives:
     width: 312
     height: 381
 library_type: 建筑景观
+region: 未知
 studio_roles:
 - 物件
 - 造型

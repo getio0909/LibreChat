@@ -1,0 +1,79 @@
+id: ad34037931a9211b
+title_zh: 北京智化寺转轮藏佛像格门与雕花柜顶
+source:
+  original_path: 家具木作开放授权实物参考/中国北方-北京智化寺转轮藏佛像格门与雕花柜顶-commons146486162.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/03-中国北方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国北方-北京智化寺转轮藏佛像格门与雕花柜顶-commons146486162.jpg
+  sha256: ad34037931a9211b13ccac2d90166b55411a03b12210968b7377a0364306d60f
+  bytes: 2859458
+  width: 3840
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ad34037931a9211b.jpg
+    sha256: 0e322bd6aec1419e7641dc7d4fc0becee71b80e4c8b91f0390879d9883151844
+    bytes: 983631
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/ad34037931a9211b.webp
+    sha256: edb6ce9e137c5e4110cf252a7152c6ed6ac8fd28fdc5d0f8ca1021f647b22e14
+    bytes: 56830
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 北京智化寺转轮藏佛像格门与雕花柜顶
+entity_type: 实物对象写实
+summary_zh: 【图中可见】多面立式经柜的红色小门按网格排列，每扇门有坐佛浮雕与圆环拉手；转角竖饰和柜顶为金色与灰褐色透雕构件。【来源著录】藏殿转轮藏.jpg；文化或地点依据：Commons 题名为藏殿转轮藏，分类明确为北京智化寺；藏殿指藏经殿，此为汉传寺院经柜。
+materials:
+- 木材（柜体与雕饰，具体树种未注明）
+- 彩绘
+colors:
+- 朱红
+- 金色
+- 灰褐
+style: 中国北方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，多面立式经柜的红色小门按网格排列，每扇门有坐佛浮雕与圆环拉手；转角竖饰和柜顶为金色与灰褐色透雕构件。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 藏殿转轮藏.jpg. Preserve the visible silhouette, ornament spacing
+  and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北京智化寺转轮藏佛像格门与雕花柜顶
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:藏殿转轮藏.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/%E8%97%8F%E6%AE%BF%E8%BD%AC%E8%BD%AE%E8%97%8F.jpg/3840px-%E8%97%8F%E6%AE%BF%E8%BD%AC%E8%BD%AE%E8%97%8F.jpg
+  credit: Patrick20242023; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2880
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

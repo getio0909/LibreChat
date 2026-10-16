@@ -1,0 +1,78 @@
+id: 2fedfcc1dfeef926
+title_zh: 泉州开元寺镇国塔全景与树木前庭
+source:
+  original_path: 建筑景观开放授权实景参考/中国南方-泉州开元寺镇国塔全景与树木前庭-commons61540702.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/04-中国南方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国南方-泉州开元寺镇国塔全景与树木前庭-commons61540702.jpg
+  sha256: 2fedfcc1dfeef926068a635b0365d28b6b4a008553dd61cdc2f420d4a12b9438
+  bytes: 3757589
+  width: 1800
+  height: 2700
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2fedfcc1dfeef926.jpg
+    sha256: 816deb9cb0111e95d079fa7ac29867d71d2c2ff65af99ef05f829052eea87a3a
+    bytes: 476832
+    width: 1365
+    height: 2048
+  thumb512:
+    path: assets/thumb512/2fedfcc1dfeef926.webp
+    sha256: cff8dd68cd6e68f4839f1a93bf117bac7043daa9957ad563a5371a95094df872
+    bytes: 30776
+    width: 341
+    height: 512
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 泉州开元寺镇国塔全景与树木前庭
+entity_type: 空间场景设计
+summary_zh: 【图中可见】五层八角石塔以层层挑檐形成竖向轮廓，前景绿树与院落围合塔身，属于建筑外观与庭院关系参考。【来源著录】Zhenguo Pagoda of Kaiyuan Temple (Quanzhou) 20170727.jpg；文化或地点依据：来源明确福建泉州开元寺镇国塔。来源将“淳熙十年”与“1250年”并列，纪年自相矛盾，故不据此确定本塔建造年代；照片日期为2017年7月27日。
+materials:
+- 石材（来源明确石构）
+colors:
+- 灰褐色
+- 黄褐色
+style: 中国南方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，五层八角石塔以层层挑檐形成竖向轮廓，前景绿树与院落围合塔身，属于建筑外观与庭院关系参考。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Zhenguo Pagoda of Kaiyuan Temple (Quanzhou) 20170727.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国南方
+- 开放授权
+- 真实摄影
+- 泉州开元寺镇国塔全景与树木前庭
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Zhenguo_Pagoda_of_Kaiyuan_Temple_(Quanzhou)_20170727.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/1/15/Zhenguo_Pagoda_of_Kaiyuan_Temple_%28Quanzhou%29_20170727.jpg
+  credit: Tyg728; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1800
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

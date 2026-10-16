@@ -1,0 +1,77 @@
+id: 915d3f94f5370257
+title_zh: 潮州清代金漆三羊开泰馔盒
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-潮州清代金漆三羊开泰馔盒-commons52175241.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-潮州清代金漆三羊开泰馔盒-commons52175241.jpg
+  sha256: 915d3f94f53702571b4f69afb39bb4719f1d563be6ea865c1d96ba6828521df4
+  bytes: 1476315
+  width: 3840
+  height: 2126
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/915d3f94f5370257.jpg
+    sha256: 05108626ec73d763ae1a8b5cf32c8a5b7747623e56bc0e582491f772935642de
+    bytes: 416111
+    width: 2048
+    height: 1134
+  thumb512:
+    path: assets/thumb512/915d3f94f5370257.webp
+    sha256: c571aec5948b6a6987dbdc65ac47467ac900f32c376f9f5938af7fd94929c385
+    bytes: 27046
+    width: 512
+    height: 283
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 潮州清代金漆三羊开泰馔盒
+entity_type: 实物对象写实
+summary_zh: 【图中可见】黑色长方盒体正面嵌金色浮雕，三只羊形之间穿插松树、竹枝与山石，盖面保留金色线描边饰，盒体上下边缘平直。【来源著录】金漆木雕三羊开泰馔盒.jpg；文化或地点依据：来源说明为清代金漆木雕三羊开泰馔盒，类别归入潮州木雕。
+materials:
+- 金漆木雕（来源说明）
+colors:
+- 金色
+- 黑色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，黑色长方盒体正面嵌金色浮雕，三只羊形之间穿插松树、竹枝与山石，盖面保留金色线描边饰，盒体上下边缘平直。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 金漆木雕三羊开泰馔盒.jpg. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 潮州清代金漆三羊开泰馔盒
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:%E9%87%91%E6%BC%86%E6%9C%A8%E9%9B%95%E4%B8%89%E7%BE%8A%E5%BC%80%E6%B3%B0%E9%A6%94%E7%9B%92.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/%E9%87%91%E6%BC%86%E6%9C%A8%E9%9B%95%E4%B8%89%E7%BE%8A%E5%BC%80%E6%B3%B0%E9%A6%94%E7%9B%92.jpg/3840px-%E9%87%91%E6%BC%86%E6%9C%A8%E9%9B%95%E4%B8%89%E7%BE%8A%E5%BC%80%E6%B3%B0%E9%A6%94%E7%9B%92.jpg
+  credit: 三猎; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2126
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

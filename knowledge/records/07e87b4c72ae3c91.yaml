@@ -1,0 +1,77 @@
+id: 07e87b4c72ae3c91
+title_zh: 山西乔家大院博古纹鼓形石柱础
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-山西乔家大院博古纹鼓形石柱础-commons66718615.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-山西乔家大院博古纹鼓形石柱础-commons66718615.jpg
+  sha256: 07e87b4c72ae3c9176894ded7ed27e5d3ca91cc3aa4cfb292516d0b54143ae5a
+  bytes: 2796664
+  width: 3008
+  height: 2000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/07e87b4c72ae3c91.jpg
+    sha256: b8a66f273276fc28e969ffce4ee2ea89896c8a8aa97ce92003096e8e796a46ca
+    bytes: 424647
+    width: 2048
+    height: 1362
+  thumb512:
+    path: assets/thumb512/07e87b4c72ae3c91.webp
+    sha256: 706423a342b2520024fcdcb24e283ebeda5e06ce4b69f4d0d76c8f32b3b4ce26
+    bytes: 21358
+    width: 512
+    height: 340
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 山西乔家大院博古纹鼓形石柱础
+entity_type: 实物对象写实
+summary_zh: 【图中可见】方木柱下为鼓形石础，腹面装饰鼎炉、瓶、如意等器物状线刻图案，浅色凹线衬灰色底面，下缘方座饰连续方折纹。【来源著录】中國山西平遙古蹟225.jpg；文化或地点依据：Commons 说明与分类明确为山西乔家大院；以民居原位柱础石刻归入中国北方。
+materials:
+- 石材（具体岩种未注明）
+colors:
+- 灰色
+- 灰白
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，方木柱下为鼓形石础，腹面装饰鼎炉、瓶、如意等器物状线刻图案，浅色凹线衬灰色底面，下缘方座饰连续方折纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 中國山西平遙古蹟225.jpg. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 山西乔家大院博古纹鼓形石柱础
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:中國山西平遙古蹟225.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/9/93/%E4%B8%AD%E5%9C%8B%E5%B1%B1%E8%A5%BF%E5%B9%B3%E9%81%99%E5%8F%A4%E8%B9%9F225.jpg
+  credit: 林高志; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

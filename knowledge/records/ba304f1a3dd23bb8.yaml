@@ -24,6 +24,7 @@ derivatives:
     width: 512
     height: 341
 library_type: 空间展陈
+region: 未知
 studio_roles:
 - 参考
 - 风格

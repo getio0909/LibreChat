@@ -1,0 +1,78 @@
+id: 07e6935e575ea61a
+title_zh: 科隆大教堂双塔与街巷景观
+source:
+  original_path: 建筑景观开放授权实景参考/西方-科隆大教堂双塔与街巷景观-commons190260399.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/01-西方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/西方-科隆大教堂双塔与街巷景观-commons190260399.jpg
+  sha256: 07e6935e575ea61a76791687a3a6a43ceb290f8809f54693eba0db7b4747a24a
+  bytes: 19214703
+  width: 5724
+  height: 3815
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/07e6935e575ea61a.jpg
+    sha256: 8a1e0f276769c62e9e78ebdd2d5efa017ea4490b59a55c37cbb184e0829890ba
+    bytes: 704169
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/07e6935e575ea61a.webp
+    sha256: 115f73756d2dcd9ea287d229d8891eb76f289f9e083c258ac191afd2e7ac69e4
+    bytes: 43386
+    width: 512
+    height: 341
+library_type: 建筑景观
+region: 西方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 科隆大教堂双塔与街巷景观
+entity_type: 空间场景设计
+summary_zh: '【图中可见】双尖塔教堂位于街巷尽端，深色石质立面有密集竖向构件、尖拱门和层层山花，前景两侧为沿街房屋。【来源著录】File : Cologne Cathedral in 2026.jpg；文化或地点依据：Commons标题与来源记录明确标识德国科隆大教堂；不以照片日期代替建筑年代。'
+materials:
+- 石构件（具体材种来源未注明）
+colors:
+- 深灰色
+- 米黄色
+style: 西方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，双尖塔教堂位于街巷尽端，深色石质立面有密集竖向构件、尖拱门和层层山花，前景两侧为沿街房屋。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: 'Design reference study based on the source photograph of File : Cologne Cathedral in 2026.jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.'
+tags:
+- 建筑景观
+- 西方
+- 开放授权
+- 真实摄影
+- 科隆大教堂双塔与街巷景观
+- CC BY 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Cologne_Cathedral_in_2026.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/b/be/Cologne_Cathedral_in_2026.jpg
+  credit: Jorge Franganillo; https://www.flickr.com/photos/46191841@N00/55215937924/
+  license: cc-by-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 3815
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

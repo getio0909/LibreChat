@@ -1,0 +1,77 @@
+id: be78e2e59ca34f21
+title_zh: 罗马爱神厄洛斯大理石头像
+source:
+  original_path: 造像雕塑开放授权实物参考/西方-罗马爱神厄洛斯大理石头像-cma101264.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/01-西方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/西方-罗马爱神厄洛斯大理石头像-cma101264.jpg
+  sha256: be78e2e59ca34f2113eeee8b278c5f03709fd984d89e652c243e1719c9973146
+  bytes: 4977449
+  width: 3009
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/be78e2e59ca34f21.jpg
+    sha256: 76362d982b6522b1f0439df2f50cc421be9f15624dab4b8f3f68f00a9cb1d5aa
+    bytes: 334418
+    width: 1812
+    height: 2048
+  thumb512:
+    path: assets/thumb512/be78e2e59ca34f21.webp
+    sha256: d65e6df607434e9360bdb45ab4e43bf574ad768a166fdf3da74d04a8a07df0b6
+    bytes: 13942
+    width: 453
+    height: 512
+library_type: 造像雕塑
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 罗马爱神厄洛斯大理石头像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】青年头像略向一侧倾转，唇部微张、鼻尖缺损，一侧保留弧形发束，另一侧头顶部为较平整的残缺面。【来源著录】Eros, the God of Love；文化或地点依据：馆方著录 Italy, Roman；古罗马地中海雕塑。
+materials:
+- 大理石
+colors:
+- 米白
+- 浅褐
+style: 西方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，青年头像略向一侧倾转，唇部微张、鼻尖缺损，一侧保留弧形发束，另一侧头顶部为较平整的残缺面。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Eros, the God of Love. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 西方
+- 开放授权
+- 真实摄影
+- 罗马爱神厄洛斯大理石头像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1920.167
+  download_url: https://openaccess-cdn.clevelandart.org/1920.167/1920.167_print.jpg
+  credit: Gift of Mrs. John Huntington
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3009
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

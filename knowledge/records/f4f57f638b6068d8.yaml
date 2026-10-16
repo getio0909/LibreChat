@@ -1,0 +1,80 @@
+id: f4f57f638b6068d8
+title_zh: 河南唐代双菩萨火焰背光石碑
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-河南唐代双菩萨火焰背光石碑-met44798.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-河南唐代双菩萨火焰背光石碑-met44798.jpg
+  sha256: f4f57f638b6068d847b526f41168b8c492dc95d01d32a994d1eee6bf2484a0f7
+  bytes: 2758815
+  width: 2912
+  height: 3880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f4f57f638b6068d8.jpg
+    sha256: d2d8fcab94516d08194d5fee08b4aaf9df3c1d3f086852fa72fb1c6b66c332a4
+    bytes: 645514
+    width: 1537
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f4f57f638b6068d8.webp
+    sha256: ce06b81224b627cb688b98f603ab0f822017e04155867f08722deb9c528864ee
+    bytes: 29776
+    width: 384
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 河南唐代双菩萨火焰背光石碑
+entity_type: 实物对象写实
+summary_zh: 【图中可见】黑灰色长方石碑中两尊立像并排，各有尖拱火焰背光、冠饰与璎珞，底部有莲花与卷叶纹。【来源著录】Stele with the Bodhisattvas Avalokiteshvara (Guanyin) and
+  Mahasthamaprapta (Dashizi)；文化或地点依据：馆方明确著录中国河南；观音与大势至之名采用馆方定名。
+materials:
+- 石灰岩
+- 颜料残迹
+colors:
+- 黑灰色
+- 褐色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，黑灰色长方石碑中两尊立像并排，各有尖拱火焰背光、冠饰与璎珞，底部有莲花与卷叶纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Stele with the Bodhisattvas Avalokiteshvara (Guanyin)
+  and Mahasthamaprapta (Dashizi). Preserve the visible silhouette, ornament spacing and surface variation. Use the image as
+  a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 河南唐代双菩萨火焰背光石碑
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/44798
+  download_url: https://images.metmuseum.org/CRDImages/as/original/DP213352.jpg
+  credit: Rogers Fund, 1930
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2912
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

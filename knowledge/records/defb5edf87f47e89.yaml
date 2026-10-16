@@ -1,0 +1,87 @@
+id: defb5edf87f47e89
+title_zh: 可能苏州制玉兔捣药纹雕漆香盘
+source:
+  original_path: 法器供器开放授权实物参考/中国南方-可能苏州制玉兔捣药纹雕漆香盘-commons77618695.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/04-中国南方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国南方-可能苏州制玉兔捣药纹雕漆香盘-commons77618695.jpg
+  sha256: defb5edf87f47e89183500d0f9e657614fa7e5867baa4463f9d0c1b99ad200ce
+  bytes: 1534968
+  width: 3840
+  height: 2532
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/defb5edf87f47e89.jpg
+    sha256: baf8c1c512963fef55364c22fd69d0cfbb44b3d47dba0aeead9d579249657f67
+    bytes: 486780
+    width: 2048
+    height: 1350
+  thumb512:
+    path: assets/thumb512/defb5edf87f47e89.webp
+    sha256: d17cd94c1a479ad5e6b2257441efbea396c26dc91201c29ab4bb05fb1ad5cff3
+    bytes: 26752
+    width: 512
+    height: 338
+library_type: 法器供器
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 可能苏州制玉兔捣药纹雕漆香盘
+entity_type: 实物对象写实
+summary_zh: 【图中可见】椭圆红色浅盘边缘起伏，中部圆形画面为长耳兔形站立持杵，旁有树木和小容器，周围红漆面雕密集起伏水波纹。【来源著录】Incense tray with hare in moon pounding the medicine
+  of immortality, China, probably Suzhou, Qianlong period, 1736-1795 AD, carved and painted lacquer on wood core, gold - Peabody
+  Essex Museum - DSC08038.jpg；文化或地点依据：Commons题名著录为香盘、中国可能苏州、乾隆时期1736–1795，题材为月中兔捣长生药；该题材身份依据来源。
+materials:
+- 木胎雕漆
+- 彩绘
+- 金（Commons题名著录）
+colors:
+- 红色
+- 橙色
+- 金色
+- 绿色
+style: 中国南方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，椭圆红色浅盘边缘起伏，中部圆形画面为长耳兔形站立持杵，旁有树木和小容器，周围红漆面雕密集起伏水波纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Incense tray with hare in moon pounding the medicine of
+  immortality, China, probably Suzhou, Qianlong period, 1736-1795 AD, carved and painted lacquer on wood core, gold - Peabody
+  Essex Museum - DSC08038.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a
+  visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国南方
+- 开放授权
+- 真实摄影
+- 可能苏州制玉兔捣药纹雕漆香盘
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Incense tray with hare in moon pounding the medicine of immortality, China,
+    probably Suzhou, Qianlong period, 1736-1795 AD, carved and painted lacquer on wood core, gold - Peabody Essex Museum -
+    DSC08038.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Incense_tray_with_hare_in_moon_pounding_the_medicine_of_immortality%2C_China%2C_probably_Suzhou%2C_Qianlong_period%2C_1736-1795_AD%2C_carved_and_painted_lacquer_on_wood_core%2C_gold_-_Peabody_Essex_Museum_-_DSC08038.jpg/3840px-thumbnail.jpg
+  credit: Daderot; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 2532
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

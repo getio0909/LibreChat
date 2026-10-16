@@ -1,0 +1,82 @@
+id: 5fe8259c1c569d95
+title_zh: 老挝琅勃拉邦霍帕邦寺层叠屋面
+source:
+  original_path: 建筑景观开放授权实景参考/东南亚与南亚-老挝琅勃拉邦霍帕邦寺层叠屋面-commons73463874.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/02-东南亚与南亚建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/东南亚与南亚-老挝琅勃拉邦霍帕邦寺层叠屋面-commons73463874.jpg
+  sha256: 5fe8259c1c569d95ba5887ffa0e76e5bd524c8dc52a73d59ecd53f4d341a0aba
+  bytes: 832861
+  width: 1920
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5fe8259c1c569d95.jpg
+    sha256: 34eec776b0e75048b41632fa30f33d0ff4126095c3e82b0b6839febf9189b002
+    bytes: 811524
+    width: 1920
+    height: 1280
+  thumb512:
+    path: assets/thumb512/5fe8259c1c569d95.webp
+    sha256: 831785b1fcbffb05b21b061fe8a3130e36f82f191d0bead016ae48777435ac2a
+    bytes: 37256
+    width: 512
+    height: 341
+library_type: 建筑景观
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 老挝琅勃拉邦霍帕邦寺层叠屋面
+entity_type: 空间场景设计
+summary_zh: 【图中可见】白色高台托起红褐色层叠屋面，中央高起的山墙有金色曲线边饰与密列尖饰，门窗四周布置金绿色装饰，前方为白色围栏和砖地。【来源著录】Buddhist monks walking in front of the temple
+  Haw Pha Bang in Luang Prabang.jpg；文化或地点依据：来源说明为老挝 Luang Prabang 的 Haw Pha Bang 寺。
+materials:
+- 瓦
+- 表面饰层；具体材料来源未注明
+colors:
+- 红褐色
+- 白色
+- 金色
+- 绿色
+style: 东南亚/南亚传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，白色高台托起红褐色层叠屋面，中央高起的山墙有金色曲线边饰与密列尖饰，门窗四周布置金绿色装饰，前方为白色围栏和砖地。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Buddhist monks walking in front of the temple Haw Pha
+  Bang in Luang Prabang.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual
+  reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 老挝琅勃拉邦霍帕邦寺层叠屋面
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Buddhist_monks_walking_in_front_of_the_temple_Haw_Pha_Bang_in_Luang_Prabang.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Buddhist_monks_walking_in_front_of_the_temple_Haw_Pha_Bang_in_Luang_Prabang.jpg/1920px-Buddhist_monks_walking_in_front_of_the_temple_Haw_Pha_Bang_in_Luang_Prabang.jpg
+  credit: Basile Morin; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

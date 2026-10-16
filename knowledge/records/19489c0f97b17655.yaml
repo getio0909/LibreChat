@@ -1,0 +1,80 @@
+id: 19489c0f97b17655
+title_zh: 斯里兰卡康提象牙彩绘塔形舍利器
+source:
+  original_path: 法器供器开放授权实物参考/东南亚与南亚-斯里兰卡康提象牙彩绘塔形舍利器-met75410.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/02-东南亚与南亚法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/东南亚与南亚-斯里兰卡康提象牙彩绘塔形舍利器-met75410.jpg
+  sha256: 19489c0f97b17655fafdc7e1f4e0db7ca44ef9c469839d3d07883325672d01a7
+  bytes: 1158368
+  width: 3108
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/19489c0f97b17655.jpg
+    sha256: db7c24dce192b0cfb75846b36d8e53c2a67b33ef4689d6c5643f169edafb3ddc
+    bytes: 180768
+    width: 1591
+    height: 2048
+  thumb512:
+    path: assets/thumb512/19489c0f97b17655.webp
+    sha256: 22c07951abc98c92a6c62468d6ad21eec2d700d58c0a01ba73dab738d361eef6
+    bytes: 8668
+    width: 398
+    height: 512
+library_type: 法器供器
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 斯里兰卡康提象牙彩绘塔形舍利器
+entity_type: 实物对象写实
+summary_zh: 【图中可见】浅色塔身上分布红黑细带，细密刹盘上托小伞和瓶形顶饰，圆腹下沿有连续红色水滴纹。【来源著录】Reliquary in the Shape of a Stupa；文化或地点依据：Sri Lanka (Kandy
+  district)。
+materials:
+- 象牙及刻绘彩饰
+colors:
+- 象牙白
+- 朱红色
+- 黑色
+style: 东南亚/南亚传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，浅色塔身上分布红黑细带，细密刹盘上托小伞和瓶形顶饰，圆腹下沿有连续红色水滴纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Reliquary in the Shape of a Stupa. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 法器供器
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 斯里兰卡康提象牙彩绘塔形舍利器
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/75410
+  download_url: https://images.metmuseum.org/CRDImages/as/original/DP-15582-010.jpg
+  credit: Gift of Barry Fernando, M.D. and Coleene Fernando, M.D., 2010
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3108
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

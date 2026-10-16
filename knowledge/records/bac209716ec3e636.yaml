@@ -1,0 +1,79 @@
+id: bac209716ec3e636
+title_zh: 法国布尔式乌木镶饰开放柜体
+source:
+  original_path: 家具木作开放授权实物参考/西方-法国布尔式乌木镶饰开放柜体-cma679331.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/01-西方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/西方-法国布尔式乌木镶饰开放柜体-cma679331.jpg
+  sha256: bac209716ec3e63683f93dfd37f584c03c79ff7e7034650e361f0ec81042294b
+  bytes: 1446265
+  width: 3400
+  height: 2752
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bac209716ec3e636.jpg
+    sha256: e75dd0875f97b405daac475915b26ca0144cd9f179316fae02f1bab9baf222f3
+    bytes: 315642
+    width: 2048
+    height: 1658
+  thumb512:
+    path: assets/thumb512/bac209716ec3e636.webp
+    sha256: e60ef9899ce826a62e1b0339de5c24e4001c98fcfeee595cb50410e9b48377db
+    bytes: 13584
+    width: 512
+    height: 414
+library_type: 家具木作
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 法国布尔式乌木镶饰开放柜体
+entity_type: 实物对象写实
+summary_zh: 【图中可见】矮柜分三组开放抽屉格，中央框架向前突出，深色柜体用金色细边和卷叶饰条围合，下方饰人物面具。【来源著录】Cabinet；文化或地点依据：France, late 17th Century。
+materials:
+- 乌木
+- 金属与玳瑁镶嵌
+colors:
+- 黑褐色
+- 金黄色
+- 红褐色
+style: 西方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，矮柜分三组开放抽屉格，中央框架向前突出，深色柜体用金色细边和卷叶饰条围合，下方饰人物面具。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Cabinet. Preserve the visible silhouette, ornament spacing
+  and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 西方
+- 开放授权
+- 真实摄影
+- 法国布尔式乌木镶饰开放柜体
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1949.539.a
+  download_url: https://openaccess-cdn.clevelandart.org/1949.539.a/1949.539.a_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2752
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

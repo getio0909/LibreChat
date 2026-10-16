@@ -1,0 +1,78 @@
+id: b980f2f5b424e5be
+title_zh: 北齐四佛塔基与龙莲卷叶浮雕
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-北齐四佛塔基与龙莲卷叶浮雕-met42705.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-北齐四佛塔基与龙莲卷叶浮雕-met42705.jpg
+  sha256: b980f2f5b424e5be7be80facd54d8c825b12a1a51b23a431f8d2e941705d377a
+  bytes: 2523660
+  width: 2966
+  height: 3722
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b980f2f5b424e5be.jpg
+    sha256: 13bd6346f54be2650a9206d75dabb41760e0ac23055a80e0859b555636807ad3
+    bytes: 617835
+    width: 1632
+    height: 2048
+  thumb512:
+    path: assets/thumb512/b980f2f5b424e5be.webp
+    sha256: d3a6a31485a150e0a9d5ddd1b5373bc21a3d43b2b3fc67da5d426e81352d61fa
+    bytes: 27150
+    width: 408
+    height: 512
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 北齐四佛塔基与龙莲卷叶浮雕
+entity_type: 实物对象写实
+summary_zh: 【图中可见】灰色方形石构件的两面各有拱形洞口，内部可见坐佛，外壁拱额刻双龙、莲花与卷叶，门侧有立像，上缘排列小佛龛。【来源著录】Pagoda base with four Buddhas；文化或地点依据：馆方著录北齐塔基；按北齐北方石构建筑装饰体系归类。
+materials:
+- 石灰岩
+- 颜料残迹
+colors:
+- 灰色
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，灰色方形石构件的两面各有拱形洞口，内部可见坐佛，外壁拱额刻双龙、莲花与卷叶，门侧有立像，上缘排列小佛龛。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Pagoda base with four Buddhas. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北齐四佛塔基与龙莲卷叶浮雕
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/42705
+  download_url: https://images.metmuseum.org/CRDImages/as/original/DT5992.jpg
+  credit: Gift of Henry and Ruth Trubner, in memory of Gertrude Trubner and Edgar Worch, and Purchase, The Astor Foundation
+    Gift, 1988
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2966
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,77 @@
+id: 5e2490b2b7cfcefa
+title_zh: 龙泉青釉鬲式三足香炉与开片
+source:
+  original_path: 法器供器开放授权实物参考/中国南方-龙泉青釉鬲式三足香炉与开片-cma132307.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/04-中国南方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国南方-龙泉青釉鬲式三足香炉与开片-cma132307.jpg
+  sha256: 5e2490b2b7cfcefad6f06daad882ae816ed40e3e4d303c9012b544c0bebc9f10
+  bytes: 936392
+  width: 3400
+  height: 2768
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5e2490b2b7cfcefa.jpg
+    sha256: af61d34917871ab740ffc217287b45d98c6b5732e3396ee2a5cb80b9680ff229
+    bytes: 232510
+    width: 2048
+    height: 1667
+  thumb512:
+    path: assets/thumb512/5e2490b2b7cfcefa.webp
+    sha256: 1a0b5e8aa7b2ecfc75094021ecf50188e1736b666f9b0c60990d2fed4944bb76
+    bytes: 5320
+    width: 512
+    height: 417
+library_type: 法器供器
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 龙泉青釉鬲式三足香炉与开片
+entity_type: 实物对象写实
+summary_zh: 【图中可见】青绿色炉有外撇口、短颈与三足，腹部中脊直贯足部，表面可见大片交错开片，足端露胎。【来源著录】Incense Burner；文化或地点依据：馆方材质明确著录龙泉窑；按龙泉窑传统归入中国南方。
+materials:
+- 龙泉窑釉瓷
+colors:
+- 青绿色
+- 褐色
+style: 中国南方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，青绿色炉有外撇口、短颈与三足，腹部中脊直贯足部，表面可见大片交错开片，足端露胎。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Incense Burner. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国南方
+- 开放授权
+- 真实摄影
+- 龙泉青釉鬲式三足香炉与开片
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1954.790
+  download_url: https://openaccess-cdn.clevelandart.org/1954.790/1954.790_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2768
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

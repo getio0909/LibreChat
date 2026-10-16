@@ -1,0 +1,77 @@
+id: 28c8d2c22705abca
+title_zh: 北魏弥勒与胁侍造像碑
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-北魏弥勒与胁侍造像碑-cma135586.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-北魏弥勒与胁侍造像碑-cma135586.jpg
+  sha256: 28c8d2c22705abca2b86b5b3b6a8c8658d76a1e44f8ab703d872ebc475de2cbf
+  bytes: 1147778
+  width: 2550
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/28c8d2c22705abca.jpg
+    sha256: 14fda3071395a8ba1c5028bde62fe7b1b600cbc49f0a8364a93c3c2166c599f2
+    bytes: 442547
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/28c8d2c22705abca.webp
+    sha256: 479ff06e2df8cd262c187dd9605669567b10bb4029c889cb8204b7ec82cc37f4
+    bytes: 18760
+    width: 384
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 北魏弥勒与胁侍造像碑
+entity_type: 实物对象写实
+summary_zh: 【图中可见】灰色立佛抬一掌，长衣下垂，两侧较小胁侍立于莲台，背屏上部残缺但保留火焰纹。【来源著录】Stele with Maitreya and Attendants；文化或地点依据：馆方著录中国北魏；以北魏北方造像碑体系归类。
+materials:
+- 灰石灰岩
+colors:
+- 灰色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，灰色立佛抬一掌，长衣下垂，两侧较小胁侍立于莲台，背屏上部残缺但保留火焰纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Stele with Maitreya and Attendants. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北魏弥勒与胁侍造像碑
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1959.130
+  download_url: https://openaccess-cdn.clevelandart.org/1959.130/1959.130_print.jpg
+  credit: Gift of Severance and Greta Millikin
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2550
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

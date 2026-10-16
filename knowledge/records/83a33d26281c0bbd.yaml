@@ -1,0 +1,77 @@
+id: 83a33d26281c0bbd
+title_zh: 秣菟罗红砂岩释迦坐像
+source:
+  original_path: 造像雕塑开放授权实物参考/东南亚与南亚-秣菟罗红砂岩释迦坐像-cma145408.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/02-东南亚与南亚造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/东南亚与南亚-秣菟罗红砂岩释迦坐像-cma145408.jpg
+  sha256: 83a33d26281c0bbd6a1b88f9a1f831453d3437c013fbeedc4d8b58597bcaa80c
+  bytes: 1959565
+  width: 2720
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/83a33d26281c0bbd.jpg
+    sha256: 7cdcfd2d191202ae537a10617f3f15c37fad39a50b40cd15cfc5f3d965ba3100
+    bytes: 503848
+    width: 1638
+    height: 2048
+  thumb512:
+    path: assets/thumb512/83a33d26281c0bbd.webp
+    sha256: 140b268a02c41fe357d8c5e787fa73381f059f604c6553a090fe84ca7df34921
+    bytes: 20680
+    width: 410
+    height: 512
+library_type: 造像雕塑
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 秣菟罗红砂岩释迦坐像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】残缺石板上的佛像右手举掌，左手落在膝边，盘腿坐于带动物形托足的座位，左侧有小型侍从。【来源著录】Seated Shakyamuni Buddha；文化或地点依据：Northern India, Uttar Pradesh,
+  Mathura, Kushan period。
+materials:
+- 斑驳红砂岩
+colors:
+- 暗红色
+style: 东南亚/南亚传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，残缺石板上的佛像右手举掌，左手落在膝边，盘腿坐于带动物形托足的座位，左侧有小型侍从。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Seated Shakyamuni Buddha. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 秣菟罗红砂岩释迦坐像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1970.63
+  download_url: https://openaccess-cdn.clevelandart.org/1970.63/1970.63_print.jpg
+  credit: Purchase from the J. H. Wade Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2720
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,77 @@
+id: 1df132105298946e
+title_zh: 潮州海阳县儒学宫龙首木构件
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-潮州海阳县儒学宫龙首木构件-commons123843355.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-潮州海阳县儒学宫龙首木构件-commons123843355.jpg
+  sha256: 1df132105298946e6eaee205ee2ebc9f8d73c4409a8ca28090f7136e5c88eb41
+  bytes: 2076062
+  width: 3840
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1df132105298946e.jpg
+    sha256: 79690fd1621d4ecab6fa658830e09ea10271eebf4bee284c77817b5e6b1015f4
+    bytes: 703892
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/1df132105298946e.webp
+    sha256: 442203d91b1e39bcb2e0fd2d533a04aaaaeb94c5d41894a239b69d7e2c0f4faa
+    bytes: 38004
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 潮州海阳县儒学宫龙首木构件
+entity_type: 实物对象写实
+summary_zh: 【图中可见】横向木构件前端雕出张口龙首，下方有花瓣状承托，后段保留卷曲枝叶形轮廓，红褐表面和木纹沿长轴延伸，端部有明显腐蚀裂隙。【来源著录】海阳县儒学宫雕刻龙首构建.jpg；文化或地点依据：来源说明为潮州海阳县儒学宫雕刻龙首构件，明代文物，摄于潮州市博物馆。
+materials:
+- 木材（图中可见木纹；木种未注明）
+colors:
+- 红褐色
+- 浅褐色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，横向木构件前端雕出张口龙首，下方有花瓣状承托，后段保留卷曲枝叶形轮廓，红褐表面和木纹沿长轴延伸，端部有明显腐蚀裂隙。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 海阳县儒学宫雕刻龙首构建.jpg. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 潮州海阳县儒学宫龙首木构件
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:%E6%B5%B7%E9%98%B3%E5%8E%BF%E5%84%92%E5%AD%A6%E5%AE%AB%E9%9B%95%E5%88%BB%E9%BE%99%E9%A6%96%E6%9E%84%E5%BB%BA.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/%E6%B5%B7%E9%98%B3%E5%8E%BF%E5%84%92%E5%AD%A6%E5%AE%AB%E9%9B%95%E5%88%BB%E9%BE%99%E9%A6%96%E6%9E%84%E5%BB%BA.jpg/3840px-%E6%B5%B7%E9%98%B3%E5%8E%BF%E5%84%92%E5%AD%A6%E5%AE%AB%E9%9B%95%E5%88%BB%E9%BE%99%E9%A6%96%E6%9E%84%E5%BB%BA.jpg
+  credit: Baomi; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2880
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

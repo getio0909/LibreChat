@@ -8,6 +8,7 @@ import json
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import yaml
 from PIL import Image, ImageCms, ImageOps
@@ -344,6 +345,7 @@ def create_draft_record(
         "original": orig,
         "derivatives": meta["derivatives"],
         "library_type": "空间展陈",
+        "region": "未知",
         "studio_roles": ["参考"],
         "category_l1": "待分类",
         "category_l2": "待分类",
@@ -389,10 +391,292 @@ def create_draft_record(
     return record_path
 
 
+# 将已审计分类和地域映射到工作台字段，不从馆藏所在地推断文化地域
+STAGED_CATEGORIES = {
+    "S": ("造像雕塑", ["参考", "物件", "造型"]),
+    "R": ("法器供器", ["参考", "物件", "造型"]),
+    "P": ("石刻纹样", ["参考", "纹样", "造型"]),
+    "A": ("建筑景观", ["参考", "造型", "风格"]),
+    "F": ("家具木作", ["参考", "物件", "造型"]),
+}
+STAGED_REGIONS = {
+    "W": ("西方", "西方"),
+    "S": ("东南亚/南亚", "南亚东南亚"),
+    "N": ("中国北方", "中国北方"),
+    "C": ("中国南方", "中国南方"),
+    "T": ("中国藏区·藏传佛教", "中国藏区"),
+}
+STAGED_LICENSES = {
+    "CC0": "cc0",
+    "Public domain": "public-domain",
+    "CC BY 2.0": "cc-by-2.0",
+    "CC BY 3.0": "cc-by-3.0",
+    "CC BY 4.0": "cc-by-4.0",
+    "CC BY-SA 2.0": "cc-by-sa-2.0",
+    "CC BY-SA 3.0": "cc-by-sa-3.0",
+    "CC BY-SA 4.0": "cc-by-sa-4.0",
+}
+MUSEUM_DOMAINS = {
+    "clevelandart.org",
+    "www.metmuseum.org",
+    "collections.lacma.org",
+    "www.artic.edu",
+    "art.thewalters.org",
+}
+
+
+# 在任何衍生图写入前检查整批元数据、原图哈希、授权和目标文件冲突
+def ingest_index(
+    index_path: Path,
+    provenance_path: Path,
+    wiki_root: Path,
+    repo_root: Path,
+) -> list[Path]:
+    entries = [
+        json.loads(line)
+        for line in index_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    sources = [
+        json.loads(line)
+        for line in provenance_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    by_id = {entry["id"]: entry for entry in entries}
+    if len(by_id) != len(entries):
+        raise ValueError("Duplicate index IDs")
+    accepted = [source for source in sources if source["status"] == "accepted"]
+    if not accepted or len({source["id"] for source in accepted}) != len(accepted):
+        raise ValueError("Missing or duplicate accepted provenance IDs")
+    wiki_root = wiki_root.resolve()
+    prepared = []
+    seen_hashes: set[str] = set()
+    seen_ids: set[str] = set()
+    for source in accepted:
+        entry = by_id[source["id"]]
+        required = (
+            "id",
+            "folder",
+            "filename",
+            "rel_path",
+            "wiki_doc",
+            "entity_type",
+            "category_l1",
+            "category_l2",
+            "summary_zh",
+            "materials",
+            "colors",
+            "style",
+            "ai_design_usage",
+            "prompt_zh",
+            "prompt_en",
+            "tags",
+            "entity_type_norm",
+        )
+        if tuple(entry) != required:
+            raise ValueError("Staged index must retain all 17 fields in order")
+        for field in required:
+            value = entry[field]
+            if field in ("materials", "colors", "tags"):
+                if not isinstance(value, list) or not all(
+                    isinstance(item, str) and item.strip() for item in value
+                ):
+                    raise ValueError("Invalid staged list field")
+            elif not isinstance(value, str) or not value.strip():
+                raise ValueError("Missing staged text field")
+        rel_path = Path(entry["rel_path"])
+        doc_path = Path(entry["wiki_doc"])
+        for path in (rel_path, doc_path):
+            if path.is_absolute() or ".." in path.parts or path.parts[0] != "wiki":
+                raise ValueError("Invalid staged relative path")
+        if (
+            entry["id"] != f"{entry['folder']}/{entry['filename']}"
+            or str(rel_path) != f"wiki/{entry['id']}"
+        ):
+            raise ValueError("Staged image identity/path mismatch")
+        if (
+            source["rel_path"] != entry["rel_path"]
+            or source["wiki_doc"] != entry["wiki_doc"]
+        ):
+            raise ValueError("Index/provenance path mismatch")
+        image_path = wiki_root / rel_path.relative_to("wiki")
+        volume_path = wiki_root / doc_path.relative_to("wiki")
+        if not image_path.resolve().is_relative_to(
+            wiki_root
+        ) or not volume_path.resolve().is_relative_to(wiki_root):
+            raise ValueError("Staged path escapes wiki root")
+        if not volume_path.is_file():
+            raise ValueError("Staged wiki volume is missing")
+        digest = compute_sha256(image_path)
+        if digest != source["sha256"] or image_path.stat().st_size != source["bytes"]:
+            raise ValueError("Original SHA256/size mismatch")
+        asset_id = digest[:16]
+        if digest in seen_hashes or asset_id in seen_ids:
+            raise ValueError("Duplicate original hash or asset ID")
+        seen_hashes.add(digest)
+        seen_ids.add(asset_id)
+        for target in (
+            f"records/{asset_id}.yaml",
+            f"assets/ref2048/{asset_id}.jpg",
+            f"assets/thumb512/{asset_id}.webp",
+        ):
+            if (repo_root / target).exists():
+                raise ValueError(f"Refusing to overwrite existing asset: {asset_id}")
+        cell = source["cell"]
+        if (
+            len(cell) != 2
+            or cell[0] not in STAGED_CATEGORIES
+            or cell[1] not in STAGED_REGIONS
+        ):
+            raise ValueError("Unknown audited category/region cell")
+        category, roles = STAGED_CATEGORIES[cell[0]]
+        region_tag, region = STAGED_REGIONS[cell[1]]
+        if category != entry["category_l1"] or region_tag not in entry["tags"]:
+            raise ValueError("Audited category/region does not match index")
+        if not entry["style"].startswith(region_tag) or any(
+            other in entry["tags"]
+            for code, (other, _) in STAGED_REGIONS.items()
+            if code != cell[1]
+        ):
+            raise ValueError("Conflicting audited cultural region")
+        if source["license"] not in STAGED_LICENSES or not source["credit_line"]:
+            raise ValueError("Unsupported licence or missing credit")
+        for field in ("source_record_url", "source_url", "license_url"):
+            parsed = urlparse(source[field])
+            allowed_schemes = (
+                ("http", "https") if field == "license_url" else ("https",)
+            )
+            if parsed.scheme not in allowed_schemes or not parsed.netloc:
+                raise ValueError("Invalid provenance URL")
+        if (
+            not source.get("full_image_inspected")
+            or len(source.get("crops_inspected", [])) < 2
+            or "真实摄影" not in entry["tags"]
+        ):
+            raise ValueError("Missing staged real-photograph visual audit")
+        with Image.open(image_path) as image:
+            if image.size != (source["width"], source["height"]):
+                raise ValueError("Original dimensions mismatch")
+            image.verify()
+        if entry["entity_type"] not in ("实物对象写实", "建筑场景实景"):
+            raise ValueError("Unsupported staged entity type")
+        if entry["entity_type"] != entry["entity_type_norm"] or (cell[0] == "A") != (
+            entry["entity_type"] == "建筑场景实景"
+        ):
+            raise ValueError("Staged entity type does not match category")
+        prepared.append((entry, source, image_path, category, roles, region))
+
+    # 无损保存原索引与来源侧录，便于追溯照片日期、地域依据及色彩转换
+    manifest_rows = [
+        {"id": source["sha256"][:16], "index": entry, "provenance": source}
+        for entry, source, *_ in prepared
+    ]
+    manifest_text = "".join(
+        json.dumps(row, ensure_ascii=False) + "\n" for row in manifest_rows
+    )
+    manifest_rel = f"imports/{compute_sha256(manifest_text.encode())[:16]}.jsonl"
+    manifest_path = repo_root / manifest_rel
+    if manifest_path.exists():
+        raise ValueError("Import manifest already exists")
+    written: list[Path] = []
+    for entry, source, image_path, category, roles, region in prepared:
+        meta = generate_derivatives(image_path, repo_root, entry["rel_path"])
+        asset_id = meta["id"]
+        orig = meta["original"]
+        min_side = min(orig["width"], orig["height"])
+        issues = ["pending_studio_review"]
+        if min_side < 800:
+            issues.append("low_resolution")
+        if source.get("catalog_note"):
+            issues.append("source_catalog_photo_mismatch")
+        record = {
+            "id": asset_id,
+            "title_zh": entry["category_l2"],
+            "source": {
+                **meta["source"],
+                "wiki_doc": str(Path(entry["wiki_doc"]).relative_to("wiki")),
+                "import_manifest": manifest_rel,
+            },
+            "original": orig,
+            "derivatives": meta["derivatives"],
+            "library_type": category,
+            "region": region,
+            "studio_roles": roles,
+            "category_l1": entry["category_l1"],
+            "category_l2": entry["category_l2"],
+            "entity_type": "空间场景设计"
+            if entry["entity_type"] == "建筑场景实景"
+            else entry["entity_type"],
+            **{
+                key: entry[key]
+                for key in (
+                    "summary_zh",
+                    "materials",
+                    "colors",
+                    "style",
+                    "ai_design_usage",
+                    "prompt_zh",
+                    "prompt_en",
+                    "tags",
+                )
+            },
+            "material_ids": [],
+            "provenance": {
+                "source": "museum"
+                if urlparse(source["source_record_url"]).hostname in MUSEUM_DOMAINS
+                else "web",
+                "url": source["source_record_url"],
+                "download_url": source["source_url"],
+                "credit": source["credit_line"],
+                "license": STAGED_LICENSES[source["license"]],
+                "license_url": source["license_url"],
+                "license_status": "confirmed",
+            },
+            "quality": {
+                "min_side_px": min_side,
+                "low_res": min_side < 800,
+                "ai_generated": False,
+                "third_party_watermark": False,
+                "text_overlay": False,
+                "notes": "Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated detection. Full-frame and native-crop evidence retained in the import manifest.",
+            },
+            "review": {
+                "status": "draft",
+                "reviewer": None,
+                "reviewed_at": None,
+                "issues": issues,
+            },
+        }
+        target = repo_root / "records" / f"{asset_id}.yaml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("x", encoding="utf-8") as handle:
+            handle.write(
+                yaml.safe_dump(record, allow_unicode=True, sort_keys=False, width=120)
+            )
+        written.append(target)
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    with manifest_path.open("x", encoding="utf-8") as handle:
+        handle.write(manifest_text)
+    return written
+
+
 # 解析命令行参数并执行单张或多张图片的草稿入库
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Ingest new images into zybc-knowledge (generates ref2048/thumb512 and a draft record)."
+    )
+    parser.add_argument(
+        "--index", type=Path, help="Wiki JSONL index containing the audited additions."
+    )
+    parser.add_argument(
+        "--provenance",
+        type=Path,
+        help="Audited provenance JSONL; only accepted entries are imported.",
+    )
+    parser.add_argument(
+        "--wiki-root",
+        type=Path,
+        help="Root directory containing the original wiki images and volumes.",
     )
     parser.add_argument(
         "images",
@@ -426,6 +710,26 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.print_gemini_schema:
         print(json.dumps(GEMINI_RESPONSE_SCHEMA, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.index or args.provenance or args.wiki_root:
+        if not (args.index and args.provenance and args.wiki_root) or args.images:
+            parser.error(
+                "Use --index, --provenance and --wiki-root together, without image arguments."
+            )
+        try:
+            created = ingest_index(
+                args.index,
+                args.provenance,
+                args.wiki_root,
+                Path(args.repo_root).resolve(),
+            )
+        except (OSError, ValueError, KeyError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+        print(
+            f"Ingested {len(created)} audited images as draft records with derivatives and provenance."
+        )
         return 0
 
     if not args.images:

@@ -1,0 +1,81 @@
+id: ed4e87ffb33f1069
+title_zh: 泉州开元寺天王殿橙瓦坡顶与石铺入口
+source:
+  original_path: 建筑景观开放授权实景参考/中国南方-泉州开元寺天王殿橙瓦坡顶与石铺入口-commons177573464.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/04-中国南方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国南方-泉州开元寺天王殿橙瓦坡顶与石铺入口-commons177573464.jpg
+  sha256: ed4e87ffb33f1069c0d3d528becc50a719e7493bc912ef4949432b30b0583db5
+  bytes: 2203082
+  width: 3840
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ed4e87ffb33f1069.jpg
+    sha256: 885916a97658854bde6b23362e91d61b2e6e244263c54edb457e9d304c5a7001
+    bytes: 764763
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/ed4e87ffb33f1069.webp
+    sha256: 2c117e9e6ec4bf6ab074b10dc9552d5dc8c17e5e5d5cdb6fec43771ac63e9b2c
+    bytes: 33656
+    width: 512
+    height: 384
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 泉州开元寺天王殿橙瓦坡顶与石铺入口
+entity_type: 空间场景设计
+summary_zh: 【图中可见】宽阔单层瓦坡覆在白色墙体和红色门面上，屋脊两端上翘，中央小塔与成对龙形脊饰对称布置；前方石铺通道两侧排列球形石墩。【来源著录】20231021 Tianwang Dian.jpg；文化或地点依据：文件描述为天王殿，所属类别为福建泉州开元寺；不从照片推定建筑年代。
+materials:
+- 瓦
+- 石材
+- 木构件（外观依据）
+colors:
+- 橙褐色
+- 白色
+- 红色
+- 灰色
+style: 中国南方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，宽阔单层瓦坡覆在白色墙体和红色门面上，屋脊两端上翘，中央小塔与成对龙形脊饰对称布置；前方石铺通道两侧排列球形石墩。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 20231021 Tianwang Dian.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国南方
+- 开放授权
+- 真实摄影
+- 泉州开元寺天王殿橙瓦坡顶与石铺入口
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20231021_Tianwang_Dian.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/20231021_Tianwang_Dian.jpg/3840px-20231021_Tianwang_Dian.jpg
+  credit: Yumeto; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2880
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

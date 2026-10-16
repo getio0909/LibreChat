@@ -10,6 +10,8 @@ This repository stores:
 - Proprietary stone catalog (`catalog/materials.yaml`) and curated style packs (`catalog/styles.yaml`).
 - Deterministic build and validation tooling (`tools/`) producing `dist/index.jsonl`, `dist/views/*.md`, and `dist/originals-v1.tar.zst`.
 
+The library now contains **607 records**: the original 368 plus 239 audited open-license references. The additions comprise 55 sculptures, 50 ritual objects, 41 carved-stone references, 42 architectural scenes and 51 furniture/woodwork references. All 239 additions have confirmed licences and draft reviews. Four additions carry `low_res` flags under the existing 800-pixel short-side threshold. One original is an MPO container with a `.jpg` filename; its bytes and format are preserved, and derivatives use the primary image.
+
 ## 2. Repository Layout / 目录结构
 
 ```text
@@ -49,6 +51,24 @@ zybc-knowledge/
    py313 python tools/validate.py
    py313 python tools/build.py
    ```
+
+Audited open-license batches can be imported without an API or a labeling service. From the LibreChat worktree root:
+
+```bash
+py313 python knowledge/tools/ingest.py --index path/to/knowledge_base_index.jsonl --provenance path/to/sources_open_license.jsonl --wiki-root path/to/wiki
+```
+
+Only accepted provenance entries are imported. The importer checks the entire batch's source hashes, dimensions, categories, regions, licences and destination collisions before generating derivatives. It preserves the source index and audit metadata in a content-addressed `imports/*.jsonl` manifest, linked from each record. Architecture photographs use the canonical `空间场景设计` entity type; the original `建筑场景实景` label remains in the manifest. Records retain Chinese and English prompts, licence and download URLs, attribution and `review.status: draft`. Resolution flags are computed from original pixels; generated-image, watermark and overlay flags inherit the staged visual audit. Catalog/photo discrepancies remain explicit review issues.
+
+Every record requires a cultural `region`: `西方`, `南亚东南亚`, `中国北方`, `中国南方`, `中国藏区` or `未知`. Museum location is not cultural origin. Existing records use `未知` unless their metadata clearly identifies a regional tradition. `public-domain` and `cc0` remain distinct licence values.
+
+To build the full search index and views while packaging only a batch's originals, supply a text file containing one new asset ID per line:
+
+```bash
+py313 python knowledge/tools/build.py --wiki-root path/to/wiki --archive-ids path/to/additions.ids
+```
+
+This writes `dist/originals-delta-v1.tar.zst` (or `.tar.gz` when zstd is unavailable), `dist/originals-delta-manifest.json` and `dist/originals-delta-SHA256SUMS`. The archive contains only the selected originals plus its manifest and checksums. Original bytes are rechecked against record hashes before packaging. `dist/` remains gitignored.
 
 ## 4. Release Pinning in Studio / 版本发布与工作台锁定
 

@@ -1,0 +1,77 @@
+id: 7ab7746430b360f5
+title_zh: 北齐怪兽托举石雕构件
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-北齐怪兽托举石雕构件-cma134788.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-北齐怪兽托举石雕构件-cma134788.jpg
+  sha256: 7ab7746430b360f5f2adf2766c79e2e949690efa2a0c74837d2c24bc70cc75f6
+  bytes: 1964245
+  width: 3400
+  height: 2586
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7ab7746430b360f5.jpg
+    sha256: 45292396943f1793215bae20274874e7065ab55dda710d9752e3191019358d3f
+    bytes: 406335
+    width: 2048
+    height: 1558
+  thumb512:
+    path: assets/thumb512/7ab7746430b360f5.webp
+    sha256: 19e4f548c42287736da7de1a2214c443bb65fb590f721a0be5a7048e92779a40
+    bytes: 14318
+    width: 512
+    height: 389
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 北齐怪兽托举石雕构件
+entity_type: 实物对象写实
+summary_zh: 【图中可见】横向石构件上下为平直边框，中间怪兽蹲踞并举起双臂托住上沿，腹部以弧线起伏塑形。【来源著录】Monster Caryatid；文化或地点依据：China, possibly from Xiangtangshan,
+  Northern Qi dynasty (550–577)。
+materials:
+- 石灰石
+colors:
+- 红褐色
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，横向石构件上下为平直边框，中间怪兽蹲踞并举起双臂托住上沿，腹部以弧线起伏塑形。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Monster Caryatid. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北齐怪兽托举石雕构件
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1957.357
+  download_url: https://openaccess-cdn.clevelandart.org/1957.357/1957.357_print.jpg
+  credit: Anonymous Gift
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2586
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

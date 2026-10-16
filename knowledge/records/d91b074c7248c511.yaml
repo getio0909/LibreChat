@@ -1,0 +1,77 @@
+id: d91b074c7248c511
+title_zh: 北齐石棺床莲瓣与线刻人物横板
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-北齐石棺床莲瓣与线刻人物横板-cma150858.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-北齐石棺床莲瓣与线刻人物横板-cma150858.jpg
+  sha256: d91b074c7248c511fb9f97d2a1f86fc81653eb17e3963549d20187a8c7778169
+  bytes: 1224495
+  width: 3400
+  height: 1472
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d91b074c7248c511.jpg
+    sha256: 257bc7dd4b1677e1cee2452fbbe879d763205f7efdc076f4257d0f7010ac04eb
+    bytes: 466790
+    width: 2048
+    height: 887
+  thumb512:
+    path: assets/thumb512/d91b074c7248c511.webp
+    sha256: f4380cbd14fc7964842d80b549308b6d18335683c0775f3aaf8d0d6defc50929
+    bytes: 22794
+    width: 512
+    height: 222
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 北齐石棺床莲瓣与线刻人物横板
+entity_type: 实物对象写实
+summary_zh: '【图中可见】灰色长方形石板顶部连续垂莲瓣，中层浅线刻人物与卷曲纹线，底部有卷叶边饰。【来源著录】Section of a Coffin Platform: Horizontal Panel；文化或地点依据：馆方著录为中国北齐；按北齐文化体系归入北方，未补写出土地。'
+materials:
+- 石灰岩
+colors:
+- 灰色
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，灰色长方形石板顶部连续垂莲瓣，中层浅线刻人物与卷曲纹线，底部有卷叶边饰。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: 'Design reference study based on the source photograph of Section of a Coffin Platform: Horizontal Panel. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.'
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北齐石棺床莲瓣与线刻人物横板
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1982.260.b
+  download_url: https://openaccess-cdn.clevelandart.org/1982.260.b/1982.260.b_print.jpg
+  credit: Gift of Mr. and Mrs. Oscar Lange
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1472
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review
