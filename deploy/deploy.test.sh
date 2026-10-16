@@ -34,7 +34,7 @@ while (( $# > 0 )); do
     *) shift ;;
   esac
 done
-image=$(cat "$root/image.env")
+image=$(tr '\n' ' ' < "$root/image.env")
 printf '%s:%s:%s\n' "$operation" "$closed" "$image" >> "$DEPLOY_TEST_LOG"
 case "$operation" in
   up)
@@ -68,15 +68,27 @@ role=USER
 if [[ "$email" == admin@example.test && "$DEPLOY_TEST_FAILURE" != role ]]; then role=ADMIN; fi
 jq -n --arg role "$role" '{user: {role: $role}}' > "$output"
 EOF
-chmod 755 "$work/bin/docker" "$work/bin/curl"
+cat > "$work/bin/chown" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+test "$1" = 10001:10001
+test -f "$2"
+printf 'config-owner:%s\n' "${2##*/}" >> "$DEPLOY_TEST_LOG"
+EOF
+chmod 755 "$work/bin/docker" "$work/bin/curl" "$work/bin/chown"
+
 printf 'previous compose\n' > "$work/previous/compose.yml"
 printf 'previous config\n' > "$work/previous/librechat.yaml"
 printf 'ALLOW_REGISTRATION=true\n' > "$work/previous/.env"
-printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\n' 0 > "$work/previous/image.env"
+printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-prev@sha256:%064d\n' 0 0 > "$work/previous/image.env"
+printf '{"shared_token":"%s","gemini_api_key":"prev-gemini","ark_api_key":"prev-ark"}\n' "$(printf 'a%.0s' {1..64})" > "$work/previous/studio.json"
+
 printf 'new compose\n' > "$work/bundle/compose.yml"
 printf 'new config\n' > "$work/bundle/librechat.yaml"
 cp "$work/previous/.env" "$work/bundle/.env"
-printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\n' "$(printf '1%.0s' {1..64})" > "$work/bundle/image.env"
+printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-next@sha256:%s\n' \
+  "$(printf '1%.0s' {1..64})" "$(printf '2%.0s' {1..64})" > "$work/bundle/image.env"
+printf '{"shared_token":"%s","gemini_api_key":"next-gemini","ark_api_key":"next-ark"}\n' "$(printf 'b%.0s' {1..64})" > "$work/bundle/studio.json"
 printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
@@ -98,7 +110,7 @@ for scenario in none health command login role final first-none first-login firs
     test "$status" != 0
     grep -q 'The failed initial application deployment has been stopped.' "$work/output.log"
     grep -q '^down:' "$DEPLOY_TEST_LOG"
-    for file in compose.yml librechat.yaml .env image.env; do test ! -f "$root/$file"; done
+    for file in compose.yml librechat.yaml .env image.env studio.json; do test ! -f "$root/$file"; done
     test -f "$DEPLOY_TEST_GATE"
   elif [[ "$failure" == none ]]; then
     test "$status" = 0
@@ -111,8 +123,9 @@ for scenario in none health command login role final first-none first-login firs
     grep -q '^up:false:.*00000000' "$DEPLOY_TEST_LOG"
   fi
   grep -q '^up:true:.*11111111' "$DEPLOY_TEST_LOG"
+  grep -q '^config-owner:studio.json$' "$DEPLOY_TEST_LOG"
   if [[ "$scenario" != first-* || "$failure" == none ]]; then
-    for file in compose.yml librechat.yaml .env image.env; do
+    for file in compose.yml librechat.yaml .env image.env studio.json; do
       cmp "$expected/$file" "$root/$file"
       test "$(stat -c '%a' "$root/$file")" = 600
     done

@@ -6213,4 +6213,210 @@ describe('initializeAgent turn delivery routing', () => {
     expect(optionsOrder).toBeLessThan(filesOrder);
     expect(filesOrder).toBeLessThan(toolsOrder);
   });
+
+  // 验证两轮对话：第 1 轮上传图与工具生成图在第 2 轮均对 MCP 工具可见，且排除其他用户及旁支分支文件
+  it('collects turn 1 uploaded and tool-generated images on turn 2 for MCP tools while excluding other users and sibling branches', async () => {
+    const { filterFilesByEndpointRuntimeConfig } = jest.requireMock('~/files') as {
+      filterFilesByEndpointRuntimeConfig: jest.Mock;
+    };
+    const { agent, req, res, loadTools, db } = createMocks({
+      loadedToolDefinitions: [
+        { name: `edit_image${Constants.mcp_delimiter}studio` },
+        { name: `design_concepts${Constants.mcp_delimiter}studio` },
+      ],
+    });
+    agent.tools = [
+      `edit_image${Constants.mcp_delimiter}studio`,
+      `design_concepts${Constants.mcp_delimiter}studio`,
+    ];
+
+    const turn1Upload: IMongoFile = {
+      file_id: 'img-upload-t1',
+      user: 'user-1',
+      filename: 'booth_sketch.png',
+      filepath: '/images/user-1/booth_sketch.png',
+      object: 'file',
+      source: FileSources.local,
+      type: 'image/png',
+      bytes: 2048,
+      usage: 1,
+      context: FileContext.message_attachment,
+      height: 1024,
+      width: 1024,
+    } as unknown as IMongoFile;
+
+    const turn1Generated: IMongoFile = {
+      file_id: 'img-gen-t1',
+      user: 'user-1',
+      filename: 'img-gen-t1-generate_image_mcp_studio.png',
+      filepath: '/images/user-1/img-gen-t1-generate_image_mcp_studio.png',
+      object: 'file',
+      source: FileSources.local,
+      type: 'image/png',
+      bytes: 4096,
+      usage: 1,
+      context: FileContext.image_generation,
+      height: 1024,
+      width: 1024,
+    } as unknown as IMongoFile;
+
+    const otherUserFile: IMongoFile = {
+      file_id: 'img-other-user',
+      user: 'user-2',
+      filename: 'foreign.png',
+      filepath: '/images/user-2/foreign.png',
+      object: 'file',
+      source: FileSources.local,
+      type: 'image/png',
+      bytes: 1024,
+      usage: 1,
+      context: FileContext.message_attachment,
+      height: 512,
+      width: 512,
+    } as unknown as IMongoFile;
+
+    const siblingBranchFile: IMongoFile = {
+      file_id: 'img-sibling',
+      user: 'user-1',
+      filename: 'sibling.png',
+      filepath: '/images/user-1/sibling.png',
+      object: 'file',
+      source: FileSources.local,
+      type: 'image/png',
+      bytes: 1024,
+      usage: 1,
+      context: FileContext.message_attachment,
+      height: 512,
+      width: 512,
+    } as unknown as IMongoFile;
+
+    const turn2Upload: IMongoFile = {
+      file_id: 'img-upload-t2',
+      user: 'user-1',
+      filename: 'marble_ref.webp',
+      filepath: '/images/user-1/marble_ref.webp',
+      object: 'file',
+      source: FileSources.local,
+      type: 'image/webp',
+      bytes: 1536,
+      usage: 0,
+      context: FileContext.message_attachment,
+      height: 768,
+      width: 768,
+    } as unknown as IMongoFile;
+
+    const storedFiles = [
+      turn1Upload,
+      turn1Generated,
+      otherUserFile,
+      siblingBranchFile,
+      turn2Upload,
+    ];
+
+    const getMessages = jest.fn().mockResolvedValue([
+      {
+        messageId: 'msg-user-1',
+        parentMessageId: Constants.NO_PARENT,
+        isCreatedByUser: true,
+        files: [
+          { file_id: 'img-upload-t1', filename: 'booth_sketch.png' },
+          { file_id: 'img-other-user', filename: 'foreign.png' },
+        ],
+      },
+      {
+        messageId: 'msg-asst-1',
+        parentMessageId: 'msg-user-1',
+        isCreatedByUser: false,
+        attachments: [
+          {
+            file_id: 'img-gen-t1',
+            filename: 'img-gen-t1-generate_image_mcp_studio.png',
+            type: 'image/png',
+            context: FileContext.image_generation,
+          },
+        ],
+      },
+      {
+        messageId: 'msg-sibling-1',
+        parentMessageId: Constants.NO_PARENT,
+        isCreatedByUser: true,
+        files: [{ file_id: 'img-sibling', filename: 'sibling.png' }],
+      },
+    ]);
+
+    (db.getFiles as jest.Mock).mockImplementation(
+      async (filter: { file_id: { $in: string[] }; user: string }) =>
+        storedFiles.filter(
+          (f) => filter.file_id.$in.includes(f.file_id) && String(f.user) === String(filter.user),
+        ),
+    );
+    filterFilesByEndpointRuntimeConfig.mockImplementation(
+      (_config: ServerRequest['config'], { files }: { files: IMongoFile[] }) => files,
+    );
+
+    const result = await initializeAgent(
+      {
+        req,
+        res,
+        agent,
+        loadTools,
+        requestFiles: [turn2Upload],
+        conversationId: 'conv-two-turn',
+        parentMessageId: 'msg-asst-1',
+        endpointOption: { endpoint: EModelEndpoint.agents },
+        allowedProviders: new Set([Providers.OPENAI]),
+        isInitialAgent: true,
+      },
+      {
+        ...db,
+        getMessages,
+      },
+    );
+
+    expect(getMessages).toHaveBeenCalledWith(
+      { conversationId: 'conv-two-turn' },
+      expect.stringMatching(/\bfiles\b.*\battachments\b/),
+    );
+    expect(loadTools).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mcpImageFiles: [
+          expect.objectContaining({
+            file_id: 'img-upload-t1',
+            filename: 'booth_sketch.png',
+            kind: 'upload',
+            turn: 1,
+          }),
+          expect.objectContaining({
+            file_id: 'img-gen-t1',
+            filename: 'img-gen-t1-generate_image_mcp_studio.png',
+            kind: 'generated',
+            turn: 1,
+          }),
+          expect.objectContaining({
+            file_id: 'img-upload-t2',
+            filename: 'marble_ref.webp',
+            kind: 'upload',
+            turn: 2,
+          }),
+        ],
+      }),
+    );
+
+    const mcpImageContext = String(result.dynamicToolContextMap?.mcp_image_context ?? '');
+    expect(mcpImageContext).toContain('- img-upload-t1 (booth_sketch.png, upload, turn 1)');
+    expect(mcpImageContext).toContain(
+      '- img-gen-t1 (img-gen-t1-generate_image_mcp_studio.png, generated, turn 1)',
+    );
+    expect(mcpImageContext).toContain('- img-upload-t2 (marble_ref.webp, upload, turn 2)');
+    expect(mcpImageContext).toContain('`edit_image.base_id`');
+    expect(mcpImageContext).toContain('`references[].id`');
+    expect(mcpImageContext).toContain('`references[].use`');
+    expect(mcpImageContext).toContain('`design_concepts.reference_ids`');
+    expect(mcpImageContext).not.toContain('img-other-user');
+    expect(mcpImageContext).not.toContain('foreign.png');
+    expect(mcpImageContext).not.toContain('img-sibling');
+    expect(mcpImageContext).not.toContain('sibling.png');
+    expect(mcpImageContext).not.toContain('image_ids');
+    expect(mcpImageContext).not.toContain('reference_uses');
+  });
 });

@@ -13,6 +13,8 @@ services:
       HOST: 0.0.0.0
       PORT: 3080
       NODE_ENV: production
+      ENDPOINTS: custom,google
+      GOOGLE_MODELS: gemini-4-argon
       MONGO_URI: mongodb://mongodb:27017/LibreChat
       MEILI_HOST: http://meilisearch:7700
       RAG_API_URL: http://rag_api:8000
@@ -24,6 +26,8 @@ services:
         condition: service_started
       rag_api:
         condition: service_started
+      studio:
+        condition: service_healthy
     volumes:
       - ./librechat.yaml:/app/librechat.yaml:ro
       - images:/app/client/public/images
@@ -43,6 +47,37 @@ services:
       timeout: 5s
       start_period: 60s
       retries: 12
+
+  # 庄严宝刹概念设计 MCP 服务容器
+  studio:
+    image: ${STUDIO_IMAGE:?Set STUDIO_IMAGE in image.env}
+    user: '10001:10001'
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 1g
+    environment:
+      STUDIO_SETTINGS_FILE: /run/secrets/studio.json
+    volumes:
+      - ./studio.json:/run/secrets/studio.json:ro
+      - images:/librechat/images:ro
+      - studio-data:/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   mongodb:
     image: mongo:8.0.20
@@ -103,3 +138,4 @@ volumes:
   uploads:
   logs:
   appdata:
+  studio-data:
