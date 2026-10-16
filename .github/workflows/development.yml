@@ -111,7 +111,7 @@ jobs:
         id: studio
         uses: docker/build-push-action@v7
         with:
-          context: deploy/studio
+          context: .
           file: deploy/studio/Dockerfile
           platforms: linux/amd64
           push: true

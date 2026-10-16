@@ -8,7 +8,7 @@ const {
   mergeFileConfig,
   getEndpointFileConfig,
 } = require('librechat-data-provider');
-const { getGoogleConfig, processMCPEnv } = require('@librechat/api');
+const { getGoogleConfig, processMCPEnv, buildMCPImageToolContext } = require('@librechat/api');
 
 const rawYaml = fs.readFileSync('librechat.yaml', 'utf8');
 const parsedYaml = yaml.load(rawYaml);
@@ -21,6 +21,22 @@ const VENDOR_NAME_PATTERN =
 
 // 禁止残留的旧版 CAD 服务或容器标识。
 const LEGACY_CAD_PATTERN = /freecad|blender|design_tools|dufs|compile_drawing_sheet/i;
+
+// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3）。
+const CONTRACT_IDENTIFIERS = new Set([
+  'design_concepts',
+  'generate_image',
+  'edit_image',
+  'list_images',
+  'prompt',
+  'base_id',
+  'references',
+  'id',
+  'use',
+  'reference_ids',
+  'aspect_ratio',
+  'resolution',
+]);
 
 test('librechat.yaml passes LibreChat configSchema validation', () => {
   const result = configSchema.safeParse(parsedYaml);
@@ -113,6 +129,44 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
   }
 });
 
+test('promptPrefix and MCP image context mention only tool and argument names present in the contract', () => {
+  const config = configSchema.parse(parsedYaml);
+  for (const spec of config.modelSpecs.list) {
+    const prefix = spec.preset.promptPrefix || '';
+    const identifiers = prefix.match(/[a-z_][a-z0-9_]*/g) || [];
+    for (const identifier of identifiers) {
+      assert.ok(
+        CONTRACT_IDENTIFIERS.has(identifier),
+        `Non-contract identifier "${identifier}" found in promptPrefix of ${spec.name}`,
+      );
+    }
+    assert.ok(prefix.includes('base_id'), 'promptPrefix must mention edit_image base_id');
+    assert.ok(prefix.includes('references'), 'promptPrefix must mention references');
+    assert.ok(prefix.includes('reference_ids'), 'promptPrefix must mention reference_ids');
+    assert.doesNotMatch(prefix, /\b(reference_uses|image_id|image_ids)\b/);
+  }
+
+  const mcpContext = buildMCPImageToolContext({
+    imageFiles: [{ file_id: 'img-1', filename: 'booth.png', kind: 'upload', turn: 1 }],
+  });
+  assert.ok(mcpContext.includes('- img-1 (booth.png, upload, turn 1)'));
+  const backtickTokens = [...mcpContext.matchAll(/`([^`]+)`/g)].map((m) => m[1]);
+  assert.deepEqual(backtickTokens, [
+    'edit_image.base_id',
+    'references[].id',
+    'references[].use',
+    'design_concepts.reference_ids',
+  ]);
+  for (const token of backtickTokens) {
+    for (const part of token.split(/[.[\]]+/).filter(Boolean)) {
+      assert.ok(
+        CONTRACT_IDENTIFIERS.has(part),
+        `Non-contract identifier "${part}" found in buildMCPImageToolContext`,
+      );
+    }
+  }
+});
+
 test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contract', () => {
   const config = configSchema.parse(parsedYaml);
   assert.ok(config.mcpSettings.allowedAddresses.includes('studio:8000'));
@@ -194,7 +248,7 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
 
-test('CI workflow builds studio image, runs Python 3.13 and config tests, and runs smoke test', () => {
+test('CI workflow builds studio image with root context, runs Python 3.13 and config tests, and runs smoke test', () => {
   const rawWorkflow = fs.readFileSync('.github/workflows/development.yml', 'utf8');
   const workflow = yaml.load(rawWorkflow);
   assert.doesNotMatch(rawWorkflow, LEGACY_CAD_PATTERN);
@@ -217,6 +271,8 @@ test('CI workflow builds studio image, runs Python 3.13 and config tests, and ru
   const imageSteps = workflow.jobs.image.steps;
   const studioBuild = imageSteps.find((step) => step.id === 'studio');
   assert.ok(studioBuild, 'CI image job must build studio image');
+  assert.equal(studioBuild.with.context, '.');
+  assert.equal(studioBuild.with.file, 'deploy/studio/Dockerfile');
   assert.match(
     studioBuild.with.tags,
     /ghcr\.io\/getio0909\/librechat-studio:sha-\$\{\{ github\.sha \}\}/,
@@ -225,4 +281,11 @@ test('CI workflow builds studio image, runs Python 3.13 and config tests, and ru
     imageSteps.some((step) => step.run && step.run.includes('bash deploy/runtime.test.sh')),
     'CI image job must run studio runtime smoke test',
   );
+
+  const rawSmokeTest = fs.readFileSync('deploy/runtime.test.sh', 'utf8');
+  assert.match(rawSmokeTest, /assert health == "OK"/);
+  assert.match(rawSmokeTest, /valid_user_id = "0123456789abcdef01234567"/);
+  assert.match(rawSmokeTest, /"X-Studio-Token": "wrong-studio-token"/);
+  assert.match(rawSmokeTest, /"X-LibreChat-User-ID": "smoke-user-1"/);
+  assert.match(rawSmokeTest, /assert exc\.code == 403/);
 });

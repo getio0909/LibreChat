@@ -57,28 +57,59 @@ assert os.getuid() == 10001, f"Expected UID 10001, got {os.getuid()}"
 
 with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=5) as resp:
     assert resp.status == 200, f"Unexpected /health status: {resp.status}"
-    health = json.loads(resp.read().decode("utf-8"))
-    assert health.get("ok") is True or health.get("status") == "ok", f"Unexpected /health body: {health}"
-
-# 验证缺少或错误的共享令牌会被拒绝。
-unauth_req = urllib.request.Request(
-    "http://127.0.0.1:8000/mcp",
-    data=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}).encode("utf-8"),
-    headers={"Content-Type": "application/json", "Accept": "application/json, text/event-stream"},
-    method="POST",
-)
-try:
-    urllib.request.urlopen(unauth_req, timeout=5)
-    raise AssertionError("Expected unauthenticated MCP request to be rejected")
-except urllib.error.HTTPError as exc:
-    assert exc.code in (401, 403), f"Expected 401/403 for unauthenticated MCP request, got {exc.code}"
+    health = resp.read().decode("utf-8").strip()
+    assert health == "OK", f"Unexpected /health body: {health!r}"
 
 token = os.environ["STUDIO_SHARED_TOKEN"]
+valid_user_id = "0123456789abcdef01234567"
+init_probe_bytes = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}).encode("utf-8")
+
+# 验证缺少共享令牌、错误共享令牌、以及非法格式的用户 ID 均返回 HTTP 403。
+for desc, bad_headers in [
+    (
+        "missing token",
+        {
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+            "X-LibreChat-User-ID": valid_user_id,
+        },
+    ),
+    (
+        "wrong token",
+        {
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+            "X-Studio-Token": "wrong-studio-token",
+            "X-LibreChat-User-ID": valid_user_id,
+        },
+    ),
+    (
+        "malformed user id",
+        {
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+            "X-Studio-Token": token,
+            "X-LibreChat-User-ID": "smoke-user-1",
+        },
+    ),
+]:
+    bad_req = urllib.request.Request(
+        "http://127.0.0.1:8000/mcp",
+        data=init_probe_bytes,
+        headers=bad_headers,
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(bad_req, timeout=5)
+        raise AssertionError(f"Expected MCP request with {desc} to be rejected with 403")
+    except urllib.error.HTTPError as exc:
+        assert exc.code == 403, f"Expected 403 for {desc}, got {exc.code}"
+
 base_headers = {
     "Content-Type": "application/json",
     "Accept": "application/json, text/event-stream",
     "X-Studio-Token": token,
-    "X-LibreChat-User-ID": "smoke-user-1",
+    "X-LibreChat-User-ID": valid_user_id,
     "X-LibreChat-Conversation-ID": "smoke-conv-1",
 }
 
