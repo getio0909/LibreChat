@@ -1,0 +1,2 @@
+# 导入清单使用字节哈希命名，固定换行以避免检出后摘要变化
+imports/*.jsonl text eol=lf
