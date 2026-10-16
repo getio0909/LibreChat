@@ -83,7 +83,7 @@ def _mark_uncertain(directory: Path, values: dict[str, Any], **extra: Any) -> No
         pass
 
 
-# 按原图宽高比计算1K或2K档位下符合16倍数与面积范围的目标尺寸
+# 按原图宽高比计算1K或2K档位下符合16倍数、面积范围与2.5%宽高比误差上限的目标尺寸
 def source_dimensions(
     size: str, source_size: tuple[int, int] | list[int]
 ) -> tuple[int, int]:
@@ -99,14 +99,47 @@ def source_dimensions(
         or not 1 / 16 <= w / h <= 16
     ):
         raise ValueError("Source image aspect ratio is out of supported range")
-    scale = math.sqrt(SIZES[size] ** 2 / (w * h))
-    width = max(16, round(w * scale / 16) * 16)
-    height = max(16, round(h * scale / 16) * 16)
-    if not 921600 <= width * height <= 4624220 or not 1 / 16 <= width / height <= 16:
+    ratio = w / h
+    target_area = SIZES[size] ** 2
+    scale = math.sqrt(target_area / (w * h))
+    base_w = max(16, round(w * scale / 16) * 16)
+    base_h = max(16, round(h * scale / 16) * 16)
+    if (
+        921600 <= base_w * base_h <= 4624220
+        and 1 / 16 <= base_w / base_h <= 16
+        and abs((base_w / base_h) / ratio - 1.0) <= 0.025
+    ):
+        return base_w, base_h
+
+    best_pair: tuple[int, int] | None = None
+    best_key: tuple[float, float] | None = None
+    for dw in range(-20, 21):
+        cw = base_w + dw * 16
+        if cw < 16:
+            continue
+        for dh in range(-20, 21):
+            ch = base_h + dh * 16
+            if ch < 16:
+                continue
+            area = cw * ch
+            if not (921600 <= area <= 4624220):
+                continue
+            cand_ratio = cw / ch
+            if not (1 / 16 <= cand_ratio <= 16):
+                continue
+            discrepancy = abs(cand_ratio / ratio - 1.0)
+            if discrepancy > 0.025:
+                continue
+            key = (discrepancy, float(abs(area - target_area)))
+            if best_key is None or key < best_key:
+                best_key = key
+                best_pair = (cw, ch)
+
+    if best_pair is None:
         raise ValueError(
             "Cannot generate at source aspect ratio; please choose a standard aspect ratio"
         )
-    return width, height
+    return best_pair
 
 
 # 规范化参考图片并返回Data URI与EXIF方向校正后的像素尺寸

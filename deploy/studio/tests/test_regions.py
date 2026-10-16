@@ -815,3 +815,165 @@ def test_real_onnx_sam_segmenter_smoke_if_available(tmp_path: Path) -> None:
     out = segmenter.segment(sample_path, [{"x": 500, "y": 500, "label": 1}])
     assert len(out["shapes"]) >= 1
     assert out["selected_pixels"] >= 16
+
+
+# 回归测试（Finding #1）：调色板P模式含tRNS透明像素的PNG底图经局部合回后，选区外RGBA四通道（含Alpha）100%一致
+def test_palette_png_with_trns_preserves_alpha_outside_selection(
+    tmp_path: Path,
+) -> None:
+    w, h = 160, 120
+    pal_img = Image.new("P", (w, h), 0)
+    palette: list[int] = [
+        10, 20, 30,     # 索引0：完全透明背景
+        180, 140, 90,   # 索引1：半透明边框
+        60, 130, 190,   # 索引2：不透明主体
+    ] + [0] * (768 - 9)
+    pal_img.putpalette(palette)
+    draw = ImageDraw.Draw(pal_img)
+    draw.rectangle((16, 16, 144, 104), fill=1)
+    draw.rectangle((40, 32, 120, 88), fill=2)
+    pal_path = tmp_path / "palette_trns_base.png"
+    pal_img.save(pal_path, format="PNG", transparency=bytes([0, 128, 255]))
+
+    selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 350, "y": 350}, {"x": 650, "y": 650}],
+            }
+        ],
+    }
+    ctx = local_context(pal_path, selection)
+    crop_w, crop_h = ctx["size"]
+    gen_img = Image.new("RGBA", (crop_w, crop_h), (240, 200, 120, 255))
+    gen_path = tmp_path / "palette_gen.png"
+    save_exact(gen_img, gen_path)
+
+    dest_path = tmp_path / "palette_out.png"
+    comp = composite_local(
+        pal_path,
+        gen_path,
+        selection,
+        ctx["crop"],
+        dest_path,
+        expected_proof=selection_proof(pal_path, selection),
+    )
+    assert comp["outside_changed_pixels"] == 0
+
+    mask = mask_for(selection, (w, h))
+    outside = np.asarray(mask) == 0
+    with Image.open(pal_path) as raw_base:
+        base_rgba = np.asarray(raw_base.convert("RGBA"))
+    with Image.open(dest_path) as raw_out:
+        out_rgba = np.asarray(raw_out.convert("RGBA"))
+
+    # 选区外包含透明（alpha=0）与半透明（alpha=128）像素，合回后RGBA全部通道必须逐像素完全相等
+    assert int(np.sum(base_rgba[:, :, 3][outside] == 0)) > 100
+    assert int(np.sum(base_rgba[:, :, 3][outside] == 128)) > 100
+    assert np.array_equal(base_rgba[outside], out_rgba[outside])
+
+
+# 回归测试（Finding #6）：约12:1极端宽高比（如8000x670与670x8000）在1K与2K档位下均满足2.5%合成比例校验
+def test_source_dimensions_and_local_crop_extreme_12_to_1_aspect_at_1k(
+    tmp_path: Path,
+) -> None:
+    for dims in ((8000, 670), (670, 8000), (3200, 200), (200, 3200)):
+        for tier in ("1K", "2K"):
+            req_w, req_h = source_dimensions(tier, dims)
+            assert req_w % 16 == 0 and req_h % 16 == 0
+            assert 921600 <= req_w * req_h <= 4624220
+            crop_ratio = dims[0] / dims[1]
+            gen_ratio = req_w / req_h
+            assert abs(gen_ratio / crop_ratio - 1.0) <= 0.025
+
+    # 端到端验证8000x670底图在整图回退裁切框与1K档位下完成prepare_local_crop与composite_local
+    banner_path = tmp_path / "banner_8000x670.png"
+    banner_img = Image.new("RGB", (8000, 670), (140, 120, 100))
+    save_exact(banner_img, banner_path)
+    selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 50, "y": 100}, {"x": 950, "y": 900}],
+            }
+        ],
+    }
+    ctx = local_context(banner_path, selection)
+    req_w, req_h = source_dimensions("1K", ctx["size"])
+    gen_banner = Image.new("RGB", (req_w, req_h), (200, 170, 90))
+    gen_banner_path = tmp_path / "gen_banner_1k.png"
+    save_exact(gen_banner, gen_banner_path)
+
+    out_banner_path = tmp_path / "out_banner_1k.png"
+    comp = composite_local(
+        banner_path,
+        gen_banner_path,
+        selection,
+        ctx["crop"],
+        out_banner_path,
+    )
+    assert comp["width"] == 8000
+    assert comp["height"] == 670
+    assert comp["outside_changed_pixels"] == 0
+
+
+# 回归测试（Finding #8）：原样贴入对象若越出L形凹多边形或带孔选区的非选中区域，必须在生图前抛出ValueError拒绝
+def test_object_placement_rejects_concave_or_holed_selection_clipping(
+    tmp_path: Path,
+) -> None:
+    base_path = tmp_path / "concave_base.png"
+    save_exact(Image.new("RGB", (300, 300), (120, 120, 120)), base_path)
+
+    # 构造不透明方形参考对象（贴入包围盒中心时会覆盖中心区域）
+    ref_path = tmp_path / "solid_ plaque.png"
+    save_exact(Image.new("RGBA", (120, 120), (210, 160, 60, 255)), ref_path)
+
+    # 1. 带中心镂空孔洞的选区：外框[100,100]-[900,900]，中心[300,300]-[700,700]被subtract挖空
+    holed_selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 100, "y": 100}, {"x": 900, "y": 900}],
+            },
+            {
+                "type": "rect",
+                "op": "subtract",
+                "points": [{"x": 300, "y": 300}, {"x": 700, "y": 700}],
+            },
+        ],
+    }
+    with pytest.raises(
+        ValueError,
+        match="Original object placement extends outside the confirmed selection",
+    ):
+        object_placement(base_path, holed_selection, ref_path)
+
+    # 2. L形凹多边形选区：右上象限[350,100]-[900,650]不在选区内，但包围盒仍为[100,100]-[900,900]
+    l_shape_selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "polygon",
+                "op": "add",
+                "points": [
+                    {"x": 100, "y": 100},
+                    {"x": 300, "y": 100},
+                    {"x": 300, "y": 700},
+                    {"x": 900, "y": 700},
+                    {"x": 900, "y": 900},
+                    {"x": 100, "y": 900},
+                ],
+            }
+        ],
+    }
+    with pytest.raises(
+        ValueError,
+        match="Original object placement extends outside the confirmed selection",
+    ):
+        object_placement(base_path, l_shape_selection, ref_path)

@@ -15,6 +15,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps, ImageStat
 
 from .config import StudioSettings
@@ -179,15 +180,31 @@ def mask_for(selection: dict[str, Any], size: tuple[int, int]) -> Image.Image:
     return mask
 
 
-# 打开图像并按EXIF方向自动摆正（可选保留Alpha透明通道）
-def open_image(path: str | Path, *, keep_alpha: bool = False) -> Image.Image:
-    with Image.open(path) as raw:
+# 打开图像并按EXIF方向自动摆正（识别调色板tRNS透明与Alpha通道并保留ICC色彩配置）
+def open_image(
+    path: str | Path | bytes | bytearray | io.BytesIO,
+    *,
+    keep_alpha: bool = False,
+) -> Image.Image:
+    source = io.BytesIO(path) if isinstance(path, (bytes, bytearray)) else path
+    with Image.open(source) as raw:
         if raw.width * raw.height > MAX_IMAGE_PIXELS:
             raise ValueError("Image pixel count exceeds safety limit")
+        icc = raw.info.get("icc_profile")
+        has_alpha = "A" in raw.getbands() or "transparency" in raw.info
         image = ImageOps.exif_transpose(raw)
-        if keep_alpha and "A" in image.getbands():
-            return image.convert("RGBA")
-        return image.convert("RGB")
+        has_alpha = has_alpha or "A" in image.getbands() or "transparency" in image.info
+        if keep_alpha and has_alpha:
+            out = image.convert("RGBA")
+        elif has_alpha:
+            rgba = image.convert("RGBA")
+            background = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
+            out = Image.alpha_composite(background, rgba).convert("RGB")
+        else:
+            out = image.convert("RGB")
+        if icc:
+            out.info["icc_profile"] = icc
+        return out
 
 
 # 将PIL图像编码为PNG格式的Data URI字符串
@@ -251,7 +268,7 @@ def local_context(path: str | Path, selection: dict[str, Any]) -> dict[str, Any]
     }
 
 
-# 按局部裁切图宽高比计算适配生图接口的16像素对齐目标宽高
+# 按局部裁切图宽高比计算适配生图接口的16像素对齐目标宽高并满足2.5%宽高比误差上限
 def source_dimensions(size: str, source_size: tuple[int, int]) -> tuple[int, int]:
     if (
         size not in SIZES
@@ -262,21 +279,62 @@ def source_dimensions(size: str, source_size: tuple[int, int]) -> tuple[int, int
     w, h = int(source_size[0]), int(source_size[1])
     if w < 1 or h < 1 or not (1 / 16 <= w / h <= 16):
         raise ValueError("Crop aspect ratio is outside the supported range")
-    scale = math.sqrt((SIZES[size] ** 2) / (w * h))
-    width = max(16, round(w * scale / 16) * 16)
-    height = max(16, round(h * scale / 16) * 16)
-    if not (921600 <= width * height <= 4624220) or not (1 / 16 <= width / height <= 16):
+    ratio = w / h
+    target_area = SIZES[size] ** 2
+    scale = math.sqrt(target_area / (w * h))
+    base_w = max(16, round(w * scale / 16) * 16)
+    base_h = max(16, round(h * scale / 16) * 16)
+    if (
+        921600 <= base_w * base_h <= 4624220
+        and 1 / 16 <= base_w / base_h <= 16
+        and abs((base_w / base_h) / ratio - 1.0) <= 0.025
+    ):
+        return base_w, base_h
+
+    best_pair: tuple[int, int] | None = None
+    best_key: tuple[float, float] | None = None
+    for dw in range(-20, 21):
+        cw = base_w + dw * 16
+        if cw < 16:
+            continue
+        for dh in range(-20, 21):
+            ch = base_h + dh * 16
+            if ch < 16:
+                continue
+            area = cw * ch
+            if not (921600 <= area <= 4624220):
+                continue
+            cand_ratio = cw / ch
+            if not (1 / 16 <= cand_ratio <= 16):
+                continue
+            discrepancy = abs(cand_ratio / ratio - 1.0)
+            if discrepancy > 0.025:
+                continue
+            key = (discrepancy, float(abs(area - target_area)))
+            if best_key is None or key < best_key:
+                best_key = key
+                best_pair = (cw, ch)
+
+    if best_pair is None:
         raise ValueError("Unable to compute valid generation dimensions for crop ratio")
-    return width, height
+    return best_pair
 
 
 # 生成选区与底图绑定的加密校验凭据（包含底图文件SHA256与掩码像素SHA256）
-def selection_proof(path: str | Path, selection: dict[str, Any]) -> dict[str, Any]:
-    resolved_path = Path(path)
-    image = open_image(resolved_path)
+def selection_proof(
+    path: str | Path | bytes | bytearray,
+    selection: dict[str, Any],
+) -> dict[str, Any]:
+    if isinstance(path, (bytes, bytearray)):
+        raw_bytes = bytes(path)
+        image = open_image(raw_bytes)
+    else:
+        resolved_path = Path(path)
+        raw_bytes = resolved_path.read_bytes()
+        image = open_image(raw_bytes)
     mask = mask_for(selection, image.size)
     return {
-        "image_sha256": hashlib.sha256(resolved_path.read_bytes()).hexdigest(),
+        "image_sha256": hashlib.sha256(raw_bytes).hexdigest(),
         "mask_sha256": hashlib.sha256(mask.tobytes()).hexdigest(),
         "width": image.width,
         "height": image.height,
@@ -348,18 +406,27 @@ def _alpha_box(image: Image.Image) -> tuple[int, int, int, int]:
     return box or (0, 0, image.width, image.height)
 
 
-# 将参考对象按原样缩放并贴入底图选区中心以供局部光影融合（原样贴入模式）
+# 将参考对象按原样缩放并贴入底图选区中心，在生图前严格校验完整变换轮廓绝不越出二值选区掩码
 def object_placement(
     base_path: str | Path,
     selection: dict[str, Any],
     reference_path: str | Path,
     *,
     reference_selection: dict[str, Any] | None = None,
+    target_selection: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     base = open_image(base_path)
     mask = mask_for(selection, base.size)
+    mask_arr = np.asarray(mask, dtype=np.uint8)
+    target_mask = mask_for(target_selection, base.size) if target_selection else mask
+    target_arr = np.asarray(target_mask, dtype=np.uint8)
+    if target_selection and bool(np.any((target_arr > 0) & (mask_arr == 0))):
+        raise ValueError(
+            "Target placement area extends outside the confirmed selection"
+        )
+
     crop = context_box(mask)
-    x1, y1, x2, y2 = mask.getbbox()
+    x1, y1, x2, y2 = target_mask.getbbox()
     target_w = max(8, x2 - x1)
     target_h = max(8, y2 - y1)
 
@@ -373,7 +440,11 @@ def object_placement(
     else:
         source = source.crop(_alpha_box(source))
 
-    source = match_color(source, base.crop((x1, y1, x2, y2)), mask.crop((x1, y1, x2, y2)))
+    source = match_color(
+        source,
+        base.crop((x1, y1, x2, y2)),
+        target_mask.crop((x1, y1, x2, y2)),
+    )
     scale = min(
         target_w * 0.92 / max(1, source.width),
         target_h * 0.92 / max(1, source.height),
@@ -386,6 +457,19 @@ def object_placement(
     paste_x = x1 + (target_w - placed_w) // 2
     paste_y = y1 + (target_h - placed_h) // 2
     layer.paste(resized, (paste_x, paste_y))
+
+    # 在做掩码裁剪前检查变换后对象的全部非透明像素，若越出不规则或镂空选区则立即拒绝
+    footprint = np.asarray(layer.getchannel("A"), dtype=np.uint8)
+    if not bool(np.any(footprint > 0)):
+        raise ValueError("Reference object has no visible foreground pixels")
+    if target_selection and bool(np.any((footprint > 0) & (target_arr == 0))):
+        raise ValueError(
+            "Original object placement extends outside the target placement area"
+        )
+    if bool(np.any((footprint > 0) & (mask_arr == 0))):
+        raise ValueError(
+            "Original object placement extends outside the confirmed selection"
+        )
 
     feather = mask.filter(ImageFilter.GaussianBlur(1))
     alpha = ImageChops.multiply(layer.getchannel("A"), feather)
@@ -426,7 +510,11 @@ def save_exact(image: Image.Image, destination: str | Path) -> str:
     dest_path = Path(destination)
     dest_path.parent.mkdir(parents=True, mode=0o700, exist_ok=True)
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
+    save_kwargs: dict[str, Any] = {"format": "PNG"}
+    icc = image.info.get("icc_profile")
+    if icc:
+        save_kwargs["icc_profile"] = icc
+    image.save(buffer, **save_kwargs)
     raw_bytes = buffer.getvalue()
     temp_path = dest_path.with_name(f"{dest_path.name}.part.{secrets.token_hex(6)}")
     descriptor = os.open(temp_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -450,8 +538,18 @@ def composite_local(
     selection: dict[str, Any],
     crop: tuple[int, int, int, int],
     destination: str | Path,
+    *,
+    expected_proof: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    original = open_image(base_path, keep_alpha=True)
+    base_bytes = Path(base_path).read_bytes()
+    if expected_proof is not None:
+        current_proof = selection_proof(base_bytes, selection)
+        for key in ("image_sha256", "mask_sha256", "width", "height", "selected_pixels"):
+            if current_proof.get(key) != expected_proof.get(key):
+                raise ValueError(
+                    "Base image or selection proof changed before local composite; refusing to composite"
+                )
+    original = open_image(base_bytes, keep_alpha=True)
     generated = open_image(generated_path, keep_alpha=True)
     mask = mask_for(selection, original.size)
     x1, y1, x2, y2 = (int(crop[0]), int(crop[1]), int(crop[2]), int(crop[3]))
@@ -474,6 +572,8 @@ def composite_local(
     radius = max(1, min(4, round(min(original.size) / 600)))
     alpha = ImageChops.multiply(mask, mask.filter(ImageFilter.GaussianBlur(radius)))
     result = Image.composite(changed, original, alpha)
+    if original.info.get("icc_profile"):
+        result.info["icc_profile"] = original.info["icc_profile"]
 
     changed_outside = count_outside_changes(original, result, mask)
     if changed_outside != 0:
@@ -484,12 +584,16 @@ def composite_local(
     dest_path = Path(destination)
     sha256 = save_exact(result, dest_path)
 
-    # 重新从磁盘读取落盘后的PNG文件，二次验证尺寸、模式及选区外像素100%字节级无改动
+    # 重新从磁盘读取落盘后的PNG文件，二次验证尺寸、模式及RGBA空间选区外像素100%字节级无改动
     saved = open_image(dest_path, keep_alpha=True)
     if (
         saved.size != original.size
         or saved.mode != original.mode
         or count_outside_changes(original, saved, mask) != 0
+        or count_outside_changes(
+            original.convert("RGBA"), saved.convert("RGBA"), mask
+        )
+        != 0
     ):
         with contextlib.suppress(OSError):
             dest_path.unlink(missing_ok=True)
