@@ -1074,3 +1074,102 @@ def test_receipt_write_failure_preserves_uncertain_warning(
     asyncio.run(_run())
 
 
+# 校验design_concepts规划阶段受每用户并发上限与全局并发上限约束，且在出图前释放规划信号量
+def test_planner_concurrency_caps_single_and_multi_user(
+    studio_env: StudioSettings,
+) -> None:
+    user_c = "65f00000000000000000000c"
+    capped = studio_env.model_copy(
+        update={"max_parallel_per_user": 2, "global_max_parallel": 3}
+    )
+
+    active_planner = 0
+    max_planner_observed = 0
+
+    async def _slow_gemini_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal active_planner, max_planner_observed
+        active_planner += 1
+        max_planner_observed = max(max_planner_observed, active_planner)
+        await asyncio.sleep(0.05)
+        active_planner -= 1
+        concept = {
+            "title": "禅案",
+            "positioning": "定位",
+            "description": "描述",
+            "materials": "材质（待确认）",
+            "key_details": "细节",
+            "image_prompt": "A stone altar concept.",
+        }
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "text": json.dumps(
+                                        {"concepts": [concept]}, ensure_ascii=False
+                                    )
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
+
+    app = create_app(
+        settings=capped,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_slow_gemini_handler),
+    )
+
+    async def _call_plan(client: httpx.AsyncClient, uid: str, req_id: int) -> None:
+        res = await client.post(
+            "/mcp",
+            headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": uid},
+            json={
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "method": "tools/call",
+                "params": {
+                    "name": "design_concepts",
+                    "arguments": {
+                        "brief": "并发规划限制测试",
+                        "count": 1,
+                        "with_images": False,
+                    },
+                },
+            },
+        )
+        assert res.status_code == 200
+        assert res.json()["result"]["isError"] is False
+
+    async def _run() -> None:
+        nonlocal max_planner_observed
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            # 1. 单用户发起4个并发with_images=False规划请求，受max_parallel_per_user=2限制
+            max_planner_observed = 0
+            await asyncio.gather(*(_call_plan(client, USER_A, i) for i in range(1, 5)))
+            assert max_planner_observed == 2
+
+            # 2. 三个用户同时各发起2个并发with_images=False规划请求（共6个），受global_max_parallel=3限制
+            max_planner_observed = 0
+            await asyncio.gather(
+                _call_plan(client, USER_A, 11),
+                _call_plan(client, USER_A, 12),
+                _call_plan(client, USER_B, 13),
+                _call_plan(client, USER_B, 14),
+                _call_plan(client, user_c, 15),
+                _call_plan(client, user_c, 16),
+            )
+            assert max_planner_observed == 3
+
+    asyncio.run(_run())
+
+
+

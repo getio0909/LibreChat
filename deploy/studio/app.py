@@ -472,15 +472,16 @@ def build_mcp_server(
                     normalize_reference(p, allowed_roots) for p in unique_ref_paths
                 ]
 
-                planned = await plan_concepts(
-                    settings,
-                    rules,
-                    brief=brief,
-                    count=count,
-                    reference_ids=canonical_ref_ids,
-                    reference_data_uris=ref_uris,
-                    transport=gemini_transport,
-                )
+                async with limiter.acquire(user_id):
+                    planned = await plan_concepts(
+                        settings,
+                        rules,
+                        brief=brief,
+                        count=count,
+                        reference_ids=canonical_ref_ids,
+                        reference_data_uris=ref_uris,
+                        transport=gemini_transport,
+                    )
 
                 stone_map = {
                     alias: "图1所示石材"
