@@ -1,0 +1,74 @@
+id: 33960ab8edf4b8aa
+title_zh: 大型佛教石雕佛像室内展示
+source:
+  original_path: 佛堂空间设计参考/大型佛教石雕佛像室内展示.jpg
+original:
+  path: 佛堂空间设计参考/大型佛教石雕佛像室内展示.jpg
+  sha256: 33960ab8edf4b8aa71293468bb6c84d3ecca2e17ffdcf80c2a4113bc3a167f2c
+  bytes: 160327
+  width: 900
+  height: 1200
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/33960ab8edf4b8aa.jpg
+    sha256: 8e3cf3b7f342d2a630a234ddaaa1a4489c17d7d1e0a483499cb8e18f19966a9d
+    bytes: 171838
+    width: 900
+    height: 1200
+  thumb512:
+    path: assets/thumb512/33960ab8edf4b8aa.webp
+    sha256: 75a7e1a98be831080dfbc02c32872eff42dc4a3e9fab6a494fea9842fd8927a2
+    bytes: 24796
+    width: 384
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 现代清水混凝土大佛殿近景仰拍场景，顶部弧形混凝土拱梁遮挡佛首，强天光洒在巨型青白石坐佛胸膛与衣褶上，深灰石莲座前设红黄鲜花供案与十级石阶，前景地面铺展金色草编花瓣席。
+materials:
+- 素面清水混凝土锥形墙
+- 青灰白花岗岩巨佛
+- 深灰花岗岩台阶与莲座
+- 天然干草编织花席
+colors:
+- 混凝土灰
+- 冷白高光
+- 麦秆金黄
+- 大红与明黄花色
+style: 现代禅意
+ai_design_usage: 现代极简大佛殿近景软装与花艺陈设参考、冷峻清水混凝土与温暖天然草编材质对比、巨型石雕佛像衣纹与水迹光影质地参考
+prompt_zh: 现代极简清水混凝土大佛殿近景仰拍构图，顶部黑色弧形混凝土拱梁框景下，一尊巨大的灰白色花岗岩石雕坐佛端坐于深灰色石雕莲花宝座之上，头部隐于上方露天光洞的强烈天光之中，宽厚胸膛与流畅衣褶泛着神圣高光，莲座前方黑色石质供台两侧对称插满鲜艳的红黄双色花束，下方为十级深灰花岗岩台阶，前景光滑混凝土地面上摆放一张天然金色干草编织并撒满白色花瓣的禅意艺术地席，冷峻工业材质与温暖自然植物对比，8K建筑摄影
+tags:
+- 清水混凝土佛殿
+- 花岗岩巨佛
+- 大地艺术草席
+- 近景框景构图
+- 冷暖材质对比
+- 现代禅意空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 900
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 头大佛殿清水混凝土厅堂近景仰拍石雕大佛胸腹、石阶与前景草编席实景。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 
@@ -57,6 +57,44 @@ function resolveStudioSharedToken() {
   return provided;
 }
 
+// 解析或生成 32 字节（64 位十六进制）的三维模型文件 HMAC 签名密钥；若目标目录已存在有效密钥则优先复用。
+function resolveFileSigningKey(targetDir) {
+  const provided = process.env.STUDIO_FILE_SIGNING_KEY;
+  if (!provided) {
+    if (targetDir) {
+      const existingStudioPath = path.join(targetDir, 'studio.json');
+      if (existsSync(existingStudioPath)) {
+        try {
+          const existing = JSON.parse(readFileSync(existingStudioPath, 'utf8'));
+          if (
+            typeof existing.file_signing_key === 'string' &&
+            /^[0-9a-fA-F]{64}$/.test(existing.file_signing_key)
+          ) {
+            return existing.file_signing_key;
+          }
+        } catch {
+          // 忽略损坏的旧配置并生成新密钥。
+        }
+      }
+    }
+    return randomBytes(32).toString('hex');
+  }
+  if (!/^[0-9a-fA-F]{64}$/.test(provided)) {
+    throw new Error('STUDIO_FILE_SIGNING_KEY must be an exact 64-character hexadecimal string.');
+  }
+  return provided;
+}
+
+// 解析公开部署基础 URL（来自 DEPLOY_URL，用于拼接签名下载链接）。
+function resolvePublicBaseUrl() {
+  const raw = process.env.DEPLOY_URL || 'https://dev.xuqian.io';
+  const cleaned = raw.trim().replace(/\/+$/, '');
+  if (!/^https?:\/\/[^\s'\\]+$/.test(cleaned)) {
+    throw new Error('DEPLOY_URL must be a valid single-line HTTP(S) URL.');
+  }
+  return cleaned;
+}
+
 const runnerTemp = process.env.RUNNER_TEMP;
 if (!runnerTemp) {
   throw new Error('Missing required environment variable: RUNNER_TEMP');
@@ -71,6 +109,8 @@ const arkApiKey = requireSafeSingleLineSecret('ARK_API_KEY');
 const librechatImage = requireImageReference('LIBRECHAT_IMAGE');
 const studioImage = requireImageReference('STUDIO_IMAGE');
 const sharedToken = resolveStudioSharedToken();
+const fileSigningKey = resolveFileSigningKey(target);
+const publicBaseUrl = resolvePublicBaseUrl();
 const accounts = {
   admin: requireAccountConfig('ADMIN'),
   user: requireAccountConfig('USER'),
@@ -94,12 +134,16 @@ writeFileSync(path.join(target, 'image.env'), imageEnvContent, { mode: 0o600 });
 // 生成权限为 0600 的 studio.json 配置文件。
 const studioSettings = {
   shared_token: sharedToken,
+  file_signing_key: fileSigningKey,
+  public_base_url: publicBaseUrl,
   gemini_api_key: geminiApiKey,
   ark_api_key: arkApiKey,
   seedream_model: 'doubao-seedream-5-0-pro-260628',
+  seed3d_model: 'doubao-seed3d-2-0-260328',
   planner_model: 'gemini-4-argon',
   planner_thinking_level: 'HIGH',
   max_parallel_per_user: 3,
+  seed3d_max_parallel: 5,
   seedream_timeout_seconds: 240,
   planner_timeout_seconds: 540,
 };

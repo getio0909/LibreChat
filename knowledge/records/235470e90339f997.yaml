@@ -1,0 +1,76 @@
+id: 235470e90339f997
+title_zh: 佛教室内雕像与装饰空间
+source:
+  original_path: 佛教空间设计案例/佛教室内雕像与装饰空间.jpg
+original:
+  path: 佛教空间设计案例/佛教室内雕像与装饰空间.jpg
+  sha256: 235470e90339f997619b30ff54cd7176252f703276beabd0f3735502f7f7c011
+  bytes: 5217575
+  width: 3433
+  height: 2563
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/235470e90339f997.jpg
+    sha256: 5bda08cb2a7881690d093d434b783f1b5094a3e5e4829202de5f1d7a63f1d10e
+    bytes: 689808
+    width: 2048
+    height: 1529
+  thumb512:
+    path: assets/thumb512/235470e90339f997.webp
+    sha256: 799b9a8be1143a691f1854b3e4b5d5eb19a326dd902e5f09ea9043e5af64a0ae
+    bytes: 63578
+    width: 512
+    height: 382
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 中心发光橙金莲座耸立巨型四面金身立佛、四周环绕多彩背光圆柱形千佛柱与弧形万佛墙、顶覆蓝天星象金穹顶的圆厅圣殿。
+materials:
+- 四面铜鎏金立佛
+- 橙金透光琉璃莲座
+- 圆柱形多彩万佛柱
+- 金色同心圆穹顶
+- 古铜浮雕须弥座
+colors:
+- 辉煌金
+- 橙金色
+- 五彩背光色
+- 星空蓝
+- 古铜棕
+style: 现代佛教文旅圆厅圣殿与多彩琉璃万佛风
+ai_design_usage: 大型四方佛环形万佛圣殿/佛教文旅中心圆厅设计、圆柱形万佛柱与多彩琉璃背光设计参考
+prompt_zh: 恢宏的圆形四面佛万佛圣殿室内空间，低角度仰视构图，正中央高耸一尊巨大的四面金身立佛造像，脚踏发光橙金色琉璃莲花座与古铜雕花须弥座，四周环绕多根粗壮的圆柱形通顶万佛柱与弧形万佛墙，小佛龛内透出红、黄、蓝、绿、紫五彩斑斓的背光，顶部是巨大的金色同心圆穹顶藻井，中心镶嵌深蓝色星象天池，金碧辉煌，8K超清建筑渲染
+tags:
+- 四面立佛
+- 千佛圆柱
+- 多彩万佛墙
+- 圆穹顶藻井
+- 橙金琉璃莲座
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2563
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a circular rotunda hall centering on a four-faced golden standing Buddha atop an illuminated orange-gold
+    lotus base, encircled by colorful backlit cylindrical 1000-Buddha columns and a starry dome.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

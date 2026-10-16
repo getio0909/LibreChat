@@ -1,0 +1,75 @@
+id: 7243258cbd656d7c
+title_zh: 佛教主题展览空间设计-07
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-07.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-07.jpg
+  sha256: 7243258cbd656d7cc607558dcd3034ebc57c018454f49ca0f6d397779a433032
+  bytes: 2670485
+  width: 3391
+  height: 2550
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7243258cbd656d7c.jpg
+    sha256: a2a0c2117a251a986cd5cd4e90f165083d589d53217ffd5768fdffae45c67dcb
+    bytes: 491040
+    width: 2048
+    height: 1540
+  thumb512:
+    path: assets/thumb512/7243258cbd656d7c.webp
+    sha256: a64a4c2da89a9dcee441effe8c8aaf3d2453ad250c91cfdb2186c236dedb08d2
+    bytes: 45356
+    width: 512
+    height: 385
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 星空顶巨型石雕涅槃卧佛殿
+entity_type: 空间场景设计
+summary_zh: 星空蓝、彩绘壁画柱与黄玉 / 巨型白石卧佛、敦煌风彩绘方柱、黄玉地面
+materials:
+- 纯白汉白玉整石卧佛
+- 敦煌重彩壁画包柱
+- 渐变发光琉璃千佛柱
+- 橙黄玉石曼荼罗地面
+- 星空天幕
+colors:
+- 汉白玉纯白
+- 星空深蓝
+- 敦煌朱红青绿
+- 松香黄
+style: 殿堂级星空涅槃卧佛纪念堂风
+ai_design_usage: 室内巨型汉白玉涅槃卧佛殿空间设计 / 敦煌重彩壁画包柱与琉璃千佛柱组合 / 星空顶宗教大殿中轴对称构图
+prompt_zh: 气势恢宏的佛教涅槃卧佛展览大殿，正向中轴对称构图，顶部是深蓝色繁星闪烁的星空天幕，大厅正中央远端供奉一尊巨大的纯白汉白玉释迦牟尼右胁涅槃卧佛雕像，安卧于白色莲花须弥长座与山石背屏前，前景左右矗立两根青白紫红渐变发光的琉璃千佛方柱，中景排列四根绘满敦煌佛国楼阁重彩壁画的方柱，地面为高光橙黄玉石镶嵌圆形曼荼罗拼花，8k超高清效果图。
+tags:
+- 涅槃卧佛
+- 汉白玉卧佛
+- 敦煌壁画方柱
+- 星空顶大殿
+- 琉璃千佛柱
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2550
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a Nirvana hall with a giant white marble reclining Buddha before a golden relief wall, flanked
+    by Dunhuang-mural columns under a fiber-optic starry ceiling.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

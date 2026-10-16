@@ -1,0 +1,77 @@
+id: 9200f186c80479bd
+title_zh: 河北东魏火焰背光三尊石碑
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-河北东魏火焰背光三尊石碑-cma93992.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-河北东魏火焰背光三尊石碑-cma93992.jpg
+  sha256: 9200f186c80479bde1d0ac7b3460e4bf2c57b11ac454084e8583c36abd319f32
+  bytes: 6048609
+  width: 2416
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9200f186c80479bd.jpg
+    sha256: 09c19b618e9413d11b602c218d1aaee41f694fd415d9530001c94b57e71ed69a
+    bytes: 518449
+    width: 1455
+    height: 2048
+  thumb512:
+    path: assets/thumb512/9200f186c80479bd.webp
+    sha256: a80afcb88fbcc39fb09b458c863a590d8d5e55cd43658f58071764bf723ca191
+    bytes: 23442
+    width: 364
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 河北东魏火焰背光三尊石碑
+entity_type: 实物对象写实
+summary_zh: 【图中可见】尖拱形石碑外缘满布向上卷曲火焰纹，中部立佛与两侧胁侍前后叠置，头光外有花叶与兽面纹。【来源著录】Stele with Sakyamuni and Bodhisattvas；文化或地点依据：馆方明确著录河北东魏，并将碑上纪年归为537年。
+materials:
+- 石灰岩
+colors:
+- 褐灰色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，尖拱形石碑外缘满布向上卷曲火焰纹，中部立佛与两侧胁侍前后叠置，头光外有花叶与兽面纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Stele with Sakyamuni and Bodhisattvas. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 河北东魏火焰背光三尊石碑
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1914.567
+  download_url: https://openaccess-cdn.clevelandart.org/1914.567/1914.567_print.jpg
+  credit: Gift of the John Huntington Art and Polytechnic Trust
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2416
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

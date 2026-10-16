@@ -1,0 +1,77 @@
+id: bea6ed03285f4a67
+title_zh: 佛教室内圣坛场景
+source:
+  original_path: 佛教空间设计案例/佛教室内圣坛场景.jpg
+original:
+  path: 佛教空间设计案例/佛教室内圣坛场景.jpg
+  sha256: bea6ed03285f4a6732fe7a2c2d358a5c56b4e5be5368948a1d421566834f745a
+  bytes: 4155410
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bea6ed03285f4a67.jpg
+    sha256: 1d958e462d5ca58ed477711b1d10eba0a1aa21a853fdca2d85d31266d1e2a422
+    bytes: 786540
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/bea6ed03285f4a67.webp
+    sha256: 5016ec0bf68478767a8961f8f53601bd732be0be790d350db4fbcd22bbd20762
+    bytes: 52176
+    width: 512
+    height: 362
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 中央设汉白玉栏杆月台、蓝色天球佛龛与直通八角金顶的锥形千佛塔华盖，左右辟荷花池伫立两尊巨型金色太子像的恢宏圣坛大殿。
+materials:
+- 汉白玉雕花栏杆月台
+- 锥形千佛塔华盖
+- 铜鎏金太子立像
+- 蓝色球形佛龛
+- 发光万佛墙
+- 室内荷花池
+colors:
+- 辉煌金
+- 汉白玉白
+- 宝石蓝
+- 荷叶绿
+- 浅灰色
+style: 华严净土圣殿与现代佛教文旅奇观风
+ai_design_usage: 大型佛教圣坛/浴佛节纪念圣殿/毗卢遮那万佛宝塔大殿概念设计、室内荷花池与汉白玉月台复合空间参考
+prompt_zh: 震撼的佛教室内华严圣坛大殿场景，中轴对称广角构图，中央是汉白玉雕花栏杆围绕的高台须弥月台，设有中央拾级台阶，月台正中金色坛城底座上托起一颗深蓝色球形佛龛，内供金身坐佛，上方连接一座高耸直达八角金色穹顶的圆锥形千佛宝塔式金色华盖，月台左右两侧设室内荷花池，池中盛开荷花并对称站立两尊巨型金色太子金童立像，大殿四周环绕通顶发光金色万佛墙，金碧辉煌，8K超清建筑渲染
+tags:
+- 佛教圣坛
+- 千佛宝塔藻井
+- 汉白玉栏杆月台
+- 室内荷花池
+- 浴佛太子像
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K 3D render of a monumental Buddhist hall with white marble terraced balustrades, a conical golden 1000-Buddha
+    stupa canopy over a blue globe niche, and two giant golden infant-Buddha statues in indoor lotus ponds.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

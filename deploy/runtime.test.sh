@@ -23,15 +23,20 @@ printf 'LIBRECHAT_IMAGE=unused\nSTUDIO_IMAGE=%s\nMEILI_MASTER_KEY=fixture\nRAG_D
   "${STUDIO_IMAGE:?Set STUDIO_IMAGE to the built studio image}" > "$work/.env"
 
 shared_token=$(printf 'a%.0s' {1..64})
+file_signing_key=$(printf 'b%.0s' {1..64})
 cat > "$work/studio.json" <<EOF
 {
   "shared_token": "$shared_token",
+  "file_signing_key": "$file_signing_key",
+  "public_base_url": "https://dev.xuqian.io",
   "gemini_api_key": "dummy-gemini-key",
   "ark_api_key": "dummy-ark-key",
   "seedream_model": "doubao-seedream-5-0-pro-260628",
+  "seed3d_model": "doubao-seed3d-2-0-260328",
   "planner_model": "gemini-4-argon",
   "planner_thinking_level": "HIGH",
   "max_parallel_per_user": 3,
+  "seed3d_max_parallel": 5,
   "seedream_timeout_seconds": 240,
   "planner_timeout_seconds": 540
 }
@@ -173,7 +178,18 @@ with urllib.request.urlopen(list_req, timeout=10) as resp:
 
 tools = tools_payload.get("result", {}).get("tools", [])
 tool_names = {tool["name"] for tool in tools}
-expected_tools = {"generate_image", "edit_image", "design_concepts", "list_images"}
+expected_tools = {
+    "generate_image",
+    "edit_image",
+    "design_concepts",
+    "list_images",
+    "search_library",
+    "compare_materials",
+    "create_3d_model",
+    "check_3d_model",
+}
 assert expected_tools.issubset(tool_names), f"Missing expected tools: {expected_tools - tool_names} (got {tool_names})"
+assert os.path.isdir("/kb/records"), "Expected /kb/records directory inside studio container"
+assert os.path.isfile("/kb/catalog/materials.yaml"), "Expected /kb/catalog/materials.yaml inside studio container"
 print(f"Studio smoke test passed with tools: {sorted(tool_names)}")
 PY

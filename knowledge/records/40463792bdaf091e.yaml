@@ -1,0 +1,77 @@
+id: 40463792bdaf091e
+title_zh: 佛教主题石材展厅设计效果图
+source:
+  original_path: 佛教空间设计案例/佛教主题石材展厅设计效果图.jpg
+original:
+  path: 佛教空间设计案例/佛教主题石材展厅设计效果图.jpg
+  sha256: 40463792bdaf091ef84cbfc8f4bbae57c43faf84f3c0a3ba5479c5eddcd45ed0
+  bytes: 844822
+  width: 1836
+  height: 1236
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/40463792bdaf091e.jpg
+    sha256: 0a900781ca787a8c281521021e8605f8c0d38a227c590bf4dd85cfe3bdeb3fe9
+    bytes: 238661
+    width: 1836
+    height: 1236
+  thumb512:
+    path: assets/thumb512/40463792bdaf091e.webp
+    sha256: b545df43fc74d47ebbd64920672efb4fad58311754445af449d98746f1fd63bc
+    bytes: 22162
+    width: 512
+    height: 345
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 材质
+- 风格
+category_l1: 佛教空间案例
+category_l2: 奢石大板对称列柱中轴展厅
+entity_type: 空间场景设计
+summary_zh: 金棕奢石、黑白拼花与暖白 / 竖向奢石大板阵列框、地面黑白水刀拼花
+materials:
+- 金棕与青绿天然奢石大板
+- 爵士白大理石地毯
+- 黑白回纹水刀拼花
+- 深绿色高光大理石
+- 十字木格栅吊顶
+colors:
+- 金棕奢石色
+- 翡翠深绿
+- 爵士纯白
+- 玄黑
+- 深木褐
+style: 新中式高端佛教奢石建材选材展厅风
+ai_design_usage: 佛教石材/奢石大板建材展厅空间设计 / 中轴通道黑白回纹水刀石材地毯拼花参考 / 圆形发光月洞门松石端景墙设计
+prompt_zh: 对称庄严的新中式佛教主题高端石材展厅室内设计，一点透视构图，左右两侧如列柱般整齐排列着高大的深木色竖向展架，内部展示天然金棕色与青绿色山水纹理奢石大板，展厅中央通道地面铺设长条白色大理石地毯，四周镶嵌精致的黑白传统回纹水刀拼花边框，两侧为深绿色高光大理石地面，走廊尽头端景墙中央设有一座圆形发光月洞门壁龛，内设假山奇石与罗汉松盆景，顶部为中式十字木格栅发光吊顶，8k效果图。
+tags:
+- 石材展厅设计
+- 奢石大板陈列
+- 回纹水刀拼花
+- 月洞门端景
+- 庄严宝刹
+material_ids:
+- dunhuang-gold
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1236
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a luxury stone slab gallery corridor displaying backlit golden-brown ('dunhuang-gold') and
+    green patterned stone slabs with small Buddha niche accents.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,80 @@
+id: 9bd6b9690c2656f6
+title_zh: 雅典帕特农神庙柱列与檐部
+source:
+  original_path: 建筑景观开放授权实景参考/西方-雅典帕特农神庙柱列与檐部-commons177605515.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/01-西方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/西方-雅典帕特农神庙柱列与檐部-commons177605515.jpg
+  sha256: 9bd6b9690c2656f6363f0dd03dedd053bf2187e271bd0701967e5a0fc917daa5
+  bytes: 619860
+  width: 1920
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9bd6b9690c2656f6.jpg
+    sha256: 0c452f0f8bfa3549ea2753f0be48a3d19301cd20e0d34bbfd6b1013fab8a7ccd
+    bytes: 603993
+    width: 1920
+    height: 1280
+  thumb512:
+    path: assets/thumb512/9bd6b9690c2656f6.webp
+    sha256: 1aaf7b12855aae56ed927e1498b2c7f5f02aadab989b7d8e05f785edfd824eab
+    bytes: 30654
+    width: 512
+    height: 341
+library_type: 建筑景观
+region: 西方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 雅典帕特农神庙柱列与檐部
+entity_type: 空间场景设计
+summary_zh: 【图中可见】浅色石构柱列围合高台，柱身纵向凹槽清楚，平直梁部上方为重复的竖槽与方格带，局部石块残损和修补色差可见。【来源著录】1010 Parthenon of the Acropolis of Athens Photo
+  by Giles Laurent.jpg；文化或地点依据：来源题名为希腊雅典卫城的 Parthenon。
+materials:
+- 石材（图中可见）
+colors:
+- 米白色
+- 浅褐色
+- 灰色
+style: 西方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，浅色石构柱列围合高台，柱身纵向凹槽清楚，平直梁部上方为重复的竖槽与方格带，局部石块残损和修补色差可见。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 1010 Parthenon of the Acropolis of Athens Photo by Giles
+  Laurent.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 西方
+- 开放授权
+- 真实摄影
+- 雅典帕特农神庙柱列与檐部
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:1010_Parthenon_of_the_Acropolis_of_Athens_Photo_by_Giles_Laurent.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/1010_Parthenon_of_the_Acropolis_of_Athens_Photo_by_Giles_Laurent.jpg/1920px-1010_Parthenon_of_the_Acropolis_of_Athens_Photo_by_Giles_Laurent.jpg
+  credit: Giles Laurent; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

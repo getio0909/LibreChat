@@ -1,0 +1,73 @@
+id: d9641b71f7ba1efb
+title_zh: 佛教石材展览空间设计
+source:
+  original_path: 佛教空间设计案例/佛教石材展览空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教石材展览空间设计.jpg
+  sha256: d9641b71f7ba1efb072192c3508125118036c68c6323ce7e2b36c8b24856edf6
+  bytes: 859162
+  width: 1979
+  height: 1325
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d9641b71f7ba1efb.jpg
+    sha256: 2c629515c937443d444a8f726478d1c995628123fe2df6d372b480ee842b89e8
+    bytes: 235911
+    width: 1979
+    height: 1325
+  thumb512:
+    path: assets/thumb512/d9641b71f7ba1efb.webp
+    sha256: 15fad39bb73dfcb4485555323b5bdd7b91989e0408737b9080114b7bcaae42e1
+    bytes: 19912
+    width: 512
+    height: 343
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代新中式佛教壁画与石雕造像博物馆展厅场景
+entity_type: 空间场景设计
+summary_zh: 本图为现代新中式佛教文物与石材雕塑博物馆长廊空间的反向视角全景（与第 14 张互为对向镜头）。该视角重点展示了左侧整面长墙的“双层嵌入式经变壁画与浮雕展陈系统”及下部斜面石材护墙基座，远端以中式圆形月洞门收束视线，展现出曲径通幽、步移景异的东方展陈美学。
+  左侧巨幅展墙下方采用温润的米黄色大理石（如莎安娜米黄/莱姆石）打造出向上内倾的折面护墙台基，并在折角处内藏洗墙暖光灯带，其下衔接约 30cm 高的纯黑哑光花岗岩内退踢脚；中轴及右侧展柜采用浅胡桃木柜体配超白无框玻璃罩；地面铺设深灰黑色仿古青石方砖，质感冷峻沉稳。
+materials:
+- 米黄大理石展台
+- 原木玻璃展柜
+- 青石地砖
+colors:
+- 暖米黄石
+- 原木色
+- 深灰青石地
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：佛教壁画与雕塑博物馆长廊反向视角设计 / 米黄石材折面洗墙灯带基座参考 / 中式圆形月洞门展厅尽端框景生成；推荐搭配：米黄莱姆石斜面洗墙基座 + 双层内嵌高显指壁画灯箱 + 浅胡桃木全玻独立展柜 +
+  深灰哑光青石地砖 + 圆形月洞门端景
+prompt_zh: 现代新中式佛教壁画与石材造像博物馆展厅长廊，单点透视纵深构图，左侧整面墙为上下两层嵌入式长卷佛教经变壁画与彩塑灯箱展柜，下方设有米黄色大理石斜面发光基座与黑色石材踢脚；展厅中央排列一列原木底座透明玻璃罩小型金铜佛像展柜；右侧靠墙排列多座独立玻璃展柜，展示白玉与翠玉观音雕像；前景右侧设中式竖条木格栅屏风与点燃蜡烛的古典铜烛台，走廊尽端为一道雅致的圆形月洞门框景，深灰黑青石板地面，三层跌级暖光吊顶，静谧典雅，高清效果图。
+tags:
+- 佛教壁画展厅
+- 石材斜面基座
+- 圆形月洞门框景
+- 玻璃文物展柜
+- 博物馆空间设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1325
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代新中式佛教壁画灯箱、米黄石材斜面基座与玻璃造像展柜长廊三维效果图（与#235互为对向视角），远端设圆形月洞门。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

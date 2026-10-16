@@ -1,0 +1,73 @@
+id: f0a2c9a7f4890089
+title_zh: 佛教石材浮雕花纹图案
+source:
+  original_path: 佛教空间设计案例/佛教石材浮雕花纹图案.jpg
+original:
+  path: 佛教空间设计案例/佛教石材浮雕花纹图案.jpg
+  sha256: f0a2c9a7f4890089b23f1517f8cde0f62e2ecb47515b5f033536e69c8f86aad5
+  bytes: 1578943
+  width: 1692
+  height: 2578
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f0a2c9a7f4890089.jpg
+    sha256: 28a6a44ede4d60bc2b84c93ee4c36f15d494aab1bd4e65087a83b583d5a54ec0
+    bytes: 307404
+    width: 1344
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f0a2c9a7f4890089.webp
+    sha256: 068529d8f812739c0be653e18ae1ddf3e7a0889c70dba811d1548851efc8f93c
+    bytes: 20220
+    width: 336
+    height: 512
+library_type: 石刻纹样
+region: 未知
+studio_roles:
+- 纹样
+- 材质
+- 参考
+category_l1: 佛教空间案例
+category_l2: 现代暖金米黄大理石鱼鳞叠瓦状如意宝相花浮雕肌理板
+entity_type: 实物对象写实
+summary_zh: 本图为一款应用于佛教殿堂主背景墙、佛龛背板或穹顶内壁的“鱼鳞叠瓦状如意宝相花”连续几何石材浮雕肌理板写实特写。设计将中国传统古建筑及铠甲中的“叠胜纹/鱼鳞纹”与佛教“如意云头、宝相团花”巧妙结合，形成极具律动感与华贵金石质感的装饰面层。
+  材质采用暖金米黄色大理石（如金碧辉煌、埃及米黄、黄洞石）或表面施以仿金箔古法擦色工艺的浮雕砂岩板，在暖黄色侧光照射下，凸起的阳纹受光面泛出柔和璀璨的琥珀金光，凹陷的阴纹暗部则呈现温润的焦糖棕色调，立体浮雕质感极强。
+materials:
+- 米黄大理石
+- 砂岩CNC浅浮雕
+- 贴金肌理
+colors:
+- 暖金米黄色
+- 琥珀光影
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：佛堂/展厅背景墙连续几何石材浮雕贴图生成 / 鱼鳞叠瓦纹与如意宝相花结合的CNC雕刻路径参考 / 暖金色奢石浮雕肌理迁移；推荐搭配：米黄大理石/黄砂岩CNC三维浮雕拼板 + 局部古铜金/香槟金擦色处理
+  + 侧向或顶部2700K洗墙灯光凸显凹凸肌理
+prompt_zh: 佛教空间装饰用暖金色大理石浮雕花纹图案特写，满幅无缝连续肌理构图，采用斜向交错层叠的鱼鳞叠瓦状方形模数拼贴设计，每个弧角方形石材单元内部均以浅浮雕雕刻一朵圆润的如意云头宝相团花与四瓣花蕊，单元交接处点缀四角小花瓣；石材呈现温润华贵的暖金米黄色泽，在暖光照射下展现细腻的凹凸立体光影与秩序美感，高清材质贴图特写。
+tags:
+- 石材浮雕花纹
+- 鱼鳞叠瓦纹
+- 如意宝相花
+- 金色大理石肌理
+- 佛堂背景墙材质
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1692
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 穹顶彩绘石雕祥云飞天衣带局部特写，属大图局部放大裁剪，画面略糊但无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 局部放大裁剪导致画质偏模糊

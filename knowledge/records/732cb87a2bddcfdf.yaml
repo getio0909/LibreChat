@@ -1,0 +1,76 @@
+id: 732cb87a2bddcfdf
+title_zh: 佛教主题大型雕像与园林景观
+source:
+  original_path: 佛教空间设计案例/佛教主题大型雕像与园林景观.jpg
+original:
+  path: 佛教空间设计案例/佛教主题大型雕像与园林景观.jpg
+  sha256: 732cb87a2bddcfdf6b91d6ddf12ace1bce08a320b43932963844f9a420fefbd0
+  bytes: 270258
+  width: 636
+  height: 381
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/732cb87a2bddcfdf.jpg
+    sha256: e311cf983b59c6462a6b5c7d6315cab01a93e1e3a65f8a23775b4d9cd43b273d
+    bytes: 75573
+    width: 636
+    height: 381
+  thumb512:
+    path: assets/thumb512/732cb87a2bddcfdf.webp
+    sha256: d5df018c8b9a795c72cbbf3715a84e1f810403603997bf7be19f4b62ec5661f7
+    bytes: 39526
+    width: 512
+    height: 307
+library_type: 建筑景观
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 依山而建的佛教生态人文纪念园与山体大佛高空鸟瞰全景，左中景端坐巨型金身释迦牟尼佛，左下角为覆钵塔地宫，后山采用扇形生态梯田塔林布局，山巅环列五座白塔。
+materials:
+- 贴金铜佛
+- 汉白玉莲花宝座
+- 白色石材覆钵塔
+- 花岗岩景观步道与碑石
+colors:
+- 苍翠绿
+- 佛像金
+- 云雾白
+- 樱花粉
+style: 传统汉传宫殿式
+ai_design_usage: 山地佛教文化园与生态纪念陵园鸟瞰规划设计、山体大佛与梯田景观融合生成
+prompt_zh: 大型山地佛教文化园与生态人文纪念陵园高空鸟瞰全景效果图，画面左中景矗立一尊巨型露天金身释迦牟尼坐佛，端坐于多层白色石雕莲花宝座上，左下角为阶梯式金字塔地宫与白色覆钵塔，大佛后方整座翠绿山坡采用扇形生态梯田设计，整齐排列无数祈福纪念碑林与苍翠松柏，粉色樱花步道蜿蜒其间，山腰设有摩崖石窟造像与中式重檐亭阁，山巅环列五座洁白的覆钵佛塔，山谷云雾缭绕、白鸽飞翔，人间净土仙境氛围，8K景观鸟瞰图。
+tags:
+- 佛教空间案例
+- 鸟瞰景观规划
+- 佛教人文纪念园
+- 山体金身大佛
+- 生态梯田园林
+- 覆钵塔群
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 381
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res aerial 3D rendering (636x381) of a hillside Buddhist memorial park with a giant golden seated Buddha, white
+    stupa underground palace, and terraced stupa/monument gardens.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

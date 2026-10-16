@@ -1,0 +1,77 @@
+id: 29f3c22df516f2dc
+title_zh: 西班牙女像与童子彩绘木雕板
+source:
+  original_path: 家具木作开放授权实物参考/西方-西班牙女像与童子彩绘木雕板-cma95026.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/01-西方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/西方-西班牙女像与童子彩绘木雕板-cma95026.jpg
+  sha256: 29f3c22df516f2dca2923a185363016f512975dbd24d91dd0126c16b3c6f33e7
+  bytes: 1492341
+  width: 1666
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/29f3c22df516f2dc.jpg
+    sha256: cdbf34afff94e2ad7770d0f30d1d4628e763f92bb74dd77a82dbc16a928972f9
+    bytes: 314304
+    width: 1004
+    height: 2048
+  thumb512:
+    path: assets/thumb512/29f3c22df516f2dc.webp
+    sha256: 71fa8877110bbedb3108e09f5fb550924022187685e2dae93799acc5a5fc4d85
+    bytes: 14778
+    width: 251
+    height: 512
+library_type: 家具木作
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 西班牙女像与童子彩绘木雕板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】窄长木板中部为柱间女性立像，上下布置童子和卷涡饰，金色背景上带蓝绿细纹。【来源著录】Carved Panel；文化或地点依据：Spain。
+materials:
+- 木材
+colors:
+- 金棕色
+- 暗蓝绿色
+style: 西方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，窄长木板中部为柱间女性立像，上下布置童子和卷涡饰，金色背景上带蓝绿细纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Carved Panel. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 西方
+- 开放授权
+- 真实摄影
+- 西班牙女像与童子彩绘木雕板
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1915.570.2
+  download_url: https://openaccess-cdn.clevelandart.org/1915.570.2/1915.570.2_print.jpg
+  credit: Gift of the John Huntington Art and Polytechnic Trust
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1666
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

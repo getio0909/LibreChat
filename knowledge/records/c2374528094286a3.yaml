@@ -1,0 +1,76 @@
+id: c2374528094286a3
+title_zh: 墨金石木｜原创空间概念
+source:
+  original_path: 设计风格精选20260930/concept-ink-gold.png
+original:
+  path: 设计风格精选20260930/concept-ink-gold.png
+  sha256: c2374528094286a310dedd582d358b136bf1875b219932449485763b2cf5ad8c
+  bytes: 2342158
+  width: 1448
+  height: 1086
+  format: PNG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c2374528094286a3.jpg
+    sha256: 3a3feed1635afb936b56bcaf77e3d300d607f093625db7c9423e14b890aa1417
+    bytes: 328103
+    width: 1448
+    height: 1086
+  thumb512:
+    path: assets/thumb512/c2374528094286a3.webp
+    sha256: 052e6c9fb355feba8930c90eee43932d53c5d6c9d0b8fb2f91255e3faee62569
+    bytes: 33122
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 风格
+- 材质
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 现代禅意奢石会所空间
+entity_type: 空间场景设计
+summary_zh: 这是一幅极具标杆意义的现代东方禅意高定会所/礼佛前厅空间场景设计图。
+materials:
+- 透光黄金云石
+- 深色胡桃木浮雕板
+- 自然劈裂面毛石
+- 高光灰色大理石
+- 黄铜灯具
+colors:
+- 琥珀暖金
+- 深胡桃木褐
+- 米黄色
+- 暖灰褐色
+style: 现代禅意 / 现代东方奢石会所
+ai_design_usage: 现代佛堂/禅茶空间概念生成 / 透光奢石背景墙效果渲染 / ControlNet Depth 殿堂中轴构图参考 / 粗犷毛石与精工木作材质对比设计
+prompt_zh: 现代东方奢华禅意会所大堂室内设计，严格中轴对称构图，正中央为巨幅背光透光黄金云石背景墙，呈现对称山峰状琥珀色纹理，两侧为深胡桃木立体莲瓣流线纹浮雕板与极简黄铜吊灯；前景中央放置整块自然劈裂面粗犷米色原石长茶台，台上陈列黑色禅意陶钵与中式枯枝插花，地面为暖灰色抛光大理石倒映金光，挑高木格栅吊顶带隐藏暖光灯带，电影级光影，8k超高清建筑摄影质感。
+tags:
+- 现代禅意空间
+- 透光云石背景墙
+- 石木融合设计
+- 自然面石材茶台
+- 中轴对称构图
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: 庄严宝刹设计素材
+  license: ai_generated
+  license_status: confirmed
+quality:
+  min_side_px: 1086
+  low_res: false
+  ai_generated: true
+  third_party_watermark: false
+  text_overlay: false
+  notes: AI-generated concept rendering of a modern Zen lobby featuring a backlit bookmatched golden onyx wall, carved dark
+    wood panels, and a rough-hewn stone table.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated

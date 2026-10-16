@@ -1,0 +1,75 @@
+id: 3a72ccdc7e6aca4c
+title_zh: 佛教主题雕花家具套装
+source:
+  original_path: 佛教家具与陈设素材/佛教主题雕花家具套装.jpg
+original:
+  path: 佛教家具与陈设素材/佛教主题雕花家具套装.jpg
+  sha256: 3a72ccdc7e6aca4c047a2a97f5de5385c1e477aaec4fd3e96380a0b117e90ff5
+  bytes: 393917
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3a72ccdc7e6aca4c.jpg
+    sha256: fcc8cfbb1fa14706d7f8344a8626a1978275c95c544ff8f01fe4c86d51ebb1be
+    bytes: 424766
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/3a72ccdc7e6aca4c.webp
+    sha256: cd1c22c16388091149fe2e1ffb073affde0ff4b6c1929e799434ab76a94f8be3
+    bytes: 42876
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: 纯白背景下的藏汉融合皇家寺院级“五佛宝座式”实木嵌石沙发茶几全套家具。与常规平顶沙发不同，本套家具将主沙发与单人位扶手椅的靠背急剧拔高，直接转化为带有多层莲瓣火焰光背的佛陀法座背光形式，使日常会客家具呈现出极强的殿堂神圣感与宗教仪式感。
+materials:
+- 缅甸柚木
+- 红酸枝
+- 碧玉理石
+- 绿松石
+colors:
+- 琥珀金棕配翠绿
+style: 汉藏融合宫廷嵌石风
+ai_design_usage: 宝座式高背宗教家具概念设计 / 佛像浮雕与家具背板融合生成 / 下沉式石材茶几造型参考
+prompt_zh: 纯白背景家具摄影，一套极具宗教威严感的佛教主题高靠背实木雕花沙发茶几套装，红酸枝与琥珀色柚木材质，沙发靠背设计成高耸的多层火焰拱形背光，正中精雕金色毗卢遮那佛坐像，两侧雕刻八辐法轮并镶嵌绿松石与红珊瑚宝珠，坐垫与方形下沉式茶几台面采用碧绿蛇纹大理石，茶几底座满雕描金卷草纹，8K超高清细节。
+tags:
+- 五佛冠造像靠背
+- 宝座式沙发
+- 下沉式石材茶几
+- 红酸枝描金
+- 八辐法轮浮雕
+- 碧玉大理石
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: 豆包AI生成的白底五佛宝座式雕花实木嵌绿石沙发茶几组合，右下角带'豆包AI生成'水印，被误标为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

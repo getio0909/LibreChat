@@ -1,0 +1,75 @@
+id: 65e42acf1d935a7d
+title_zh: 佛教主题展览空间设计-06
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-06.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-06.jpg
+  sha256: 65e42acf1d935a7de9d62804d287268fc02c43cf699e1fa8604d8f7b44a7f073
+  bytes: 3548088
+  width: 3376
+  height: 2530
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/65e42acf1d935a7d.jpg
+    sha256: 8f0838a021988c9d31e936071a0209502d9072c68758f91e9a72bbd33cae06fa
+    bytes: 459751
+    width: 2048
+    height: 1535
+  thumb512:
+    path: assets/thumb512/65e42acf1d935a7d.webp
+    sha256: 7b0ba2a7e6576173001aa13e00bda930940d1a247e1239f303e35424ce661d1e
+    bytes: 41036
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 星空顶浮雕白石柱与千佛殿
+entity_type: 空间场景设计
+summary_zh: 星空深蓝与暖金黄玉 / 白色浮雕八吉祥方柱、彩色千佛柱、黄玉曼荼罗地面
+materials:
+- 米白莱姆石/汉白玉浅浮雕
+- 七彩渐变琉璃千佛柱
+- 松香黄玉石大板
+- 彩色水刀拼花大理石
+- 光纤星空顶
+colors:
+- 米白色
+- 星空墨蓝
+- 橙黄玉色
+- 七彩渐变
+style: 恢弘石雕列柱与星空佛殿风
+ai_design_usage: 佛教大厅米白石材八吉祥浮雕方柱设计 / 星空顶与黄玉地面曼荼罗拼花搭配 / 石材千佛墙立面构成参考
+prompt_zh: 恢弘的佛教主题展览大厅广角室内设计，顶部是深蓝色璀璨星空吊顶，中景矗立三根高大的米白色汉白玉方柱，柱身精雕细琢佛教八吉祥宝伞与吉祥结浅浮雕图案，前景右侧是一根青白紫红渐变发光的琉璃千佛方柱，左侧背景为米白色石材千佛龛墙与镂空石雕隔断，地面铺设高光橙黄色玉石并镶嵌大型圆形彩色曼荼罗水刀拼花，倒影清晰，8k效果图。
+tags:
+- 八吉祥浮雕柱
+- 米白石材方柱
+- 星空顶展厅
+- 曼荼罗地拼
+- 琉璃千佛柱
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2530
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a starry-ceiling Buddhist hall featuring square white stone Eight Auspicious Symbols relief
+    columns and a central rainbow-gradient backlit cylindrical 1000-Buddha pillar.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

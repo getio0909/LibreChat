@@ -1,0 +1,74 @@
+id: 97a1b0a22480aeac
+title_zh: 大型金佛及佛教园林景观
+source:
+  original_path: 佛教空间设计案例/大型金佛及佛教园林景观.jpg
+original:
+  path: 佛教空间设计案例/大型金佛及佛教园林景观.jpg
+  sha256: 97a1b0a22480aeacc42762d50e09d739004a1b60f62756508430f75ee5491fc5
+  bytes: 72810
+  width: 400
+  height: 134
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/97a1b0a22480aeac.jpg
+    sha256: e60905c0273f3fb33a40d3bc6328ca0a0b29bf79a95e4db570e6ed057a9ac1de
+    bytes: 18281
+    width: 400
+    height: 134
+  thumb512:
+    path: assets/thumb512/97a1b0a22480aeac.webp
+    sha256: 9c1ef8ec67a590d586d3246a23becc478bea0d75f901c0f5037ba8d6abae633f
+    bytes: 13754
+    width: 400
+    height: 134
+library_type: 建筑景观
+region: 未知
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 中央矗立汉白玉莲座露天大金佛、后倚传统重檐古建大殿、前设圆形白石莲花喷泉广场并环绕假山跌水与菩提伽耶式佛塔的佛教园林鸟瞰。
+materials:
+- 露天巨型铜鎏金坐佛
+- 汉白玉莲座
+- 重檐歇山顶殿宇
+- 莲花喷泉水景
+- 菩提伽耶式佛塔
+colors:
+- 辉煌金
+- 苍翠绿
+style: 大型佛教文旅景区生态园林风
+ai_design_usage: 大型佛教文化景区鸟瞰规划、露天大金佛与中轴古建群及生态禅意园林统筹参考
+prompt_zh: 超宽全景大型佛教文化景区与生态园林鸟瞰效果图，正中央矗立一尊宏伟的露天铜鎏金释迦牟尼佛坐像，安坐于洁白的汉白玉莲花宝座上，大佛后方为传统青瓦重檐歇山顶大殿，正前方广场设有圆形白色石雕莲花喷泉水景池，左侧为假山跌水与中式亭台绿植园林，右侧耸立一座印度菩提伽耶风格的金色佛塔，洁白和平鸽在空中飞翔，蓝天白云，人间净土氛围，8K景观鸟瞰渲染
+tags:
+- 露天大金佛
+- 佛教园林景观
+- 寺院景区规划
+- 莲花喷泉广场
+- 菩提伽耶佛塔
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 134
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 山顶露天金色大佛与陵园梯田、金刚宝座塔鸟瞰横幅小图（400x134）。分辨率极低，且summary_zh与materials虚构了“前设圆形白石莲花喷泉广场并环绕假山跌水”（实为山林大佛、左侧方形小亭与弧形阶梯墓园、右下角菩提伽耶式塔尖）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 400x134 (<800px short side)'
+  - 分辨率极低（400x134，最短边<768px）
+  - summary_zh、materials、tags存在幻觉（虚构圆形白石莲花喷泉广场与假山跌水）

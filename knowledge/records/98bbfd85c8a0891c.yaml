@@ -1,0 +1,69 @@
+id: 98bbfd85c8a0891c
+title_zh: 石材加工厂内大理石板材展示场景
+source:
+  original_path: 蓝金灰大板自家产品/石材加工厂内大理石板材展示场景.jpg
+original:
+  path: 蓝金灰大板自家产品/石材加工厂内大理石板材展示场景.jpg
+  sha256: 98bbfd85c8a0891c8f02fcb8cbeb90a307e6006996ee93db29515281e7959f06
+  bytes: 865092
+  width: 1706
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/98bbfd85c8a0891c.jpg
+    sha256: 36a81e8f337224bc5d3c49d61be15a66741f118cc0ba79afeedc5a1bd5fcf9db
+    bytes: 462833
+    width: 1706
+    height: 1280
+  thumb512:
+    path: assets/thumb512/98bbfd85c8a0891c.webp
+    sha256: 5915b6d1dc9f37afd746eabf7e8c6b123eeebb5b5f0c4a3cffc24d50b144f424
+    bytes: 39562
+    width: 512
+    height: 384
+library_type: 矿山车间
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 矿山与车间场景
+entity_type: 空间场景设计
+summary_zh: 这是一幅极具匠心纪实感的大型石材精加工车间「蓝金灰」工程板地面连纹预铺与工程师持图审板空间场景图。
+materials:
+- 加工车间实景
+colors:
+- 蓝金灰三列连纹长阵
+- 红毯检验区
+style: 现代工业车间与奢石排版
+ai_design_usage: 大型展厅/佛堂地面大面积斜纹连铺效果参考 / 企业品控与定制服务宣传场景参考 / ControlNet Depth 工业空间纵深构图
+prompt_zh: 广角实景纪实摄影，大型现代化石材精加工车间内部，红色检验地毯上纵向整齐预铺着三列数十块蓝金灰天然奢石大规格板，深浅烟灰蓝与奶油白、琥珀金色带形成连绵不断的45度斜向流云纹理，高光板面反射顶部点阵灯光，左上方两名穿深蓝工装的工程师正手持排版图纸低头核对石材纹路，右侧排列钢制A字大板架，专业工业品质空间。
+tags:
+- 蓝金灰大面积预铺
+- 石材车间场景
+- 工程师持图审板
+- 斜向连纹排版
+- 工程定制品控
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Stone workshop scene showing two engineers with layout drawings inspecting a large vein-matched array of Blue-Gold-Grey
+    tiles on red carpet.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

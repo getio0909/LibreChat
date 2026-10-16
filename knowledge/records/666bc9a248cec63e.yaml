@@ -1,0 +1,79 @@
+id: 666bc9a248cec63e
+title_zh: 青白釉镂空卷叶纹三足熏炉
+source:
+  original_path: 法器供器开放授权实物参考/中国南方-青白釉镂空卷叶纹三足熏炉-aic159683.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/04-中国南方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国南方-青白釉镂空卷叶纹三足熏炉-aic159683.jpg
+  sha256: 666bc9a248cec63eb405bb1ed6dd423efb8fc6248315838e9aad85719595d5a3
+  bytes: 451671
+  width: 2063
+  height: 2250
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/666bc9a248cec63e.jpg
+    sha256: dcb4c44f5e1a48168d0c9e09b3f82d012992506ca1e75f45d7c3c2e891f49657
+    bytes: 409928
+    width: 1878
+    height: 2048
+  thumb512:
+    path: assets/thumb512/666bc9a248cec63e.webp
+    sha256: 407b016688efcefcbc81096809e5cb9d472640b6054ec9fa8154d015489f70bc
+    bytes: 7162
+    width: 469
+    height: 512
+library_type: 法器供器
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 青白釉镂空卷叶纹三足熏炉
+entity_type: 实物对象写实
+summary_zh: 【图中可见】浅青白色熏炉由圆腹与穹顶盖组成，盖面卷叶相接形成镂空孔，器腹有连续瓣状浅凸纹，下承短足。【来源著录】Covered Tripod Incense Burner (Censer) with Foliate Scrolls
+  and Leafy Tendrils；文化或地点依据：来源著录青白窑类型；按南方青白瓷传统归类，来源未注明具体窑址。
+materials:
+- 青白窑瓷
+- 镂空与模印装饰
+colors:
+- 青白色
+style: 中国南方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，浅青白色熏炉由圆腹与穹顶盖组成，盖面卷叶相接形成镂空孔，器腹有连续瓣状浅凸纹，下承短足。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Covered Tripod Incense Burner (Censer) with Foliate Scrolls
+  and Leafy Tendrils. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国南方
+- 开放授权
+- 真实摄影
+- 青白釉镂空卷叶纹三足熏炉
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.artic.edu/artworks/159683
+  download_url: https://www.artic.edu/iiif/2/0d3a48e0-7980-ed19-6c22-02328493e131/full/2063,/0/default.jpg
+  credit: Gift of Dorothy Braude Edinburg to the Harry B. and Bessie K. Braude Memorial Collection
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2063
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

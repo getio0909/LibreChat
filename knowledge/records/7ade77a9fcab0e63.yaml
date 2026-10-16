@@ -1,0 +1,71 @@
+id: 7ade77a9fcab0e63
+title_zh: 现代中式禅意卧室设计
+source:
+  original_path: 佛教空间设计案例/现代中式禅意卧室设计.jpg
+original:
+  path: 佛教空间设计案例/现代中式禅意卧室设计.jpg
+  sha256: 7ade77a9fcab0e637cc2a665a65823d4f468982e3f6ea0bb66eb9480cb452f16
+  bytes: 1912280
+  width: 3452
+  height: 2580
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7ade77a9fcab0e63.jpg
+    sha256: c20405ef173496b33777a00ecd2c5c25c16bb3aa04290f1482855359f9029738
+    bytes: 239090
+    width: 2048
+    height: 1531
+  thumb512:
+    path: assets/thumb512/7ade77a9fcab0e63.webp
+    sha256: dc91fafd3095c934a4b06392abc053f05cc04554540a85ac873c702762256713
+    bytes: 15062
+    width: 512
+    height: 383
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 侧向广角展现的新中式禅意卧室与茶室套房设计，右侧设胡桃木框架大床，左侧配置实木罗汉床茶席、圆形水墨远山挂画与竖向木格栅移门。
+materials:
+- 胡桃木框架大床与罗汉榻
+- 圆形水墨挂画
+- 木格栅推拉门
+- 哑光浅灰石材地砖
+colors:
+- 原木暖棕
+- 米白色
+style: 现代新中式宋氏极简禅意风
+ai_design_usage: 高端寺院上客堂、禅修酒店居士套房、新中式别墅禅意卧房室内软硬装一体化参考
+prompt_zh: 超高清现代新中式禅意卧室与茶室套房室内设计效果图，侧向广角透视，右侧为暖胡桃木框架双人床，米色软包床头背景配两侧竖向木格栅与暖光床头灯；左侧及前景为禅意茶席区，摆放新中式实木罗汉床沙发、方形实木茶几与白瓷茶具，后方留白墙面悬挂一幅圆形水墨山水禅画，画下设中式条案与绿植；左侧为半通透木格栅推拉门，顶部为极简无主灯暗藏暖光灯带吊顶，地面铺设哑光浅灰色石材地砖，静谧雅致，8K室内设计渲染
+tags:
+- 禅意卧室
+- 新中式室内设计
+- 罗汉床茶席
+- 禅修酒店客房
+- 水墨圆画
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2580
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 新中式禅意居室（带双人床与罗汉床沙发，与#283同空间）。summary_zh、materials、tags均将墙面挂画误述为“圆形水墨远山挂画”，实际左侧墙面为竖幅长方形卷轴画、罗汉床上方为横幅长方形框画，全图并无圆形挂画。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - summary_zh、materials、tags存在幻觉（误称圆形水墨挂画，实际为竖幅卷轴画与横幅长卷画）

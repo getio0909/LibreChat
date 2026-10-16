@@ -1,0 +1,72 @@
+id: c53303fbecb2a2de
+title_zh: 佛教石制立柱式装饰灯
+source:
+  original_path: 佛教空间设计案例/佛教石制立柱式装饰灯.jpg
+original:
+  path: 佛教空间设计案例/佛教石制立柱式装饰灯.jpg
+  sha256: c53303fbecb2a2de6cbb4b10b194907ac3d835b5ba22df59457bf4cb9634a579
+  bytes: 849359
+  width: 1254
+  height: 2658
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c53303fbecb2a2de.jpg
+    sha256: 31a006d6cfb2b9fe07b68849c883db4ab4d012e403db77be273b6e9be4fcada1
+    bytes: 182579
+    width: 966
+    height: 2048
+  thumb512:
+    path: assets/thumb512/c53303fbecb2a2de.webp
+    sha256: 409da82b3dddd568932151fc4712608c8d06f7f503bdecff616e7f96754cf3d4
+    bytes: 9452
+    width: 242
+    height: 512
+library_type: 法器供器
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 传统寺院六角亭式石雕/木雕落地宫灯构件
+entity_type: 实物对象写实
+summary_zh: 本图为陈设于传统佛教殿堂佛坛两侧或回廊通道旁的单体“六角亭阁式立柱落地宫灯（供灯/长明灯）”写实特写。器型仿造中国传统六角攒尖顶亭阁古建筑，兼具殿堂辅助照明与宗教“燃灯供佛、破除愚痴”的礼仪陈设功能。 宫灯主体采用暖红棕色（紫檀色/红砂岩色）致密石材或名贵硬木精雕而成，表面呈温润的半哑光质感；上部灯室六面镶嵌金色菱形斜方格镂空花窗与半透明暖黄仿羊皮灯罩，内部点亮2700K暖黄光源，光影透过格栅柔和溢出。
+materials:
+- 红木
+- 褐石精雕
+- 镂空花格灯窗
+colors:
+- 暖红棕色
+- 柔和暖黄灯光
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统佛殿佛坛两侧落地宫灯单品植入 / 中式六角亭阁式石灯笼/木宫灯三维建模与生图参考 / 佛教陈设器具局部替换(Inpainting)；推荐搭配：红砂岩/紫檀木精雕灯体 + 黄铜鎏金菱形花格窗棂 +
+  仿羊皮透光云石灯片 + 2400K暖烛光LED光源
+prompt_zh: 中国传统佛教寺院室内立柱式六角亭阁造型落地装饰宫灯单品特写，暖红棕色木石雕刻材质，三段式结构：底部为稳重的六角形覆斗状斜坡台基与仰覆莲花束腰座；中部为挺拔的圆柱形灯杆；上部为六角攒尖顶古建亭式灯笼，屋顶冠有莲花摩尼宝珠顶刹，六个翘起檐角下悬挂流苏小铃铛，六面灯窗镶嵌精细的金色菱形花格镂空窗棂，内部透出温暖柔和的黄色灯光，造型古朴典雅，高清产品写实渲染。
+tags:
+- 六角亭式宫灯
+- 佛教落地装饰灯
+- 石制立柱灯笼
+- 传统佛殿陈设
+- 中式长明供灯
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1254
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统佛殿内六角亭阁式立柱落地宫灯局部三维渲染图，原标注误定为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'subject_mismatch: 图像实为三维室内设计渲染图中的灯具局部裁切，而非entity_type所标的“实物对象写实”'

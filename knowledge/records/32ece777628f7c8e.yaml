@@ -1,0 +1,80 @@
+id: 32ece777628f7c8e
+title_zh: 大足北山火焰背屏莲座佛坐像
+source:
+  original_path: 造像雕塑开放授权实物参考/中国南方-大足北山火焰背屏莲座佛坐像-commons153662089.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/04-中国南方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国南方-大足北山火焰背屏莲座佛坐像-commons153662089.jpg
+  sha256: 32ece777628f7c8e5d7e7121ca6bf58a1196667f9e51e85d47d3b5ee7112e97c
+  bytes: 2535120
+  width: 3840
+  height: 2560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/32ece777628f7c8e.jpg
+    sha256: 344a171450c9b4f315438511d5c8cc6ff7cf1cec71b062069744a921f88ca245
+    bytes: 566002
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/32ece777628f7c8e.webp
+    sha256: a22560abe5fd99e878781ed3c0284e1b42290fee18d780f3d6f61e3824086835
+    bytes: 22874
+    width: 512
+    height: 341
+library_type: 造像雕塑
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 大足北山火焰背屏莲座佛坐像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】中央卷发佛像盘坐于大莲瓣座上，右手屈举于身前，左手下垂扶膝，背后火焰形尖拱光背包围头身，两旁有小型立像和上部飞举人物。【来源著录】Dazu Rock Carvings - Beishan 大足石刻-北山摩崖造像,
+  Chongqing, 2023 (53669202062).jpg；文化或地点依据：来源记为重庆大足北山摩崖造像，照片摄于2023年；不据通用地点说明确定本龛编号、尊名和制作年代。
+materials:
+- 石材及残存表面饰层（图中可见）
+colors:
+- 灰褐色
+- 金色
+- 红褐色
+style: 中国南方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，中央卷发佛像盘坐于大莲瓣座上，右手屈举于身前，左手下垂扶膝，背后火焰形尖拱光背包围头身，两旁有小型立像和上部飞举人物。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Dazu Rock Carvings - Beishan 大足石刻-北山摩崖造像, Chongqing, 2023
+  (53669202062).jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 中国南方
+- 开放授权
+- 真实摄影
+- 大足北山火焰背屏莲座佛坐像
+- CC BY-SA 2.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Dazu_Rock_Carvings_-_Beishan_%E5%A4%A7%E8%B6%B3%E7%9F%B3%E5%88%BB-%E5%8C%97%E5%B1%B1%E6%91%A9%E5%B4%96%E9%80%A0%E5%83%8F,_Chongqing,_2023_(53669202062).jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Dazu_Rock_Carvings_-_Beishan_%E5%A4%A7%E8%B6%B3%E7%9F%B3%E5%88%BB-%E5%8C%97%E5%B1%B1%E6%91%A9%E5%B4%96%E9%80%A0%E5%83%8F%2C_Chongqing%2C_2023_%2853669202062%29.jpg/3840px-Dazu_Rock_Carvings_-_Beishan_%E5%A4%A7%E8%B6%B3%E7%9F%B3%E5%88%BB-%E5%8C%97%E5%B1%B1%E6%91%A9%E5%B4%96%E9%80%A0%E5%83%8F%2C_Chongqing%2C_2023_%2853669202062%29.jpg
+  credit: JL Cogburn; Dazu Rock Carvings - Beishan 大足石刻-北山摩崖造像, Chongqing, 2023
+  license: cc-by-sa-2.0
+  license_url: https://creativecommons.org/licenses/by-sa/2.0
+  license_status: confirmed
+quality:
+  min_side_px: 2560
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

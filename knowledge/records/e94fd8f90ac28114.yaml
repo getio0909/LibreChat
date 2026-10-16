@@ -1,0 +1,80 @@
+id: e94fd8f90ac28114
+title_zh: 成都文殊院云形悬挂铜板
+source:
+  original_path: 法器供器开放授权实物参考/中国南方-成都文殊院云形悬挂铜板-commons51965068.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/04-中国南方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国南方-成都文殊院云形悬挂铜板-commons51965068.jpg
+  sha256: e94fd8f90ac28114ab3cac980f2e94ab5bbba6e37d747fc0f5c68ae913ae8789
+  bytes: 1476697
+  width: 1920
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e94fd8f90ac28114.jpg
+    sha256: 2ce7be6e6c340c6540a69c1eff6c02ca74426e928da958af7f97853805ba717d
+    bytes: 708172
+    width: 1365
+    height: 2048
+  thumb512:
+    path: assets/thumb512/e94fd8f90ac28114.webp
+    sha256: 32dfb9f2d14a3fbcaea18007eff90d3335d501b5f7a838001c1386035e504941
+    bytes: 26556
+    width: 341
+    height: 512
+library_type: 法器供器
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 成都文殊院云形悬挂铜板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】大块灰绿色悬板以顶部外扩和两侧内卷形成云形轮廓，正中纵列铭文，下部为圆形金色凸点，边缘有连续凸线。【来源著录】Bronze - Wenshu Monastery - Chengdu, China - DSC05233.jpg；文化或地点依据：来源题名仅记为成都文殊院
+  Bronze；本条按可见云形悬板记录，不据照片推定具体使用仪轨。
+materials:
+- 铜质器（来源题名 Bronze）
+colors:
+- 灰绿色
+- 金色
+- 深褐色
+style: 中国南方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，大块灰绿色悬板以顶部外扩和两侧内卷形成云形轮廓，正中纵列铭文，下部为圆形金色凸点，边缘有连续凸线。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Bronze - Wenshu Monastery - Chengdu, China - DSC05233.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国南方
+- 开放授权
+- 真实摄影
+- 成都文殊院云形悬挂铜板
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Bronze_-_Wenshu_Monastery_-_Chengdu,_China_-_DSC05233.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Bronze_-_Wenshu_Monastery_-_Chengdu%2C_China_-_DSC05233.jpg/1920px-Bronze_-_Wenshu_Monastery_-_Chengdu%2C_China_-_DSC05233.jpg
+  credit: Daderot; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 1920
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

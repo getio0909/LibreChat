@@ -1,0 +1,73 @@
+id: a483b536fd1d64bf
+title_zh: 佛教彩绘菩萨雕像
+source:
+  original_path: 25年秋季佛事展设计方案/佛教彩绘菩萨雕像.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教彩绘菩萨雕像.jpg
+  sha256: a483b536fd1d64bf6e80d9042053e7aa3b7cb264c35bb51825606c8e8ee571b8
+  bytes: 4270247
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a483b536fd1d64bf.jpg
+    sha256: 9d3d1ada7f8ae06b2c6991f4c3023a0f5535a88b2c265fc5a75faae1e2444777
+    bytes: 878507
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/a483b536fd1d64bf.webp
+    sha256: 2cf739aef36f2815106fa5cff581ae750defbed59e65a024aa5b7e0503f61aa0
+    bytes: 52564
+    width: 288
+    height: 512
+library_type: 造像雕塑
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛事展展位方案
+category_l2: 佛像造像-彩绘阿弥陀佛立像
+entity_type: 实物对象写实
+summary_zh: 本图为展位后方主背景墙前供奉的西方三圣主尊——汉传极细彩绘描金阿弥陀佛接引立像（配青绿镂空卷草莲花大背光）正面半身至全身特写。造像融合了唐代丰满端庄的体态与明清宫廷“极彩泥金/描金漆画”的繁复装饰工艺。
+materials:
+- 贴金彩绘木雕/树脂
+- 金镶玉背板
+colors:
+- 朱红
+- 石青
+- 石绿
+- 描金
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 汉传佛教极细彩绘贴金佛像与青绿镂空卷草背光单品设计参考
+prompt_zh: 汉传佛教极彩描金阿弥陀佛接引立像正面特写，佛像螺发肉髻，面相丰满慈悲，双目微垂，胸前佩戴精致金璎珞，左手托碧玉莲花台，右手自然下垂结接引印；身披华丽的朱红、石蓝与玄黑拼接百衲格纹福田袈裟，衣面上以纯金线极细勾勒祥云、海水与团花纹样；脑后有金色圆形头光，外围环绕巨大的舟形全镂空石绿色卷草纹与紫蓝描金莲花大背光；背景为竖向黑色金属条分缝的暖金色天然金镶玉大理石奢石墙面，色彩浓郁古雅，敦煌岩彩与宫廷造像质感，8K超高清文物摄影。
+tags:
+- 阿弥陀佛立像
+- 彩绘描金佛像
+- 青绿镂空背光
+- 西方三圣
+- 金镶玉背景墙
+- 佛教造像艺术
+material_ids:
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展金镶玉奢石背景墙前供奉的极彩描金阿弥陀佛接引立像正面特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

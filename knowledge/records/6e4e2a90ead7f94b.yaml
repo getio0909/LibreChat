@@ -1,0 +1,74 @@
+id: 6e4e2a90ead7f94b
+title_zh: 佛教禅修厅室内设计场景
+source:
+  original_path: 佛教空间设计案例/佛教禅修厅室内设计场景.jpg
+original:
+  path: 佛教空间设计案例/佛教禅修厅室内设计场景.jpg
+  sha256: 6e4e2a90ead7f94bff0d15ee9407942fa209de95a0ea49d8b5347e50975e5395
+  bytes: 3013467
+  width: 3349
+  height: 2519
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6e4e2a90ead7f94b.jpg
+    sha256: 453211ca7281649ea05d59691ea34e5cbe65c19a5e55ddd69737836a70b44870
+    bytes: 364377
+    width: 2048
+    height: 1540
+  thumb512:
+    path: assets/thumb512/6e4e2a90ead7f94b.webp
+    sha256: 722226c07820b7f5844df23a5752e006828fea31cf5ee31e205368ff7d855115
+    bytes: 30642
+    width: 512
+    height: 385
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代大跨度禅修堂斜视场景与金色莲花蒲团阵列
+entity_type: 空间场景设计
+summary_zh: 本图为大型现代佛教禅修大厅/共修讲堂的斜向对角线广角场景（与第 07 张正面中轴图形成完整空间立体表达）。该视角以近景地面成百上千个明黄色莲花蒲团阵列与右侧粗壮的鎏金铜套石柱为视觉引导，生动展现了超大型现代禅堂的恢宏气度与秩序美学。
+  近景特写清晰展示了四大核心材质细节：①地面铺装：大规格浅灰色云纹大理石高光板材，反射出柔和的蒲团与天幕光影；②禅修蒲团：高密度圆柱形海绵外包明黄色棉麻/丝绒布料，顶面居中印制精致的深褐色双层八瓣莲花团花图案；③承重巨柱：上部为暖灰褐色石材圆柱，下部包嵌一圈高浮雕24K鎏金缠枝宝相莲…
+materials:
+- 浅灰云纹大理石
+- 印莲花蒲团
+- 鎏金铜浮雕
+colors:
+- 明黄蒲团
+- 浅灰大理石
+- 暖白光幕
+- 鎏金柱套
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：现代大型禅修堂斜向对角线空间构图参考 / 印莲花纹明黄色圆形禅修蒲团单品与矩阵生成 / 圆柱鎏金浮雕铜柱套与石材柱础细部设计；推荐搭配：帕斯高灰/云多拉灰大理石地面 + 定制明黄色印莲花圆形禅修蒲团
+  + 24K鎏金铜浮雕柱套配青石覆莲柱础 + 白色GRG层叠莲花发光佛龛
+prompt_zh: 现代大型佛教禅修厅室内斜向广角透视场景，浅灰色高光云纹大理石地面上，成百上千个明黄色圆柱形禅修蒲团按严谨矩阵排列，近景蒲团顶面清晰印有精致的莲花团花图案；画面右侧前景与中景矗立粗壮的圆柱，柱身下部包嵌精雕细琢的鎏金缠枝莲花纹铜柱套，下承青石高浮雕覆莲柱础；右远方主佛坛设有一座巨大的多层盛开白玉莲花瓣形内发光佛龛，内部端坐纯白汉白玉释迦牟尼佛像，前设实木雕花供桌；顶部为现代斜向折板式白色条形发光天幕吊顶，空间宏大澄明，8K超高清建筑渲染。
+tags:
+- 现代禅修大厅
+- 莲花蒲团阵列
+- 鎏金浮雕柱套
+- 层叠莲花佛龛
+- 大跨度佛教空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2519
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代禅意空间八角门洞、折扇形水墨格栅屏风与蒲团打坐区渲染图，画面干净无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

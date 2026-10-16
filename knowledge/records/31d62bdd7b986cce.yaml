@@ -1,0 +1,79 @@
+id: 31d62bdd7b986cce
+title_zh: 山西司马金龙墓莲瓣蟠龙石柱础
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-山西司马金龙墓莲瓣蟠龙石柱础-commons35404727.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-山西司马金龙墓莲瓣蟠龙石柱础-commons35404727.jpg
+  sha256: 31d62bdd7b986cce30c4691d0d94890d6f6a04bbb7b4029817aec3e3fb9eac65
+  bytes: 1790221
+  width: 2592
+  height: 1936
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/31d62bdd7b986cce.jpg
+    sha256: 816ce96a99aaec5fbce98f38d9887abf6b69aa5e86f1cf8d486b388634dba05d
+    bytes: 556076
+    width: 2048
+    height: 1530
+  thumb512:
+    path: assets/thumb512/31d62bdd7b986cce.webp
+    sha256: 17ab970e3e01384d3746150515137748f4a4d4589b372da033308d0d13940be0
+    bytes: 27998
+    width: 512
+    height: 382
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 山西司马金龙墓莲瓣蟠龙石柱础
+entity_type: 实物对象写实
+summary_zh: 【图中可见】圆鼓形柱础中心开圆孔，顶层绕孔作环带与莲瓣，外壁以盘曲长身兽纹组成浮雕带，下接方形底板。【来源著录】Shanxi Museum - stone carved pillar base.JPG；文化或地点依据：Commons
+  明确著录北魏石雕柱础，山西大同石家寨村司马金龙墓出土。
+materials:
+- 石材（具体岩种未注明）
+colors:
+- 灰白
+- 浅褐
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，圆鼓形柱础中心开圆孔，顶层绕孔作环带与莲瓣，外壁以盘曲长身兽纹组成浮雕带，下接方形底板。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Shanxi Museum - stone carved pillar base.JPG. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 山西司马金龙墓莲瓣蟠龙石柱础
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Shanxi_Museum_-_stone_carved_pillar_base.JPG
+  download_url: https://upload.wikimedia.org/wikipedia/commons/c/cf/Shanxi_Museum_-_stone_carved_pillar_base.JPG
+  credit: Underbar dk; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1936
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

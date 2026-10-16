@@ -1,0 +1,75 @@
+id: a8ffe9b14cb87351
+title_zh: 佛教藻井装饰结构
+source:
+  original_path: 佛堂空间设计参考/佛教藻井装饰结构.jpg
+original:
+  path: 佛堂空间设计参考/佛教藻井装饰结构.jpg
+  sha256: a8ffe9b14cb87351ae695e734dfbc7c5b0e9813a8da0e6f372428b0adceea3dd
+  bytes: 147786
+  width: 690
+  height: 690
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a8ffe9b14cb87351.jpg
+    sha256: dd422bc8d73f54080db4d76897d82e671011b69d0ebcec1801f4324fe19864dd
+    bytes: 158242
+    width: 690
+    height: 690
+  thumb512:
+    path: assets/thumb512/a8ffe9b14cb87351.webp
+    sha256: 2ecac8589e9cdd11c9b5db28145511276bda84ed395e4ff45079571747143c4d
+    bytes: 69162
+    width: 512
+    height: 512
+library_type: 建筑景观
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 纹样
+category_l1: 佛堂空间参考
+category_l2: 建筑木石构件
+entity_type: 实物对象写实
+summary_zh: 中国传统佛教寺院大殿八角重层斗拱彩绘藻井垂直仰视构件特写，外方内八角再收束为中心发光千叶莲花曼荼罗圆顶，十六道放射状橘红斗拱层层悬挑，四角饰金绿凤凰角花。
+materials:
+- 传统木作榫卯斗拱
+- 青绿旋子重彩贴金彩画
+- 木雕凤凰角花
+- 浮雕莲花曼荼罗顶心
+colors:
+- 粉青石绿
+- 橘红
+- 明黄鎏金
+- 象牙白
+style: 传统汉传宫殿式
+ai_design_usage: 传统大雄宝殿/中式佛堂顶部藻井构件建模与贴图提取、佛龛顶部八角穹顶设计、曼荼罗中心对称图案生成
+prompt_zh: 中国传统佛教寺院大殿八角斗拱彩绘藻井垂直仰视特写，严格中心对称的正方形构图，外方内八角再收束为中心圆顶的“天圆地方”木构榫卯结构，外圈为青绿冷色调传统彩绘梁枋与十字斗拱，中间八角形结构由十六道放射状橘红与翠绿相间的斗拱层层向内悬挑叠涩，四角镶嵌展翅飞翔的金黄色与翠绿色木雕凤凰角花，正中央为温暖发光的圆形千叶莲花曼荼罗浮雕顶心，极其繁复华丽的东方古建木作工艺，8K超高清
+tags:
+- 实物对象写实
+- 佛教藻井
+- 八角斗拱
+- 古建筑彩画
+- 天圆地方
+- 木作穹顶构件
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 690
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统寺院外方内八角斗拱彩绘莲花藻井垂直仰视实景，分辨率偏低（690×690）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

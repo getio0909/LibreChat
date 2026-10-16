@@ -1,0 +1,71 @@
+id: bf56cfaf848ffdb4
+title_zh: 佛教寺庙大殿内部佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部佛像展示场景.jpg
+  sha256: bf56cfaf848ffdb4ea9afcab0ac3f3d1c399baf93259894778c771f318ac03e8
+  bytes: 3498961
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bf56cfaf848ffdb4.jpg
+    sha256: fd1d0964ebcfeefa65eeafc864d0dd607323fb935ede185f22ed31372ee502bc
+    bytes: 639944
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/bf56cfaf848ffdb4.webp
+    sha256: 24d0b9adf84dbad4dfb3c59adc38afe3cc17f8c7d94f9f56dd06d37639e017e6
+    bytes: 37662
+    width: 512
+    height: 362
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 本图为当代“黑金新中式”木构与三联透光奢石玉屏风融合的大雄宝殿展示场景（空间场景设计）。
+materials:
+- 乌木黑漆描金梁架斗拱与立柱
+- 三联式冰花玉/山水纹透光奢石屏风
+- 汉白玉须弥座
+- 古铜鎏金坐佛
+colors:
+- 乌木黑
+- 冰玉青白
+style: 当代东方黑金新中式先锋风
+ai_design_usage: 当代黑金新中式佛殿先锋空间设计、三联式半透明奢石玉石屏风背板应用、黑漆描金木构与汉白玉佛台冷暖对比
+prompt_zh: 极具东方先锋美学的黑金新中式佛教大殿室内场景，正面中轴对称构图，大殿梁架、层叠斗拱、井字藻井与高大圆柱均采用深邃的乌木黑漆配精致金色描金花纹，圆柱柱身包镶三道黑金缠枝莲铜箍并立于深灰石雕莲花柱础上，大殿正中央设一座洁白无瑕的汉白玉精雕须弥座佛坛，供奉一尊古铜鎏金释迦牟尼坐佛（带镂空火焰背光），佛像背后竖立一座中扇高两侧低的三联式半透明青白山水纹冰花玉奢石透光屏风（配金色金属边框），后方为中式黑色木格栅门窗，深灰镜面石材地面，冷峻神秘，禅意高雅，8K超高清渲染
+tags:
+- 黑金新中式佛殿
+- 透光奢石屏风
+- 冰花玉背景墙
+- 汉白玉须弥座
+- 乌木描金斗拱
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 当代黑金新中式木构大殿配汉白玉须弥座与三联冰花玉奢石屏风超清三维效果图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

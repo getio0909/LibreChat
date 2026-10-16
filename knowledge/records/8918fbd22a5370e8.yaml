@@ -1,0 +1,72 @@
+id: 8918fbd22a5370e8
+title_zh: 佛教寺庙内部空间设计
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内部空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内部空间设计.jpg
+  sha256: 8918fbd22a5370e827f3cc821e3a0d930c9062475f1e6f67392d939855bcfa63
+  bytes: 1037996
+  width: 1954
+  height: 1354
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8918fbd22a5370e8.jpg
+    sha256: bd0e57a5fcf956391cbce96df8b330c730a91f5228860b315200ba29380cf7a4
+    bytes: 290198
+    width: 1954
+    height: 1354
+  thumb512:
+    path: assets/thumb512/8918fbd22a5370e8.webp
+    sha256: d1eca4a9cf73d9c49931cd5445e5894df5a9a2c3fbf76e8b804b202b44df167c
+    bytes: 26248
+    width: 512
+    height: 355
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为多进式传统佛殿内部回廊、护法壁画墙与分殿隔断空间设计（空间场景设计，本卷第33号为其正视中轴全景）。
+materials:
+- 高光灰褐水墨纹大理石
+- 深棕实木梁柱配青白石柱础
+- 万字纹木格栅隔扇
+- 发光重彩护法壁画
+- 弧形千佛墙
+colors:
+- 深木棕
+- 灰褐色
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 多进式复合佛殿回廊穿插空间设计、木格栅隔断框景构图、重彩护法壁画与发光千佛廊结合参考
+prompt_zh: 传统佛教寺庙多进式内部空间设计，斜向纵深透视构图，地面满铺高光深灰褐色水墨纹理大理石大板，倒影清晰，两排深棕色实木方柱下承高大的青白石多层莲花须弥座柱础，左侧木墙镶嵌多幅发光的中国传统工笔重彩四大天王护法壁画，走廊尽端为弧形排列的金色发光千佛墙，右侧通过半开的万字纹镂空木格栅屏风门透视出分殿内供奉的金身菩萨立像与壁画，顶部为蓝底星空金色井字格藻井天花，层次丰富，8K建筑渲染
+tags:
+- 多进式佛殿
+- 木格栅屏风隔断
+- 青白石须弥柱础
+- 发光护法壁画
+- 框景透视构图
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1354
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 多进式传统佛殿回廊、木格栅隔扇与护法壁画墙斜向三维效果图，左下角带半透明莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

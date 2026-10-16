@@ -1,0 +1,79 @@
+id: 040ad0ae2e82a17c
+title_zh: 北齐镂空飞天与龙首造像碑
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-北齐镂空飞天与龙首造像碑-met39757.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-北齐镂空飞天与龙首造像碑-met39757.jpg
+  sha256: 040ad0ae2e82a17c604c65127ef3f726d7d315a598ac25e0404a3d50210856a1
+  bytes: 2082112
+  width: 3001
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/040ad0ae2e82a17c.jpg
+    sha256: 6e03263f8da29cc54ecb78fb4a00d5aa603d7936fd6d30536b83223e665498ff
+    bytes: 458041
+    width: 1537
+    height: 2048
+  thumb512:
+    path: assets/thumb512/040ad0ae2e82a17c.webp
+    sha256: 8c862f3730eedd8236778fc65709d11268f48cab51ecc05174b67e1d55f2ed63
+    bytes: 20996
+    width: 384
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 北齐镂空飞天与龙首造像碑
+entity_type: 实物对象写实
+summary_zh: 【图中可见】灰白泛红石碑中部为佛与两胁侍，背屏镂空，两侧龙首上承弧形龛楣，上方有飞天与飘带。【来源著录】Votive stele with Buddha and bodhisattvas；文化或地点依据：馆方著录为中国北齐；以北齐造像碑的北方文化体系归类。
+materials:
+- 石灰岩
+- 颜料与贴金残迹
+colors:
+- 灰白色
+- 红色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，灰白泛红石碑中部为佛与两胁侍，背屏镂空，两侧龙首上承弧形龛楣，上方有飞天与飘带。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Votive stele with Buddha and bodhisattvas. Preserve the
+  visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北齐镂空飞天与龙首造像碑
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/39757
+  download_url: https://images.metmuseum.org/CRDImages/as/original/DP164057.jpg
+  credit: Gift of Enid A. Haupt, 1997
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3001
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

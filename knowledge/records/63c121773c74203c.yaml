@@ -1,0 +1,77 @@
+id: 63c121773c74203c
+title_zh: 佛教室内供奉空间设计
+source:
+  original_path: 佛教空间设计案例/佛教室内供奉空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教室内供奉空间设计.jpg
+  sha256: 63c121773c74203cdaf0628214f2cadd0f5a4ed2d44392265e4b011725dc2c57
+  bytes: 3885298
+  width: 4370
+  height: 2636
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/63c121773c74203c.jpg
+    sha256: f8d2e4e40797132fe33fb6da5764cc8d629a1683519076c9aa51c2191462d02f
+    bytes: 368379
+    width: 2048
+    height: 1235
+  thumb512:
+    path: assets/thumb512/63c121773c74203c.webp
+    sha256: 9fbba2aa1fb64c5af8a61d95d061d5e85881753bbf207487619e534c45b2185c
+    bytes: 26006
+    width: 512
+    height: 309
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 中式居家与会所佛堂
+entity_type: 空间场景设计
+summary_zh: 浅灰大理石地面配金色九宫格藻井、正中海棠框发光莲瓣龛供奉地藏菩萨、右墙挂“静·悟·禅”水墨三联画的新中式佛堂。
+materials:
+- 浅灰大理石地面
+- 海棠形发光莲花龛
+- 红木六角宫灯
+- 鎏金地藏菩萨像
+- 水墨三联挂画
+- 九宫格金色藻井
+colors:
+- 浅灰色
+- 深红木色
+- 辉煌金
+- 纯白色
+- 明黄色
+style: 新中式雅致居家佛堂风
+ai_design_usage: 新中式居家/精舍佛堂室内设计、浅灰石材地面与中式木作佛龛搭配、禅意书画软装配置参考
+prompt_zh: 新中式佛教室内供奉空间设计，正中红木落地罩内设海棠形边框与多层发光金色莲花瓣背光佛龛，供奉一尊金身地藏菩萨坐像，前方摆放红木雕花供桌、浅色地席与三个明黄色圆蒲团，两侧对称立两盏古典红木六角落地宫灯，左侧为中式木格栅窗，右侧白墙悬挂三幅题有“静、悟、禅”三字的水墨山水禅意三联画，浅灰色纹理大理石地面，顶部金色九宫格藻井配回纹灯带，清雅庄严，8K室内效果图
+tags:
+- 新中式佛堂
+- 海棠形佛龛
+- 静悟禅挂画
+- 六角宫灯
+- 浅灰大理石
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2636
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a neo-Chinese Buddhist shrine room featuring a begonia-framed backlit lotus niche with a golden Ksitigarbha
+    statue, flanked by miniature niche cabinets and a '静·悟·禅' ink triptych.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

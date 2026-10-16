@@ -1,0 +1,72 @@
+id: 00b9d9083badd7e4
+title_zh: 藏传佛教雕刻展台
+source:
+  original_path: 佛教家具与陈设素材/藏传佛教雕刻展台.jpg
+original:
+  path: 佛教家具与陈设素材/藏传佛教雕刻展台.jpg
+  sha256: 00b9d9083badd7e4b34e91f9c2ecd7fa6688d473b6aebc7687fce054ebb2ff76
+  bytes: 393609
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/00b9d9083badd7e4.jpg
+    sha256: 608facf8d2beaa618ea32d9796216abbf2e1692767324e3bcd686291f5f92c1d
+    bytes: 424135
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/00b9d9083badd7e4.webp
+    sha256: 477979d91794fe628cfb731638efbc6515e48df8d8502e6f198c077ba686cb43
+    bytes: 41650
+    width: 384
+    height: 512
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 展厅正面全景实拍的一套寺院大殿级全配置藏传佛教高僧大法座装置（Full-Scale Monastic Dharma Throne Ensemble with Side Pulpit and Stairs）。相比第 26
+  项，本套装置不仅尺幅更高、雕工更立体饱满，而且完整包含了中央主法座与经案、左侧高脚侍从经台（配S形双龙戏莲腿）、右侧四级实木登座扶手木梯，是极其难得的完整法台工程实物范本。
+materials:
+- 实木圆雕浮雕
+- 重彩描金
+- 实木台阶
+colors:
+- 金棕红配明黄哈达
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 寺院大经堂/讲经堂核心法座全套装置设计 / 六拏具与双雪狮须弥座高精细节参考 / 佛堂主视觉中心建模
+prompt_zh: 展厅正面全景实景摄影，一套殿堂级全配置藏传佛教高僧大法座与经案装置，金棕色实木重彩描金雕刻，后方高耸背光顶雕朱红金翅大鹏鸟并披挂橙黄花环，两侧精雕天女、摩羯鱼、骑马护法与雪狮，背光中心嵌大型彩色莲花曼陀罗圆盘，中部经案雕刻双鹿法轮，下部须弥座深浮雕两尊立体白雪狮与十字金刚杵，左侧配双宝马浮雕高脚侍从台，右侧配四级实木登座台阶，顶部轨道射灯聚焦，8K超高清。
+tags:
+- 藏传大法座
+- 六拏具全套
+- 双雪狮须弥座
+- 双鹿法轮经案
+- 带木梯法台
+- 金翅大鹏鸟背光
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a full-scale Tibetan monastic dharma throne assembly with Garuda halo, deer-and-wheel
+    sutra desk, snow-lion sumeru base, side pulpit, and wooden stairs.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

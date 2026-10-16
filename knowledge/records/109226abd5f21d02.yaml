@@ -1,0 +1,73 @@
+id: 109226abd5f21d02
+title_zh: 佛教殿堂佛像陈设场景
+source:
+  original_path: 佛教空间设计案例/佛教殿堂佛像陈设场景.jpg
+original:
+  path: 佛教空间设计案例/佛教殿堂佛像陈设场景.jpg
+  sha256: 109226abd5f21d02a27097b9516151b1aa4cc552151593faaa008c6e1b8aec4a
+  bytes: 4884568
+  width: 3748
+  height: 2629
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/109226abd5f21d02.jpg
+    sha256: 10c5d698b5f8ec50f9167cbff78b37f3f4097105cb08a36816e0c12e2f450c3a
+    bytes: 613458
+    width: 2048
+    height: 1437
+  thumb512:
+    path: assets/thumb512/109226abd5f21d02.webp
+    sha256: 4305396e53470e2f5fdaa05c18ecb1f200b7fb77a6fd0aa12274a7d76f47adb5
+    bytes: 53058
+    width: 512
+    height: 359
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 藏汉融合金碧盘龙柱三世佛与大威德金刚佛殿场景
+entity_type: 空间场景设计
+summary_zh: 本图为一座气势磅礴的汉藏融合（显密双修）大雄宝殿正面主佛坛陈设全景。空间将汉传佛教经典的“三世佛 + 二弟子”五尊造像体系与藏传佛教无上瑜伽部本尊“大威德金刚（或时轮金刚）双身忿怒尊”及藏式法座、经堂坐垫融为一体，呈现出极尽庄严华美、显密圆融的宗教殿堂气象。
+  全殿主佛坛通体采用高纯度24K贴金木雕/铜雕工艺，散发出耀眼夺目的赤金光泽；主尊正前方的密宗护法本尊采用藏传唐卡式矿物重彩（深邃宝蓝身色、五骷髅冠、多臂持法器、下踏莲台）塑造；法座与前排四列经箱坐垫采用纯正的藏式朱红/大红漆艺，绘制金彩八吉祥与雪狮团花图案…
+materials:
+- 贴金木雕盘龙柱
+- 金身佛像
+- 彩绘忿怒尊
+colors:
+- 赤金辉煌
+- 藏红法座
+- 忿怒宝蓝
+style: 藏汉融合金碧传统佛教殿堂风格
+ai_design_usage: 适用场景：藏传/汉藏融合寺院主佛坛正面立面设计 / 贴金盘龙柱三开间大佛龛与大背光参考 / 显密双修佛殿供具与法会坐垫陈设生成；推荐搭配：全贴金木雕盘龙柱三开间佛龛 + 锻铜贴金三世佛坐像 + 藏式重彩密宗本尊造像
+  + 朱红描金藏式法座与经垫 + 深色镜面大理石地面
+prompt_zh: 金碧辉煌的汉藏融合佛教大殿正面主佛坛陈设全景，严格中轴对称构图，后方高大贴金雕花须弥座上矗立四根立体贴金盘龙巨柱构成的三开间大佛龛，三间内并列供奉三尊大型金身结跏趺坐佛，每尊背后有繁复镂空的金色大舟形火焰背光，中央主佛两侧侍立阿难与迦叶金身立像；主尊正前方红色藏式雕花高法座上供奉一尊蓝身多臂忿怒尊（大威德金刚）彩绘雕像；台沿摆放一排藏式八供，台下木地板与藏毯上对称排列四列红色吉祥图案法会坐垫箱，前景为高光深色大理石地面，富丽堂皇，8K超高清效果图。
+tags:
+- 汉藏融合佛殿
+- 贴金盘龙柱
+- 三世佛金身造像
+- 大威德金刚造像
+- 藏式法座陈设
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2629
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 藏汉融合四根贴金盘龙柱、三世佛二弟子与中央大威德金刚忿怒尊及藏式红漆法座陈设全景三维效果图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

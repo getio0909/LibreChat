@@ -1,0 +1,75 @@
+id: 8dda1918ca6fcf1f
+title_zh: 佛教风格石材家具套装
+source:
+  original_path: 佛教家具与陈设素材/佛教风格石材家具套装.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格石材家具套装.jpg
+  sha256: 8dda1918ca6fcf1fd973eccf42eeefb68c9836342a66dcbf62e2a1cb8e2ea2e5
+  bytes: 221003
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8dda1918ca6fcf1f.jpg
+    sha256: dab655f26b7bb8873d0cc44f0d2aeb973cd59019886b6fd471fc2165e00e8ac4
+    bytes: 233472
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/8dda1918ca6fcf1f.webp
+    sha256: ebc06a80cc2db0eb350acd7c8ee370cc4d6886247f99c4f1add264c03c9e5eb8
+    bytes: 21582
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: 纯白背景下的“净土白玉风”全套雕花会客家具创意设计。该方案大胆突破传统红木深色系的束缚，将整套传统宫廷雕花沙发、茶几、角几及配饰全面转化为羊脂白玉、汉白玉与浅奶油色白蜡木/枫木的纯净组合，象征佛教“琉璃净土、清净无染”的崇高美学境界。
+materials:
+- 羊脂白玉
+- 阿富汗白玉
+- 浅色枫木
+colors:
+- 羊脂白配浅香槟金
+style: 汉藏融合宫廷嵌石风
+ai_design_usage: 传统重型家具极简白玉化风格迁移（Style Transfer） / 汉白玉石雕家具概念设计 / 现代高定净土风佛堂软装研发
+prompt_zh: 纯白背景产品摄影，一套超凡脱俗的全羊脂白玉与浅奶油色枫木结合的佛教雕花沙发茶几套装，整套家具由温润洁白的汉白玉和浅木精雕而成，靠背浮雕白色盛开莲花与团花，坐垫为纯白丝绸配浅金抱枕，方形大茶几镶嵌带暖金云纹的白玉透光云石大板，束腰嵌珍珠母贝与浅蓝宝石，两侧角几摆放汉白玉碗与白玉莲花圆屏，清净神圣，8K渲染。
+tags:
+- 羊脂白玉家具
+- 汉白玉雕刻
+- 浅色禅意家具
+- 白玉透光云石
+- 净土风佛堂
+- 石材家具套装
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of an all-white-jade/cream-colored carved sofa and coffee
+    table set on white background. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

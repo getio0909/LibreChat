@@ -15,6 +15,7 @@ if ! command -v nginx >/dev/null || ! command -v jq >/dev/null || \
   apt-get update -qq
   apt-get install -y -qq ca-certificates curl nginx jq openssl
 fi
+# shellcheck disable=SC1091
 if ! command -v docker >/dev/null || ! docker compose version >/dev/null 2>&1; then
   if [[ $(. /etc/os-release && printf '%s' "$ID") != debian ]]; then
     echo 'Automatic Docker installation currently supports Debian servers.' >&2

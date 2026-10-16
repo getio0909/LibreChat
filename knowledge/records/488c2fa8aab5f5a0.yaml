@@ -1,0 +1,77 @@
+id: 488c2fa8aab5f5a0
+title_zh: 佛教大殿佛像与蒲团布局
+source:
+  original_path: 佛教空间设计案例/佛教大殿佛像与蒲团布局.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿佛像与蒲团布局.jpg
+  sha256: 488c2fa8aab5f5a0ae498d73a9fb5a8146fb47f5d60edcc6147d9bcbb3a54aaf
+  bytes: 4752501
+  width: 5061
+  height: 2514
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/488c2fa8aab5f5a0.jpg
+    sha256: 5c2f8d9003a81bf1329cbadc9642581a9934456c79ef1067c21abb27ee51845f
+    bytes: 369453
+    width: 2048
+    height: 1017
+  thumb512:
+    path: assets/thumb512/488c2fa8aab5f5a0.webp
+    sha256: d2b6b9e056570e20088ebbec088f00c531b847078881f1f4af0c31455c3b5f5a
+    bytes: 27626
+    width: 512
+    height: 254
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 灰褐带翠绿斑纹奢石地面上整齐排列48个明黄圆蒲团阵列、远端供奉汉白玉坐佛配金色祥云背板的现代大型禅修礼佛大殿。
+materials:
+- 山水绿灰褐奢石
+- 汉白玉佛像
+- 鎏金祥云浮雕
+- 深胡桃木包柱
+- 汉白玉柱础
+- 黄色圆蒲团
+colors:
+- 灰褐色
+- 明黄色
+- 汉白玉白
+- 辉煌金
+- 深木棕
+style: 现代新中式大型禅堂风
+ai_design_usage: 大型现代禅堂/讲经堂蒲团矩阵布局、大面积山水奢石地面铺贴效果、汉白玉主尊配金背光设计参考
+prompt_zh: 大型现代中式佛教禅修礼佛大殿室内全景，中轴对称广角透视，地面满铺高光灰褐色带翠绿玉斑的天然山水奢石大板，地面上整齐排列六列八排明黄色圆形禅修蒲团阵列，中间留出宽阔通道，两排深色胡桃木方形巨柱配汉白玉石雕柱础与柱脚暖光射灯，正前方远端供奉一尊洁白的汉白玉释迦牟尼佛坐像，背后是辉煌的金色祥云浮雕背景墙，顶部为现代井字梁格栅发光吊顶，两侧为透光中式木花窗，庄严静谧，8K建筑渲染
+tags:
+- 蒲团矩阵
+- 汉白玉坐佛
+- 奢石地面
+- 禅修大殿
+- 金色祥云背景
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2514
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Wide 3D render of a modern meditation and lecture hall with 48 yellow round cushions on a grey-green veined luxury
+    stone floor facing a white marble seated Buddha.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

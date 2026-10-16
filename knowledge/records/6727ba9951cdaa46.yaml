@@ -1,0 +1,72 @@
+id: 6727ba9951cdaa46
+title_zh: 佛教寺庙千佛墙与佛像内景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙千佛墙与佛像内景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙千佛墙与佛像内景.jpg
+  sha256: 6727ba9951cdaa46c88cb6c3c5f579fb68c85098ef0236a7dc2aab394f81e004
+  bytes: 4910774
+  width: 3513
+  height: 2634
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6727ba9951cdaa46.jpg
+    sha256: f7925a9fa25c0d6134be94a5f68b19bf47682d36398663b66fec381ab1667767
+    bytes: 666063
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/6727ba9951cdaa46.webp
+    sha256: f8d2a702bdad57749cdb228bc0ff62b8c7b9d4d27244b526745d44d31e54cb38
+    bytes: 59700
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 中国藏区
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 藏传与多民族融合佛殿
+entity_type: 空间场景设计
+summary_zh: 本图为藏传佛教风格（或藏汉融合）千佛墙与三联度母/长寿三尊主龛大殿内景（空间场景设计）。
+materials:
+- 金色满铺千佛墙与三联镀金雕花主龛
+- 藏式菩萨/度母坐像
+- 红金彩绘须弥座台基
+- 发光甘珠尔藏经架
+- 藏式彩绘斗拱
+colors:
+- 辉煌金
+- 朱砂红
+style: 藏传佛教金碧重彩宫殿风
+ai_design_usage: 藏汉融合万佛殿/度母殿室内立面设计、三联金龛嵌入千佛墙构图、藏式彩绘斗拱梁架与发光藏经格参考
+prompt_zh: 藏传佛教寺庙千佛墙与佛像大殿内景，金碧辉煌的室内立面，墙面主体满铺整整齐齐的金色发光小拱龛千佛阵列，正中央镶嵌三座华丽的紫铜鎏金高浮雕尖拱形大佛龛，龛内供奉三尊戴宝冠的藏传佛教度母菩萨金像，墙面下部为朱红色描金宝相花束腰须弥座台基，左侧墙面设有五层发光的藏式大藏经书架（陈列黄色绸缎包裹的长条经函），顶部为层层叠涩的藏式红蓝绿彩绘斗拱、金翅鸟金色浮雕额枋与贴金天花，色彩绚丽浓郁，8K超清建筑渲染
+tags:
+- 藏式千佛墙
+- 三联镀金佛龛
+- 度母殿内景
+- 藏式彩绘斗拱
+- 甘珠尔藏经架
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2634
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 藏式金碧千佛墙与三联雕花主龛大殿内景三维效果图，左侧设发光藏经格，顶部饰藏式彩绘斗拱。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

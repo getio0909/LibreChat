@@ -1,0 +1,71 @@
+id: 7213dbec062d89c7
+title_zh: 佛教寺庙大殿内部装饰场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部装饰场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部装饰场景.jpg
+  sha256: 7213dbec062d89c71c583dff21826a01d9a27db96a35867cbb34ff749c7c416d
+  bytes: 6171382
+  width: 4693
+  height: 2586
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7213dbec062d89c7.jpg
+    sha256: f662bb942c2181010ce6779a8b7304ded02c5ecbf7158fcddaee7898c3cdc6f2
+    bytes: 508624
+    width: 2048
+    height: 1129
+  thumb512:
+    path: assets/thumb512/7213dbec062d89c7.webp
+    sha256: 3ac603e51a287d115f48f634dcae73a54504e549bb7e0a04f7370574ab993fae
+    bytes: 42342
+    width: 512
+    height: 282
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为“重彩佛教群像壁画 + 金色发光白玉千佛格 + 高处二十诸天彩绘悬塑廊”大型禅修大殿正面中轴超宽全景场景（空间场景设计，本卷第25号为其右侧斜视图）。
+materials:
+- 中央铜鎏金大佛配双层圆形贴金飞天藻井
+- 三壁重彩壁画与发光白玉佛格交替立面
+- 高处彩绘悬塑廊
+- 对称蒲团阵列
+colors:
+- 辉煌金
+- 暖灰褐色
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 重彩壁画与发光佛格交替大殿正面超宽全景构图、中心圆形斗拱藻井与四周方格金藻井主次统筹设计参考
+prompt_zh: 大型佛教寺庙大殿内部装饰正面中轴对称超宽全景，暖灰褐色哑光大理石地面，左右两侧对称排列整齐的米黄色方形共修蒲团矩阵，中间留出宽阔通道并立有两根配浅灰石雕柱础的深棕色实木大圆柱，正中央木雕须弥座主坛上供奉一尊巨大的铜鎏金坐佛（带镂空雕花火焰大背光），主佛正上方天花镶嵌一座双层圆形贴金斗拱彩绘大藻井，四周天花满布金色雕花方格发光藻井，大殿三面环墙采用大幅工笔重彩佛教群像壁画与金色发光方格龛（内供白玉小佛）交替排布，墙面高处环绕一圈立体彩绘诸天人物悬塑廊带，8K超清全景渲染
+tags:
+- 大殿超宽全景
+- 圆形斗拱藻井
+- 彩绘悬塑廊
+- 壁画佛格交替
+- 共修大殿设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2586
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 重彩壁画、发光白玉千佛格与高处彩绘悬塑廊复合立面大殿正面超宽全景三维效果图，左下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

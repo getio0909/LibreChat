@@ -1,0 +1,74 @@
+id: 7add4830cb7e7f0c
+title_zh: 深绿纹理石材展示图-02
+source:
+  original_path: 常用石材大板/深绿纹理石材展示图-02.jpg
+original:
+  path: 常用石材大板/深绿纹理石材展示图-02.jpg
+  sha256: 7add4830cb7e7f0c0356b82f7dc56b07402214611c9115461932ea9012a3a50f
+  bytes: 1544589
+  width: 2048
+  height: 1536
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7add4830cb7e7f0c.jpg
+    sha256: f904ca7dd4a714b32c50f6c75e282fc716ae6ddd92263561b959a922536524d5
+    bytes: 968998
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/7add4830cb7e7f0c.webp
+    sha256: a6ea0229088c2b2e24737da06deda1b7f30e0b06bcdbbcb51df6665857fb8feb
+    bytes: 58228
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-深绿碎裂网纹系
+entity_type: 实物对象写实
+summary_zh: 本图为陈列于“澳盛大板市场”展架上的超高清天然深绿色角砾网纹大理石（属丹东绿、蛇纹石化大理岩或印度绿/雨林绿品系）大板写实图。
+materials:
+- 天然深绿大理石
+- 丹东绿大理石
+- 蛇纹石化角砾大理岩
+colors:
+- 深墨绿色
+- 黑绿色
+- 浅薄荷绿
+- 纯白色
+style: 现代奢石展陈 / 复古海派禅意
+ai_design_usage: 复古奢华/海派禅意空间背景墙贴图 / 深色系供桌、茶台与博古架台面材质 / 鎏金铜佛像高反差深色背板
+prompt_zh: 超高清天然深绿色网纹大理石大板正面特写，墨绿色与黑绿色角砾斑块基底，表面布满狂野交织的浅薄荷绿与纯白色蛛网状、海浪泡沫状碎裂纹理，丹东绿与蛇纹石玉质感，高光镜面抛光，澳盛大板市场展厅实拍，深邃浓郁的复古奢石肌理，8K画质。
+tags:
+- 深绿大理石
+- 丹东绿
+- 蛇纹石网纹
+- 墨绿角砾石材
+- 澳盛大板市场
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1536
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: High-res dark green brecciated serpentine marble slab on display rack with physical market labels on left and STM石猫
+    watermark in bottom right.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

@@ -1,0 +1,78 @@
+id: aa8d780518bb6cbc
+title_zh: 泰鲁阿讷主教座堂使徒石雕头像
+source:
+  original_path: 造像雕塑开放授权实物参考/西方-泰鲁阿讷主教座堂使徒石雕头像-cma149403.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/01-西方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/西方-泰鲁阿讷主教座堂使徒石雕头像-cma149403.jpg
+  sha256: aa8d780518bb6cbc67f7661bbd31f6b82fea10a1ec52a71a949e3490ad94a8b9
+  bytes: 4962920
+  width: 2508
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/aa8d780518bb6cbc.jpg
+    sha256: 038094ff74af3f2959ea14f854e602a3e793aff8d16cb8343189fe83f990f7ea
+    bytes: 450592
+    width: 1511
+    height: 2048
+  thumb512:
+    path: assets/thumb512/aa8d780518bb6cbc.webp
+    sha256: ef545c5cd139725a187dfd960769efa13781a59733a4f6b134460bd50a27763b
+    bytes: 20966
+    width: 378
+    height: 512
+library_type: 造像雕塑
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 泰鲁阿讷主教座堂使徒石雕头像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】独立男性石雕头像留卷曲发须，鼻部与面颊明显残损，眼眶和口唇轮廓尚存。【来源著录】Head of an Apostle from the South Portal of the Cathedral of Thérouanne；文化或地点依据：Northern
+  France (Pas-de-Calais), Thérouanne, 13th century。
+materials:
+- 鲕状石灰石
+colors:
+- 浅灰色
+style: 西方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，独立男性石雕头像留卷曲发须，鼻部与面颊明显残损，眼眶和口唇轮廓尚存。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Head of an Apostle from the South Portal of the Cathedral
+  of Thérouanne. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 西方
+- 开放授权
+- 真实摄影
+- 泰鲁阿讷主教座堂使徒石雕头像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1978.56.2
+  download_url: https://openaccess-cdn.clevelandart.org/1978.56.2/1978.56.2_print.jpg
+  credit: Leonard C. Hanna Jr. Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2508
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

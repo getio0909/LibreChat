@@ -1,0 +1,75 @@
+id: def3570bcb8265a1
+title_zh: 大型白色纹理石材板材展示
+source:
+  original_path: 常用石材大板/大型白色纹理石材板材展示.jpg
+original:
+  path: 常用石材大板/大型白色纹理石材板材展示.jpg
+  sha256: def3570bcb8265a1e7a1be71387a42c173777231822c58b62758a1bf55c02eab
+  bytes: 184885
+  width: 828
+  height: 620
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/def3570bcb8265a1.jpg
+    sha256: a781c33e561a2bf927c5e2e942b2fb18ad2f69f4e0a96b944e4331a9584cfa57
+    bytes: 85140
+    width: 828
+    height: 620
+  thumb512:
+    path: assets/thumb512/def3570bcb8265a1.webp
+    sha256: 0db7e9c99c395986526fd87454b5e9c6373a7994fd4f5cff190ec7bc619e09b1
+    bytes: 21852
+    width: 512
+    height: 383
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-白底宽带斜纹系
+entity_type: 实物对象写实
+summary_zh: 本图为石材厂房内展示的大型白底宽带斜纹天然大理石大板实物写实。
+materials:
+- 天然大理石
+- 雅士白大理石
+- 爵士白大理石
+colors:
+- 奶白色
+- 象牙白
+- 暖银灰色
+style: 现代奢石展陈 / 新中式水墨禅意
+ai_design_usage: 高端禅意空间主景墙贴图 / 佛堂供桌背景墙材质替换 / 现代中式水墨风室内渲染
+prompt_zh: 天然大型白底灰斜纹大理石大板实拍，温润奶白色底面，左右两侧分别有两道从左下向右上延伸的暖银灰色宽幅流云斜带，中间留有一道宽阔纯净的斜向白色玉带，镜面级高光抛光，石材车间木架展示，大气典雅的天然石材纹理。
+tags:
+- 白底宽带斜纹
+- 雅士白大板
+- 玉带留白
+- 高光抛光石材
+- 新中式背景墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 620
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 红棕金黑熔岩肌理奢石大板实拍（与#301同系列），原图828x620分辨率偏低，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 828x620 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（828x620，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印

@@ -1,0 +1,78 @@
+id: 2c3bd4ed077bf21e
+title_zh: 佛教大殿佛像与装饰场景
+source:
+  original_path: 佛教空间设计案例/佛教大殿佛像与装饰场景.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿佛像与装饰场景.jpg
+  sha256: 2c3bd4ed077bf21e5706d0381c0170dc224c2454da3537c5134d6af61ab1d057
+  bytes: 4684904
+  width: 4525
+  height: 2527
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2c3bd4ed077bf21e.jpg
+    sha256: 18a0778b96662a4715e820c44c3aa4ab7639c0a4d140e81e59803a3c3b81f282
+    bytes: 420968
+    width: 2048
+    height: 1144
+  thumb512:
+    path: assets/thumb512/2c3bd4ed077bf21e.webp
+    sha256: 2ac90af6e00b904d444765bdb123af0faa9e17830f88441f5f95bc65d67d2207
+    bytes: 34468
+    width: 512
+    height: 286
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 供奉挑高两层鎏金千手观音立像、墙面饰“如意珠手印”四十二手眼浮雕与万佛龛、顶部设星空穹顶与橘黄莲花灯的宏伟观音宝殿。
+materials:
+- 铜鎏金千手观音
+- 浅米黄石柱
+- 鎏金莲瓣柱础
+- 四十二手眼浮雕板
+- 深灰黑地砖
+- 橘色莲花吊灯
+colors:
+- 辉煌金
+- 香槟米黄
+- 深灰黑
+- 朱砂红
+- 星空蓝
+- 橘黄色
+style: 传统与现代融合千手观音专修大殿
+ai_design_usage: 千手观音殿/观音阁双层挑空空间设计、四十二手眼文化浮雕墙设计、星空藻井与万佛墙结合参考
+prompt_zh: 挑高两层的宏伟千手观音殿室内空间设计，斜向广角仰视构图，中央供奉一尊巨大的金身千手千眼观音立像，背后是放射状金色背光，底座层叠围绕上百尊发光小金佛，右侧高墙上镶嵌红底描金“摩尼部增益法如意珠手印”等四十二手眼浮雕壁画与内嵌发光千佛龛，粗壮的米色巨柱配鎏金莲花柱础与金箍，左侧为二层回廊与满墙万佛龛，顶部为发光方格藻井与圆形蓝色星空穹顶，悬挂橘黄色莲花灯，深灰黑色石砖地面摆放两排黄色拜垫，金碧辉煌，8K效果图
+tags:
+- 千手观音殿
+- 四十二手眼
+- 如意珠手印
+- 万佛墙
+- 星空藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2527
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a double-height Guanyin hall enshrining a gilded Thousand-Armed Guanyin beneath a starry dome, surrounded
+    by illuminated 42-hand-mudra relief plaques and orange lotus lanterns.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

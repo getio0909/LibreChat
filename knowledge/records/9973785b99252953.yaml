@@ -1,0 +1,79 @@
+id: 9973785b99252953
+title_zh: 天津蓟州独乐寺山门与屋顶
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-天津蓟州独乐寺山门与屋顶-commons39381487.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-天津蓟州独乐寺山门与屋顶-commons39381487.jpg
+  sha256: 9973785b992529538d1f71678550ebd5f60dbf04d9ebf3b7d31268125cd21719
+  bytes: 1364542
+  width: 3840
+  height: 2560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9973785b99252953.jpg
+    sha256: f954dff288f2b15ed2ffcd50e215ffea1d0ac84a7fd7267d86d89a3f6ea9540d
+    bytes: 418810
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/9973785b99252953.webp
+    sha256: 439696a9404bf927b7e3358f69ca86f8ffaf1c149ee323204df0e0265b04ed07
+    bytes: 18382
+    width: 512
+    height: 341
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 天津蓟州独乐寺山门与屋顶
+entity_type: 空间场景设计
+summary_zh: 【图中可见】山门正面为单层宽檐屋顶，红色立柱与门窗分列，中央通道可见后方院墙，屋脊有相对兽形饰件，前方摆供炉。【来源著录】The Shan Gate of Dule Temple.JPG；文化或地点依据：Commons题名明确标识独乐寺山门；该寺分类地点为天津蓟州，按北方寺院归类。
+materials:
+- 木构件
+- 瓦与砖石（按可见构件索引）
+colors:
+- 灰色
+- 红色
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，山门正面为单层宽檐屋顶，红色立柱与门窗分列，中央通道可见后方院墙，屋脊有相对兽形饰件，前方摆供炉。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of The Shan Gate of Dule Temple.JPG. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 天津蓟州独乐寺山门与屋顶
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:The_Shan_Gate_of_Dule_Temple.JPG
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/The_Shan_Gate_of_Dule_Temple.JPG/3840px-The_Shan_Gate_of_Dule_Temple.JPG
+  credit: Xin; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2560
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

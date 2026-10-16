@@ -1,0 +1,78 @@
+id: fa94648b0e210d79
+title_zh: 北魏嵌饰鎏金诞生佛立像
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-北魏嵌饰鎏金诞生佛立像-cma133035.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-北魏嵌饰鎏金诞生佛立像-cma133035.jpg
+  sha256: fa94648b0e210d792c4a7c02d53fef62d085c61fdb43c0190ea5eb55d9de39fb
+  bytes: 619351
+  width: 2792
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fa94648b0e210d79.jpg
+    sha256: 58c4b03ea86660c84461c4257b2ef3aad0b81e6587eac7718999ff755e7d5b34
+    bytes: 249740
+    width: 1682
+    height: 2048
+  thumb512:
+    path: assets/thumb512/fa94648b0e210d79.webp
+    sha256: dd0a2984e8c8d0308f18c42394e79f6355a6d250b5973ca91723c238085bab9b
+    bytes: 10424
+    width: 420
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 北魏嵌饰鎏金诞生佛立像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】金色小型立像双臂下垂，掌面朝前，肩部两朵花心呈蓝绿色，下承外翻莲瓣座。【来源著录】The New-born Buddha；文化或地点依据：馆方著录为中国北魏；按北魏文化体系归入北方，未补写出土地。
+materials:
+- 鎏金青铜
+- 蓝玻璃与绿松石嵌饰
+colors:
+- 金色
+- 蓝绿色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，金色小型立像双臂下垂，掌面朝前，肩部两朵花心呈蓝绿色，下承外翻莲瓣座。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of The New-born Buddha. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北魏嵌饰鎏金诞生佛立像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1955.46
+  download_url: https://openaccess-cdn.clevelandart.org/1955.46/1955.46_print.jpg
+  credit: Purchase from the J. H. Wade Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2792
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

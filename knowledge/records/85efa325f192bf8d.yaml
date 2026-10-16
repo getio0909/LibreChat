@@ -1,0 +1,77 @@
+id: 85efa325f192bf8d
+title_zh: 佛教室内供奉空间
+source:
+  original_path: 佛教空间设计案例/佛教室内供奉空间.jpg
+original:
+  path: 佛教空间设计案例/佛教室内供奉空间.jpg
+  sha256: 85efa325f192bf8d170dfcd0fcaf6a706f94800c62f5dd561ff87d97332cfcfb
+  bytes: 3791076
+  width: 3454
+  height: 2639
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/85efa325f192bf8d.jpg
+    sha256: 941e71cd188bb911aedc1f91fbdabb811269cb9488403c32a43d416bc04ef9e4
+    bytes: 520586
+    width: 2048
+    height: 1565
+  thumb512:
+    path: assets/thumb512/85efa325f192bf8d.webp
+    sha256: d52e269e11c490b44cf170798898ec3e38649bf579f4ede46c1c027db4c13414
+    bytes: 40824
+    width: 512
+    height: 391
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 中式居家与会所佛堂
+entity_type: 空间场景设计
+summary_zh: 全屋采用拼花木地板与中式木格栅花窗（含右侧圆形月洞花窗）、顶部设金色方格藻井、正中金龛供奉自在观音坐像的古典木作佛堂。
+materials:
+- 花梨木格栅花窗
+- 几何拼花木地板
+- 鎏金自在观音像
+- 红木雕花供桌
+- 金色方格藻井
+- 白石柱础
+colors:
+- 琥珀木色
+- 辉煌金
+- 深红木色
+- 明黄色
+- 暖白色
+style: 中式古典全木作私家佛堂风
+ai_design_usage: 高端中式别墅私家佛堂、禅意会所观音供奉室、全木作格栅花窗佛堂室内设计参考
+prompt_zh: 中式古典全木作室内观音佛堂供奉空间，正中央金色发光佛龛内供奉一尊铜鎏金水月自在观音坐像，背后有金色圆光，前方设深色红木雕花供桌与两个明黄色方蒲团，左右两侧墙面装饰精致的中式木格栅花窗，右侧墙面嵌有一扇圆形月洞式背光木格栅花窗，四角木柱配白色石柱础，地面铺设复古几何图案拼花实木地板，顶部为金碧辉煌的方格发光藻井天花，温润庄严，8K室内效果图
+tags:
+- 观音佛堂
+- 月洞格栅窗
+- 拼花木地板
+- 私家佛堂
+- 全木作空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2639
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a classical wood-paneled domestic Buddhist shrine room with a parquet wood floor, circular moon-window
+    lattice, golden coffered ceiling, and gilded Guanyin altar.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

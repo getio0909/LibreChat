@@ -1,0 +1,81 @@
+id: b7b1a6c692cc89b7
+title_zh: 法国仿竹木框刺绣火屏
+source:
+  original_path: 家具木作开放授权实物参考/西方-法国仿竹木框刺绣火屏-cma165188.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/01-西方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/西方-法国仿竹木框刺绣火屏-cma165188.jpg
+  sha256: b7b1a6c692cc89b7b34b8236bfe1cd4881c8ecebbc485c0007726c1352eb5d0f
+  bytes: 4600732
+  width: 2513
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b7b1a6c692cc89b7.jpg
+    sha256: f9388d4824963834deba78b0308c224709eb81c11a4389c53b04e5462d808af0
+    bytes: 413428
+    width: 1514
+    height: 2048
+  thumb512:
+    path: assets/thumb512/b7b1a6c692cc89b7.webp
+    sha256: 9f4545016f41c0f682bd6de8661f06b6fd85e048ddb346decca3febd42b22810
+    bytes: 23032
+    width: 378
+    height: 512
+library_type: 家具木作
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 法国仿竹木框刺绣火屏
+entity_type: 实物对象写实
+summary_zh: 【图中可见】落地火屏用金色仿竹框架围住蓝底刺绣，画面为贝壳、盒子与穿绕的橙色带绳，下接弯曲支脚。【来源著录】Fire Screen with Shell-Matching Game；文化或地点依据：France, 19th
+  century。
+materials:
+- 贴金木框
+- 丝绣面板
+colors:
+- 金黄色
+- 深蓝色
+- 橙红色
+style: 西方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，落地火屏用金色仿竹框架围住蓝底刺绣，画面为贝壳、盒子与穿绕的橙色带绳，下接弯曲支脚。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Fire Screen with Shell-Matching Game. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 家具木作
+- 西方
+- 开放授权
+- 真实摄影
+- 法国仿竹木框刺绣火屏
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/2007.182
+  download_url: https://openaccess-cdn.clevelandart.org/2007.182/2007.182_print.jpg
+  credit: Dudley P. Allen Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2513
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

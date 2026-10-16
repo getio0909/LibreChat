@@ -1,0 +1,71 @@
+id: 147e20a9d4dbc896
+title_zh: 佛教寺庙室内佛像供奉场景-02
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内佛像供奉场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内佛像供奉场景-02.jpg
+  sha256: 147e20a9d4dbc8964667c994e43030568c0b32a4ee11058c53e245e5cf804bec
+  bytes: 744750
+  width: 1575
+  height: 1400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/147e20a9d4dbc896.jpg
+    sha256: 4935f3cee070c279b4367e37fb406a928603c76e5a44b2f19c1d9010d74062d6
+    bytes: 192714
+    width: 1575
+    height: 1400
+  thumb512:
+    path: assets/thumb512/147e20a9d4dbc896.webp
+    sha256: 2f9c23a1fb0a6e744ef8aa619a832eaa28f26938e56fd0e74719059f703446af
+    bytes: 22204
+    width: 512
+    height: 455
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为传统寺院文殊/普贤菩萨配殿右斜视供奉与壁画展示场景（空间场景设计，本卷第11号为其正面标准图）。
+materials:
+- 骑瑞兽铜鎏金菩萨像（配发光火焰背光）
+- 右侧大幅工笔重彩佛教经变图壁画
+- 包镶鎏金云纹铜套筒木柱
+- 汉白玉覆莲柱础
+colors:
+- 深木棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 寺院菩萨配殿右斜视构图参考、侧壁大幅传统重彩经变壁画与主龛造像及鎏金包箍木柱空间关系展示
+prompt_zh: 传统佛教寺庙菩萨配殿室内供奉右斜视场景，深灰黑色高光石材地砖地面，画面左右矗立粗壮的深棕色实木大圆柱，柱身上下两端包镶精美的鎏金镂空如意云纹铜套筒，下承洁白的汉白玉雕花覆莲鼓形柱础，正中深色木雕须弥座佛台与红木供桌后供奉一尊头戴五佛冠骑乘瑞兽的铜鎏金菩萨坐像，背后是通体发光的金色火焰舟形大背光，桌前摆放两个米黄色方形拜垫，右侧墙面大幅镶嵌色彩绚丽的中国传统工笔重彩佛教经变图壁画，上方为白墙与传统木构梁架斗拱，8K建筑渲染
+tags:
+- 菩萨配殿斜视图
+- 佛教经变壁画
+- 鎏金如意云纹柱套
+- 汉白玉覆莲柱础
+- 发光火焰背光
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1400
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统寺院菩萨配殿右斜视三维效果图，展示骑兽金像、右侧工笔重彩经变壁画与鎏金云纹铜柱套。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

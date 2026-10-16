@@ -1,0 +1,73 @@
+id: 1a62c5d8745899e6
+title_zh: 佛教文物展陈空间设计
+source:
+  original_path: 佛教空间设计案例/佛教文物展陈空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教文物展陈空间设计.jpg
+  sha256: 1a62c5d8745899e6c7a16d904734a59204a4cbc5fd011596bf0c131cf67bd3fb
+  bytes: 1554220
+  width: 1699
+  height: 2563
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1a62c5d8745899e6.jpg
+    sha256: 98d5c68b8f57b7e339a885c8082922bf3bdfcefa1c597c43a2d2cda9f82bee12
+    bytes: 309680
+    width: 1358
+    height: 2048
+  thumb512:
+    path: assets/thumb512/1a62c5d8745899e6.webp
+    sha256: ab3901b257059ad2e422297f4b95f4ddbf8db44deac4151b4cd77d167619a2ff
+    bytes: 25568
+    width: 339
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 新中式藏经阁与佛教法器文物独立展柜空间
+entity_type: 空间场景设计
+summary_zh: 本图为新中式寺院藏经阁（大藏经楼）兼佛教传世法器、瓷器文物珍宝馆室内场景。空间将浩瀚的古典经籍书墙与博物馆级独立文物展柜相结合，营造出书香氤氲、古雅深邃的佛学研修与文物鉴赏空间。 空间以温润的胡桃木本色、深绿与褐棕色奢石/大理石、素白古籍纸本色构成醇厚色调。前景三座并列独立展柜的底座采用天然大理石整石包覆：左侧底座为墨绿/森林绿云纹大理石（如大花绿/雨林绿），中间与右侧底座为深褐棕色乱纹大理石（如咖啡网纹/古木纹石）；地面外圈及前景铺设高光深绿色云纹大理石（右下角带浅浮雕莲花暗纹），展柜底座四周地面设一圈米白石…
+materials:
+- 深绿大理石
+- 褐棕奢石
+- 原木书柜
+- 超白玻璃
+colors:
+- 胡桃木色
+- 深绿与褐棕大理石
+- 素白宣纸
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：寺院现代藏经阁/佛学图书馆空间设计 / 奢石大理石底座独立文物玻璃展柜参考 / 中式回纹木格栅吊顶生成；推荐搭配：大花绿/雨林绿与啡网纹大理石展柜底座 + 胡桃木通顶藏经书架 + 超白无框玻璃罩 +
+  回纹木格栅吊顶 + 底部匀光照明
+prompt_zh: 新中式寺院藏经阁与佛教法器文物展陈空间，竖幅对称构图，前景并列三座高规格独立超白玻璃展柜，左侧展柜底座为深绿色云纹大理石，中右展柜底座为褐棕色纹理大理石，底座底部环绕黑色砾石槽，玻璃柜内发光底板上白色展托分别陈列彩绘净瓶、高足供器与白瓷佛钵；空间左中右三面墙均为通顶胡桃木方格书架，整齐排满线装古籍佛经，远端正中挂山水画；天花为中式几何回纹交错木格栅吊顶配嵌入式筒灯，高光深绿色大理石地面带莲花暗纹，儒雅庄重，高清建筑效果图。
+tags:
+- 新中式藏经阁
+- 佛教法器展柜
+- 大理石展柜底座
+- 回纹木格栅吊顶
+- 线装佛经书墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1699
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 新中式藏经阁通顶书墙与三座绿褐奢石底座玻璃法器展柜竖幅三维效果图，顶部设回纹交叠木格栅吊顶。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

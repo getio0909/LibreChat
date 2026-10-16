@@ -1,0 +1,74 @@
+id: 4eb9d057658224c6
+title_zh: 佛教主题石材雕刻细节
+source:
+  original_path: 佛教空间设计案例/佛教主题石材雕刻细节.jpg
+original:
+  path: 佛教空间设计案例/佛教主题石材雕刻细节.jpg
+  sha256: 4eb9d057658224c6541815633d8b499d477b2f50a2ca7d1ab53c8c1e78b098b9
+  bytes: 89618
+  width: 212
+  height: 378
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4eb9d057658224c6.jpg
+    sha256: 90124fbbff2c027551867e43ca10c7c8654f382f3a13014ffaf1d92c4b551cb7
+    bytes: 23101
+    width: 212
+    height: 378
+  thumb512:
+    path: assets/thumb512/4eb9d057658224c6.webp
+    sha256: b75df5352392443228352d85db837debfe3d5d2fc844cca2491cded297168be9
+    bytes: 15148
+    width: 212
+    height: 378
+library_type: 石刻纹样
+region: 未知
+studio_roles:
+- 纹样
+- 材质
+- 造型
+category_l1: 佛教空间案例
+category_l2: 乌金石/青石海水江崖祥云浮雕构件
+entity_type: 实物对象写实
+summary_zh: 玄黑紫褐与金色阳光剪影 / 海水江崖波涛纹、如意卷云纹、海棠形开光框
+materials:
+- 深青灰色嘉祥青石/乌金石
+- 多层高浮雕如意祥云纹
+- 阴刻细线海水江崖纹
+- 海棠形开光石框
+colors:
+- 青石深灰黑
+- 夕阳暖金光斑
+- 阴影冷灰
+style: 传统古建石雕微距工艺写实风
+ai_design_usage: 古建青石/乌金石海水江崖祥云浮雕3D建模与CNC雕刻参考 / 须弥座华板与栏板石雕纹样提取 / 古寺石雕构件自然光影微距摄影参考
+prompt_zh: 中国传统佛教寺院石材雕刻工艺细节微距摄影，一块镶嵌在海棠形开光边框内的深青黑色青石浮雕构件，上半部分以精湛的多层高浮雕工艺雕刻出立体饱满、盘旋升腾的如意祥云纹，下半部分雕刻出线条细密、波涛翻滚的海水江崖纹，石材表面质感温润古朴，刀法苍劲清晰，一束温暖的金色夕阳斜射在青石板上，投下古建筑飞檐翘角的斜向阴影，光影质感极佳，微距特写。
+tags:
+- 实物对象写实
+- 青石浮雕细节
+- 海水江崖纹
+- 如意祥云纹
+- 古建石雕构件
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 212
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res close-up photo (212x378) of a dark bluestone architectural relief panel carved with swirling ruyi clouds
+    and rolling sea waves.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

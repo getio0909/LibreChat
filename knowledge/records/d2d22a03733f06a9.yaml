@@ -1,0 +1,74 @@
+id: d2d22a03733f06a9
+title_zh: 佛教雕像与传统建筑展览场景
+source:
+  original_path: 佛教空间设计案例/佛教雕像与传统建筑展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教雕像与传统建筑展览场景.jpg
+  sha256: d2d22a03733f06a9be972b580a7b14340eefa88f4bd9c1cf7a1d8998692f1926
+  bytes: 123323
+  width: 313
+  height: 382
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d2d22a03733f06a9.jpg
+    sha256: eb5f6548d88921fbd5100ab4e6c0b2bab89c575554907066803287b17a9529e9
+    bytes: 32026
+    width: 313
+    height: 382
+  thumb512:
+    path: assets/thumb512/d2d22a03733f06a9.webp
+    sha256: 1f24fe2f6b5797b72922711a5ee758967387ab9ff02052c8f10a66f8a9144b30
+    bytes: 19216
+    width: 313
+    height: 382
+library_type: 建筑景观
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 新唐风现代佛教寺院建筑主入口门厅局部，左侧为原木格栅大门与深挑檐，右侧白石高龛内立持琵琶与宝剑的四大天王汉白玉高浮雕像。
+materials:
+- 新唐风木构檐廊
+- 木格栅殿门
+- 四大天王高浮雕石像壁龛
+- 汉白玉栏杆
+colors:
+- 原木棕
+- 灰白色
+style: 现代新唐风寺院建筑
+ai_design_usage: 现代寺院山门/天王殿入口门厅设计、门侧内嵌护法天王高浮雕石龛节点参考
+prompt_zh: 现代新唐风佛教寺院建筑主入口门厅局部场景，左侧为高大的原木色中式直棂木格栅大门与深远挑檐，右侧白色汉白玉石墙内嵌两座高大的竖向矩形壁龛，龛内精雕威武的四大天王汉白玉高浮雕立像（手持琵琶的持国天王与手持宝剑的增长天王），前方设汉白玉雕花护栏与宽阔台阶，传统与现代融合的宗教建筑设计，写实建筑效果图
+tags:
+- 四大天王石雕
+- 新唐风建筑
+- 寺院入口门厅
+- 汉白玉护法龛
+- 佛教建筑设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 313
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 殿堂入口外立面局部（#272的左半部裁切）。原图尺寸313x382分辨率过低；且summary_zh左右方位颠倒（画面左侧为白石高龛内持琵琶天王像，右侧为原木格栅大门）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 313x382 (<800px short side)'
+  - 分辨率过低（313x382，最短边<768px）
+  - summary_zh左右方位描述颠倒（左为白石天王龛，右为木格栅门）

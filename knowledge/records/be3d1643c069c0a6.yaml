@@ -1,0 +1,79 @@
+id: be3d1643c069c0a6
+title_zh: 北京故宫保和殿云龙御路石纹样
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-北京故宫保和殿云龙御路石纹样-commons54466966.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-北京故宫保和殿云龙御路石纹样-commons54466966.jpg
+  sha256: be3d1643c069c0a657d57263211a83df2759d161087ca32dab7a6ab7fc08f4ac
+  bytes: 1451117
+  width: 1748
+  height: 2332
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/be3d1643c069c0a6.jpg
+    sha256: e7d3ff5e561660a6dfbcdb7e2c34810a54b5e2383dc475942ffd1059c4e13b5c
+    bytes: 876217
+    width: 1535
+    height: 2048
+  thumb512:
+    path: assets/thumb512/be3d1643c069c0a6.webp
+    sha256: 1e041d59f7a80c36ab9861b081d1a659d54faa12c1d7961fecafd86a0311fb99
+    bytes: 47524
+    width: 384
+    height: 512
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 北京故宫保和殿云龙御路石纹样
+entity_type: 实物对象写实
+summary_zh: 【图中可见】长条御路石在两列台阶之间向上延伸，近处清楚显示盘龙、密集云纹及窄卷草边带，远处可见保和殿背景。【来源著录】保和殿御路石 Dragon Stairway Behind Baohe Hall - panoramio.jpg；文化或地点依据：Commons
+  标题明确为北京故宫保和殿御路石；按原位宫廷建筑石雕归入中国北方。
+materials:
+- 石材（具体岩种未注明）
+colors:
+- 浅灰
+- 灰白
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，长条御路石在两列台阶之间向上延伸，近处清楚显示盘龙、密集云纹及窄卷草边带，远处可见保和殿背景。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 保和殿御路石 Dragon Stairway Behind Baohe Hall - panoramio.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北京故宫保和殿云龙御路石纹样
+- CC BY 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:保和殿御路石_Dragon_Stairway_Behind_Baohe_Hall_-_panoramio.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/d/d1/%E4%BF%9D%E5%92%8C%E6%AE%BF%E5%BE%A1%E8%B7%AF%E7%9F%B3_Dragon_Stairway_Behind_Baohe_Hall_-_panoramio.jpg
+  credit: lienyuan lee; https://web.archive.org/web/20161019163723/http://www.panoramio.com/photo/65976663
+  license: cc-by-3.0
+  license_url: https://creativecommons.org/licenses/by/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1748
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

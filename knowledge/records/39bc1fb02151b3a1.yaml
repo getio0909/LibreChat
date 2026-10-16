@@ -1,0 +1,72 @@
+id: 39bc1fb02151b3a1
+title_zh: 佛教寺庙大殿室内场景-02
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿室内场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿室内场景-02.jpg
+  sha256: 39bc1fb02151b3a1b4feef536a2f692e2f823668a8a2c1b42eaee652d4edef58
+  bytes: 5198411
+  width: 5079
+  height: 2535
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/39bc1fb02151b3a1.jpg
+    sha256: 7e2a78a198adc99a81d7bdd6b14df17e79f9fa4753e07e6763efc7bbd38b089d
+    bytes: 396489
+    width: 2048
+    height: 1022
+  thumb512:
+    path: assets/thumb512/39bc1fb02151b3a1.webp
+    sha256: 6c7b9c848d11fd5bae91911a9c111c7b94f0cd922b590a164de947d32df71d4d
+    bytes: 30556
+    width: 512
+    height: 256
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 本图为现代新中式大型禅修礼佛大殿（水墨流纹奢石地面配汉白玉坐佛）2:1 超宽画幅全景场景（空间场景设计，与本卷第12号同属一案的不同画幅版本）。
+materials:
+- 2:1超宽画幅水墨流纹奢石地面
+- 汉白玉释迦牟尼坐佛
+- 金色祥云浮雕背板
+- 汉白玉莲瓣柱础凹槽木柱
+- 黄圆蒲团阵
+colors:
+- 水墨灰白
+- 深胡桃木色
+style: 现代新中式禅意奢石风
+ai_design_usage: 新中式大型禅堂 2:1 宽银幕全景构图参考、大面积水墨流纹奢石地面横向延展视觉效果展示
+prompt_zh: 2:1超宽画幅现代新中式佛教禅修大殿室内全景，中轴对称广角透视，地面满铺如水墨山水般流淌的灰白色高光天然流纹奢石大理石大板，地面左右对称排列整齐的明黄色圆形禅修蒲团阵列，四根粗壮的深胡桃木竖向凹槽方形巨柱，柱头与柱础均为洁白的汉白玉精雕仰覆莲瓣方形石构件，正中央雕花木栏杆与须弥座上供奉一尊洁白无瑕的大型汉白玉释迦牟尼坐佛，背后是金碧辉煌的立体祥云浮雕背景墙，两侧为中式木格栅门与长条玉石壁灯，顶部为叠级发光木格栅天花，8K宽银幕建筑渲染
+tags:
+- 超宽画幅禅堂
+- 水墨奢石地面
+- 汉白玉坐佛
+- 汉白玉莲花柱础
+- 新中式佛殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2535
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代新中式禅修礼佛大殿2:1超宽画幅三维效果图，水墨流纹奢石地面配汉白玉坐佛与金色祥云背板。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

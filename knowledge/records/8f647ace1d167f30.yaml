@@ -1,0 +1,77 @@
+id: 8f647ace1d167f30
+title_zh: 佛教主题室内展览空间-04
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-04.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-04.jpg
+  sha256: 8f647ace1d167f30288954b379c4ab47f344b6cee02328ba7fc97cd87b699185
+  bytes: 701439
+  width: 1490
+  height: 980
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8f647ace1d167f30.jpg
+    sha256: ed538783cb82192bdef2085e74a9b289c43d17f1bb6a947b44108ea259c4434c
+    bytes: 190965
+    width: 1490
+    height: 980
+  thumb512:
+    path: assets/thumb512/8f647ace1d167f30.webp
+    sha256: b816d4429b63c9fc43f9d2352c736fd5689de1676fc299e25a0f45673e1893b3
+    bytes: 28228
+    width: 512
+    height: 337
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 新中式药师琉璃光佛殿前厅与十二药叉大将壁画展厅场景，右侧敞门内可见宝蓝色琉璃药师佛，外厅设发光神将壁画与宝蓝星空木藻井天花，地面满铺灰绿色高光奢石大板。
+materials:
+- 深胡桃木梁柱与格扇
+- 宝蓝色琉璃药师佛像
+- 星空发光木藻井天花
+- 灰绿色高光奢石大理石大板
+colors:
+- 胡桃木褐
+- 琉璃宝蓝
+- 灰绿翡翠色
+- 佛像金
+style: 现代奢石展陈
+ai_design_usage: 药师佛殿内外套间过渡设计、宝蓝琉璃光藻井与绿色系高光奢石大板地面铺装效果参考
+prompt_zh: 新中式药师琉璃光佛殿前厅与壁画展厅室内设计，内外双空间透视构图，右侧透过中式镂空木格扇敞门可见内殿供奉的宝蓝色琉璃药师佛坐像与金身胁侍菩萨，外厅左侧及正面深胡桃木墙面上嵌设多幅竖向发光工笔重彩十二药叉大将与菩萨壁画，方形木柱立于双层雕花石柱础上，顶部为立体木构井字藻井天花，格栅内嵌深邃的宝蓝色琉璃星空背景并悬垂小宫灯，地面满铺高光泽度灰绿色天然纹理奢石大理石大板，镜面倒影清晰，净土琉璃境界，8K渲染。
+tags:
+- 佛教空间案例
+- 药师佛殿
+- 琉璃光佛
+- 十二药叉壁画
+- 绿色奢石地面
+- 星空藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 980
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 3D interior rendering of the Medicine Buddha outer hall with Twelve Yaksha Generals glowing murals, starry coffered
+    ceiling, green luxury marble floor, and inner hall view with blue liuli Medicine Buddha. Faint semi-transparent lotus
+    watermark in bottom-right corner.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark

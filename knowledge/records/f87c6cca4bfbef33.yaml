@@ -1,0 +1,78 @@
+id: f87c6cca4bfbef33
+title_zh: 潮州从熙公祠双狮金漆木雕梁架
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-潮州从熙公祠双狮金漆木雕梁架-commons52196177.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-潮州从熙公祠双狮金漆木雕梁架-commons52196177.jpg
+  sha256: f87c6cca4bfbef33a6cb2f70c1b3b7ab6e8dab0070c08485d7b3625ea5fffd52
+  bytes: 2619205
+  width: 3840
+  height: 2556
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f87c6cca4bfbef33.jpg
+    sha256: d36e3f3b1970464a5fadcc29518681968c718759428a7bec0fd4f283663b1e49
+    bytes: 724171
+    width: 2048
+    height: 1363
+  thumb512:
+    path: assets/thumb512/f87c6cca4bfbef33.webp
+    sha256: a37670bb5f8789f34f913cc123e2ee4db3ac757bb88680b56c636888e97d642a
+    bytes: 50014
+    width: 512
+    height: 341
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 潮州从熙公祠双狮金漆木雕梁架
+entity_type: 实物对象写实
+summary_zh: 【图中可见】两只金褐色狮形托木分立在横梁上，卷曲鬃毛、张口齿列和粗爪突出，上方以透空枝叶、亭阁形小构件和木梁相互叠置。【来源著录】从熙公祠金漆木雕3.jpg；文化或地点依据：来源说明为广东潮州从熙公祠金漆木雕。
+materials:
+- 金漆木雕（来源说明）
+colors:
+- 金色
+- 褐色
+- 绿色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，两只金褐色狮形托木分立在横梁上，卷曲鬃毛、张口齿列和粗爪突出，上方以透空枝叶、亭阁形小构件和木梁相互叠置。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 从熙公祠金漆木雕3.jpg. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 潮州从熙公祠双狮金漆木雕梁架
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:%E4%BB%8E%E7%86%99%E5%85%AC%E7%A5%A0%E9%87%91%E6%BC%86%E6%9C%A8%E9%9B%953.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/%E4%BB%8E%E7%86%99%E5%85%AC%E7%A5%A0%E9%87%91%E6%BC%86%E6%9C%A8%E9%9B%953.jpg/3840px-%E4%BB%8E%E7%86%99%E5%85%AC%E7%A5%A0%E9%87%91%E6%BC%86%E6%9C%A8%E9%9B%953.jpg
+  credit: 三猎; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2556
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

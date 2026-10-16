@@ -1,0 +1,78 @@
+id: 0efef8f9f78852f8
+title_zh: 秣菟罗女像与莲花石栏片
+source:
+  original_path: 石刻纹样开放授权实物参考/东南亚与南亚-秣菟罗女像与莲花石栏片-cma123467.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/02-东南亚与南亚石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/东南亚与南亚-秣菟罗女像与莲花石栏片-cma123467.jpg
+  sha256: 0efef8f9f78852f8aaf8c57366d9279ed4cc53aad65d4ff7b76d64fd0cb35515
+  bytes: 1937540
+  width: 2973
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0efef8f9f78852f8.jpg
+    sha256: e11d878a0e7a220dee8e6a33c1d3e17cafffd748c8d6b551ff05e8fc2cc92ee9
+    bytes: 695737
+    width: 1791
+    height: 2048
+  thumb512:
+    path: assets/thumb512/0efef8f9f78852f8.webp
+    sha256: 646ebbf27fffeff0b7a7efb51aababaddd9a1ebe202c2457fa38d5c592d878d6
+    bytes: 32874
+    width: 448
+    height: 512
+library_type: 石刻纹样
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 秣菟罗女像与莲花石栏片
+entity_type: 实物对象写实
+summary_zh: 【图中可见】红褐色石栏左侧为站立女性，右侧排列圆形莲花纹单元，横档与拱形上缘相连。【来源著录】Section of Monolithic Railing with Bather and Lotus Medallions；文化或地点依据：India,
+  Mathura, Kushan period。
+materials:
+- 红砂岩
+colors:
+- 红褐色
+style: 东南亚/南亚传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，红褐色石栏左侧为站立女性，右侧排列圆形莲花纹单元，横档与拱形上缘相连。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Section of Monolithic Railing with Bather and Lotus Medallions.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 秣菟罗女像与莲花石栏片
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1943.71
+  download_url: https://openaccess-cdn.clevelandart.org/1943.71/1943.71_print.jpg
+  credit: Purchase from the J. H. Wade Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2973
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -104,7 +104,7 @@ modelSpecs:
         thinking: true
         thinkingLevel: high
         promptPrefix: &designPromptPrefix |-
-          你是庄严宝刹的概念设计助手，专注寺院佛堂装饰、石材大板、禅意家具与展会展位设计。凡涉及图片需求，请立即调用工具：仅需文字方案或多方向构思时调用 design_concepts（参考图通过 reference_ids 传入）；生成单张效果图时调用 generate_image；修改对话中已上传或之前生成的图片时调用 edit_image（从对话图片列表中获取 base_id，不确定时先调用 list_images）；生成或改图传入参考图时须在 references 中逐一提供 id 与 use。请原样保留客户填写的石材名称，切勿自行改名。概念效果图仅供方案参考，并非施工图或生产下料图；CAD 与施工生产图功能正在重建升级，当前版本暂不提供。严禁在回复中提及任何底层模型、平台或厂商名称。
+          你是庄严宝刹设计助手，专注佛堂、石材、家具与展位设计。出图或三维预览调工具：查图库用 search_library（kb_ 前缀 id 可传 base_id、image_id、references、reference_ids）；多方案用 design_concepts（传 reference_ids）；出图用 generate_image；改图用 edit_image（取 base_id，未知调 list_images）；对比石材用 compare_materials（传 base_id、target、materials）；三维用 create_3d_model（传 image_id、detail，返 job_id 调 check_3d_model，留视图标记并附下载链接）；references 含 id 与 use。保留石材原名；产物仅作视觉参考，非制造模型。禁提模型或厂商名。
     - name: zyb-design-fast
       label: 庄严设计助手 · 快速
       description: 快速响应的概念设计与图像改图助手
@@ -116,8 +116,9 @@ modelSpecs:
         model: anthropic/claude-haiku-5.5
         promptPrefix: *designPromptPrefix
 
-# 允许访问内部 Docker 网络中的概念设计 MCP 服务地址
+# 启用内联 MCP UI 资源渲染并允许访问内部 Docker 网络中的概念设计 MCP 服务地址
 mcpSettings:
+  apps: true
   allowedAddresses:
     - studio:8000
 

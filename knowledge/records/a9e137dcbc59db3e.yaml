@@ -1,0 +1,77 @@
+id: a9e137dcbc59db3e
+title_zh: 佛教主题室内供奉与展览空间
+source:
+  original_path: 佛堂空间设计参考/佛教主题室内供奉与展览空间.jpg
+original:
+  path: 佛堂空间设计参考/佛教主题室内供奉与展览空间.jpg
+  sha256: a9e137dcbc59db3e951a994396454e079ffc8967c91132b08c0af1211f5a9e0e
+  bytes: 189241
+  width: 1600
+  height: 824
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a9e137dcbc59db3e.jpg
+    sha256: 83ed58a5008afa75c2d20db552465b7541147d05f4f453921a1bf7991f5d53fc
+    bytes: 215426
+    width: 1600
+    height: 824
+  thumb512:
+    path: assets/thumb512/a9e137dcbc59db3e.webp
+    sha256: bfbe4d3cdf797321ab5a0b11c7f176eb6040db21dc9d35814c808b971541d244
+    bytes: 20852
+    width: 512
+    height: 264
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 新中式高定会所佛堂与文化展厅室内效果图，中央设带庑殿飞檐的三开间胡桃木雕花大佛龛供奉三尊金佛，配金色暗纹背板、井字吊顶、刺绣袈裟挂画与多宝格茶席。
+materials:
+- 深胡桃木/红木
+- 金色暗纹锦缎背板
+- 贴金铜佛
+- 刺绣袈裟装裱画
+- 实木地板
+colors:
+- 象牙白
+- 深褐木色
+- 香槟金
+- 暖黄
+style: 现代禅意
+ai_design_usage: 高定会所/大宅佛堂全景效果图生成、庑殿顶三开间木质佛龛造型参考、佛堂与多宝格茶室复合布局
+prompt_zh: 新中式豪华室内佛堂与文化展厅设计，中央为带传统飞檐屋顶与鎏金雕花的深胡桃木三开间大佛龛，佛龛内衬金色暗纹背板并暗藏暖光，供奉三尊贴金坐佛，前方摆放中式供桌与三个白色圆蒲团，天花板为六个象牙白叠级方形灯槽井字吊顶并镶嵌金色角花，左侧为通高木质博古柜，右侧墙面悬挂黑色画框装裱的传统刺绣华服艺术品，配发光多宝格与新中式禅意茶桌圈椅，3D室内效果图，明亮暖金色调，8K
+tags:
+- 新中式佛堂
+- 庑殿顶佛龛
+- 井字吊顶
+- 多宝格展陈
+- 茶禅会所
+- 金佛供奉
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 824
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 新中式会所佛堂与文化展厅3D效果图，全图遍布'建E网 www.justeasy.cn'斜向重复水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

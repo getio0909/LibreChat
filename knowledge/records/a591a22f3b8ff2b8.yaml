@@ -1,0 +1,73 @@
+id: a591a22f3b8ff2b8
+title_zh: 佛教石材浮雕神话生物纹样
+source:
+  original_path: 佛教空间设计案例/佛教石材浮雕神话生物纹样.jpg
+original:
+  path: 佛教空间设计案例/佛教石材浮雕神话生物纹样.jpg
+  sha256: a591a22f3b8ff2b8e966027e91991caa3b71472bbe067a81f19467e0cb457f11
+  bytes: 1360153
+  width: 1962
+  height: 1184
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a591a22f3b8ff2b8.jpg
+    sha256: db68f81ccf63734bb6a2da449fc2b1bf8dc44f0f7e91debc32b5f765e4a9ca2e
+    bytes: 471992
+    width: 1962
+    height: 1184
+  thumb512:
+    path: assets/thumb512/a591a22f3b8ff2b8.webp
+    sha256: b8c8dd41dbb95b42513a7fb2de894ac3b35a38fa7dbf8590c2ecbf659b7508da
+    bytes: 37308
+    width: 512
+    height: 309
+library_type: 石刻纹样
+region: 未知
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 传统青白石彩绘浅浮雕瑞兽麒麟/狻猊踏浪祥云纹构件
+entity_type: 实物对象写实
+summary_zh: 本图为一件用于佛教殿堂丹陛御道圆盘、地面藻井中心石或须弥座束腰部位的“瑞兽（狻猊/麒麟/海兽）踏浪祥云纹”彩绘石材浅浮雕构件局部特写（与第 08、12、14 张中的圆形地面/墙面装饰盘同源）。狻猊为龙生九子之一，喜烟好坐，常饰于香炉及佛座，象征护持正法、镇宅辟邪、吉祥瑞应。
+  基底采用温润细腻的米灰白色大理石/青白石，通过多层次阴线刻与浅浮雕（铲地浮雕）技法雕出纹样后，在中心瑞兽躯干部位施以古雅的青蓝灰色（石青调墨）矿物彩绘，眼部、口鼻与爪部点染白粉与淡金，周围水浪与祥云则保留米白与浅灰的天然石材本色对比。
+materials:
+- 汉白玉
+- 青白石浅浮雕
+- 矿物彩绘
+colors:
+- 米白石底
+- 青黑瑞兽
+- 浅灰云浪
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统佛殿丹陛石/地面圆盘瑞兽浮雕纹样生成 / 石材CNC浅浮雕灰度图与法线贴图参考 / 佛教瑞兽狻猊麒麟踏浪图案设计；推荐搭配：汉白玉/青白石数控精雕浅浮雕 + 局部古法矿物彩绘（石青/墨灰）或仿古做旧擦色
+  + 仰莲瓣圆框收边
+prompt_zh: 中国传统佛教石材浅浮雕神话瑞兽纹样局部特写，圆形团花构图，米灰白色大理石基底，左侧雕刻一尊身姿矫健、回首咆哮的青蓝灰色瑞兽（狻猊或麒麟），怒目圆睁、鬃毛飞扬、四爪有力；瑞兽四周环绕放射状翻涌的波涛水浪纹与朵朵饱满的如意祥云纹，最外缘饰有一圈精细的白色仰莲花瓣边框，阴刻线条流畅苍劲，浅浮雕层次细腻，传统古建石雕工艺细节，高清写实。
+tags:
+- 石材瑞兽浮雕
+- 狻猊踏浪纹
+- 祥云水波纹石雕
+- 丹陛石浮雕纹样
+- 佛教传统纹饰
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1184
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 汉白玉莲花飞天弧形横梁浮雕局部实拍，画面干净无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

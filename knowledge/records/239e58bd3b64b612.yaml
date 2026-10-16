@@ -1,0 +1,75 @@
+id: 239e58bd3b64b612
+title_zh: 大型浅色石材板材
+source:
+  original_path: 常用石材大板/大型浅色石材板材.jpg
+original:
+  path: 常用石材大板/大型浅色石材板材.jpg
+  sha256: 239e58bd3b64b6123dda970532996d2977923a9187d827e3ea8b397925e890aa
+  bytes: 211210
+  width: 853
+  height: 640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/239e58bd3b64b612.jpg
+    sha256: 7ff67935dc40c3e82d0cec005aff22796e316c64a0c305949059cdf1ee619765
+    bytes: 104126
+    width: 853
+    height: 640
+  thumb512:
+    path: assets/thumb512/239e58bd3b64b612.webp
+    sha256: 48115368764bf59351ccf6534d8c9cdbeb964f21cc7b775891e53daa30a9dca9
+    bytes: 22324
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-浅奶油米白系
+entity_type: 实物对象写实
+summary_zh: 本图为一块高明度的浅奶油米白色天然大理石大板实物写实。
+materials:
+- 天然大理石
+- 浅米白大理石
+- 高光抛光石材
+colors:
+- 浅奶油米白
+- 象牙白
+- 淡米黄色
+style: 现代奢石展陈 / 现代侘寂禅风
+ai_design_usage: 居士林/现代禅修室柔和墙面贴图 / 极简侘寂风（Wabi-Sabi）与现代禅风空间主材 / 浅色石材地面渲染
+prompt_zh: 大型浅奶油米白色天然大理石大板正面特写，温润的象牙白与浅米黄底色，表面分布细腻柔和的浅灰米色云絮状暗纹与微晶颗粒，镜面抛光高光泽表面，反射顶部条形天窗光线，石材仓库实景拍摄，纯净柔和的禅意空间基础石材。
+tags:
+- 浅米白大理石
+- 奶油色石材
+- 象牙白大板
+- 温润肌理
+- 现代禅修空间主材
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 640
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 灰蓝与暖黄交织斜向流体纹大理石大板实拍（与#305、#308同品种），原图853x640分辨率偏低，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 853x640 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（853x640，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印

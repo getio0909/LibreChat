@@ -1,0 +1,29 @@
+schema: 1
+id: "4444444444444441"
+title_zh: 蓝金灰奢石样板
+library_type: 材质纹理
+studio_roles:
+  - 材质
+  - 参考
+category_l1: 材质纹理
+materials:
+  - 蓝金灰
+material_ids:
+  - blue-gold-grey
+colors:
+  - 蓝灰
+  - 金
+style:
+  - 艺术奢华
+tags:
+  - 蓝金灰大板
+summary_zh: 蓝金灰奢石样板。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: approved

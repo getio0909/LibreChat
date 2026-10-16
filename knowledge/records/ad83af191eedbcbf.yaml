@@ -1,0 +1,77 @@
+id: ad83af191eedbcbf
+title_zh: 德化白瓷龙鱼座观音立像
+source:
+  original_path: 造像雕塑开放授权实物参考/中国南方-德化白瓷龙鱼座观音立像-met51235.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/04-中国南方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国南方-德化白瓷龙鱼座观音立像-met51235.jpg
+  sha256: ad83af191eedbcbf5108831fbb336a453fd3580236f27f4a32da25b484ca992e
+  bytes: 788983
+  width: 2998
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ad83af191eedbcbf.jpg
+    sha256: d49cfbe4c6598ebec82637f0189f5b1bd4e7fdd9ee20ef3a8ac54c3d25083396
+    bytes: 151595
+    width: 1535
+    height: 2048
+  thumb512:
+    path: assets/thumb512/ad83af191eedbcbf.webp
+    sha256: 82b62ebe34a8f8dcb344ca880186958f0acd5efeef2faade3b8735bec3f6ce1b
+    bytes: 7146
+    width: 384
+    height: 512
+library_type: 造像雕塑
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 德化白瓷龙鱼座观音立像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】乳白色立像身披长衣，胸前层层珠链与坠饰，双手置于腰前，脚下卷浪与有须鳞状兽首相连。【来源著录】Bodhisattva Guanyin standing on a dragonfish；文化或地点依据：馆方材质明确著录德化窑，按德化瓷雕传统归入福建相关南方参考。
+materials:
+- 德化象牙白釉瓷
+colors:
+- 乳白色
+style: 中国南方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，乳白色立像身披长衣，胸前层层珠链与坠饰，双手置于腰前，脚下卷浪与有须鳞状兽首相连。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Bodhisattva Guanyin standing on a dragonfish. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.
+tags:
+- 造像雕塑
+- 中国南方
+- 开放授权
+- 真实摄影
+- 德化白瓷龙鱼座观音立像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/51235
+  download_url: https://images.metmuseum.org/CRDImages/as/original/DP-15944-043.jpg
+  credit: Bequest of Robert West, 1950
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2998
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

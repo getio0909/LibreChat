@@ -1,0 +1,77 @@
+id: 58820d45651fe3aa
+title_zh: 佛教主题展览空间-04
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间-04.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间-04.jpg
+  sha256: 58820d45651fe3aaac80de379a3cb0bbf22c3b611fe0417d8f1c88574f074327
+  bytes: 2944465
+  width: 3439
+  height: 2586
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/58820d45651fe3aa.jpg
+    sha256: b591aa5fce2906f5315ca809060b3c701ff4e3b55076c37a75d8285276716eae
+    bytes: 419454
+    width: 2048
+    height: 1540
+  thumb512:
+    path: assets/thumb512/58820d45651fe3aa.webp
+    sha256: ac41164183f7a2204ef77926ce7f0abbb5952913c4156842b72445508334b3b8
+    bytes: 35030
+    width: 512
+    height: 385
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院藏经阁与禅修阅览室
+entity_type: 空间场景设计
+summary_zh: 暖琥珀木色 / 通顶实木发光书架、长条实木阅览桌、深色木地板
+materials:
+- 原木书架
+- 青石雕禅定佛像
+- 白色鹅卵石
+- 宣纸水墨挂画
+- 米灰纹理地砖
+colors:
+- 原木色
+- 青石灰
+- 留白
+- 暖黄光
+style: 现代禅意书房与艺术展廊风
+ai_design_usage: 寺院藏经阁/国学书院单点透视构图(ControlNet Depth) / 通顶发光书架照明设计 / 禅修抄经桌椅排布
+prompt_zh: 中式古典寺院藏经阁与禅修阅览室室内设计，严格的单点中心对称透视，正面与左右两侧均为通顶深胡桃木发光藏经书架，每格内置暖黄灯光照亮整齐排列的精装典籍，左右墙壁各有一扇带鎏金铜铺首门环的传统木格扇大门，深色实木地板中央摆放长条实木矮桌，两侧对称排列八个米白色方形打坐坐垫，温暖静谧，8k室内渲染。
+tags:
+- 藏经阁
+- 佛学阅览室
+- 发光书架
+- 抄经堂
+- 单点透视
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2586
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3K 3D interior rendering of a symmetrical wooden sutra library and reading room with floor-to-ceiling backlit bookshelves,
+    long wooden reading table with white floor cushions, and dark wood floor. Metadata materials/colors fields are misaligned
+    (claiming 青石雕禅定佛像/白色鹅卵石/宣纸水墨挂画/米灰纹理地砖).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials and colors fields claim 青石雕禅定佛像/白色鹅卵石/宣纸水墨挂画/米灰纹理地砖 which are completely absent'

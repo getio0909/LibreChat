@@ -1,0 +1,71 @@
+id: c610e9593b0fbff0
+title_zh: 佛教主题雕花木质展柜
+source:
+  original_path: 佛教家具与陈设素材/佛教主题雕花木质展柜.jpg
+original:
+  path: 佛教家具与陈设素材/佛教主题雕花木质展柜.jpg
+  sha256: c610e9593b0fbff0fc5f9c3adc7d8bea3b10bf67c0768e47e7323556dc0f1d09
+  bytes: 397765
+  width: 1280
+  height: 1136
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c610e9593b0fbff0.jpg
+    sha256: 48a982afb5549c2da3986be42b575629bac0ba4b94409b8ea9dfdeb0a35d6c14
+    bytes: 428552
+    width: 1280
+    height: 1136
+  thumb512:
+    path: assets/thumb512/c610e9593b0fbff0.webp
+    sha256: b24543884d02717d18bc67fe9435018d50d2530836d77a6d58e47dda177902e7
+    bytes: 66766
+    width: 512
+    height: 454
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 正面实景拍摄的一座大型藏式三联一体多宝格佛龛博古展柜（Tibetan Buddhist Multi-Niche Shrine & Display Cabinet）。整座大柜集成了上部五连拱冠顶、中部三段式多层亮格佛龛、中部八吉祥腰线以及下部多抽屉储物底柜，是藏传佛堂中用于供奉主尊与圣物、收纳经书唐卡与法器的核心定制大家具。
+materials:
+- 红木
+- 矿物质彩绘
+- 青玉拉手
+- 金箔
+colors:
+- 紫红棕配明黄内衬
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 大型佛堂整墙定制佛龛柜立面参考 / 六拏具欢门与八吉祥浮雕细节提取 / 佛像植入背景母本
+prompt_zh: 正面立面摄影，一座恢弘华丽的藏式三联多宝格木雕佛龛大展柜，深紫红色红木柜体配明黄色佛龛内衬，顶冠为五连拱龛与瑞兽浮雕，正中主佛龛雕刻繁复的六拏具雪狮白象背光，两侧立柱浮雕彩绘天女与宝瓶柱，腰线横列立体彩绘八吉祥徽章，下层抽屉镶嵌青绿色玉石拉手底板，底部柜门精雕金翅大鹏鸟、开屏孔雀与白象，极致传统藏式木雕彩绘工艺，8K高清。
+tags:
+- 藏式多宝格佛柜
+- 六拏具欢门
+- 金翅大鹏鸟浮雕
+- 八吉祥腰线
+- 明黄背板佛龛
+- 三联雕花展柜
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1136
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 展厅正面实拍大型藏式三联多宝格重工雕花彩绘佛龛博古大柜。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

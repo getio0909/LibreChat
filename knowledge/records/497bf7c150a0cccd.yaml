@@ -1,0 +1,75 @@
+id: 497bf7c150a0cccd
+title_zh: 佛教主题展览空间设计-14
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-14.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-14.jpg
+  sha256: 497bf7c150a0cccd43376425f009cb0efd5bb7155c3097bde2e3315fc18b0128
+  bytes: 963942
+  width: 1748
+  height: 1214
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/497bf7c150a0cccd.jpg
+    sha256: e80a0ac9762f7e90ddf586d0aee76a818b5ea2465ec7ff156e0e31a64d5fbb8f
+    bytes: 254937
+    width: 1748
+    height: 1214
+  thumb512:
+    path: assets/thumb512/497bf7c150a0cccd.webp
+    sha256: 0687d190af365dc2eb91a735807620e713fa3bb7b8e2c391db4325332377cf72
+    bytes: 28752
+    width: 512
+    height: 356
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 道教/民俗五路财神与天尊供奉殿
+entity_type: 空间场景设计
+summary_zh: 金黄暖木与米黄大理石 / 五尊彩绘神像、圆形发光背光、实木大供案、拜垫
+materials:
+- 脱胎彩绘描金神像
+- 拉丝金圆形发光背光盘
+- 黄花梨实木雕花供案
+- 高光米黄大理石
+- 明黄绸缎拜垫
+colors:
+- 富贵暖金
+- 米黄色
+- 明黄
+- 彩绘朱红石绿
+style: 传统汉地民俗与道教祈福财神殿风
+ai_design_usage: 祈福文化馆财神殿/天尊殿室内设计 / 巨型圆形金色发光背光环设计 / 传统中式供桌与方形拜垫陈设参考
+prompt_zh: 金碧辉煌的中式祈福财神殿室内设计，正向对称构图，大殿中央高台上并排供奉五尊精美的传统彩绘描金五路财神天尊坐像，神像背后是金色祥云背景墙与三轮巨大的圆形发光金环背光，神台前摆放一张中式实木雕花长条供桌，桌前米黄色高光大理石地面上整齐排列六个明黄色方形跪拜垫，两侧墙面绘有金色山水云纹壁画，顶部为金色井字藻井吊顶，吉祥庄严，8k效果图。
+tags:
+- 五路财神殿
+- 圆形金背光
+- 中式供桌拜垫
+- 祈福殿堂
+- 彩绘塑金神像
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1214
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a shrine hall enshrining five Taoist/Chinese folk-religion deities (Five Wealth Gods / Tianzun
+    in Taoist crowns and robes holding flywhisk and ruyi), contradicting the Buddhist space classification.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - subject_mismatch

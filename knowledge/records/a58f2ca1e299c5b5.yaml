@@ -1,0 +1,71 @@
+id: a58f2ca1e299c5b5
+title_zh: 天然美石佛国画卷立面设计图
+source:
+  original_path: 26年春季佛事展设计方案/天然美石佛国画卷立面设计图.jpg
+original:
+  path: 26年春季佛事展设计方案/天然美石佛国画卷立面设计图.jpg
+  sha256: a58f2ca1e299c5b5f4beb145859e6ba069b641462a4f5c15ddfa19b22fb67955
+  bytes: 2419582
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/a58f2ca1e299c5b5.jpg
+    sha256: d7632099a354bbe21467ffeff90555f4fcf95a2c14b1b2150cafe7769b4d8e38
+    bytes: 299022
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/a58f2ca1e299c5b5.webp
+    sha256: 0507c40ac3a42682539ca5a3541a17045ff12dbe8d66fd62d58d33ca58b5b081
+    bytes: 14150
+    width: 512
+    height: 362
+library_type: 工程图纸
+region: 未知
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-C立面佛国画卷施工图
+entity_type: 工程设计图纸
+summary_zh: 本图为 2026年春季佛事展西侧主背景墙——C 立面图 施工深化图。精确规定了 9.78 米长“天然美石 · 佛國畫卷”展墙的石材净下料尺寸、木作画框线条宽度、底部中式回纹护墙板三段式高度构成以及顶部留白比例。
+materials:
+- 石材(8800×2500)
+- 回型条
+colors:
+- 暖米白(C13M9Y19K0)
+- 胡桃木
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 9.78米超长跨度新中式奢石背景墙黄金竖向比例分割与CAD尺寸参考
+prompt_zh: 室内装饰工程CAD彩色立面施工图，“C立面图”，展示9780mm长、5000mm高的新中式“天然美石·佛國畫卷”巨幅石材背景墙设计，暖米白色木结构底墙（CMYK色值C13 M9 Y19 K0），上方1200mm留白区居中标注“天然美石·佛國畫卷”PVC雕刻字，中央为8800×2500mm大型对纹玉石背景墙并由100mm宽木纹线条包边，底部为900mm高（150+600+150mm）深胡桃木回型条护墙板，前方透视可见两张白色圆形洽谈桌椅，四周带有详尽精准的红色工程尺寸标注与中文工艺引线，白底专业CAD施工图。
+tags:
+- 26年春季佛事展
+- C立面图
+- 佛国画卷施工图
+- 奢石背景墙尺寸
+- 回型条护墙板
+- 8800x2500石材墙
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展西侧C立面天然美石佛国画卷奢石背景墙CAD施工尺寸标注图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

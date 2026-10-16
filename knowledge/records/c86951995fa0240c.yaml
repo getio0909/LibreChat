@@ -1,0 +1,78 @@
+id: c86951995fa0240c
+title_zh: 佛教主题室内展览空间-02
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-02.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-02.jpg
+  sha256: c86951995fa0240c98aadd69c41b54f7d1256feb82659129a1c21801046f4bc7
+  bytes: 3153691
+  width: 3281
+  height: 2560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c86951995fa0240c.jpg
+    sha256: b024085d222bd68b2a951fa1830285d2aa57daf4531ff216d009f397161758a0
+    bytes: 445535
+    width: 2048
+    height: 1598
+  thumb512:
+    path: assets/thumb512/c86951995fa0240c.webp
+    sha256: 7e8cf270269fb67f5a0ce7cdadc82bec24491481d624cc0430f8494cc0943135
+    bytes: 36028
+    width: 512
+    height: 399
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 新中式大悲咒发光经文墙与居士共修禅堂场景，左右整墙镌刻立体白字发光《大悲咒》全文，正前方设青石台基、双联雕花供桌与巨幅说法图壁画，地面阵列35个明黄色莲花蒲团。
+materials:
+- 浅米灰石材背景墙
+- 立体发光亚克力汉字
+- 传统井字原木梁架
+- 青石浮雕台基
+- 明黄色刺绣蒲团
+colors:
+- 暖原木色
+- 明黄色
+- 发光纯白
+- 深灰褐色
+style: 现代禅意
+ai_design_usage: 大型居士共修禅堂设计、大悲咒整墙立体发光经文背景墙制作与禅修蒲团矩阵布局参考
+prompt_zh: 新中式佛教共修禅堂室内全景设计，严谨的中轴对称广角构图，左右两侧整面高墙为浅米灰色背景配整齐排列的立体白色发光汉字《大悲咒》全文，正前方青石雕花台基上并列两张中式实木雕花供桌，后方主背景墙镶嵌巨幅重彩佛陀说法图壁画，四周饰有暖光木格栅边框，顶部为传统井字形原木梁架配筒灯，深灰褐色石材地面上整齐阵列三十五个明黄色绣莲花圆形打坐蒲团，庄严明亮，8K超高清室内渲染。
+tags:
+- 佛教空间案例
+- 共修禅堂
+- 大悲咒经文墙
+- 立体发光字
+- 禅修蒲团
+- 说法图壁画
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2560
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 3D interior rendering of a meditation hall with flanking full-height walls of glowing white 3D Great Compassion Mantra
+    characters, central Buddhist mural and altar, and yellow lotus cushions. Semi-transparent lotus watermark in bottom-right
+    corner.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark

@@ -1,0 +1,76 @@
+id: b19c0a4024c23510
+title_zh: 佛教风格多层装饰柜
+source:
+  original_path: 佛教家具与陈设素材/佛教风格多层装饰柜.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格多层装饰柜.jpg
+  sha256: b19c0a4024c23510b2c0bada56c749d382f15347228a119e76e459aabf51c162
+  bytes: 426420
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b19c0a4024c23510.jpg
+    sha256: ec0418d836d9a051507066434aaa275a40a2bafc889cb4da5ab70ab7e1b322d7
+    bytes: 459137
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/b19c0a4024c23510.webp
+    sha256: 00e167a922ecbebddd0a66042a22880452f48f3d9930c90c33a09eae0fba8b55
+    bytes: 46506
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 三层阶梯式坛城装饰柜的“红酸枝主体 + 绿松石满嵌 + 局部青玉开光”折中平衡版设计方案。相比第 13 项大面积使用青玉束腰的高昂造价，本方案将玉石集中在下层柜门的核心视觉区，同时强化了红木本身的醇厚木纹与绿松石珠串的点缀感，更具工程落地可行性。
+materials:
+- 红酸枝木
+- 绿松石圆珠
+- 青玉
+- 黄铜包角
+colors:
+- 殷红配松石绿
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 木石嵌宝比例梯度调节参考（从全木到局部嵌玉再到全嵌玉） / 红酸枝嵌绿松石家具设计
+prompt_zh: 室内家具摄影，一座老挝大红酸枝镶嵌绿松石与青玉的三层阶梯式佛教装饰柜，殷红色纹理清晰的红酸枝实木柜体，转角配黄铜嵌松石包角，中层上沿镶嵌一圈绿松石、红珊瑚与青金石圆珠，束腰红木浮雕镶嵌绿松石，下层双开门内嵌浅绿青玉底板与海棠形木雕花芯，木框四周点缀绿松石梅花珠饰，8K写实渲染。
+tags:
+- 大红酸枝
+- 绿松石镶嵌
+- 三层阶梯柜
+- 青玉门芯
+- 藏式坛城柜
+- 铜包角红木柜
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a 3-tier stepped Tibetan rosewood cabinet with turquoise
+    beads and jade door panel inserts. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

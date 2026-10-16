@@ -1,0 +1,71 @@
+id: 8487219508ec59de
+title_zh: 佛教寺庙室内佛像展示空间
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内佛像展示空间.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内佛像展示空间.jpg
+  sha256: 8487219508ec59de19df1092bf826997b3c00c77af4b3d128c1ce76c5e2d96bc
+  bytes: 172743
+  width: 668
+  height: 350
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8487219508ec59de.jpg
+    sha256: 9f4d48adcf105ec8b6615542c635873cbe20373968f164bf3b5f40a21d544cda
+    bytes: 50904
+    width: 668
+    height: 350
+  thumb512:
+    path: assets/thumb512/8487219508ec59de.webp
+    sha256: ae55b05eede8f43c8421dba2b066f6dec8488291685e5f89300376f26030c26b
+    bytes: 20428
+    width: 512
+    height: 268
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 本图为现代极简禅意白色石材“八角白莲穹顶与三联拱龛万佛展示空间”（空间场景设计）。
+materials:
+- 八角形白色叠涩斗拱发光穹顶配双层立体莲花天池
+- 正面三座石材拱形佛龛（中龛三世佛+侧龛青绿山水壁画坐佛）
+- 极简白色万佛墙
+colors:
+- 象牙白
+- 香槟金
+style: 现代奢石与传统佛殿融合风
+ai_design_usage: 现代极简禅意白色万佛厅/美术馆式佛像展厅设计、八角白色斗拱莲花天窗穹顶与三联拱龛立面参考
+prompt_zh: 现代极简禅意佛教寺庙室内万佛与佛像展示空间，正面中轴对称广角全景，高光暖灰褐色大理石地面倒影清晰，空间顶部为一座宏伟的八角形白色叠涩斗拱格栅发光穹顶藻井，藻井正中心镶嵌一朵巨大的双层立体白色莲花浮雕透光天窗，正前方浅色墙面开启三座白色石材雕花拱形大佛龛：中央主龛供奉铜鎏金一佛二菩萨像（配金色火焰背光），左右两龛各供奉一尊金身坐佛并衬以淡雅的青绿山水云海背景壁画，左右两侧斜墙满铺纯白色极简方格发光万佛墙，空灵圣洁，现代建筑美学，8K渲染
+tags:
+- 现代极简万佛堂
+- 八角莲花穹顶
+- 白色石材拱龛
+- 青绿山水佛龛
+- 佛教美术馆空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 350
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代极简白石八角白莲穹顶与三联拱龛万佛堂广角三维效果图，原图分辨率偏低（668x350）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 668x350 (<800px short side)'

@@ -1,0 +1,74 @@
+id: 72ac68a093946d8f
+title_zh: 深绿纹理石材展示图
+source:
+  original_path: 常用石材大板/深绿纹理石材展示图.jpg
+original:
+  path: 常用石材大板/深绿纹理石材展示图.jpg
+  sha256: 72ac68a093946d8f907146b815c08871ba205a360b659a9d099d2e461a02026d
+  bytes: 340745
+  width: 829
+  height: 622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/72ac68a093946d8f.jpg
+    sha256: 79facb05e4cc8f74c659db7296600f5ab12e29c2fbb8d62ff5ec1630ff6c55c0
+    bytes: 175147
+    width: 829
+    height: 622
+  thumb512:
+    path: assets/thumb512/72ac68a093946d8f.webp
+    sha256: 45fb9935bae36deb1b6a25b4cd2b56b44a64c0b6a975811933530338397a60e2
+    bytes: 51200
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-翠绿闪电白纹系
+entity_type: 实物对象写实
+summary_zh: 本图为在半户外阳光展棚（铺设绿色仿真草坪）中由天车吊夹悬吊展示的天然深翠绿闪电白纹大理石大板（规格241×204cm）实物写实。
+materials:
+- 天然深翠绿大理石
+- 祖母绿奢石大板
+colors:
+- 祖母绿
+- 深翡翠绿
+- 纯白色
+- 浅青色
+style: 现代奢石展陈 / 东方奢华庄严风
+ai_design_usage: 中式大堂/佛堂镇宅石材屏风设计 / 绿度母或药师佛法座背景墙 / 现代奢华茶空间视觉中心墙
+prompt_zh: 天然祖母绿与深翡翠绿色大理石大板正面特写，尺寸241x204厘米，浓郁深翠绿底色上贯穿数道苍劲有力的白色与浅青色斜向闪电状粗脉纹，四周散落细密冰裂白丝，高光抛光镜面质感，色泽浓郁如翡翠碧玉，高端装饰奢石实拍，8K高清。
+tags:
+- 翡翠绿大理石
+- 闪电白纹绿石
+- 241x204大板
+- 祖母绿奢石
+- 石材屏风母板
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 622
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Crane-suspended emerald green marble slab with white veining over artificial turf, overlaid with red text '241*204'
+    and bottom-right STM石猫 watermark.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - third_party_watermark
+  - text_overlay

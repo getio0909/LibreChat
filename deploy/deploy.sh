@@ -47,7 +47,7 @@ cleanup() {
         echo 'Restoring the previous application deployment failed.' >&2
       fi
     elif "${compose[@]}" down --remove-orphans; then
-      for file in "${config_files[@]}"; do
+      for file in "${config_files[@]}" .file_signing_key; do
         rm -f -- "$deploy_root/$file"
       done
       echo 'The failed initial application deployment has been stopped.' >&2
@@ -86,11 +86,32 @@ if ! grep -Eq '^STUDIO_IMAGE=ghcr\.io/getio0909/librechat-studio(:[A-Za-z0-9_.-]
 fi
 if ! jq -e '
   (.shared_token | type == "string" and length >= 64)
+  and (.file_signing_key | type == "string" and test("^[0-9a-fA-F]{64}$"))
   and (.gemini_api_key | type == "string" and length >= 1)
   and (.ark_api_key | type == "string" and length >= 1)
 ' "$stage/studio.json" >/dev/null; then
   echo 'Studio configuration settings are invalid.' >&2
   exit 1
+fi
+# 复用服务器上已持久化的文件签名密钥；仅在首次部署且密钥不存在时生成并持久化。
+persisted_signing_key=''
+if [[ -f "$deploy_root/.file_signing_key" ]]; then
+  candidate_key=$(tr -d '\r\n' < "$deploy_root/.file_signing_key")
+  if [[ "$candidate_key" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    persisted_signing_key=$candidate_key
+  fi
+fi
+if [[ -z "$persisted_signing_key" && -f "$deploy_root/studio.json" ]]; then
+  candidate_key=$(jq -r '.file_signing_key // empty' "$deploy_root/studio.json" 2>/dev/null || true)
+  if [[ "$candidate_key" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    persisted_signing_key=$candidate_key
+  fi
+fi
+if [[ -n "$persisted_signing_key" ]]; then
+  jq --arg key "$persisted_signing_key" '.file_signing_key = $key' "$stage/studio.json" > "$stage/studio.json.tmp"
+  mv "$stage/studio.json.tmp" "$stage/studio.json"
+else
+  persisted_signing_key=$(jq -r '.file_signing_key' "$stage/studio.json")
 fi
 if ! jq -e '
   [.admin, .user] | all(.
@@ -126,6 +147,8 @@ activated=true
 for file in "${config_files[@]}"; do
   install -m 600 "$stage/$file" "$deploy_root/$file"
 done
+printf '%s\n' "$persisted_signing_key" > "$deploy_root/.file_signing_key"
+chmod 600 "$deploy_root/.file_signing_key"
 own_service_configs
 
 # 默认账户验证完成前关闭公开注册，避免首个管理员被抢先创建。

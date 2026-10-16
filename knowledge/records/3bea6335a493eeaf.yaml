@@ -1,0 +1,72 @@
+id: 3bea6335a493eeaf
+title_zh: 佛教主题石材投影墙面
+source:
+  original_path: 26年春季佛事展设计方案/佛教主题石材投影墙面.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教主题石材投影墙面.jpg
+  sha256: 3bea6335a493eeafd0ece4af0a81fcd4e74f5397afc430bf1e35dc245ea09781
+  bytes: 5037739
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3bea6335a493eeaf.jpg
+    sha256: 2c0594048d5e58ef93cf3fb0ffdb62145234af8782a24342faffc92252e58dff
+    bytes: 971331
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/3bea6335a493eeaf.webp
+    sha256: 64c4ab10820a84134ee74baa151e586bf5e8cef61eb617de0e35b2bd16e35277
+    bytes: 56858
+    width: 384
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 材质
+- 风格
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-奢石墙光学禅诗投影
+entity_type: 空间场景设计
+summary_zh: 本图为 C立面“天然美石 · 佛國畫卷”背景墙右侧区域的斜向仰视特写，重点展示了“天然奢石肌理 + 光学定制文字投影（Gobo Projection）”的创新展陈手法。通过将品牌原创禅诗直接以光影形式烙印在亿万年天然形成的敦煌金石纹之上，实现了视觉艺术与佛教哲理的深度共鸣。
+materials:
+- 佛国画卷大理石
+- 光学投影灯
+colors:
+- 琥珀金
+- 墨黑
+- 发光白字
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 奢石墙面光学书法投影（Gobo Light）与轨道射灯光影氛围参考
+prompt_zh: 高端禅意石材美学馆室内光影特写，斜视角拍摄，金褐色、琥珀色与深墨色交织的天然敦煌金奢石大理石墙面，高光抛光石材表面上通过光学投影仪精准投射出八列竖排白色发光中文禅诗书法（“天成佛缘，石载禅心，石蕴佛塔，纹显真如”），文字在深色石纹上散发圣洁白光，同时石材镜面反射出远处的暖黄色阶梯状轮廓灯带，顶部安装黑色现代轨道射灯，新中式木质雕花边框，极具东方哲学与宗教神圣意境，8K实景摄影。
+tags:
+- 26年春季佛事展
+- 光学禅诗投影
+- 佛国画卷
+- 石蕴佛塔纹显真如
+- 展厅灯光设计
+- Gobo投影墙
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展C立面佛国画卷（敦煌金系列）奢石背景墙右侧与八列竖排光学投影禅诗斜向仰视实景。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

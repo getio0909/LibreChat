@@ -1,0 +1,81 @@
+id: bd0b7bd75f99f566
+title_zh: 北京故宫保和殿龙纹宝座与屏风
+source:
+  original_path: 家具木作开放授权实物参考/中国北方-北京故宫保和殿龙纹宝座与屏风-commons64823106.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/03-中国北方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国北方-北京故宫保和殿龙纹宝座与屏风-commons64823106.jpg
+  sha256: bd0b7bd75f99f566103f77ad380e830840f03177020a963f57b7916a6688c201
+  bytes: 2423283
+  width: 3840
+  height: 2571
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bd0b7bd75f99f566.jpg
+    sha256: 76768826a6043c1171fbb9b8c9877302ca553daccb0dcf85de07a4b2f57d1cac
+    bytes: 670161
+    width: 2048
+    height: 1371
+  thumb512:
+    path: assets/thumb512/bd0b7bd75f99f566.webp
+    sha256: df0c9ade62e68b3fdd9a690d5bb2a679bc5ca7eabf9ff87a86271ceb2533ea34
+    bytes: 38082
+    width: 512
+    height: 343
+library_type: 家具木作
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 北京故宫保和殿龙纹宝座与屏风
+entity_type: 实物对象写实
+summary_zh: 【图中可见】金褐色宝座置于阶台中轴，靠背两侧镂雕盘曲龙身，中板饰圆形龙纹；座下有层叠束腰和雕花踏具，后接红框金边三扇屏风。【来源著录】Beijing-Verbotene Stadt-Halle der Wahrung der
+  Harmonie-24-Drachenthron-gje.jpg；文化或地点依据：Commons 明确著录北京故宫保和殿内部；按北京宫廷汉式木作陈设归入中国北方，具体材种与年代不推断。
+materials:
+- 木作（具体材种未注明）
+- 金色表面装饰
+colors:
+- 金褐
+- 朱红
+- 深褐
+style: 中国北方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，金褐色宝座置于阶台中轴，靠背两侧镂雕盘曲龙身，中板饰圆形龙纹；座下有层叠束腰和雕花踏具，后接红框金边三扇屏风。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Beijing-Verbotene Stadt-Halle der Wahrung der Harmonie-24-Drachenthron-gje.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北京故宫保和殿龙纹宝座与屏风
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Beijing-Verbotene_Stadt-Halle_der_Wahrung_der_Harmonie-24-Drachenthron-gje.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Beijing-Verbotene_Stadt-Halle_der_Wahrung_der_Harmonie-24-Drachenthron-gje.jpg/3840px-Beijing-Verbotene_Stadt-Halle_der_Wahrung_der_Harmonie-24-Drachenthron-gje.jpg
+  credit: Gerd Eichmann; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2571
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

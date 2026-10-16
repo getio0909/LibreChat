@@ -1,0 +1,78 @@
+id: f01de50a3f619756
+title_zh: 大足宝顶山院落狮顶象座石柱组
+source:
+  original_path: 石刻纹样开放授权实物参考/中国南方-大足宝顶山院落狮顶象座石柱组-commons167661342.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/04-中国南方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国南方-大足宝顶山院落狮顶象座石柱组-commons167661342.jpg
+  sha256: f01de50a3f6197568a9ae7a1f0946be90cfe06452488ef07729c401174b862ad
+  bytes: 892953
+  width: 1920
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f01de50a3f619756.jpg
+    sha256: e5df5b1e93594be8d75a683306e6edfa3d80a9e30b1c0a0d6e142efd41acfeaa
+    bytes: 871880
+    width: 1920
+    height: 1280
+  thumb512:
+    path: assets/thumb512/f01de50a3f619756.webp
+    sha256: 33e884968711c4e234fbe4552118816abab2681329b7db733678b24d9b69be0a
+    bytes: 43540
+    width: 512
+    height: 341
+library_type: 石刻纹样
+region: 中国南方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 大足宝顶山院落狮顶象座石柱组
+entity_type: 实物对象写实
+summary_zh: 【图中可见】多根浅灰色石柱在院内排列，柱顶为成组狮形动物，柱身布圆形素面和卷草边饰，下部以象首环托并配莲瓣带。【来源著录】Dazu Rock Carvings (54067324727).jpg；文化或地点依据：来源将照片地点记为重庆大足宝顶山；柱组制作年代未注明，不把遗址的概括年代套用于这些柱子。
+materials:
+- 石材（图中可见）
+colors:
+- 浅灰色
+- 米白色
+style: 中国南方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，多根浅灰色石柱在院内排列，柱顶为成组狮形动物，柱身布圆形素面和卷草边饰，下部以象首环托并配莲瓣带。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Dazu Rock Carvings (54067324727).jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 石刻纹样
+- 中国南方
+- 开放授权
+- 真实摄影
+- 大足宝顶山院落狮顶象座石柱组
+- CC BY 2.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Dazu_Rock_Carvings_(54067324727).jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Dazu_Rock_Carvings_%2854067324727%29.jpg/1920px-Dazu_Rock_Carvings_%2854067324727%29.jpg
+  credit: xiquinhosilva; Dazu Rock Carvings
+  license: cc-by-2.0
+  license_url: https://creativecommons.org/licenses/by/2.0
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

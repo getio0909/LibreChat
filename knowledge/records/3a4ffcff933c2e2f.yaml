@@ -1,0 +1,83 @@
+id: 3a4ffcff933c2e2f
+title_zh: 桑利斯主教座堂祭坛与环形柱廊
+source:
+  original_path: 建筑景观开放授权实景参考/西方-桑利斯主教座堂祭坛与环形柱廊-commons40026071.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/01-西方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/西方-桑利斯主教座堂祭坛与环形柱廊-commons40026071.jpg
+  sha256: 3a4ffcff933c2e2faa28f0764ff2669893089db3c1340512fc153934a572ce93
+  bytes: 959335
+  width: 1920
+  height: 1349
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3a4ffcff933c2e2f.jpg
+    sha256: f36bc489c397be2e71f7bf86f2c9cdaeef401014d3e320004dde44a5df73e5ba
+    bytes: 925203
+    width: 1920
+    height: 1349
+  thumb512:
+    path: assets/thumb512/3a4ffcff933c2e2f.webp
+    sha256: dc69c826b40a582f61e3f84c781c86051383aa3234f2438a4be3a5c42059c81c
+    bytes: 47016
+    width: 512
+    height: 360
+library_type: 建筑景观
+region: 西方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 桑利斯主教座堂祭坛与环形柱廊
+entity_type: 空间场景设计
+summary_zh: 【图中可见】浅色石柱和拱券围绕祭坛，端部高处设立像龛和有翼人形浮饰，侧窗为彩色玻璃，黄白织物向上斜拉形成临时陈设。【来源著录】Senlis Cathedral Sanctuary, Picardy, France - Diliff.jpg；文化或地点依据：来源题名为法国皮卡第
+  Senlis Cathedral 的圣所。
+materials:
+- 石材（图中可见）
+- 玻璃
+- 织物
+colors:
+- 米灰色
+- 黄色
+- 白色
+- 红褐色
+style: 西方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，浅色石柱和拱券围绕祭坛，端部高处设立像龛和有翼人形浮饰，侧窗为彩色玻璃，黄白织物向上斜拉形成临时陈设。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Senlis Cathedral Sanctuary, Picardy, France - Diliff.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 建筑景观
+- 西方
+- 开放授权
+- 真实摄影
+- 桑利斯主教座堂祭坛与环形柱廊
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Senlis_Cathedral_Sanctuary,_Picardy,_France_-_Diliff.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Senlis_Cathedral_Sanctuary%2C_Picardy%2C_France_-_Diliff.jpg/1920px-Senlis_Cathedral_Sanctuary%2C_Picardy%2C_France_-_Diliff.jpg
+  credit: Diliff; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1349
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

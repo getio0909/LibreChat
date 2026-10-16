@@ -1,0 +1,71 @@
+id: 85faf48d9d9e3cd1
+title_zh: 藏式佛教雕花木制展柜
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教雕花木制展柜.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教雕花木制展柜.jpg
+  sha256: 85faf48d9d9e3cd1efeab95f1cc711a9923f77dd667c0fa3faffd4de3be9025a
+  bytes: 509999
+  width: 1440
+  height: 1211
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/85faf48d9d9e3cd1.jpg
+    sha256: 7d70613c477f257d932c3befc4d23e164ff91f7e36c5880bdd22f3609d2b43f0
+    bytes: 550687
+    width: 1440
+    height: 1211
+  thumb512:
+    path: assets/thumb512/85faf48d9d9e3cd1.webp
+    sha256: 210ae0eae8b90007b04ebee13965fccebe7b005c269047593eab69aed72a8d08
+    bytes: 69970
+    width: 512
+    height: 431
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 展厅正面实拍的一座藏汉宫廷技艺巅峰融合的“大鹏双龙冠顶 + 盘龙抱柱”三联多宝格大佛龛展柜。与第 19 项纯藏式十一佛冠不同，本座大柜将汉传皇家建筑的镂空游龙冠顶、高浮雕盘龙抱柱与藏传佛教的金翅大鹏鸟（迦楼罗）、双鹿法轮、兰札体梵藏铭文、护法力士金刚杵完美熔铸于一体。
+materials:
+- 核桃木
+- 贴金彩绘
+- 盘龙圆雕柱
+colors:
+- 暖黄木配贴金银
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 藏汉融合皇家风佛龛设计 / 盘龙抱柱与大鹏鸟冠顶构件提取 / 兰札体藏文门楣细节参考
+prompt_zh: 正面展厅实景摄影，一座融合汉藏皇家宫廷工艺的大型木雕贴金三联佛龛大展柜，冠顶正中精雕金翅大鹏鸟、八辐法轮与双鹿，两侧雕刻四条腾云金龙，门楣额枋雕刻鎏金藏文真言，中央主佛龛两侧立柱为立体高浮雕盘龙抱柱，神龙手托宝珠，龛内为明黄色背板，腰线雕刻护法力士、十字金刚杵与八吉祥，下层凸出式底柜包镶金色莲珠边并雕刻瑞兽海棠开光，香槟金与胡桃木配色，8K超高清。
+tags:
+- 盘龙抱柱佛龛
+- 大鹏双龙冠顶
+- 藏文真言门楣
+- 藏汉宫廷风格
+- 三联木制展柜
+- 力士八吉祥腰线
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1211
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a Sino-Tibetan 3-bay altar cabinet with Garuda and dragons crown, Tibetan/Lantsa script
+    lintel, and coiled-dragon columns.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

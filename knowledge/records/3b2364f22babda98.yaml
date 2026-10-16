@@ -1,0 +1,78 @@
+id: 3b2364f22babda98
+title_zh: 勃艮第大胆菲利普墓哀悼者石像
+source:
+  original_path: 造像雕塑开放授权实物参考/西方-勃艮第大胆菲利普墓哀悼者石像-cma135539.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/01-西方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/西方-勃艮第大胆菲利普墓哀悼者石像-cma135539.jpg
+  sha256: 3b2364f22babda98e953fa59d296f7a0da5ccbca5fe173418901f2aa90e4008e
+  bytes: 880342
+  width: 2598
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3b2364f22babda98.jpg
+    sha256: 8ffe4a81d37e5eebe2689bfa862ea6d10c8bcdab1f7899c1d85e62a8101291bd
+    bytes: 190692
+    width: 1565
+    height: 2048
+  thumb512:
+    path: assets/thumb512/3b2364f22babda98.webp
+    sha256: 9e5555467dcf0438ec3f56753bf6a900e78482dcc79036abd31e761237ee98ea
+    bytes: 6548
+    width: 391
+    height: 512
+library_type: 造像雕塑
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 勃艮第大胆菲利普墓哀悼者石像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】披长袍人物侧转头部，双手在胸前相交，兜帽堆叠于颈肩，长褶一直落至脚边。【来源著录】Mourner from the Tomb of Philip the Bold, Duke of Burgundy (1364–1404)；文化或地点依据：Netherlands,
+  active Dijon, 15th century。
+materials:
+- 雪花石膏
+colors:
+- 米白色
+style: 西方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，披长袍人物侧转头部，双手在胸前相交，兜帽堆叠于颈肩，长褶一直落至脚边。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Mourner from the Tomb of Philip the Bold, Duke of Burgundy
+  (1364–1404). Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 西方
+- 开放授权
+- 真实摄影
+- 勃艮第大胆菲利普墓哀悼者石像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1958.67
+  download_url: https://openaccess-cdn.clevelandart.org/1958.67/1958.67_print.jpg
+  credit: Bequest of Leonard C. Hanna Jr.
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2598
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

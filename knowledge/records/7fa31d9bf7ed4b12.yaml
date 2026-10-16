@@ -1,0 +1,79 @@
+id: 7fa31d9bf7ed4b12
+title_zh: 佛教寺庙佛像展览场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙佛像展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙佛像展览场景.jpg
+  sha256: 7fa31d9bf7ed4b125c1d478773eb74ec9cec30776ece2e3a96f24539f3aa7d21
+  bytes: 152655
+  width: 519
+  height: 349
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7fa31d9bf7ed4b12.jpg
+    sha256: 74f92584cb8855fae1980937292f285fc9c9cae994106ca84a54fc09f6ed8260
+    bytes: 42041
+    width: 519
+    height: 349
+  thumb512:
+    path: assets/thumb512/7fa31d9bf7ed4b12.webp
+    sha256: 50861fe0a309732d9e276751e08c5692c07ab64c2f25a127218c0a998dddb4cc
+    bytes: 24242
+    width: 512
+    height: 344
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 现代露明木椽坡屋顶下设玻璃护栏双层挑空中庭、升起大型青铜鎏金坐佛、两侧配嵌星点壁灯的竖向竹木格栅墙与后方黑金山水画的展陈空间。
+materials:
+- 青铜鎏金大佛
+- 多层石雕莲花座
+- 露明木椽坡屋顶
+- 竖向竹木格栅墙
+- 挑空玻璃护栏
+- 黑金山水画
+colors:
+- 原木竹色
+- 古铜鎏金
+- 玄黑配赤金
+- 浅灰石色
+- 暖白星光
+style: 当代极简禅意建筑与佛教美术馆挑空展陈风
+ai_design_usage: 现代佛教美术馆/禅意建筑双层挑空大佛展厅设计、坡屋顶木椽与竖向木格栅光影墙面参考
+prompt_zh: 现代禅意坡屋顶双层挑空佛教寺庙佛像展览空间，顶部是高耸的人字形现代露明木椽坡屋顶，中央双层挑空中庭四周设透明玻璃护栏，一尊大型青铜鎏金坐佛配镂空火焰背光安坐于从下层升起的多层石雕莲花底座上，左右两侧高墙采用温暖的竖向竹木格栅装饰，并点缀错落分布的菱形暖光星点壁灯，远景后墙下层为发光万佛长廊，上层悬挂一幅巨型黑底金彩山水画，浅灰色石材地面，空灵庄严，8K建筑渲染
+tags:
+- 双层挑空中庭
+- 坡屋顶木椽
+- 竹木格栅墙
+- 青铜大佛
+- 佛教美术馆
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 349
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D render (519x349) of a double-height sloped-roof atrium gallery where a giant bronze seated Buddha rises
+    through a glass-railed floor opening, misclassified under category_l2 as '现代禅修茶室'.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - subject_mismatch

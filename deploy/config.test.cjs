@@ -17,17 +17,21 @@ const parsedCompose = yaml.load(rawCompose);
 
 // 禁止在面向用户的名称、描述或提示词中出现的厂商与模型标识。
 const VENDOR_NAME_PATTERN =
-  /gemini|argon|claude|haiku|sonnet|opus|openrouter|seedream|google|anthropic|deepseek|doubao|\bark\b|openai|gpt/i;
+  /gemini|argon|claude|haiku|sonnet|opus|openrouter|seedream|seed3d|volcengine|google|anthropic|deepseek|doubao|\bark\b|openai|gpt/i;
 
 // 禁止残留的旧版 CAD 服务或容器标识。
 const LEGACY_CAD_PATTERN = /freecad|blender|design_tools|dufs|compile_drawing_sheet/i;
 
-// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3）。
+// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3、WP-P2a 与 WP-P2b 扩展）。
 const CONTRACT_IDENTIFIERS = new Set([
   'design_concepts',
   'generate_image',
   'edit_image',
   'list_images',
+  'search_library',
+  'compare_materials',
+  'create_3d_model',
+  'check_3d_model',
   'prompt',
   'base_id',
   'references',
@@ -36,6 +40,19 @@ const CONTRACT_IDENTIFIERS = new Set([
   'reference_ids',
   'aspect_ratio',
   'resolution',
+  'query',
+  'library_type',
+  'role',
+  'region',
+  'limit',
+  'include_flagged',
+  'target',
+  'materials',
+  'kb_',
+  'image_id',
+  'detail',
+  'note',
+  'job_id',
 ]);
 
 test('librechat.yaml passes LibreChat configSchema validation', () => {
@@ -115,7 +132,7 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
     assert.doesNotMatch(spec.preset.modelLabel || '', VENDOR_NAME_PATTERN);
     assert.doesNotMatch(spec.preset.promptPrefix || '', VENDOR_NAME_PATTERN);
 
-    // 验证中文提示词精简且包含四个核心工具名。
+    // 验证中文提示词精简且包含八个核心工具名。
     const prefix = spec.preset.promptPrefix || '';
     const chineseChars = (prefix.match(/[\u4e00-\u9fff]/g) || []).length;
     assert.ok(
@@ -123,7 +140,16 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
       `Expected <= 250 Chinese characters, got ${chineseChars}`,
     );
     assert.ok(prefix.length <= 400, `Expected <= 400 total characters, got ${prefix.length}`);
-    for (const toolName of ['design_concepts', 'generate_image', 'edit_image', 'list_images']) {
+    for (const toolName of [
+      'design_concepts',
+      'generate_image',
+      'edit_image',
+      'list_images',
+      'search_library',
+      'compare_materials',
+      'create_3d_model',
+      'check_3d_model',
+    ]) {
       assert.ok(prefix.includes(toolName), `promptPrefix must reference ${toolName}`);
     }
   }
@@ -140,10 +166,19 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
         `Non-contract identifier "${identifier}" found in promptPrefix of ${spec.name}`,
       );
     }
-    assert.ok(prefix.includes('base_id'), 'promptPrefix must mention edit_image base_id');
+    assert.ok(prefix.includes('base_id'), 'promptPrefix must mention base_id');
     assert.ok(prefix.includes('references'), 'promptPrefix must mention references');
     assert.ok(prefix.includes('reference_ids'), 'promptPrefix must mention reference_ids');
-    assert.doesNotMatch(prefix, /\b(reference_uses|image_id|image_ids)\b/);
+    assert.ok(prefix.includes('kb_'), 'promptPrefix must mention kb_ IDs');
+    assert.ok(prefix.includes('target'), 'promptPrefix must mention compare_materials target');
+    assert.ok(
+      prefix.includes('materials'),
+      'promptPrefix must mention compare_materials materials',
+    );
+    assert.ok(prefix.includes('image_id'), 'promptPrefix must mention create_3d_model image_id');
+    assert.ok(prefix.includes('detail'), 'promptPrefix must mention create_3d_model detail');
+    assert.ok(prefix.includes('job_id'), 'promptPrefix must mention check_3d_model job_id');
+    assert.doesNotMatch(prefix, /\b(reference_uses|image_ids)\b/);
   }
 
   const mcpContext = buildMCPImageToolContext({
@@ -170,6 +205,7 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
 test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contract', () => {
   const config = configSchema.parse(parsedYaml);
   assert.ok(config.mcpSettings.allowedAddresses.includes('studio:8000'));
+  assert.equal(config.mcpSettings.apps, true);
 
   const studioServer = config.mcpServers.zyb_studio;
   assert.equal(studioServer.type, 'streamable-http');
@@ -237,6 +273,8 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.deepEqual(studio.cap_drop, ['ALL']);
   assert.deepEqual(studio.security_opt, ['no-new-privileges:true']);
   assert.equal(studio.mem_limit, '1g');
+  assert.deepEqual(studio.ports, ['127.0.0.1:8000:8000']);
+  assert.doesNotMatch(rawCompose, /STUDIO_PORT/);
   assert.ok(studio.volumes.includes('./studio.json:/run/secrets/studio.json:ro'));
   assert.ok(studio.volumes.includes('images:/librechat/images:ro'));
   assert.ok(studio.volumes.includes('studio-data:/data'));
@@ -248,10 +286,59 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
 
-test('CI workflow builds studio image with root context, runs Python 3.13 and config tests, and runs smoke test', () => {
+test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding and matches compose host port', () => {
+  const rawNginx = fs.readFileSync('deploy/nginx.conf', 'utf8');
+  assert.match(rawNginx, /location \/studio-files\/\s*\{/);
+  assert.match(rawNginx, /proxy_pass http:\/\/127\.0\.0\.1:8000\/files\/;/);
+  assert.match(rawNginx, /proxy_set_header Range \$http_range;/);
+
+  // 验证 compose.yml 绑定的宿主机回环地址与 nginx.conf 的反向代理上游地址完全一致且不可被环境变量偏移。
+  const composePortBinding = parsedCompose.services.studio.ports[0];
+  const nginxProxyMatch = rawNginx.match(/proxy_pass http:\/\/(127\.0\.0\.1:\d+)\/files\/;/);
+  assert.ok(nginxProxyMatch, 'nginx.conf must proxy /studio-files/ to 127.0.0.1:<port>/files/');
+  assert.equal(composePortBinding, `${nginxProxyMatch[1]}:8000`);
+});
+
+test('studio Dockerfile copies knowledge/ to /kb while LibreChat app image excludes knowledge/', () => {
+  const studioDockerfile = fs.readFileSync('deploy/studio/Dockerfile', 'utf8');
+  assert.match(studioDockerfile, /COPY --chmod=0555 knowledge\/records \/kb\/records/);
+  assert.match(
+    studioDockerfile,
+    /COPY --chmod=0555 knowledge\/assets\/ref2048 \/kb\/assets\/ref2048/,
+  );
+  assert.match(
+    studioDockerfile,
+    /COPY --chmod=0555 knowledge\/assets\/thumb512 \/kb\/assets\/thumb512/,
+  );
+  assert.match(studioDockerfile, /COPY --chmod=0555 knowledge\/catalog \/kb\/catalog/);
+  assert.doesNotMatch(studioDockerfile, /kb\.lock|zybc-knowledge|git clone|curl|wget/i);
+
+  const studioDockerignore = fs.readFileSync('deploy/studio/Dockerfile.dockerignore', 'utf8');
+  assert.match(studioDockerignore, /^!knowledge\/records\/\*\*$/m);
+  assert.match(studioDockerignore, /^!knowledge\/assets\/ref2048\/\*\*$/m);
+  assert.match(studioDockerignore, /^!knowledge\/assets\/thumb512\/\*\*$/m);
+  assert.match(studioDockerignore, /^!knowledge\/catalog\/\*\*$/m);
+
+  const rootDockerignore = fs.readFileSync('.dockerignore', 'utf8');
+  assert.match(rootDockerignore, /^knowledge$/m);
+
+  const appDockerfileMulti = fs.readFileSync('Dockerfile.multi', 'utf8');
+  assert.doesNotMatch(appDockerfileMulti, /\bknowledge\b/);
+});
+
+test('CI workflow builds studio image with root context, runs Python 3.13 and knowledge checks, and runs smoke test', () => {
   const rawWorkflow = fs.readFileSync('.github/workflows/development.yml', 'utf8');
   const workflow = yaml.load(rawWorkflow);
   assert.doesNotMatch(rawWorkflow, LEGACY_CAD_PATTERN);
+  assert.equal(
+    fs.existsSync('knowledge/.github'),
+    false,
+    'knowledge/.github must be removed after moving KB checks to root CI',
+  );
+  assert.ok(
+    workflow.on.pull_request.paths.includes('knowledge/**'),
+    'CI pull_request paths must include knowledge/**',
+  );
 
   const checkSteps = workflow.jobs.checks.steps;
   const pythonSetup = checkSteps.find(
@@ -262,6 +349,14 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and co
   assert.ok(
     checkSteps.some((step) => step.run && step.run.includes('pytest deploy/studio')),
     'CI checks must run pytest deploy/studio',
+  );
+  assert.ok(
+    checkSteps.some((step) => step.run && step.run.includes('python knowledge/tools/validate.py')),
+    'CI checks must run python knowledge/tools/validate.py',
+  );
+  assert.ok(
+    checkSteps.some((step) => step.run && step.run.includes('pytest knowledge/tests')),
+    'CI checks must run pytest knowledge/tests',
   );
   assert.ok(
     checkSteps.some((step) => step.run && step.run.includes('node --test deploy/*.test.cjs')),
@@ -288,4 +383,8 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and co
   assert.match(rawSmokeTest, /"X-Studio-Token": "wrong-studio-token"/);
   assert.match(rawSmokeTest, /"X-LibreChat-User-ID": "smoke-user-1"/);
   assert.match(rawSmokeTest, /assert exc\.code == 403/);
+  assert.match(rawSmokeTest, /"search_library"/);
+  assert.match(rawSmokeTest, /"compare_materials"/);
+  assert.match(rawSmokeTest, /"create_3d_model"/);
+  assert.match(rawSmokeTest, /"check_3d_model"/);
 });

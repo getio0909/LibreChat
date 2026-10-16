@@ -1,0 +1,78 @@
+id: 67869fa9250fe38a
+title_zh: 佛教主题展览空间设计-12
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-12.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-12.jpg
+  sha256: 67869fa9250fe38ab34ce293c798f71970af065f0a5cba6167244e781159e7c2
+  bytes: 1798540
+  width: 1754
+  height: 2537
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/67869fa9250fe38a.jpg
+    sha256: a9e160d08ab83dda971eb839f01030840094a0dd8cd491ac64cee0721daf5fc4
+    bytes: 356102
+    width: 1416
+    height: 2048
+  thumb512:
+    path: assets/thumb512/67869fa9250fe38a.webp
+    sha256: 81640c918ef113a0f4c3b729919d87547d5afaec336ed0013035674addf40535
+    bytes: 31916
+    width: 354
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 材质
+category_l1: 佛教空间案例
+category_l2: 汉白玉坐佛与鎏金祥云背光局部
+entity_type: 空间场景设计
+summary_zh: 纯白汉白玉与金黄 / 汉白玉释迦牟尼坐佛、金色祥云浮雕背景、灰纹大理石
+materials:
+- 一级四川汉白玉
+- 24K鎏金祥云浮雕板
+- 老红木雕花护栏
+- 灰木纹大理石
+- 明黄织锦蒲团
+colors:
+- 洁白玉色
+- 璀璨鎏金
+- 红木深褐
+- 明黄
+- 浅灰
+style: 精致新中式室内佛坛局部特写风
+ai_design_usage: 室内汉白玉佛像佛台与背光屏细部设计 / 海棠形鎏金祥云浮雕背光墙参考 / 红木雕花佛台护栏与拜垫搭配
+prompt_zh: 精致的佛教室内佛坛竖幅特写效果图，中央木质高台上供奉一尊洁白温润的汉白玉释迦牟尼佛结跏趺坐像与莲花宝座，佛像正后方是一面海棠形边框的鎏金祥云浮雕发光背景墙，佛台四周环绕深色红木精雕护栏，望柱头装饰金色莲花，台下浅灰色木纹大理石地面上整齐摆放着鲜艳的明黄色圆形莲花禅修蒲团，顶部射灯柔和打亮佛像，庄严静谧，8k。
+tags:
+- 汉白玉佛像
+- 鎏金祥云背光
+- 海棠形背屏
+- 佛台木护栏
+- 莲花蒲团
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1754
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 3D interior render of a white marble seated Buddha on a carved lotus Sumeru base before a gilded cloud relief backdrop;
+    contains a faint circular '3D' platform watermark on the floor beside the bottom-left yellow cushion.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

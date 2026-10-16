@@ -1,0 +1,74 @@
+id: 5dcb048ab69e7b57
+title_zh: 佛教主题展览空间设计-11
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-11.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-11.jpg
+  sha256: 5dcb048ab69e7b57c76ac7534fff5e6ca555a1398566ed7dfe28e20939f96b88
+  bytes: 1281473
+  width: 2213
+  height: 1243
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5dcb048ab69e7b57.jpg
+    sha256: 5c93ecf484a5d4e4551d133e5822111e156e8d1940094539a7d4c1cc7721edd2
+    bytes: 300136
+    width: 2048
+    height: 1150
+  thumb512:
+    path: assets/thumb512/5dcb048ab69e7b57.webp
+    sha256: b092dc6e3bd0dc18a5e5227ef9b3ced4234a8fb04b2379a5b6e07add4abcb3e4
+    bytes: 28930
+    width: 512
+    height: 288
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 紫微星空弧形万佛金龛走道
+entity_type: 空间场景设计
+summary_zh: 璀璨金黄与紫蓝星空 / 金色浮雕佛龛、铜雕莲花护墙板、黑金镜面石材地面
+materials:
+- 24K镀金万佛浮雕龛
+- 紫铜手工锻造立体莲花板
+- 紫蓝色星云UV软膜顶
+- 黑金花镜面大理石
+colors:
+- 璀璨金黄
+- 紫微星云蓝紫
+- 古铜褐
+- 镜面乌黑
+style: 超现实星云鎏金弧形万佛甬道风
+ai_design_usage: 弧形万佛祈福通道空间设计 / 紫铜锻造立体莲花护墙板细部参考 / 紫蓝星云顶与鎏金墙面色彩碰撞
+prompt_zh: 震撼的低角度弧形佛教万佛鎏金走道室内设计，两侧高耸的弯曲墙面上半部密布金光璀璨的浮雕小佛龛阵列，下半部护墙板采用古铜色金属打造精美的立体盛开大莲花高浮雕，走道顶部是一条深邃迷人的紫蓝色星云繁星天幕，地面铺设镜面抛光的黑褐色金纹大理石并倒映出漫天金光，弧形通道尽头通向明亮的石门大厅，步步生莲，神秘辉煌，8k效果图。
+tags:
+- 弧形万佛通道
+- 铜雕莲花护墙板
+- 紫蓝星云顶
+- 鎏金佛龛
+- 步步生莲
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1243
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a curved golden 10,000-Buddha corridor with embossed copper lotus dado panels, a reflective
+    dark marble floor, and a purple-blue nebula ceiling.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

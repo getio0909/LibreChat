@@ -1,0 +1,71 @@
+id: 66ed4fb3a750040e
+title_zh: 阿利坦石材展厅展示
+source:
+  original_path: 天川金大板自家产品/阿利坦石材展厅展示.jpg
+original:
+  path: 天川金大板自家产品/阿利坦石材展厅展示.jpg
+  sha256: 66ed4fb3a750040e2f9c32832819b05ad633d4b7e724b97dde89e5b6c4f1f2a1
+  bytes: 5586570
+  width: 4096
+  height: 3072
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/66ed4fb3a750040e.jpg
+    sha256: b4a4b68324d77d21f3fa44f007ccd7d92179b33505895841bb53e551db8f5dc2
+    bytes: 753229
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/66ed4fb3a750040e.webp
+    sha256: cbd5b7cf3e2496b5057f84a425aeb29489b11c4273ac2fca53b3ab729eadd6f0
+    bytes: 39648
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图是阿利坦石材（Alitan Stone）水头鹏翔石材城 A1 区旗舰展厅内，「天川金」官方认证整扎大板（扎号 3-2，共 38 片，总面积 51.97㎡）的权威基准展示图。
+materials:
+- 天川金官方标板
+colors:
+- 浓郁琥珀金
+- 斜向浅粉白流云
+- 赤褐脉
+style: 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: LibreChat 知识库「天川金」官方参数与实景问答标准图 / 佛事展展位大板陈列区3D还原参考 / 整扎连纹背景墙工程选材
+prompt_zh: 阿利坦石材A1区旗舰展厅4K实景摄影，一整扎38片天川金天然奢石大板（规格2050x1810mm）竖立在带底部发光灯带的白色鹅卵石展床上，首片大板呈现浓郁的黄金色、琥珀金与斜向浅玫瑰粉、烟灰流云交织的华丽纹理，右上角贴有橙色“天川金
+  ALITAN STONE”参数标签，正前方摆放橙色“alitan阿利坦 艺术与品质同在”品牌展台，高端商业展陈摄影。
+tags:
+- 天川金官方标板
+- 阿利坦石材
+- 编号KSA9-2-3828
+- 规格2050x1810
+- 整扎奢石大板
+- A1区展厅实景
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 自家产品“天川金”（dunhuang-gold）奢石大板展厅横幅实拍，右侧可见“天川金”实体展牌，画面清晰。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

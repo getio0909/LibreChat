@@ -1,0 +1,84 @@
+id: d5b6ec9d9e966c75
+title_zh: 北京宫廷凤首长柄悬链提炉
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-北京宫廷凤首长柄悬链提炉-commons77536616.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-北京宫廷凤首长柄悬链提炉-commons77536616.jpg
+  sha256: d5b6ec9d9e966c753e13cf6d4952e240dc4bde8147b97299f69d3e7524271324
+  bytes: 1145521
+  width: 3840
+  height: 3224
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d5b6ec9d9e966c75.jpg
+    sha256: 3931ac0258b5e299c12fcf36dc1c9041c87f09b23243dc21233cb31f1351e01b
+    bytes: 360895
+    width: 2048
+    height: 1719
+  thumb512:
+    path: assets/thumb512/d5b6ec9d9e966c75.webp
+    sha256: d83dee6e30c163690490c2dd72619335394e5ab49c372ea1bd2cfd624dc1b118
+    bytes: 17850
+    width: 512
+    height: 430
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 北京宫廷凤首长柄悬链提炉
+entity_type: 实物对象写实
+summary_zh: 【图中可见】长柄一端饰金色凤首，下面通过数条链条悬挂带盖小炉；柄身为深褐色雕花段，另一端垂有编结与穗子。【来源著录】Portable censer with phoenixes, gourds, and double happiness,
+  China, Imperial Workshop, Beijing, Tongzhi period, c. 1872 AD, gold alloy, zitan wood, silk - Peabody Essex Museum - DSC07859.jpg；文化或地点依据：Commons
+  完整题名明确著录 China, Imperial Workshop, Beijing, Tongzhi period, c. 1872 AD；按北京宫廷制作归入中国北方。
+materials:
+- 金合金
+- 紫檀木
+- 丝（据来源题名）
+colors:
+- 金色
+- 深褐
+- 米白
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，长柄一端饰金色凤首，下面通过数条链条悬挂带盖小炉；柄身为深褐色雕花段，另一端垂有编结与穗子。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Portable censer with phoenixes, gourds, and double happiness,
+  China, Imperial Workshop, Beijing, Tongzhi period, c. 1872 AD, gold alloy, zitan wood, silk - Peabody Essex Museum - DSC07859.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北京宫廷凤首长柄悬链提炉
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Portable_censer_with_phoenixes,_gourds,_and_double_happiness,_China,_Imperial_Workshop,_Beijing,_Tongzhi_period,_c._1872_AD,_gold_alloy,_zitan_wood,_silk_-_Peabody_Essex_Museum_-_DSC07859.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Portable_censer_with_phoenixes%2C_gourds%2C_and_double_happiness%2C_China%2C_Imperial_Workshop%2C_Beijing%2C_Tongzhi_period%2C_c._1872_AD%2C_gold_alloy%2C_zitan_wood%2C_silk_-_Peabody_Essex_Museum_-_DSC07859.jpg/3840px-thumbnail.jpg
+  credit: Daderot; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 3224
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

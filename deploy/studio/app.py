@@ -6,6 +6,7 @@ import json
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -15,7 +16,7 @@ from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.responses import JSONResponse, PlainTextResponse, Response
 from starlette.routing import Route
 from starlette.types import Receive, Scope, Send
 
@@ -35,18 +36,36 @@ from .images import (
     build_edit_prompt,
     build_generate_prompt,
     build_stone_replacements,
+    comparison_target,
     encode_display_image,
     generate_seedream,
     neutralize_stone_names,
     normalize_reference,
     normalize_reference_with_size,
+    prepare_seed3d_image,
+)
+from .kb import LIBRARY_REGIONS, LIBRARY_TYPES, KnowledgeBaseIndex, load_kb_index
+from .models3d import (
+    DETAIL_SPECS,
+    VISUAL_MODEL_DISCLAIMER,
+    ModelJobManager,
+    build_model_viewer_html,
+    build_signed_file_url,
+    format_utc_timestamp,
+    load_saved_model_bytes,
+    parse_byte_range,
+    sign_file_token,
+    verify_file_token,
 )
 from .planner import plan_concepts
 from .store import (
+    ResolvedImage,
     allocate_studio_job,
     list_user_images,
     normalize_conversation_id,
+    read_bytes_no_follow,
     reconcile_pending_receipts,
+    record_search_previews,
     resolve_image,
     user_librechat_images_dir,
     user_studio_dir,
@@ -67,13 +86,13 @@ _request_ctx_var: ContextVar[RequestContext | None] = ContextVar(
 )
 
 
-# 四个固定MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
+# 六个固定MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
 REFERENCE_ITEM_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
         "id": {
             "type": "string",
-            "description": "图片编号（file_id、img_<hex> 或 @latest）",
+            "description": "图片编号（file_id、img_<hex>、kb_<id> 或 @latest）",
         },
         "use": {
             "type": "string",
@@ -128,7 +147,7 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "items": {"type": "string"},
                     "maxItems": 10,
                     "default": [],
-                    "description": "参考图片编号列表（最多10张）",
+                    "description": "参考图片编号列表（支持 file_id、img_<hex>、kb_<id> 或 @latest，最多10张）",
                 },
             },
             "required": ["brief"],
@@ -175,7 +194,7 @@ STUDIO_TOOLS: list[types.Tool] = [
             "properties": {
                 "base_id": {
                     "type": "string",
-                    "description": "底图编号（file_id、img_<hex> 或 @latest）",
+                    "description": "底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
                 },
                 "instruction": {
                     "type": "string",
@@ -215,7 +234,123 @@ STUDIO_TOOLS: list[types.Tool] = [
             "required": [],
         },
     ),
+    types.Tool(
+        name="search_library",
+        description="检索知识库中的设计参考、石材大板、造像法器、家具与空间案例，返回条目摘要与缩略图。",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "检索关键词（标题、石材名及别名、品类、风格、颜色或标签）",
+                },
+                "library_type": {
+                    "type": "string",
+                    "enum": list(LIBRARY_TYPES),
+                    "description": "图库分类筛选",
+                },
+                "role": {
+                    "type": "string",
+                    "enum": list(REFERENCE_USES),
+                    "description": "参考用途角色筛选",
+                },
+                "region": {
+                    "type": "string",
+                    "enum": list(LIBRARY_REGIONS),
+                    "description": "文化地域筛选",
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 12,
+                    "default": 6,
+                    "description": "返回的最大条目数量（1-12）",
+                },
+                "include_flagged": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": "是否包含低分辨率、AI生成、第三方水印或已驳回标记的记录",
+                },
+            },
+            "required": ["query"],
+        },
+    ),
+    types.Tool(
+        name="compare_materials",
+        description="基于同一张底图并发生成多款石材（1-3款）替换指定部位的对比效果图，各款独立基于原底图生成且互不串联。",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "base_id": {
+                    "type": "string",
+                    "description": "底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
+                },
+                "target": {
+                    "type": "string",
+                    "description": "需要替换石材的具体部位（如：佛像背后的墙板、供桌台面）",
+                },
+                "materials": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "description": "要对比的石材名称或别名列表（1-3款）",
+                },
+            },
+            "required": ["base_id", "target", "materials"],
+        },
+    ),
+    types.Tool(
+        name="create_3d_model",
+        description="根据选定的设计图、上传照片或图库资产生成交互式三维视觉预览模型（GLB），仅供视觉预览参考，非工程制造模型。",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "type": "string",
+                    "description": "输入图片编号（file_id、img_<hex>、kb_<id> 或 @latest）",
+                },
+                "detail": {
+                    "type": "string",
+                    "enum": ["standard", "high"],
+                    "default": "standard",
+                    "description": "模型精细度档位（standard 约10万面，high 约50万面）",
+                },
+                "note": {
+                    "type": "string",
+                    "description": "可选补充说明",
+                },
+            },
+            "required": ["image_id"],
+        },
+    ),
+    types.Tool(
+        name="check_3d_model",
+        description="查询或恢复后台进行中的三维模型生成任务状态，完成后返回交互式三维视觉预览与下载链接。",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "job_id": {
+                    "type": "string",
+                    "description": "三维模型任务编号（create_3d_model 返回的 job_id 或 model_id）",
+                },
+            },
+            "required": ["job_id"],
+        },
+    ),
 ]
+
+
+# 汇总显式传入的带标记知识库资产警告信息（按编号去重）
+def _collect_flag_warnings(items: list[ResolvedImage]) -> list[str]:
+    warnings: list[str] = []
+    seen: set[str] = set()
+    for item in items:
+        msg = item.flag_warning_message()
+        if msg and item.id not in seen:
+            seen.add(item.id)
+            warnings.append(msg)
+    return warnings
 
 
 # 获取当前工具调用关联的已认证用户上下文
@@ -235,21 +370,146 @@ def _get_active_context(mcp_server: Server) -> RequestContext:
     return ctx
 
 
-# 构建并绑定MCP底层Server与四个设计工具处理器
+# 构建并绑定MCP底层Server与八个设计工具处理器
 def build_mcp_server(
     settings: StudioSettings,
     rules: StudioRules,
     limiter: ConcurrencyLimiter,
     *,
+    kb_index: KnowledgeBaseIndex | None = None,
+    model_manager: ModelJobManager | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Server:
     mcp_server = Server("zyb_studio")
+    active_kb = (
+        kb_index
+        if kb_index is not None
+        else load_kb_index(settings.kb_root, fallback_materials=rules.materials)
+    )
+    active_rules = (
+        rules.model_copy(update={"materials": active_kb.materials})
+        if active_kb.materials
+        else rules
+    )
+    active_model_manager = model_manager or ModelJobManager(
+        settings,
+        limiter,
+        ark_transport=ark_transport,
+    )
 
-    # 注册tools/list处理器，返回固定扁平Schema的四个工具
+    # 注册tools/list处理器，返回固定扁平Schema的工具列表
     @mcp_server.list_tools()
     async def handle_list_tools() -> list[types.Tool]:
         return STUDIO_TOOLS
+
+    # 组装三维模型生成完成或进行中的MCP返回结构（含JSON摘要、Three.js UI资源与源图像）
+    def _format_3d_model_tool_result(
+        user_id: str,
+        outcome: dict[str, Any],
+        source_resolved: ResolvedImage | None,
+        allowed_roots: tuple[Path, ...],
+    ) -> types.CallToolResult:
+        warnings = (
+            _collect_flag_warnings([source_resolved])
+            if source_resolved is not None
+            else []
+        )
+        if outcome.get("state") == "running":
+            billing_warning = (
+                "3D model generation is still running in the background; the request may have been billed. "
+                "Do not resubmit create_3d_model; call check_3d_model with job_id to retrieve the result."
+            )
+            running_payload: dict[str, Any] = {
+                "job_id": outcome["job_id"],
+                "model_id": outcome["model_id"],
+                "source_image_id": outcome["source_image_id"],
+                "detail": outcome["detail"],
+                "faces": outcome["faces"],
+                "state": "running",
+                "message": billing_warning,
+                "disclaimer": VISUAL_MODEL_DISCLAIMER,
+                "warnings": [*warnings, billing_warning],
+            }
+            return types.CallToolResult(
+                content=[
+                    types.TextContent(
+                        type="text",
+                        text=json.dumps(running_payload, ensure_ascii=False),
+                    )
+                ],
+                isError=False,
+            )
+
+        model_id = str(outcome["model_id"])
+        faces = int(outcome["faces"])
+        file_size = int(outcome["bytes"])
+        token, exp_ts = sign_file_token(settings, user_id, model_id)
+        signed_url = build_signed_file_url(settings, token)
+        expires_at = format_utc_timestamp(exp_ts)
+        download_markdown = f"[下载 GLB 模型 ({model_id}.glb)]({signed_url})"
+
+        summary_payload: dict[str, Any] = {
+            "model_id": model_id,
+            "job_id": model_id,
+            "state": "saved",
+            "source_image_id": outcome["source_image_id"],
+            "detail": outcome["detail"],
+            "faces": faces,
+            "file_size": file_size,
+            "bytes": file_size,
+            "download_url": signed_url,
+            "download_markdown": download_markdown,
+            "message": f"3D visual preview model is ready. Include this download link in your chat response: {download_markdown}",
+            "expires_at": expires_at,
+            "disclaimer": VISUAL_MODEL_DISCLAIMER,
+            "warnings": warnings,
+        }
+        viewer_html = build_model_viewer_html(
+            model_id=model_id,
+            signed_url=signed_url,
+            expires_at=expires_at,
+            faces=faces,
+            file_size=file_size,
+        )
+        content_blocks: list[
+            types.TextContent | types.ImageContent | types.EmbeddedResource
+        ] = [
+            types.TextContent(
+                type="text",
+                text=json.dumps(summary_payload, ensure_ascii=False),
+            ),
+            types.EmbeddedResource(
+                type="resource",
+                resource=types.TextResourceContents(
+                    uri=f"ui://zyb_studio/model/{model_id}",
+                    mimeType="text/html",
+                    text=viewer_html,
+                ),
+            ),
+        ]
+        if source_resolved is not None:
+            source_root = next(
+                (
+                    root
+                    for root in allowed_roots
+                    if root.exists()
+                    and not root.is_symlink()
+                    and source_resolved.path.is_relative_to(root.resolve(strict=True))
+                ),
+                None,
+            )
+            if source_root is not None:
+                raw_source = read_bytes_no_follow(source_resolved.path, source_root)
+                disp_bytes, disp_mime = encode_display_image(raw_source)
+                content_blocks.append(
+                    types.ImageContent(
+                        type="image",
+                        data=base64.b64encode(disp_bytes).decode("ascii"),
+                        mimeType=disp_mime,
+                    )
+                )
+        return types.CallToolResult(content=content_blocks, isError=False)
 
     # 注册tools/call处理器，按用户隔离执行设计工具
     @mcp_server.call_tool()
@@ -260,14 +520,18 @@ def build_mcp_server(
         try:
             ctx = _get_active_context(mcp_server)
             user_id = ctx.user_id
+            kb_root = Path(settings.kb_root)
             allowed_roots = (
                 user_librechat_images_dir(settings, user_id),
                 user_studio_dir(settings, user_id, create=True),
+                kb_root,
             )
 
             if name == "list_images":
                 limit = int(args.get("limit", 20))
-                images = list_user_images(settings, user_id, limit=limit)
+                images = list_user_images(
+                    settings, user_id, limit=limit, kb_index=active_kb
+                )
                 warnings = [
                     f"Image job {item['id']} is in uncertain state (the request may have been billed)."
                     for item in images
@@ -287,6 +551,67 @@ def build_mcp_server(
                     isError=False,
                 )
 
+            if name == "search_library":
+                if "query" not in args or not isinstance(args.get("query"), str):
+                    raise ValueError("query is required and must be a string")
+                query = str(args.get("query") or "")
+                library_type = (
+                    str(args["library_type"])
+                    if args.get("library_type") is not None
+                    else None
+                )
+                role = str(args["role"]) if args.get("role") is not None else None
+                region = str(args["region"]) if args.get("region") is not None else None
+                raw_limit = args.get("limit", 6)
+                if isinstance(raw_limit, bool) or not isinstance(raw_limit, int):
+                    raise ValueError("limit must be an integer between 1 and 12")
+                include_flagged = bool(args.get("include_flagged", False))
+
+                matched = active_kb.search(
+                    query,
+                    library_type=library_type,
+                    role=role,
+                    region=region,
+                    limit=raw_limit,
+                    include_flagged=include_flagged,
+                )
+                result_items: list[dict[str, Any]] = []
+                thumb_blocks: list[types.ImageContent] = []
+                emitted_records = []
+                for rec in matched:
+                    result_items.append(rec.to_search_dict())
+                    if (
+                        rec.thumb512_path.is_file()
+                        and not rec.thumb512_path.is_symlink()
+                    ):
+                        thumb_bytes = read_bytes_no_follow(rec.thumb512_path, kb_root)
+                        thumb_blocks.append(
+                            types.ImageContent(
+                                type="image",
+                                data=base64.b64encode(thumb_bytes).decode("ascii"),
+                                mimeType="image/webp",
+                            )
+                        )
+                        emitted_records.append(rec)
+                record_search_previews(settings, user_id, emitted_records)
+
+                search_payload = {
+                    "results": result_items,
+                    "items": result_items,
+                    "count": len(result_items),
+                    "query": query.strip(),
+                }
+                return types.CallToolResult(
+                    content=[
+                        types.TextContent(
+                            type="text",
+                            text=json.dumps(search_payload, ensure_ascii=False),
+                        ),
+                        *thumb_blocks,
+                    ],
+                    isError=False,
+                )
+
             if name == "generate_image":
                 prompt = str(args.get("prompt") or "").strip()
                 if not prompt:
@@ -299,24 +624,30 @@ def build_mcp_server(
                 if not isinstance(raw_refs, list) or len(raw_refs) > MAX_REFERENCES:
                     raise ValueError(f"At most {MAX_REFERENCES} references are allowed")
 
+                resolved_objs: list[ResolvedImage] = []
                 resolved_refs: list[dict[str, Any]] = []
                 for item in raw_refs:
                     if not isinstance(item, dict):
                         raise TypeError("Each reference must be an object")
                     resolved = resolve_image(
-                        settings, user_id, str(item.get("id") or "")
+                        settings,
+                        user_id,
+                        str(item.get("id") or ""),
+                        kb_index=active_kb,
                     )
+                    resolved_objs.append(resolved)
                     resolved_refs.append(
                         {
                             "id": resolved.id,
                             "path": resolved.path,
                             "use": str(item.get("use") or "参考"),
                             "note": str(item.get("note") or ""),
+                            "material_ids": resolved.material_ids,
                         }
                     )
 
                 full_prompt, unique_paths = build_generate_prompt(
-                    prompt, resolved_refs, rules
+                    prompt, resolved_refs, active_rules
                 )
                 ref_uris = [normalize_reference(p, allowed_roots) for p in unique_paths]
 
@@ -342,7 +673,7 @@ def build_mcp_server(
                     "width": gen_result["width"],
                     "height": gen_result["height"],
                     "size": f"{gen_result['width']}x{gen_result['height']}",
-                    "warnings": [],
+                    "warnings": _collect_flag_warnings(resolved_objs),
                 }
                 return types.CallToolResult(
                     content=[
@@ -373,29 +704,37 @@ def build_mcp_server(
                         f"At most {MAX_EDIT_REFERENCES} additional references are allowed"
                     )
 
-                base_resolved = resolve_image(settings, user_id, base_id)
+                base_resolved = resolve_image(
+                    settings, user_id, base_id, kb_index=active_kb
+                )
                 base_uri, base_size = normalize_reference_with_size(
                     base_resolved.path, allowed_roots
                 )
 
+                resolved_objs = [base_resolved]
                 resolved_refs = []
                 for item in raw_refs:
                     if not isinstance(item, dict):
                         raise TypeError("Each reference must be an object")
                     resolved = resolve_image(
-                        settings, user_id, str(item.get("id") or "")
+                        settings,
+                        user_id,
+                        str(item.get("id") or ""),
+                        kb_index=active_kb,
                     )
+                    resolved_objs.append(resolved)
                     resolved_refs.append(
                         {
                             "id": resolved.id,
                             "path": resolved.path,
                             "use": str(item.get("use") or "参考"),
                             "note": str(item.get("note") or ""),
+                            "material_ids": resolved.material_ids,
                         }
                     )
 
                 full_prompt, unique_paths = build_edit_prompt(
-                    instruction, resolved_refs, rules
+                    instruction, resolved_refs, active_rules
                 )
                 extra_uris = [
                     normalize_reference(p, allowed_roots) for p in unique_paths
@@ -430,7 +769,7 @@ def build_mcp_server(
                     "width": gen_result["width"],
                     "height": gen_result["height"],
                     "size": f"{gen_result['width']}x{gen_result['height']}",
-                    "warnings": [],
+                    "warnings": _collect_flag_warnings(resolved_objs),
                 }
                 return types.CallToolResult(
                     content=[
@@ -442,6 +781,188 @@ def build_mcp_server(
                         ),
                     ],
                     isError=False,
+                )
+
+            if name == "compare_materials":
+                base_id = str(args.get("base_id") or "").strip()
+                if not base_id:
+                    raise ValueError("base_id is required")
+                target = comparison_target(args.get("target"), active_rules)
+                raw_materials = args.get("materials")
+                if (
+                    not isinstance(raw_materials, list)
+                    or not 1 <= len(raw_materials) <= 3
+                ):
+                    raise ValueError(
+                        "materials must be a list of 1 to 3 material names"
+                    )
+                size = str(args.get("size", "2K"))
+                if size not in NATIVE:
+                    raise ValueError("Invalid size parameter")
+
+                # 先解析所有请求的石材名称/别名与无标记样图，拒绝自动选用带标记样图；若某石材无可用样图则报错
+                resolved_materials = []
+                all_resolved_assets: list[ResolvedImage] = []
+                for raw_mat_name in raw_materials:
+                    if not isinstance(raw_mat_name, str) or not raw_mat_name.strip():
+                        raise ValueError(
+                            f"Material name must be a non-empty string. Known materials: {active_kb.format_known_materials()}"
+                        )
+                    mat_obj = active_kb.resolve_material(raw_mat_name)
+                    if not mat_obj.sample_asset_ids:
+                        raise ValueError(
+                            f"Material '{mat_obj.name}' has no sample assets configured"
+                        )
+                    sample_images = [
+                        img
+                        for sid in mat_obj.sample_asset_ids
+                        if not (
+                            img := resolve_image(
+                                settings, user_id, f"kb_{sid}", kb_index=active_kb
+                            )
+                        ).warning
+                    ]
+                    if not sample_images:
+                        raise ValueError(
+                            f"Material '{mat_obj.name}' has no usable unflagged sample assets"
+                        )
+                    all_resolved_assets.extend(sample_images)
+                    resolved_materials.append(
+                        (raw_mat_name.strip(), mat_obj, sample_images)
+                    )
+
+                base_resolved = resolve_image(
+                    settings, user_id, base_id, kb_index=active_kb
+                )
+                all_resolved_assets.insert(0, base_resolved)
+                base_uri, base_size = normalize_reference_with_size(
+                    base_resolved.path, allowed_roots
+                )
+
+                # 对target中可能出现的任何石材商业名称做中性化处理，再生成Mac标准替换说明
+                generic_stone_map = {
+                    alias: "本次材质样图所示石材"
+                    for prod in active_rules.materials
+                    for alias in (prod.name, *prod.aliases)
+                    if alias
+                }
+                clean_target = neutralize_stone_names(target, generic_stone_map)
+                instruction = (
+                    f"将图1的{clean_target}替换为本次材质样图所示石材，其他部分不变。"
+                )
+
+                async def _render_material_variant(
+                    req_name: str,
+                    mat_obj: Any,
+                    sample_images: list[ResolvedImage],
+                ) -> tuple[dict[str, Any] | None, str | None, bool]:
+                    variant_refs = [
+                        {
+                            "id": sample_img.id,
+                            "path": sample_img.path,
+                            "use": "材质",
+                            "note": mat_obj.name,
+                            "material_id": mat_obj.id,
+                            "material_ids": sample_img.material_ids,
+                        }
+                        for sample_img in sample_images
+                    ]
+                    full_prompt, unique_paths = build_edit_prompt(
+                        instruction, variant_refs, active_rules
+                    )
+                    sample_uris = [
+                        normalize_reference(p, allowed_roots) for p in unique_paths
+                    ]
+                    all_uris = [base_uri, *sample_uris]
+                    try:
+                        async with limiter.acquire(user_id):
+                            img_id, job_dir = allocate_studio_job(settings, user_id)
+                            result = await generate_seedream(
+                                settings,
+                                full_prompt,
+                                all_uris,
+                                size=size,
+                                aspect="source",
+                                source_size=base_size,
+                                destination=job_dir,
+                                transport=ark_transport,
+                            )
+                        return {"id": img_id, **result}, None, False
+                    except GenerationUncertain as exc:
+                        return None, str(exc), True
+                    except (ValueError, TypeError, RuntimeError, OSError) as exc:
+                        return None, str(exc), False
+
+                rendered_variants = await asyncio.gather(
+                    *(
+                        _render_material_variant(req_name, mat_obj, sample_images)
+                        for req_name, mat_obj, sample_images in resolved_materials
+                    )
+                )
+
+                variants_out: list[dict[str, Any]] = []
+                image_blocks: list[types.ImageContent] = []
+                warnings: list[str] = _collect_flag_warnings(all_resolved_assets)
+                any_uncertain = False
+
+                for (req_name, mat_obj, sample_images), (
+                    img_res,
+                    err_text,
+                    is_uncertain,
+                ) in zip(resolved_materials, rendered_variants):
+                    sample_kb_ids = [s.id for s in sample_images]
+                    variant_entry: dict[str, Any] = {
+                        "material": mat_obj.name,
+                        "material_id": mat_obj.id,
+                        "requested_material": req_name,
+                        "reference_ids": sample_kb_ids,
+                    }
+                    if img_res is not None:
+                        variant_entry["id"] = img_res["id"]
+                        variant_entry["image_id"] = img_res["id"]
+                        variant_entry["width"] = img_res["width"]
+                        variant_entry["height"] = img_res["height"]
+                        variant_entry["size"] = (
+                            f"{img_res['width']}x{img_res['height']}"
+                        )
+                        disp_bytes, disp_mime = encode_display_image(
+                            img_res["raw_bytes"]
+                        )
+                        image_blocks.append(
+                            types.ImageContent(
+                                type="image",
+                                data=base64.b64encode(disp_bytes).decode("ascii"),
+                                mimeType=disp_mime,
+                            )
+                        )
+                    elif err_text:
+                        variant_entry["error"] = err_text
+                        if is_uncertain:
+                            variant_entry["state"] = "uncertain"
+                            any_uncertain = True
+                        warnings.append(f"{mat_obj.name}: {err_text}")
+                    variants_out.append(variant_entry)
+
+                compare_payload: dict[str, Any] = {
+                    "base_id": base_resolved.id,
+                    "target": target,
+                    "variants": variants_out,
+                    "comparisons": variants_out,
+                    "count": len(image_blocks),
+                    "warnings": warnings,
+                }
+                if any_uncertain:
+                    compare_payload["state"] = "uncertain"
+                is_err = len(image_blocks) == 0
+                return types.CallToolResult(
+                    content=[
+                        types.TextContent(
+                            type="text",
+                            text=json.dumps(compare_payload, ensure_ascii=False),
+                        ),
+                        *image_blocks,
+                    ],
+                    isError=is_err,
                 )
 
             if name == "design_concepts":
@@ -464,7 +985,8 @@ def build_mcp_server(
                     )
 
                 resolved_ref_items = [
-                    resolve_image(settings, user_id, str(rid)) for rid in raw_ref_ids
+                    resolve_image(settings, user_id, str(rid), kb_index=active_kb)
+                    for rid in raw_ref_ids
                 ]
                 unique_ref_paths: list[Any] = []
                 canonical_ref_ids: list[str] = []
@@ -479,7 +1001,7 @@ def build_mcp_server(
                 async with limiter.acquire(user_id):
                     planned = await plan_concepts(
                         settings,
-                        rules,
+                        active_rules,
                         brief=brief,
                         count=count,
                         reference_ids=canonical_ref_ids,
@@ -493,16 +1015,18 @@ def build_mcp_server(
                         "path": item.path,
                         "use": "参考",
                         "note": item.path.stem,
+                        "material_ids": item.material_ids,
                     }
                     for item in resolved_ref_items
                 ]
                 stone_map = build_stone_replacements(
-                    rules, unique_ref_paths, concept_refs, has_base=False
+                    active_rules, unique_ref_paths, concept_refs, has_base=False
                 )
 
                 public_concepts: list[dict[str, Any]] = []
-                image_blocks: list[types.ImageContent] = []
-                warnings: list[str] = []
+                image_blocks = []
+                warnings = _collect_flag_warnings(resolved_ref_items)
+                render_errors: list[str] = []
 
                 if with_images:
                     # 按每用户并发上限并发生成各概念方案的效果图，并附带原始brief作为硬性design_constraints
@@ -517,9 +1041,11 @@ def build_mcp_server(
                         raw_img_prompt = neutralize_stone_names(
                             concept_item["image_prompt"], stone_map
                         )
-                        full_prompt = rules.render_prefix + raw_img_prompt
+                        full_prompt = active_rules.render_prefix + raw_img_prompt
                         if ref_uris:
-                            full_prompt = f"{full_prompt}\n{rules.reference_rules}"
+                            full_prompt = (
+                                f"{full_prompt}\n{active_rules.reference_rules}"
+                            )
                         full_prompt = f"{full_prompt}\n{constraints_line}"
                         try:
                             async with limiter.acquire(user_id):
@@ -564,6 +1090,7 @@ def build_mcp_server(
                                 )
                             )
                         elif err_text:
+                            render_errors.append(err_text)
                             warnings.append(err_text)
                         public_concepts.append(entry)
                 else:
@@ -583,7 +1110,7 @@ def build_mcp_server(
                     "count": len(public_concepts),
                     "warnings": warnings,
                 }
-                is_err = bool(with_images and not image_blocks and warnings)
+                is_err = bool(with_images and not image_blocks and render_errors)
                 return types.CallToolResult(
                     content=[
                         types.TextContent(
@@ -595,9 +1122,61 @@ def build_mcp_server(
                     isError=is_err,
                 )
 
+            if name == "create_3d_model":
+                image_id = str(args.get("image_id") or "").strip()
+                if not image_id:
+                    raise ValueError("image_id is required")
+                detail = str(args.get("detail") or "standard").strip()
+                if detail not in DETAIL_SPECS:
+                    raise ValueError("detail must be 'standard' or 'high'")
+                raw_note = args.get("note")
+                if raw_note is not None and not isinstance(raw_note, str):
+                    raise TypeError("note must be a string when provided")
+
+                source_resolved = resolve_image(
+                    settings, user_id, image_id, kb_index=active_kb
+                )
+                image_data_uri = prepare_seed3d_image(
+                    source_resolved.path, allowed_roots
+                )
+                outcome = await active_model_manager.create_model(
+                    user_id=user_id,
+                    source_image_id=source_resolved.id,
+                    image_data_uri=image_data_uri,
+                    detail=detail,
+                    note=raw_note,
+                )
+                return _format_3d_model_tool_result(
+                    user_id, outcome, source_resolved, allowed_roots
+                )
+
+            if name == "check_3d_model":
+                job_id = str(args.get("job_id") or "").strip()
+                if not job_id:
+                    raise ValueError("job_id is required")
+                outcome = await active_model_manager.check_model(
+                    user_id=user_id, job_id=job_id
+                )
+                source_resolved_check: ResolvedImage | None = None
+                src_id = str(outcome.get("source_image_id") or "").strip()
+                if src_id:
+                    with contextlib.suppress(ValueError, OSError):
+                        source_resolved_check = resolve_image(
+                            settings, user_id, src_id, kb_index=active_kb
+                        )
+                return _format_3d_model_tool_result(
+                    user_id, outcome, source_resolved_check, allowed_roots
+                )
+
             raise ValueError(f"Unknown tool: {name}")
         except GenerationUncertain as exc:
-            err_payload = {"error": str(exc), "state": "uncertain"}
+            err_payload: dict[str, Any] = {
+                "error": str(exc),
+                "state": exc.state,
+            }
+            if exc.job_id:
+                err_payload["job_id"] = exc.job_id
+                err_payload["model_id"] = exc.job_id
             return types.CallToolResult(
                 content=[
                     types.TextContent(
@@ -620,7 +1199,7 @@ def build_mcp_server(
     return mcp_server
 
 
-# 创建包含/health与受保护无状态/mcp端点的Starlette ASGI应用
+# 创建包含/health、签名/files/<token>与受保护无状态/mcp端点的Starlette ASGI应用
 def create_app(
     settings: StudioSettings | None = None,
     rules: StudioRules | None = None,
@@ -630,15 +1209,25 @@ def create_app(
 ) -> Starlette:
     active_settings = settings or load_settings()
     active_rules = rules or load_rules()
+    kb_index = load_kb_index(
+        active_settings.kb_root, fallback_materials=active_rules.materials
+    )
     reconcile_pending_receipts(active_settings)
     limiter = ConcurrencyLimiter(
         max_per_user=active_settings.max_parallel_per_user,
         global_max=active_settings.global_max_parallel,
     )
+    model_manager = ModelJobManager(
+        active_settings,
+        limiter,
+        ark_transport=ark_transport,
+    )
     mcp_server = build_mcp_server(
         active_settings,
         active_rules,
         limiter,
+        kb_index=kb_index,
+        model_manager=model_manager,
         ark_transport=ark_transport,
         gemini_transport=gemini_transport,
     )
@@ -654,7 +1243,7 @@ def create_app(
             security_settings=security_settings,
         )
 
-    # 管理应用生命周期内的无状态MCP会话管理器
+    # 管理应用生命周期内的无状态MCP会话管理器与后台3D任务清理
     @contextlib.asynccontextmanager
     async def lifespan(app_instance: Starlette) -> AsyncIterator[None]:
         reconcile_pending_receipts(active_settings)
@@ -664,11 +1253,97 @@ def create_app(
             try:
                 yield
             finally:
+                await model_manager.shutdown()
                 app_instance.state.session_manager = None
 
     # 健康检查端点处理函数
     async def health_endpoint(request: Request) -> PlainTextResponse:
         return PlainTextResponse("OK", status_code=200)
+
+    # 仅在签名文件路由上附加的跨域与安全响应头
+    def _signed_file_cors_headers(
+        extra: dict[str, str] | None = None,
+    ) -> dict[str, str]:
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+            "Access-Control-Allow-Headers": "Range, If-None-Match, If-Modified-Since",
+            "Access-Control-Expose-Headers": "Accept-Ranges, Content-Disposition, Content-Length, Content-Range, Content-Type",
+            "X-Content-Type-Options": "nosniff",
+        }
+        if extra:
+            headers.update(extra)
+        return headers
+
+    # 拒绝目录列举请求并统一返回404
+    async def files_index_not_found(request: Request) -> Response:
+        return PlainTextResponse(
+            "Not Found", status_code=404, headers=_signed_file_cors_headers()
+        )
+
+    # 校验HMAC签名令牌并提供支持Range分段传输与CORS的GLB二进制下载服务
+    async def signed_file_endpoint(request: Request) -> Response:
+        token = str(request.path_params.get("token") or "")
+        if not token or "/" in token or "\\" in token or ".." in token:
+            return PlainTextResponse(
+                "Not Found", status_code=404, headers=_signed_file_cors_headers()
+            )
+        if request.method == "OPTIONS":
+            return Response(b"", status_code=204, headers=_signed_file_cors_headers())
+
+        try:
+            user_id, model_id, _ = verify_file_token(active_settings, token)
+            glb_bytes, _ = load_saved_model_bytes(active_settings, user_id, model_id)
+        except (ValueError, RuntimeError, OSError):
+            return PlainTextResponse(
+                "Not Found", status_code=404, headers=_signed_file_cors_headers()
+            )
+
+        total_size = len(glb_bytes)
+        base_headers = _signed_file_cors_headers(
+            {
+                "Accept-Ranges": "bytes",
+                "Cache-Control": "private, max-age=3600",
+                "Content-Disposition": f'attachment; filename="{model_id}.glb"',
+            }
+        )
+        range_header = request.headers.get("range")
+        if range_header:
+            try:
+                start, end = parse_byte_range(range_header, total_size)
+            except ValueError:
+                err_headers = _signed_file_cors_headers(
+                    {
+                        "Accept-Ranges": "bytes",
+                        "Content-Range": f"bytes */{total_size}",
+                    }
+                )
+                return PlainTextResponse(
+                    "Range Not Satisfiable", status_code=416, headers=err_headers
+                )
+            chunk = glb_bytes[start : end + 1]
+            part_headers = {
+                **base_headers,
+                "Content-Range": f"bytes {start}-{end}/{total_size}",
+                "Content-Length": str(len(chunk)),
+            }
+            return Response(
+                b"" if request.method == "HEAD" else chunk,
+                status_code=206,
+                media_type="model/gltf-binary",
+                headers=part_headers,
+            )
+
+        full_headers = {
+            **base_headers,
+            "Content-Length": str(total_size),
+        }
+        return Response(
+            b"" if request.method == "HEAD" else glb_bytes,
+            status_code=200,
+            media_type="model/gltf-binary",
+            headers=full_headers,
+        )
 
     # 校验X-Studio-Token与X-LibreChat-User-ID后转发至无状态Streamable HTTP处理器
     class _MCPASGIHandler:
@@ -730,6 +1405,21 @@ def create_app(
         routes=[
             Route("/health", endpoint=health_endpoint, methods=["GET"]),
             Route(
+                "/files",
+                endpoint=files_index_not_found,
+                methods=["GET", "HEAD", "OPTIONS"],
+            ),
+            Route(
+                "/files/",
+                endpoint=files_index_not_found,
+                methods=["GET", "HEAD", "OPTIONS"],
+            ),
+            Route(
+                "/files/{token:path}",
+                endpoint=signed_file_endpoint,
+                methods=["GET", "HEAD", "OPTIONS"],
+            ),
+            Route(
                 "/mcp", endpoint=_MCPASGIHandler(), methods=["POST", "GET", "DELETE"]
             ),
         ],
@@ -737,6 +1427,8 @@ def create_app(
     )
     app.state.settings = active_settings
     app.state.rules = active_rules
+    app.state.kb_index = kb_index
     app.state.limiter = limiter
+    app.state.model_manager = model_manager
     app.state.session_manager = None
     return app

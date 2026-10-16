@@ -1,0 +1,72 @@
+id: d30a24689a2c53b6
+title_zh: 观音菩萨石像寺庙场景
+source:
+  original_path: 佛教空间设计案例/观音菩萨石像寺庙场景.jpg
+original:
+  path: 佛教空间设计案例/观音菩萨石像寺庙场景.jpg
+  sha256: d30a24689a2c53b63d3505377a6078919adcdbfa40aae7b3ded0c231a72525a8
+  bytes: 1694554
+  width: 1366
+  height: 2578
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d30a24689a2c53b6.jpg
+    sha256: ef27b7d4a81bbc0d997a1fe26388efbad43bfee4ff86ade9882ca7e79057bdc7
+    bytes: 327654
+    width: 1085
+    height: 2048
+  thumb512:
+    path: assets/thumb512/d30a24689a2c53b6.webp
+    sha256: a1a0bf3b43c59e14927b7349eea77dac382fdb41e2a374947e16d038d6fc649e
+    bytes: 32200
+    width: 271
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 八角观音宝殿竖幅正面全景，完整展现红木供桌、米黄大理石八角须弥坛、双层石雕莲座、纯白汉白玉观音坐像、万佛墙与顶部八角千瓣金莲穹顶。
+materials:
+- 汉白玉观音坐像
+- 双层石雕仰覆莲座
+- 米黄大理石须弥坛
+- 八角金莲穹顶
+- 发光万佛墙
+colors:
+- 汉白玉白
+- 米黄鎏金
+style: 现代大型寺院八角金莲万佛殿风
+ai_design_usage: 八角观音宝殿竖幅正面庄严构图（与图31同殿联动）、双层石雕莲座与石材须弥座设计参考
+prompt_zh: 大型佛教八角观音宝殿室内竖幅正面全景效果图，中轴对称构图，高大的米黄色大理石八角须弥座与双层石雕仰覆莲花宝座之上，端坐一尊洁白无瑕的巨型汉白玉观音菩萨石雕像，头戴精美宝冠，神态慈悲庄严；佛坛正前方设深色红木雕花供桌，摆放铜香炉、烛台与水果供品；背景四周高墙为通顶发光的金色万佛墙小佛龛，顶部悬覆一座宏伟的八角形千瓣金莲花发光穹顶藻井，高光浅米色大理石地面，神圣崇高，8K竖构图建筑渲染
+tags:
+- 观音菩萨石像
+- 汉白玉石雕
+- 石雕须弥座
+- 八角观音殿
+- 千瓣金莲藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1366
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代中式佛殿右侧千佛发光龛墙与方格藻井局部竖图（#289的右侧局部裁切），画面无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

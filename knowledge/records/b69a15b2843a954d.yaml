@@ -1,0 +1,78 @@
+id: b69a15b2843a954d
+title_zh: 法国托举人物与双狮柱头
+source:
+  original_path: 石刻纹样开放授权实物参考/西方-法国托举人物与双狮柱头-cma139700.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/01-西方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/西方-法国托举人物与双狮柱头-cma139700.jpg
+  sha256: b69a15b2843a954d8fa3caf178beb8e5e49ffeeba6d884f5b2f60d4b3e5bbad5
+  bytes: 5958739
+  width: 3400
+  height: 2431
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b69a15b2843a954d.jpg
+    sha256: 8914d59cd7acb0c332f8ab25c8db057ffff1cb5baedc015ca5e64d19884d4886
+    bytes: 653062
+    width: 2048
+    height: 1464
+  thumb512:
+    path: assets/thumb512/b69a15b2843a954d.webp
+    sha256: e9add9eb9e66e718595afa19221a2656d241ac3823bfc49f0e0be1ec272d12e5
+    bytes: 34942
+    width: 512
+    height: 366
+library_type: 石刻纹样
+region: 西方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 法国托举人物与双狮柱头
+entity_type: 实物对象写实
+summary_zh: 【图中可见】矮胖须髯人物屈膝坐于柱头中央，两侧对称布置体量很大的兽身，顶端为平直断边。【来源著录】Engaged Capital with a Supporting (Caryatidal) Figure Flanked
+  by Lions；文化或地点依据：Western France, Vendée or Angoulême?, 12th century。
+materials:
+- 石灰石
+colors:
+- 米黄色
+style: 西方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，矮胖须髯人物屈膝坐于柱头中央，两侧对称布置体量很大的兽身，顶端为平直断边。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Engaged Capital with a Supporting (Caryatidal) Figure
+  Flanked by Lions. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 西方
+- 开放授权
+- 真实摄影
+- 法国托举人物与双狮柱头
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1963.477
+  download_url: https://openaccess-cdn.clevelandart.org/1963.477/1963.477_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2431
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

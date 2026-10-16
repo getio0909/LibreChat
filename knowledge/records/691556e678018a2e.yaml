@@ -1,0 +1,72 @@
+id: 691556e678018a2e
+title_zh: 佛教寺庙室内展览场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内展览场景.jpg
+  sha256: 691556e678018a2ea1f89d7c8908516a06ad78ddab9a5721c944ac93e01f21dc
+  bytes: 2928518
+  width: 3697
+  height: 2581
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/691556e678018a2e.jpg
+    sha256: cc6de6dbfa7e3f65eaed3b77740ee84c5c84c546144e3f1a82087a18e4c57003
+    bytes: 356829
+    width: 2048
+    height: 1430
+  thumb512:
+    path: assets/thumb512/691556e678018a2e.webp
+    sha256: d212adbec225482a352f12eacec7fa356d5992a50b504336c403ab34056aff35
+    bytes: 27428
+    width: 512
+    height: 357
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院佛殿外侧回廊与藏经展柜空间
+entity_type: 空间场景设计
+summary_zh: 本图呈现的是一座大型传统佛教寺院主殿侧翼的室内外过渡回廊兼藏经文物展陈长廊空间。空间兼具大殿礼佛动线疏导与佛教历史书画、经卷陈列双重功能，尺度高敞深远，散发出庄重、静谧、古雅的传统宗教殿堂氛围。 空间以深沉的紫檀/胡桃木色为主基调，辅以汉白玉的温润素白与暖黄灯光。左侧承重方柱采用深红棕色名贵硬木包镶，底部承托三层叠涩青白石覆盆式仰覆莲瓣须弥柱础（底层四角雕卷草纹）；左侧大殿主坛基座采用汉白玉精雕祥云栏板，其上隐现贴金繁复浮雕须弥座；右侧整面长墙定制通顶深色红木雕花玻璃展柜，下部柜门浮雕传统博古拐子龙纹，上部镶嵌…
+materials:
+- 红木
+- 汉白玉
+- 青石砖
+colors:
+- 深胡桃木色
+- 青白石色
+- 暖金灯光
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：寺院大殿侧翼回廊空间设计 / 藏经楼与佛教书画展柜立面参考 / 传统木柱与青白石莲瓣柱础及竖向壁灯细部生成(ControlNet Depth)；推荐搭配：深色老榆木或酸枝木饰面 + 房山汉白玉/青白石浮雕柱础与栏板
+  + 仿古青石哑光地砖 + 2700K暖黄透光云石柱灯
+prompt_zh: 中国传统佛教寺庙大殿室内外过渡回廊空间，单点透视纵深构图，左侧为粗壮的深红木方柱与青白石多层仰覆莲瓣柱础，柱身安装如意云头铜饰竖长条暖光壁灯，后方可见汉白玉雕花栏杆与贴金佛坛底座及橙色莲花灯；右侧整面墙为通顶红木雕花玻璃藏经展柜，内部陈列佛教古画并带暖色内打光；顶部为斜坡密排木椽屋顶，远端为带发光轮廓的如意壶门形拱门，地面铺设灰褐色青石板与浅浮雕团花地砖，光影静谧庄严，建筑效果图质感，8K超高清。
+tags:
+- 寺院回廊空间
+- 红木藏经展柜
+- 汉白玉莲瓣柱础
+- 中式竖向柱灯
+- 斜坡木椽吊顶
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2581
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统佛殿侧翼回廊与通顶红木雕花藏经展柜空间三维效果图，左侧见青白石覆莲柱础与汉白玉台基栏杆。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

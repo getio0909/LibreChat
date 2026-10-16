@@ -1,0 +1,80 @@
+id: 25621d7b6a6c8811
+title_zh: 应县佛宫寺木塔重檐与斗拱
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-应县佛宫寺木塔重檐与斗拱-commons190016144.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-应县佛宫寺木塔重檐与斗拱-commons190016144.jpg
+  sha256: 25621d7b6a6c8811067bc39055cf620ce772cc1ac084187fd43e3c4620a49959
+  bytes: 5606534
+  width: 3072
+  height: 4096
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/25621d7b6a6c8811.jpg
+    sha256: 6da72d9192273663503629064372ebec3420ce5c9091b2f7416c45bff46243b9
+    bytes: 577945
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/25621d7b6a6c8811.webp
+    sha256: 8c29bc3b118e323906aa8d5ae92bedd161fa3a12f54202ee5a0c8aaec619d8e7
+    bytes: 36428
+    width: 384
+    height: 512
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 应县佛宫寺木塔重檐与斗拱
+entity_type: 空间场景设计
+summary_zh: 【图中可见】八角多层木塔层层出檐，木柱、栏杆和密集承托构件环绕塔身，底层红墙配石基台阶，屋面覆灰瓦。【来源著录】20250604 Ying Xian Muta (080826).jpg；文化或地点依据：Commons标题与分类明确标识山西应县佛宫寺木塔。
+materials:
+- 木构件
+- 瓦与石基（按可见构件索引）
+colors:
+- 棕色
+- 红色
+- 灰色
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，八角多层木塔层层出檐，木柱、栏杆和密集承托构件环绕塔身，底层红墙配石基台阶，屋面覆灰瓦。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 20250604 Ying Xian Muta (080826).jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 应县佛宫寺木塔重檐与斗拱
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20250604_Ying_Xian_Muta_(080826).jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/2/2c/20250604_Ying_Xian_Muta_%28080826%29.jpg
+  credit: Yumeto; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review
