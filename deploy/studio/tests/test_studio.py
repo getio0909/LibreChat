@@ -3557,3 +3557,656 @@ def test_compare_materials_target_validation_matches_mac_comparison_target(
             assert len(ark_requests) == 0
 
     asyncio.run(_run())
+
+
+# 回归测试P2B Finding 1：含provider_task_id的任务在转为uncertain或进程重启对账后仍可通过GET轮询恢复为saved，且所有非saved结果均返回job_id与计费警告
+def test_p2b_finding1_get_only_recovery_after_uncertain_or_restart(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "f1000001-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__vase.jpg").write_bytes(
+        _make_image_bytes(360, 360, fmt="JPEG")
+    )
+    raw_glb = _make_glb_bytes(b"FINDING1_RECOVERED_GLB_MODEL")
+
+    create_posts = 0
+    query_gets = 0
+    task_ready = False
+
+    async def _handler(request: httpx.Request) -> httpx.Response:
+        nonlocal create_posts, query_gets
+        if request.method == "POST":
+            create_posts += 1
+            return httpx.Response(200, json={"id": "cgt-f1-recover"})
+        if request.url.path.endswith("/cgt-f1-recover"):
+            query_gets += 1
+            if not task_ready:
+                return httpx.Response(
+                    200, json={"id": "cgt-f1-recover", "status": "running"}
+                )
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f1-recover",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f1.glb"},
+                },
+            )
+        if request.url.host == "tos.example.test":
+            return httpx.Response(200, content=raw_glb)
+        return httpx.Response(404)
+
+    cfg = studio_env.model_copy(
+        update={
+            "seed3d_poll_timeout_seconds": 0.01,
+            "seed3d_background_timeout_seconds": 0.03,
+            "seed3d_poll_initial_seconds": 0.01,
+            "seed3d_poll_max_interval_seconds": 0.01,
+        }
+    )
+    app = create_app(
+        settings=cfg,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_handler),
+    )
+
+    async def _run() -> None:
+        nonlocal task_ready
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 1. 前台窗口超时返回running，必须包含job_id与may have been billed警告
+            res_create = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 601,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id, "detail": "standard"},
+                    },
+                },
+            )
+            create_body = json.loads(res_create.json()["result"]["content"][0]["text"])
+            assert create_body["state"] == "running"
+            job_id = create_body["job_id"]
+            assert job_id.startswith("mdl_")
+            assert "may have been billed" in create_body["message"]
+            assert any("may have been billed" in w for w in create_body["warnings"])
+            assert create_posts == 1
+
+            # 2. 等待后台轮询窗口耗尽使receipt变为uncertain，再模拟进程重启reconcile_pending_receipts
+            await asyncio.sleep(0.08)
+            receipt_path = (
+                cfg.data_dir / "users" / USER_A / "models" / job_id / "receipt.json"
+            )
+            receipt_data = json.loads(receipt_path.read_text(encoding="utf-8"))
+            assert receipt_data["state"] == "uncertain"
+            assert receipt_data["provider_task_id"] == "cgt-f1-recover"
+
+            # 3. 远端任务完成后调用check_3d_model(job_id)，仅通过GET恢复为saved，零二次POST
+            task_ready = True
+            app_restarted = create_app(
+                settings=cfg,
+                rules=load_rules(),
+                ark_transport=httpx.MockTransport(_handler),
+            )
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app_restarted),
+                base_url="http://studio:8000",
+            ) as client2:
+                res_check = await client2.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 602,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "check_3d_model",
+                            "arguments": {"job_id": job_id},
+                        },
+                    },
+                )
+                result_check = res_check.json()["result"]
+                assert result_check.get("isError") is False
+                saved_meta = json.loads(result_check["content"][0]["text"])
+                assert saved_meta["state"] == "saved"
+                assert saved_meta["model_id"] == job_id
+                assert create_posts == 1
+                assert query_gets >= 2
+
+    asyncio.run(_run())
+
+
+# 回归测试P2B Finding 2：远端成功或创建后本地落盘抛OSError时返回含job_id与计费警告的GenerationUncertain，磁盘恢复后check_3d_model通过GET恢复
+def test_p2b_finding2_storage_failure_returns_uncertain_with_job_id_and_recovers(
+    studio_env: StudioSettings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import deploy.studio.models3d as models3d_mod
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "f2000002-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__lion.jpg").write_bytes(
+        _make_image_bytes(360, 360, fmt="JPEG")
+    )
+    raw_glb = _make_glb_bytes(b"FINDING2_STORAGE_RECOVERY_GLB")
+
+    create_posts = 0
+
+    async def _handler(request: httpx.Request) -> httpx.Response:
+        nonlocal create_posts
+        if request.method == "POST":
+            create_posts += 1
+            return httpx.Response(200, json={"id": f"cgt-f2-{create_posts}"})
+        if request.url.path.startswith("/api/v3/contents/generations/tasks/"):
+            tid = request.url.path.rsplit("/", 1)[-1]
+            return httpx.Response(
+                200,
+                json={
+                    "id": tid,
+                    "status": "succeeded",
+                    "content": {"file_url": f"https://tos.example.test/{tid}.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    orig_write_glb = models3d_mod.write_glb_atomic
+    orig_write_receipt = models3d_mod.write_model_receipt
+    fail_glb_write = True
+    fail_running_receipt_write = False
+
+    def _flaky_write_glb(model_dir: Path, glb_bytes: bytes) -> Path:
+        if fail_glb_write:
+            raise OSError("Simulated disk full during write_glb_atomic")
+        return orig_write_glb(model_dir, glb_bytes)
+
+    def _flaky_write_receipt(model_dir: Path, values: dict[str, Any]) -> None:
+        if fail_running_receipt_write and values.get("state") == "running":
+            raise OSError("Simulated disk full during running receipt write")
+        orig_write_receipt(model_dir, values)
+
+    monkeypatch.setattr(models3d_mod, "write_glb_atomic", _flaky_write_glb)
+    monkeypatch.setattr(models3d_mod, "write_model_receipt", _flaky_write_receipt)
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_handler),
+    )
+
+    async def _run() -> None:
+        nonlocal fail_glb_write, fail_running_receipt_write
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 1. write_glb_atomic抛出OSError -> 转为uncertain且返回job_id与计费警告
+            res_err = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 611,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            result_err = res_err.json()["result"]
+            assert result_err["isError"] is True
+            err_body = json.loads(result_err["content"][0]["text"])
+            assert err_body["state"] == "uncertain"
+            assert "may have been billed" in err_body["error"]
+            job_id = err_body["job_id"]
+            assert job_id.startswith("mdl_")
+            assert create_posts == 1
+
+            # 2. 磁盘恢复正常后调用check_3d_model(job_id)，仅通过GET恢复并落盘成功
+            fail_glb_write = False
+            res_recover = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 612,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            result_recover = res_recover.json()["result"]
+            assert result_recover["isError"] is False
+            saved_body = json.loads(result_recover["content"][0]["text"])
+            assert saved_body["state"] == "saved"
+            assert saved_body["model_id"] == job_id
+            assert create_posts == 1
+
+            # 3. POST返回provider_task_id后写入running receipt抛OSError -> 返回含job_id的uncertain，随后GET恢复
+            fail_running_receipt_write = True
+            res_err2 = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 613,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            err_body2 = json.loads(res_err2.json()["result"]["content"][0]["text"])
+            assert err_body2["state"] == "uncertain"
+            assert "may have been billed" in err_body2["error"]
+            job_id2 = err_body2["job_id"]
+            assert create_posts == 2
+
+            fail_running_receipt_write = False
+            res_recover2 = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 614,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id2},
+                    },
+                },
+            )
+            saved_body2 = json.loads(
+                res_recover2.json()["result"]["content"][0]["text"]
+            )
+            assert saved_body2["state"] == "saved"
+            assert saved_body2["model_id"] == job_id2
+            assert create_posts == 2
+
+    asyncio.run(_run())
+
+
+# 回归测试P2B Finding 3：单任务锁与终态保护确保saved状态绝不会被后台轮询超时或异常覆盖
+def test_p2b_finding3_terminal_saved_never_overwritten_by_race_or_timeout(
+    studio_env: StudioSettings,
+) -> None:
+    from deploy.studio.models3d import _transition_model_receipt, write_model_receipt
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "f3000003-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__lotus.jpg").write_bytes(
+        _make_image_bytes(360, 360, fmt="JPEG")
+    )
+    raw_glb = _make_glb_bytes(b"FINDING3_IMMUTABLE_SAVED_GLB")
+
+    poll_counter = 0
+
+    async def _handler(request: httpx.Request) -> httpx.Response:
+        nonlocal poll_counter
+        if request.method == "POST":
+            return httpx.Response(200, json={"id": "cgt-f3-race"})
+        if request.url.path.endswith("/cgt-f3-race"):
+            poll_counter += 1
+            if poll_counter == 1:
+                return httpx.Response(
+                    200, json={"id": "cgt-f3-race", "status": "running"}
+                )
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f3-race",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f3.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    cfg = studio_env.model_copy(
+        update={
+            "seed3d_poll_timeout_seconds": 0.005,
+            "seed3d_background_timeout_seconds": 0.04,
+            "seed3d_poll_initial_seconds": 0.02,
+            "seed3d_poll_max_interval_seconds": 0.02,
+        }
+    )
+    app = create_app(
+        settings=cfg,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_handler),
+    )
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            res_create = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 621,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            job_id = json.loads(res_create.json()["result"]["content"][0]["text"])[
+                "job_id"
+            ]
+
+            # 立即通过check_3d_model完成落盘，并与后台轮询超时并发竞争
+            res_check = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 622,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            assert res_check.json()["result"]["isError"] is False
+            await asyncio.sleep(0.06)
+
+            # 尝试直接写入uncertain或failed到已saved的目录，验证终态保护拒绝覆盖
+            model_dir = cfg.data_dir / "users" / USER_A / "models" / job_id
+            stale_dict: dict[str, Any] = {
+                "state": "uncertain",
+                "model_id": job_id,
+                "provider_task_id": "cgt-f3-race",
+            }
+            write_model_receipt(model_dir, stale_dict)
+            assert stale_dict["state"] == "saved"
+            assert (
+                _transition_model_receipt(
+                    model_dir, stale_dict, "failed", best_effort=True
+                )
+                is False
+            )
+
+            on_disk = json.loads(
+                (model_dir / "receipt.json").read_text(encoding="utf-8")
+            )
+            assert on_disk["state"] == "saved"
+
+            # 签名文件下载端点持续返回200
+            tok, _ = sign_file_token(cfg, USER_A, job_id)
+            res_dl = await client.get(f"/files/{tok}")
+            assert res_dl.status_code == 200
+            assert res_dl.content == raw_glb
+
+    asyncio.run(_run())
+
+
+# 回归测试P2B Finding 4：查询任务GET返回401/403/404等HTTP错误时标记为uncertain而非failed，保留provider_task_id供后续check_3d_model恢复
+def test_p2b_finding4_query_4xx_marks_uncertain_not_failed_and_recovers(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "f4000004-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__relief.jpg").write_bytes(
+        _make_image_bytes(360, 360, fmt="JPEG")
+    )
+    raw_glb = _make_glb_bytes(b"FINDING4_QUERY_404_RECOVERED_GLB")
+
+    create_posts = 0
+    query_status_to_return = 404
+
+    async def _handler(request: httpx.Request) -> httpx.Response:
+        nonlocal create_posts
+        if request.method == "POST":
+            create_posts += 1
+            return httpx.Response(200, json={"id": "cgt-f4-query"})
+        if request.url.path.endswith("/cgt-f4-query"):
+            if query_status_to_return != 200:
+                return httpx.Response(
+                    query_status_to_return,
+                    json={
+                        "error": {"code": "NotFound", "message": "eventual consistency"}
+                    },
+                )
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f4-query",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f4.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_handler),
+    )
+
+    async def _run() -> None:
+        nonlocal query_status_to_return
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 1. 创建成功但首次GET返回404 -> 标记为uncertain（非failed），返回job_id与计费警告
+            res_create = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 631,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            result_create = res_create.json()["result"]
+            assert result_create["isError"] is True
+            err_body = json.loads(result_create["content"][0]["text"])
+            assert err_body["state"] == "uncertain"
+            assert "may have been billed" in err_body["error"]
+            job_id = err_body["job_id"]
+            assert job_id.startswith("mdl_")
+
+            # 2. 再次查询遇到401 -> 仍保持uncertain且保留provider_task_id
+            query_status_to_return = 401
+            res_check_401 = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 632,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            err_401 = json.loads(res_check_401.json()["result"]["content"][0]["text"])
+            assert err_401["state"] == "uncertain"
+            assert err_401["job_id"] == job_id
+
+            # 3. 查询接口恢复200 -> check_3d_model成功恢复为saved且无二次创建POST
+            query_status_to_return = 200
+            res_check_ok = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 633,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            result_ok = res_check_ok.json()["result"]
+            assert result_ok["isError"] is False
+            saved_body = json.loads(result_ok["content"][0]["text"])
+            assert saved_body["state"] == "saved"
+            assert saved_body["model_id"] == job_id
+            assert create_posts == 1
+
+    asyncio.run(_run())
+
+
+# 回归测试P2B Finding 5：前台轮询超时转后台续跑期间持续持有每用户与全局准入配额（不释放再重获），直至远端任务进入终态
+def test_p2b_finding5_admission_held_across_background_handoff_until_terminal(
+    studio_env: StudioSettings,
+) -> None:
+    for uid in (USER_A, USER_B):
+        ulc = studio_env.librechat_images_dir / uid
+        ulc.mkdir(parents=True, mode=0o700, exist_ok=True)
+        (ulc / "f5000005-1111-2222-3333-444444444444__src.jpg").write_bytes(
+            _make_image_bytes(360, 360, fmt="JPEG")
+        )
+    raw_glb = _make_glb_bytes(b"FINDING5_ADMISSION_LEASE_GLB")
+
+    created_tasks: list[str] = []
+    finish_task_1 = asyncio.Event()
+
+    async def _handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            tid = f"cgt-f5-{len(created_tasks) + 1}"
+            created_tasks.append(tid)
+            return httpx.Response(200, json={"id": tid})
+        if request.url.path.endswith("/cgt-f5-1"):
+            if not finish_task_1.is_set():
+                return httpx.Response(200, json={"id": "cgt-f5-1", "status": "running"})
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f5-1",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f5-1.glb"},
+                },
+            )
+        if request.url.path.endswith("/cgt-f5-2"):
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f5-2",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f5-2.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    # 设置max_parallel_per_user=1与seed3d_max_parallel=1，验证后台续跑期间配额不泄露
+    cfg = studio_env.model_copy(
+        update={
+            "max_parallel_per_user": 1,
+            "seed3d_max_parallel": 1,
+            "seed3d_poll_timeout_seconds": 0.015,
+            "seed3d_background_timeout_seconds": 5.0,
+            "seed3d_poll_initial_seconds": 0.01,
+            "seed3d_poll_max_interval_seconds": 0.02,
+        }
+    )
+    app = create_app(
+        settings=cfg,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_handler),
+    )
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 1. 启动任务1，前台轮询窗口超时返回running并移交后台任务
+            res1 = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 641,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {
+                            "image_id": "f5000005-1111-2222-3333-444444444444"
+                        },
+                    },
+                },
+            )
+            body1 = json.loads(res1.json()["result"]["content"][0]["text"])
+            assert body1["state"] == "running"
+            job1_id = body1["job_id"]
+            assert created_tasks == ["cgt-f5-1"]
+
+            # 2. 在任务1仍处于后台running时启动任务2，验证任务2被准入信号量阻塞，未发出第二个POST
+            job2_task = asyncio.create_task(
+                client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 642,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "create_3d_model",
+                            "arguments": {
+                                "image_id": "f5000005-1111-2222-3333-444444444444"
+                            },
+                        },
+                    },
+                )
+            )
+            await asyncio.sleep(0.04)
+            assert not job2_task.done()
+            assert created_tasks == ["cgt-f5-1"]
+
+            # 3. 同一用户对任务1调用check_3d_model复用已有租约（不会自死锁）
+            res_check_running = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 643,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job1_id},
+                    },
+                },
+            )
+            assert (
+                json.loads(res_check_running.json()["result"]["content"][0]["text"])[
+                    "state"
+                ]
+                == "running"
+            )
+            assert created_tasks == ["cgt-f5-1"]
+
+            # 4. 放行远端任务1使其进入终态saved，租约释放后任务2立即获得准入并完成
+            finish_task_1.set()
+            res2 = await asyncio.wait_for(job2_task, timeout=2.0)
+            body2 = json.loads(res2.json()["result"]["content"][0]["text"])
+            assert body2["state"] == "saved"
+            assert created_tasks == ["cgt-f5-1", "cgt-f5-2"]
+
+    asyncio.run(_run())

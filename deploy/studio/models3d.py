@@ -17,7 +17,7 @@ from typing import Any
 
 import httpx
 
-from .config import ConcurrencyLimiter, StudioSettings
+from .config import ConcurrencyLease, ConcurrencyLimiter, StudioSettings
 from .images import GenerationUncertain
 from .store import (
     allocate_model_job,
@@ -39,6 +39,17 @@ MAX_GLB_BYTES = 200 * 1024 * 1024
 GLB_MAGIC = b"glTF"
 ZIP_MAGIC = b"PK\x03\x04"
 VISUAL_MODEL_DISCLAIMER = "仅供视觉预览参考（visual model only），非工程制造或施工下料模型（not a manufacturing model）。"
+
+# 三维模型任务状态机合法状态与允许的状态迁移表（saved为不可逆终态）
+MODEL_JOB_STATES = frozenset({"pending", "running", "uncertain", "failed", "saved"})
+ALLOWED_MODEL_STATE_TRANSITIONS: dict[str | None, frozenset[str]] = {
+    None: frozenset({"pending", "running", "uncertain", "failed", "saved"}),
+    "pending": frozenset({"pending", "running", "uncertain", "failed", "saved"}),
+    "running": frozenset({"running", "uncertain", "failed", "saved"}),
+    "uncertain": frozenset({"uncertain", "running", "failed", "saved"}),
+    "failed": frozenset({"failed"}),
+    "saved": frozenset({"saved"}),
+}
 
 
 # 校验三维模型任务编号格式（mdl_<32位小写十六进制>）
@@ -228,8 +239,54 @@ def extract_glb_bytes(raw_bytes: bytes) -> bytes:
     )
 
 
-# 以0600权限原子写入三维模型凭据receipt.json
+# 读取目录中已存在的receipt.json字典（若不存在或不可读则返回None）
+def _read_existing_receipt_dict(model_dir: Path) -> dict[str, Any] | None:
+    target = model_dir / "receipt.json"
+    try:
+        if not target.exists() or target.is_symlink() or not target.is_file():
+            return None
+        parsed = json.loads(target.read_text(encoding="utf-8"))
+        return parsed if isinstance(parsed, dict) else None
+    except (OSError, ValueError, TypeError):
+        return None
+
+
+# 以0600权限原子写入三维模型凭据receipt.json（保护saved终态不可被覆盖且保留provider_task_id）
 def write_model_receipt(model_dir: Path, values: dict[str, Any]) -> None:
+    next_state = values.get("state")
+    if next_state not in MODEL_JOB_STATES:
+        raise ValueError(f"Invalid 3D model receipt state: {next_state!r}")
+
+    existing = _read_existing_receipt_dict(model_dir)
+    if existing is not None:
+        existing_state = existing.get("state")
+        if existing_state == "saved" and next_state != "saved":
+            values.clear()
+            values.update(existing)
+            return
+        allowed = ALLOWED_MODEL_STATE_TRANSITIONS.get(
+            existing_state if isinstance(existing_state, str) else None,
+            MODEL_JOB_STATES,
+        )
+        if next_state not in allowed:
+            if existing_state == "saved":
+                values.clear()
+                values.update(existing)
+                return
+            raise ValueError(
+                f"Disallowed 3D model state transition: {existing_state!r} -> {next_state!r}"
+            )
+        existing_task_id = existing.get("provider_task_id") or existing.get("task_id")
+        if (
+            isinstance(existing_task_id, str)
+            and existing_task_id.strip()
+            and not (
+                isinstance(values.get("provider_task_id"), str)
+                and str(values.get("provider_task_id")).strip()
+            )
+        ):
+            values["provider_task_id"] = existing_task_id.strip()
+
     target = model_dir / "receipt.json"
     temporary = model_dir / "receipt.tmp"
     descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
@@ -238,6 +295,50 @@ def write_model_receipt(model_dir: Path, values: dict[str, Any]) -> None:
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temporary, target)
+
+
+# 按单任务状态机规则更新三维模型receipt（若已处于saved终态则拒绝覆盖并返回False）
+def _transition_model_receipt(
+    model_dir: Path,
+    receipt: dict[str, Any],
+    next_state: str,
+    *,
+    best_effort: bool = False,
+    **updates: Any,
+) -> bool:
+    existing = _read_existing_receipt_dict(model_dir)
+    if (
+        existing is not None
+        and existing.get("state") == "saved"
+        and next_state != "saved"
+    ):
+        receipt.clear()
+        receipt.update(existing)
+        return False
+    if receipt.get("state") == "saved" and next_state != "saved":
+        return False
+
+    preserved_task_id = (
+        updates.get("provider_task_id")
+        or receipt.get("provider_task_id")
+        or receipt.get("task_id")
+        or (
+            (existing.get("provider_task_id") or existing.get("task_id"))
+            if existing is not None
+            else None
+        )
+    )
+    receipt.update(updates)
+    receipt["state"] = next_state
+    if isinstance(preserved_task_id, str) and preserved_task_id.strip():
+        receipt["provider_task_id"] = preserved_task_id.strip()
+
+    if best_effort:
+        with contextlib.suppress(OSError, ValueError):
+            write_model_receipt(model_dir, receipt)
+    else:
+        write_model_receipt(model_dir, receipt)
+    return receipt.get("state") == next_state
 
 
 # 以0600权限原子写入原始model.glb文件
@@ -879,6 +980,31 @@ def build_model_viewer_html(
 </html>"""
 
 
+# 封装单个三维模型任务的完整并发准入租约（含每用户配额、全局配额与Seed3D并发配额）
+class _ModelAdmissionLease:
+    def __init__(
+        self,
+        user_lease: ConcurrencyLease,
+        seed3d_sem: asyncio.Semaphore,
+    ) -> None:
+        self._user_lease = user_lease
+        self._seed3d_sem = seed3d_sem
+        self._released = False
+
+    # 查询当前三维模型并发租约是否已释放
+    @property
+    def released(self) -> bool:
+        return self._released
+
+    # 幂等释放Seed3D并发信号量与每用户/全局并发租约
+    def release(self) -> None:
+        if self._released:
+            return
+        self._released = True
+        self._seed3d_sem.release()
+        self._user_lease.release()
+
+
 # 管理豆包Seed3D异步任务的提交、退避轮询、后台续跑、落盘与状态恢复
 class ModelJobManager:
     def __init__(
@@ -893,6 +1019,57 @@ class ModelJobManager:
         self._seed3d_sem = asyncio.Semaphore(settings.seed3d_max_parallel)
         self._ark_transport = ark_transport
         self._background_tasks: dict[tuple[str, str], asyncio.Task[None]] = {}
+        self._job_locks: dict[tuple[str, str], asyncio.Lock] = {}
+        self._active_leases: dict[tuple[str, str], _ModelAdmissionLease] = {}
+        self._known_task_ids: dict[tuple[str, str], str] = {}
+
+    # 获取指定（user_id, model_id）的专属异步互斥锁以串行化轮询与状态迁移
+    def _get_job_lock(self, uid: str, model_id: str) -> asyncio.Lock:
+        key = (uid, model_id)
+        lock = self._job_locks.get(key)
+        if lock is None:
+            lock = asyncio.Lock()
+            self._job_locks[key] = lock
+        return lock
+
+    # 获取单次三维模型任务的完整并发准入租约（每用户+全局+Seed3D信号量）
+    async def _acquire_model_lease(self, uid: str) -> _ModelAdmissionLease:
+        user_lease = await self._user_limiter.acquire_lease(uid)
+        try:
+            await self._seed3d_sem.acquire()
+        except BaseException:
+            user_lease.release()
+            raise
+        return _ModelAdmissionLease(user_lease, self._seed3d_sem)
+
+    # 幂等释放并移除指定任务的并发准入租约
+    def _release_job_lease(
+        self,
+        uid: str,
+        model_id: str,
+        lease: _ModelAdmissionLease | None = None,
+    ) -> None:
+        stored = self._active_leases.pop((uid, model_id), None)
+        if stored is not None:
+            stored.release()
+        if lease is not None and lease is not stored:
+            lease.release()
+
+    # 从receipt或内存缓存中提取已记录的远端provider_task_id
+    def _extract_provider_task_id(
+        self, uid: str, model_id: str, receipt: dict[str, Any]
+    ) -> str | None:
+        raw_task_id = (
+            receipt.get("provider_task_id")
+            or receipt.get("task_id")
+            or self._known_task_ids.get((uid, model_id))
+        )
+        if isinstance(raw_task_id, str) and raw_task_id.strip():
+            cleaned = raw_task_id.strip()
+            receipt["provider_task_id"] = cleaned
+            self._known_task_ids[(uid, model_id)] = cleaned
+            return cleaned
+        return None
 
     # 创建访问火山方舟3D任务接口的HTTP客户端
     def _build_client(self) -> httpx.AsyncClient:
@@ -908,104 +1085,179 @@ class ModelJobManager:
             follow_redirects=False,
         )
 
-    # 查询单次远端3D生成任务状态并在成功时下载和落盘GLB文件
+    # 在单任务锁保护下查询单次远端3D生成任务状态并在成功时下载和落盘GLB文件
     async def _poll_once_and_finalize_if_ready(
         self,
         client: httpx.AsyncClient,
         *,
+        uid: str,
+        model_id: str,
         model_dir: Path,
         receipt: dict[str, Any],
         provider_task_id: str,
     ) -> dict[str, Any]:
-        tasks_base_url = (
-            f"{self._settings.ark_base_url.rstrip('/')}/contents/generations/tasks"
-        )
-        headers = {
-            "Authorization": f"Bearer {self._settings.ark_api_key}",
-            "Content-Type": "application/json",
-        }
-        try:
-            query_res = await client.get(
-                f"{tasks_base_url}/{provider_task_id}",
-                headers=headers,
+        async with self._get_job_lock(uid, model_id):
+            existing = _read_existing_receipt_dict(model_dir)
+            if existing is not None and existing.get("state") == "saved":
+                receipt.clear()
+                receipt.update(existing)
+            if receipt.get("state") == "saved" and (model_dir / "model.glb").is_file():
+                glb_bytes, saved_receipt = load_saved_model_bytes(
+                    self._settings, uid, model_id
+                )
+                return {
+                    "state": "saved",
+                    "model_id": model_id,
+                    "job_id": model_id,
+                    "source_image_id": str(saved_receipt.get("source_image_id") or ""),
+                    "detail": str(saved_receipt.get("detail") or "standard"),
+                    "faces": int(saved_receipt.get("faces") or 100_000),
+                    "bytes": len(glb_bytes),
+                    "sha256": str(saved_receipt.get("sha256") or ""),
+                }
+
+            receipt["provider_task_id"] = provider_task_id
+            self._known_task_ids[(uid, model_id)] = provider_task_id
+
+            tasks_base_url = (
+                f"{self._settings.ark_base_url.rstrip('/')}/contents/generations/tasks"
             )
-            query_res.raise_for_status()
-            parsed = parse_seed3d_query_response(query_res.json())
-        except httpx.HTTPStatusError as exc:
-            if (
-                400 <= exc.response.status_code < 500
-                and exc.response.status_code != 429
-            ):
-                receipt["state"] = "failed"
-                receipt["finished"] = time.time()
-                receipt["error_code"] = f"http_{exc.response.status_code}"
-                write_model_receipt(model_dir, receipt)
-                raise RuntimeError(
-                    "3D model generation task query was rejected by upstream service"
+            headers = {
+                "Authorization": f"Bearer {self._settings.ark_api_key}",
+                "Content-Type": "application/json",
+            }
+            try:
+                query_res = await client.get(
+                    f"{tasks_base_url}/{provider_task_id}",
+                    headers=headers,
+                )
+                query_res.raise_for_status()
+                parsed = parse_seed3d_query_response(query_res.json())
+            except httpx.HTTPStatusError as exc:
+                # 查询接口HTTP异常（含401/403/404/429/5xx）仅表示状态查询失败，绝不能误判为远端任务failed
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "uncertain",
+                    best_effort=True,
+                    finished=time.time(),
+                    provider_task_id=provider_task_id,
+                    query_error_code=f"http_{exc.response.status_code}",
+                )
+                raise GenerationUncertain(
+                    "3D model generation task status query failed; the request may have been billed. Do not automatically resubmit.",
+                    job_id=model_id,
+                    state="uncertain",
                 ) from None
-            receipt["state"] = "uncertain"
-            receipt["finished"] = time.time()
-            write_model_receipt(model_dir, receipt)
-            raise GenerationUncertain(
-                "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
-            ) from None
-        except (
-            httpx.TimeoutException,
-            httpx.TransportError,
-            ValueError,
-            RuntimeError,
-        ) as exc:
-            receipt["state"] = "uncertain"
-            receipt["finished"] = time.time()
-            write_model_receipt(model_dir, receipt)
-            raise GenerationUncertain(
-                "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
-            ) from exc
+            except (
+                httpx.TimeoutException,
+                httpx.TransportError,
+                ValueError,
+                RuntimeError,
+            ) as exc:
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "uncertain",
+                    best_effort=True,
+                    finished=time.time(),
+                    provider_task_id=provider_task_id,
+                )
+                raise GenerationUncertain(
+                    "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit.",
+                    job_id=model_id,
+                    state="uncertain",
+                ) from exc
 
-        status = parsed["status"]
-        if status in ("queued", "running"):
-            return {"state": "running", "provider_status": status}
+            status = parsed["status"]
+            if status in ("queued", "running"):
+                if receipt.get("state") != "running":
+                    _transition_model_receipt(
+                        model_dir,
+                        receipt,
+                        "running",
+                        best_effort=True,
+                        provider_task_id=provider_task_id,
+                    )
+                return {"state": "running", "provider_status": status}
 
-        if status in ("failed", "cancelled", "expired"):
-            receipt["state"] = "failed"
-            receipt["finished"] = time.time()
-            receipt["error_code"] = parsed.get("error_code", status)
-            write_model_receipt(model_dir, receipt)
-            raise RuntimeError(f"3D model generation task {status} upstream")
+            if status in ("failed", "cancelled", "expired"):
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "failed",
+                    best_effort=True,
+                    finished=time.time(),
+                    error_code=parsed.get("error_code", status),
+                    provider_task_id=provider_task_id,
+                )
+                raise GenerationUncertain(
+                    f"3D model generation task {status} upstream; the request may have been billed. Do not automatically resubmit.",
+                    job_id=model_id,
+                    state="failed",
+                )
 
-        file_url = parsed["file_url"]
-        try:
-            dl_res = await client.get(file_url)
-            dl_res.raise_for_status()
-            glb_bytes = extract_glb_bytes(dl_res.content)
-        except Exception as exc:
-            receipt["state"] = "uncertain"
-            receipt["finished"] = time.time()
-            write_model_receipt(model_dir, receipt)
-            raise GenerationUncertain(
-                "3D model artifact download failed after upstream task completion; the request may have been billed. Do not automatically resubmit."
-            ) from exc
+            file_url = parsed["file_url"]
+            try:
+                dl_res = await client.get(file_url)
+                dl_res.raise_for_status()
+                glb_bytes = extract_glb_bytes(dl_res.content)
+            except Exception as exc:
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "uncertain",
+                    best_effort=True,
+                    finished=time.time(),
+                    provider_task_id=provider_task_id,
+                )
+                raise GenerationUncertain(
+                    "3D model artifact download failed after upstream task completion; the request may have been billed. Do not automatically resubmit.",
+                    job_id=model_id,
+                    state="uncertain",
+                ) from exc
 
-        write_glb_atomic(model_dir, glb_bytes)
-        digest = hashlib.sha256(glb_bytes).hexdigest()
-        receipt["state"] = "saved"
-        receipt["file"] = "model.glb"
-        receipt["bytes"] = len(glb_bytes)
-        receipt["sha256"] = digest
-        receipt["finished"] = time.time()
-        write_model_receipt(model_dir, receipt)
-        return {
-            "state": "saved",
-            "model_id": receipt["model_id"],
-            "job_id": receipt["model_id"],
-            "source_image_id": receipt["source_image_id"],
-            "detail": receipt["detail"],
-            "faces": int(receipt["faces"]),
-            "bytes": len(glb_bytes),
-            "sha256": digest,
-        }
+            digest = hashlib.sha256(glb_bytes).hexdigest()
+            try:
+                write_glb_atomic(model_dir, glb_bytes)
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "saved",
+                    best_effort=False,
+                    file="model.glb",
+                    bytes=len(glb_bytes),
+                    sha256=digest,
+                    finished=time.time(),
+                    provider_task_id=provider_task_id,
+                )
+            except Exception as exc:
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "uncertain",
+                    best_effort=True,
+                    finished=time.time(),
+                    provider_task_id=provider_task_id,
+                )
+                raise GenerationUncertain(
+                    "3D model local persistence failed after upstream task completion; the request may have been billed. Do not automatically resubmit.",
+                    job_id=model_id,
+                    state="uncertain",
+                ) from exc
 
-    # 在后台继续轮询尚未完成的Seed3D任务直至落盘或超时转为uncertain
+            return {
+                "state": "saved",
+                "model_id": model_id,
+                "job_id": model_id,
+                "source_image_id": str(receipt.get("source_image_id") or ""),
+                "detail": str(receipt.get("detail") or "standard"),
+                "faces": int(receipt.get("faces") or 100_000),
+                "bytes": len(glb_bytes),
+                "sha256": digest,
+            }
+
+    # 在后台继续持有准入租约并轮询尚未完成的Seed3D任务直至终态或超时
     async def _background_poll_loop(
         self,
         user_id: str,
@@ -1013,6 +1265,7 @@ class ModelJobManager:
         model_dir: Path,
         receipt: dict[str, Any],
         provider_task_id: str,
+        lease: _ModelAdmissionLease,
     ) -> None:
         deadline = time.monotonic() + float(
             self._settings.seed3d_background_timeout_seconds
@@ -1020,7 +1273,7 @@ class ModelJobManager:
         delay = float(self._settings.seed3d_poll_initial_seconds)
         max_interval = float(self._settings.seed3d_poll_max_interval_seconds)
         try:
-            async with self._seed3d_sem, self._build_client() as client:
+            async with self._build_client() as client:
                 while time.monotonic() < deadline:
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
@@ -1029,25 +1282,33 @@ class ModelJobManager:
                     delay = min(max_interval, delay * 1.5)
                     outcome = await self._poll_once_and_finalize_if_ready(
                         client,
+                        uid=user_id,
+                        model_id=model_id,
                         model_dir=model_dir,
                         receipt=receipt,
                         provider_task_id=provider_task_id,
                     )
                     if outcome["state"] == "saved":
                         return
-            # 后台总轮询窗口耗尽仍未完成，标记为uncertain防止重复计费提交
-            if receipt.get("state") == "running":
-                receipt["state"] = "uncertain"
-                receipt["finished"] = time.time()
-                write_model_receipt(model_dir, receipt)
+            # 后台总轮询窗口耗尽仍未完成，在单任务锁保护下标记为uncertain（不覆盖saved终态）
+            async with self._get_job_lock(user_id, model_id):
+                _transition_model_receipt(
+                    model_dir,
+                    receipt,
+                    "uncertain",
+                    best_effort=True,
+                    finished=time.time(),
+                    provider_task_id=provider_task_id,
+                )
         except (GenerationUncertain, RuntimeError, ValueError, OSError):
             return
         except asyncio.CancelledError:
             raise
         finally:
             self._background_tasks.pop((user_id, model_id), None)
+            self._release_job_lease(user_id, model_id, lease)
 
-    # 提交新的三维模型生成任务并在工具调用窗口内退避轮询，超时则转后台继续轮询并返回job_id
+    # 提交新的三维模型生成任务并在工具调用窗口内退避轮询，超时则无空隙移交后台继续轮询并返回job_id
     async def create_model(
         self,
         *,
@@ -1066,8 +1327,12 @@ class ModelJobManager:
         )
         clean_note = sanitize_model_note(note)
 
-        async with self._user_limiter.acquire(uid), self._seed3d_sem:
+        lease = await self._acquire_model_lease(uid)
+        model_id = ""
+        transferred_to_bg = False
+        try:
             model_id, model_dir = allocate_model_job(self._settings, uid)
+            self._active_leases[(uid, model_id)] = lease
             started_ts = time.time()
             receipt: dict[str, Any] = {
                 "state": "pending",
@@ -1107,18 +1372,30 @@ class ModelJobManager:
                             400 <= exc.response.status_code < 500
                             and exc.response.status_code != 429
                         ):
-                            receipt["state"] = "failed"
-                            receipt["finished"] = time.time()
-                            receipt["error_code"] = f"http_{exc.response.status_code}"
-                            write_model_receipt(model_dir, receipt)
-                            raise ValueError(
-                                "3D model generation request was rejected by upstream service"
+                            _transition_model_receipt(
+                                model_dir,
+                                receipt,
+                                "failed",
+                                best_effort=True,
+                                finished=time.time(),
+                                error_code=f"http_{exc.response.status_code}",
+                            )
+                            raise GenerationUncertain(
+                                "3D model generation request was rejected by upstream service; the request may have been billed. Do not automatically resubmit.",
+                                job_id=model_id,
+                                state="failed",
                             ) from None
-                        receipt["state"] = "uncertain"
-                        receipt["finished"] = time.time()
-                        write_model_receipt(model_dir, receipt)
+                        _transition_model_receipt(
+                            model_dir,
+                            receipt,
+                            "uncertain",
+                            best_effort=True,
+                            finished=time.time(),
+                        )
                         raise GenerationUncertain(
-                            "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
+                            "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit.",
+                            job_id=model_id,
+                            state="uncertain",
                         ) from None
                     except (
                         httpx.TimeoutException,
@@ -1126,16 +1403,44 @@ class ModelJobManager:
                         ValueError,
                         RuntimeError,
                     ) as exc:
-                        receipt["state"] = "uncertain"
-                        receipt["finished"] = time.time()
-                        write_model_receipt(model_dir, receipt)
+                        _transition_model_receipt(
+                            model_dir,
+                            receipt,
+                            "uncertain",
+                            best_effort=True,
+                            finished=time.time(),
+                        )
                         raise GenerationUncertain(
-                            "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
+                            "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit.",
+                            job_id=model_id,
+                            state="uncertain",
                         ) from exc
 
-                    receipt["state"] = "running"
+                    # 立即在内存与receipt中记录provider_task_id，确保后续落盘失败也可通过GET恢复
+                    self._known_task_ids[(uid, model_id)] = provider_task_id
                     receipt["provider_task_id"] = provider_task_id
-                    write_model_receipt(model_dir, receipt)
+                    try:
+                        _transition_model_receipt(
+                            model_dir,
+                            receipt,
+                            "running",
+                            best_effort=False,
+                            provider_task_id=provider_task_id,
+                        )
+                    except Exception as exc:
+                        _transition_model_receipt(
+                            model_dir,
+                            receipt,
+                            "uncertain",
+                            best_effort=True,
+                            finished=time.time(),
+                            provider_task_id=provider_task_id,
+                        )
+                        raise GenerationUncertain(
+                            "3D model local receipt persistence failed after upstream task creation; the request may have been billed. Do not automatically resubmit.",
+                            job_id=model_id,
+                            state="uncertain",
+                        ) from exc
 
                     deadline = time.monotonic() + float(
                         self._settings.seed3d_poll_timeout_seconds
@@ -1148,6 +1453,8 @@ class ModelJobManager:
                     while True:
                         outcome = await self._poll_once_and_finalize_if_ready(
                             client,
+                            uid=uid,
+                            model_id=model_id,
                             model_dir=model_dir,
                             receipt=receipt,
                             provider_task_id=provider_task_id,
@@ -1161,19 +1468,23 @@ class ModelJobManager:
                         delay = min(max_interval, delay * 1.5)
             except BaseException:
                 if receipt.get("state") == "pending":
-                    with contextlib.suppress(Exception):
-                        receipt["state"] = "uncertain"
-                        receipt["finished"] = time.time()
-                        write_model_receipt(model_dir, receipt)
+                    _transition_model_receipt(
+                        model_dir,
+                        receipt,
+                        "uncertain",
+                        best_effort=True,
+                        finished=time.time(),
+                    )
                 raise
 
-            # 工具内轮询窗口（约8分钟）尚未完成，启动后台续跑任务并返回job_id
+            # 工具内轮询窗口尚未完成，将准入租约直接移交后台续跑任务（不释放再重获）并返回job_id
             bg_task = asyncio.create_task(
                 self._background_poll_loop(
-                    uid, model_id, model_dir, receipt, provider_task_id
+                    uid, model_id, model_dir, receipt, provider_task_id, lease
                 )
             )
             self._background_tasks[(uid, model_id)] = bg_task
+            transferred_to_bg = True
             return {
                 "state": "running",
                 "job_id": model_id,
@@ -1182,8 +1493,14 @@ class ModelJobManager:
                 "detail": detail,
                 "faces": faces,
             }
+        finally:
+            if not transferred_to_bg:
+                if model_id:
+                    self._release_job_lease(uid, model_id, lease)
+                else:
+                    lease.release()
 
-    # 查询或恢复指定job_id的三维模型生成任务
+    # 通过GET轮询恢复或查询指定job_id的三维模型生成任务（绝不触发二次创建POST）
     async def check_model(self, *, user_id: str, job_id: str) -> dict[str, Any]:
         uid = validate_user_id(user_id)
         mid = validate_model_id(job_id)
@@ -1195,9 +1512,14 @@ class ModelJobManager:
                 await bg_task
 
         model_dir, receipt = read_model_receipt(self._settings, uid, mid)
+        provider_task_id = self._extract_provider_task_id(uid, mid, receipt)
         state = receipt.get("state")
 
         if state == "saved":
+            active_bg = self._background_tasks.pop((uid, mid), None)
+            if active_bg is not None and not active_bg.done():
+                active_bg.cancel()
+            self._release_job_lease(uid, mid)
             glb_bytes, saved_receipt = load_saved_model_bytes(self._settings, uid, mid)
             return {
                 "state": "saved",
@@ -1210,44 +1532,66 @@ class ModelJobManager:
                 "sha256": str(saved_receipt.get("sha256") or ""),
             }
 
-        if state == "uncertain":
+        if state == "failed":
+            self._release_job_lease(uid, mid)
             raise GenerationUncertain(
-                "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
+                "3D model generation task failed; the request may have been billed. Do not automatically resubmit.",
+                job_id=mid,
+                state="failed",
             )
 
-        if state == "failed":
-            raise RuntimeError("3D model generation task failed")
+        # 只要存在provider_task_id（无论receipt处于running、uncertain或pending），均通过GET轮询恢复
+        if provider_task_id is None:
+            _transition_model_receipt(
+                model_dir,
+                receipt,
+                "uncertain",
+                best_effort=True,
+                finished=time.time(),
+            )
+            self._release_job_lease(uid, mid)
+            raise GenerationUncertain(
+                "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit.",
+                job_id=mid,
+                state="uncertain",
+            )
 
-        if state == "running":
-            provider_task_id = receipt.get("provider_task_id")
-            if not isinstance(provider_task_id, str) or not provider_task_id.strip():
-                receipt["state"] = "uncertain"
-                receipt["finished"] = time.time()
-                write_model_receipt(model_dir, receipt)
-                raise GenerationUncertain(
-                    "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
-                )
+        existing_lease = self._active_leases.get((uid, mid))
+        if existing_lease is not None and not existing_lease.released:
+            lease = existing_lease
+            acquired_here = False
+        else:
+            lease = await self._acquire_model_lease(uid)
+            self._active_leases[(uid, mid)] = lease
+            acquired_here = True
 
-            async with self._user_limiter.acquire(uid), self._build_client() as client:
+        transferred_to_bg = False
+        try:
+            async with self._build_client() as client:
                 outcome = await self._poll_once_and_finalize_if_ready(
                     client,
+                    uid=uid,
+                    model_id=mid,
                     model_dir=model_dir,
                     receipt=receipt,
-                    provider_task_id=provider_task_id.strip(),
+                    provider_task_id=provider_task_id,
                 )
             if outcome["state"] == "saved":
                 active_bg = self._background_tasks.pop((uid, mid), None)
                 if active_bg is not None and not active_bg.done():
                     active_bg.cancel()
+                self._release_job_lease(uid, mid, lease)
                 return outcome
 
-            if (uid, mid) not in self._background_tasks:
+            active_bg = self._background_tasks.get((uid, mid))
+            if active_bg is None or active_bg.done():
                 new_bg = asyncio.create_task(
                     self._background_poll_loop(
-                        uid, mid, model_dir, receipt, provider_task_id.strip()
+                        uid, mid, model_dir, receipt, provider_task_id, lease
                     )
                 )
                 self._background_tasks[(uid, mid)] = new_bg
+            transferred_to_bg = True
             return {
                 "state": "running",
                 "job_id": mid,
@@ -1256,12 +1600,18 @@ class ModelJobManager:
                 "detail": str(receipt.get("detail") or "standard"),
                 "faces": int(receipt.get("faces") or 100_000),
             }
+        except BaseException:
+            active_bg = self._background_tasks.pop((uid, mid), None)
+            if active_bg is not None and not active_bg.done():
+                active_bg.cancel()
+            if acquired_here or active_bg is not None:
+                self._release_job_lease(uid, mid, lease)
+            raise
+        finally:
+            if acquired_here and not transferred_to_bg:
+                self._release_job_lease(uid, mid, lease)
 
-        raise GenerationUncertain(
-            "3D model generation outcome is uncertain; the request may have been billed. Do not automatically resubmit."
-        )
-
-    # 关闭应用时清理所有未完成的后台轮询任务
+    # 关闭应用时清理所有未完成的后台轮询任务并释放持有的并发租约
     async def shutdown(self) -> None:
         tasks = list(self._background_tasks.values())
         self._background_tasks.clear()
@@ -1270,3 +1620,6 @@ class ModelJobManager:
                 task.cancel()
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
+        for key, lease in list(self._active_leases.items()):
+            self._active_leases.pop(key, None)
+            lease.release()

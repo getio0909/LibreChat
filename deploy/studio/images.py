@@ -48,9 +48,18 @@ MAX_DISPLAY_BYTES = 3 * 1024 * 1024
 REFERENCE_USES = ("参考", "物件", "造型", "材质", "纹样", "风格")
 
 
-# 请求发出后结果状态不确定的异常类型（提示可能已计费且不自动重试）
+# 请求发出后结果状态不确定或非saved终态的异常类型（附带job_id与计费警告且不自动重试）
 class GenerationUncertain(RuntimeError):
-    pass
+    def __init__(
+        self,
+        message: str,
+        *,
+        job_id: str | None = None,
+        state: str = "uncertain",
+    ) -> None:
+        super().__init__(message)
+        self.job_id = job_id
+        self.state = state
 
 
 # 以0600权限和fsync原子写入receipt.json状态文件

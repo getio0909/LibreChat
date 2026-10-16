@@ -410,6 +410,10 @@ def build_mcp_server(
             else []
         )
         if outcome.get("state") == "running":
+            billing_warning = (
+                "3D model generation is still running in the background; the request may have been billed. "
+                "Do not resubmit create_3d_model; call check_3d_model with job_id to retrieve the result."
+            )
             running_payload: dict[str, Any] = {
                 "job_id": outcome["job_id"],
                 "model_id": outcome["model_id"],
@@ -417,8 +421,9 @@ def build_mcp_server(
                 "detail": outcome["detail"],
                 "faces": outcome["faces"],
                 "state": "running",
+                "message": billing_warning,
                 "disclaimer": VISUAL_MODEL_DISCLAIMER,
-                "warnings": warnings,
+                "warnings": [*warnings, billing_warning],
             }
             return types.CallToolResult(
                 content=[
@@ -1152,7 +1157,13 @@ def build_mcp_server(
 
             raise ValueError(f"Unknown tool: {name}")
         except GenerationUncertain as exc:
-            err_payload = {"error": str(exc), "state": "uncertain"}
+            err_payload: dict[str, Any] = {
+                "error": str(exc),
+                "state": exc.state,
+            }
+            if exc.job_id:
+                err_payload["job_id"] = exc.job_id
+                err_payload["model_id"] = exc.job_id
             return types.CallToolResult(
                 content=[
                     types.TextContent(

@@ -155,6 +155,31 @@ def load_rules(rules_dir: str | Path = RULES_DIR) -> StudioRules:
     )
 
 
+# 表示已获取的单用户与全局并发配额租约（支持跨协程与后台轮询移交生命周期）
+class ConcurrencyLease:
+    def __init__(
+        self,
+        user_sem: asyncio.Semaphore,
+        global_sem: asyncio.Semaphore,
+    ) -> None:
+        self._user_sem = user_sem
+        self._global_sem = global_sem
+        self._released = False
+
+    # 查询当前租约是否已释放
+    @property
+    def released(self) -> bool:
+        return self._released
+
+    # 幂等释放持有的全局与单用户并发信号量
+    def release(self) -> None:
+        if self._released:
+            return
+        self._released = True
+        self._global_sem.release()
+        self._user_sem.release()
+
+
 # 按用户与全局上限控制并发任务的信号量管理器
 class ConcurrencyLimiter:
     def __init__(self, max_per_user: int = 3, global_max: int = 12) -> None:
@@ -163,12 +188,25 @@ class ConcurrencyLimiter:
         self._global_sem = asyncio.Semaphore(global_max)
         self._user_sems: dict[str, asyncio.Semaphore] = {}
 
-    # 获取指定用户的并发信号量与全局并发信号量
-    @asynccontextmanager
-    async def acquire(self, user_id: str) -> AsyncIterator[None]:
+    # 获取可跨协程移交的单用户与全局并发租约
+    async def acquire_lease(self, user_id: str) -> ConcurrencyLease:
         user_sem = self._user_sems.get(user_id)
         if user_sem is None:
             user_sem = asyncio.Semaphore(self._max_per_user)
             self._user_sems[user_id] = user_sem
-        async with user_sem, self._global_sem:
+        await user_sem.acquire()
+        try:
+            await self._global_sem.acquire()
+        except BaseException:
+            user_sem.release()
+            raise
+        return ConcurrencyLease(user_sem, self._global_sem)
+
+    # 获取指定用户的并发信号量与全局并发信号量
+    @asynccontextmanager
+    async def acquire(self, user_id: str) -> AsyncIterator[None]:
+        lease = await self.acquire_lease(user_id)
+        try:
             yield
+        finally:
+            lease.release()
