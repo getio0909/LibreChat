@@ -17,12 +17,12 @@ const parsedCompose = yaml.load(rawCompose);
 
 // 禁止在面向用户的名称、描述或提示词中出现的厂商与模型标识。
 const VENDOR_NAME_PATTERN =
-  /gemini|argon|claude|haiku|sonnet|opus|openrouter|seedream|google|anthropic|deepseek|doubao|\bark\b|openai|gpt/i;
+  /gemini|argon|claude|haiku|sonnet|opus|openrouter|seedream|seed3d|volcengine|google|anthropic|deepseek|doubao|\bark\b|openai|gpt/i;
 
 // 禁止残留的旧版 CAD 服务或容器标识。
 const LEGACY_CAD_PATTERN = /freecad|blender|design_tools|dufs|compile_drawing_sheet/i;
 
-// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3 与 WP-P2a 扩展）。
+// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3、WP-P2a 与 WP-P2b 扩展）。
 const CONTRACT_IDENTIFIERS = new Set([
   'design_concepts',
   'generate_image',
@@ -30,6 +30,8 @@ const CONTRACT_IDENTIFIERS = new Set([
   'list_images',
   'search_library',
   'compare_materials',
+  'create_3d_model',
+  'check_3d_model',
   'prompt',
   'base_id',
   'references',
@@ -46,6 +48,10 @@ const CONTRACT_IDENTIFIERS = new Set([
   'target',
   'materials',
   'kb_',
+  'image_id',
+  'detail',
+  'note',
+  'job_id',
 ]);
 
 test('librechat.yaml passes LibreChat configSchema validation', () => {
@@ -125,7 +131,7 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
     assert.doesNotMatch(spec.preset.modelLabel || '', VENDOR_NAME_PATTERN);
     assert.doesNotMatch(spec.preset.promptPrefix || '', VENDOR_NAME_PATTERN);
 
-    // 验证中文提示词精简且包含六个核心工具名。
+    // 验证中文提示词精简且包含八个核心工具名。
     const prefix = spec.preset.promptPrefix || '';
     const chineseChars = (prefix.match(/[\u4e00-\u9fff]/g) || []).length;
     assert.ok(
@@ -140,6 +146,8 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
       'list_images',
       'search_library',
       'compare_materials',
+      'create_3d_model',
+      'check_3d_model',
     ]) {
       assert.ok(prefix.includes(toolName), `promptPrefix must reference ${toolName}`);
     }
@@ -166,7 +174,10 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
       prefix.includes('materials'),
       'promptPrefix must mention compare_materials materials',
     );
-    assert.doesNotMatch(prefix, /\b(reference_uses|image_id|image_ids)\b/);
+    assert.ok(prefix.includes('image_id'), 'promptPrefix must mention create_3d_model image_id');
+    assert.ok(prefix.includes('detail'), 'promptPrefix must mention create_3d_model detail');
+    assert.ok(prefix.includes('job_id'), 'promptPrefix must mention check_3d_model job_id');
+    assert.doesNotMatch(prefix, /\b(reference_uses|image_ids)\b/);
   }
 
   const mcpContext = buildMCPImageToolContext({
@@ -193,6 +204,7 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
 test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contract', () => {
   const config = configSchema.parse(parsedYaml);
   assert.ok(config.mcpSettings.allowedAddresses.includes('studio:8000'));
+  assert.equal(config.mcpSettings.apps, true);
 
   const studioServer = config.mcpServers.zyb_studio;
   assert.equal(studioServer.type, 'streamable-http');
@@ -260,6 +272,7 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.deepEqual(studio.cap_drop, ['ALL']);
   assert.deepEqual(studio.security_opt, ['no-new-privileges:true']);
   assert.equal(studio.mem_limit, '1g');
+  assert.deepEqual(studio.ports, ['127.0.0.1:${STUDIO_PORT:-8000}:8000']);
   assert.ok(studio.volumes.includes('./studio.json:/run/secrets/studio.json:ro'));
   assert.ok(studio.volumes.includes('images:/librechat/images:ro'));
   assert.ok(studio.volumes.includes('studio-data:/data'));
@@ -269,6 +282,13 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.environment.ENDPOINTS, 'custom,google');
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
+});
+
+test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding', () => {
+  const rawNginx = fs.readFileSync('deploy/nginx.conf', 'utf8');
+  assert.match(rawNginx, /location \/studio-files\/\s*\{/);
+  assert.match(rawNginx, /proxy_pass http:\/\/127\.0\.0\.1:8000\/files\/;/);
+  assert.match(rawNginx, /proxy_set_header Range \$http_range;/);
 });
 
 test('studio Dockerfile copies knowledge/ to /kb while LibreChat app image excludes knowledge/', () => {
@@ -357,4 +377,6 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.match(rawSmokeTest, /assert exc\.code == 403/);
   assert.match(rawSmokeTest, /"search_library"/);
   assert.match(rawSmokeTest, /"compare_materials"/);
+  assert.match(rawSmokeTest, /"create_3d_model"/);
+  assert.match(rawSmokeTest, /"check_3d_model"/);
 });

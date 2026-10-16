@@ -81,14 +81,16 @@ printf 'previous compose\n' > "$work/previous/compose.yml"
 printf 'previous config\n' > "$work/previous/librechat.yaml"
 printf 'ALLOW_REGISTRATION=true\n' > "$work/previous/.env"
 printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-prev@sha256:%064d\n' 0 0 > "$work/previous/image.env"
-printf '{"shared_token":"%s","gemini_api_key":"prev-gemini","ark_api_key":"prev-ark"}\n' "$(printf 'a%.0s' {1..64})" > "$work/previous/studio.json"
+printf '{"shared_token":"%s","file_signing_key":"%s","public_base_url":"https://dev.xuqian.io","gemini_api_key":"prev-gemini","ark_api_key":"prev-ark"}\n' \
+  "$(printf 'a%.0s' {1..64})" "$(printf 'c%.0s' {1..64})" > "$work/previous/studio.json"
 
 printf 'new compose\n' > "$work/bundle/compose.yml"
 printf 'new config\n' > "$work/bundle/librechat.yaml"
 cp "$work/previous/.env" "$work/bundle/.env"
 printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-next@sha256:%s\n' \
   "$(printf '1%.0s' {1..64})" "$(printf '2%.0s' {1..64})" > "$work/bundle/image.env"
-printf '{"shared_token":"%s","gemini_api_key":"next-gemini","ark_api_key":"next-ark"}\n' "$(printf 'b%.0s' {1..64})" > "$work/bundle/studio.json"
+printf '{"shared_token":"%s","file_signing_key":"%s","public_base_url":"https://dev.xuqian.io","gemini_api_key":"next-gemini","ark_api_key":"next-ark"}\n' \
+  "$(printf 'b%.0s' {1..64})" "$(printf 'd%.0s' {1..64})" > "$work/bundle/studio.json"
 printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
