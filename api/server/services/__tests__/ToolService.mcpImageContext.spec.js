@@ -191,7 +191,7 @@ describe('loadAgentTools — MCP image context', () => {
   });
 
   it.each([true, false])(
-    'populates dynamicToolContextMap.mcp_image_context with file_id and filename when images and MCP tools are present (definitionsOnly=%s)',
+    'populates dynamicToolContextMap.mcp_image_context with neutral id (filename, kind, turn) list and contract args (definitionsOnly=%s)',
     async (definitionsOnly) => {
       if (!definitionsOnly) {
         mockLoadToolsUtil.mockResolvedValue({
@@ -201,6 +201,12 @@ describe('loadAgentTools — MCP image context', () => {
         });
       }
 
+      const mcpImageFiles = [
+        { file_id: 'img-111', filename: 'stone_slab.png', kind: 'upload', turn: 1 },
+        { file_id: 'img-gen-1', filename: 'concept_1.png', kind: 'generated', turn: 1 },
+        { file_id: 'img-222', filename: 'booth_ref.webp', kind: 'upload', turn: 2 },
+      ];
+
       const result = await loadAgentTools({
         req: createMockReq(capabilities),
         res: {},
@@ -208,15 +214,27 @@ describe('loadAgentTools — MCP image context', () => {
         tool_resources: {
           [EToolResources.image_edit]: { files: imageFiles },
         },
+        mcpImageFiles,
         definitionsOnly,
       });
 
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
-        '- img-111 (stone_slab.png)',
+        '- img-111 (stone_slab.png, upload, turn 1)',
       );
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
-        '- img-222 (booth_ref.webp)',
+        '- img-gen-1 (concept_1.png, generated, turn 1)',
       );
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
+        '- img-222 (booth_ref.webp, upload, turn 2)',
+      );
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`edit_image.base_id`');
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`references[].id`');
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`references[].use`');
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
+        '`design_concepts.reference_ids`',
+      );
+      expect(result.dynamicToolContextMap?.mcp_image_context).not.toContain('image_ids');
+      expect(result.dynamicToolContextMap?.mcp_image_context).not.toContain('reference_uses');
     },
   );
 

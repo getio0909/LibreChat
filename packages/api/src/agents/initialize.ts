@@ -54,6 +54,11 @@ import type {
   EndpointTokenConfig,
   InitializeResultBase,
 } from '~/types';
+import type {
+  MCPBranchMessage,
+  MCPImageContextFile,
+  MCPImageCandidateRecord,
+} from '~/tools/toolkits';
 import type { ResolveLinkedInstructions, LinkedInstructionsFacts } from './instructions/linked';
 import type { LCAvailableTools, RequestScopedMCPConnectionStore } from '../mcp/types';
 import type { ContentTraversalLimitError } from '../protection/adapters/nested';
@@ -99,6 +104,11 @@ import {
   registerFileAuthoringTools,
   isFileAuthoringToolDefinition,
 } from './tools';
+import {
+  buildMCPImageToolContext,
+  collectBranchImageCandidateIds,
+  collectConversationBranchImageFiles,
+} from '~/tools/toolkits';
 import {
   normalizeServerName,
   requiresEphemeralUserConnection,
@@ -931,6 +941,8 @@ export interface InitializeAgentParams {
      *  already fetched them — lets execution-side collision guards see
      *  cross-tier shadowing without another registry round-trip. */
     accessibleMcpServerNames?: readonly string[];
+    /** Conversation-branch and current-turn image files owned by the requesting user for MCP tools. */
+    mcpImageFiles?: readonly MCPImageContextFile[];
   }) => Promise<{
     /** Full tool instances (only present when definitionsOnly=false) */
     tools?: GenericTool[];
@@ -1106,7 +1118,10 @@ export interface InitializeAgentDbMethods extends EndpointDbMethods {
   ) => Promise<Array<{
     messageId: string;
     parentMessageId?: string;
-    files?: Array<{ file_id: string }>;
+    isCreatedByUser?: boolean;
+    user?: string;
+    files?: Array<{ file_id: string; filename?: string; type?: string; context?: string }>;
+    attachments?: Array<{ file_id?: string; filename?: string; type?: string; context?: string }>;
   }> | null>;
   /** List skill summaries for catalog injection (paginated, omits body/frontmatter) */
   listSkillsByAccess?: TListSkillsByAccess;
@@ -1672,11 +1687,17 @@ export async function initializeAgent(
     fileSearch: wantsSearchFiles,
   };
   const wantsProvisioning = wantsCodeFiles || wantsSearchFiles;
+  // 当挂载了 MCP 工具时，沿选定会话分支收集本用户的历史上传图与生成图
+  const wantsMCPImages = effectiveToolNames.some(
+    (tool) => typeof tool === 'string' && tool.includes(Constants.mcp_delimiter),
+  );
+  let mcpBranchMessages: MCPBranchMessage[] = [];
+  let mcpBranchCandidateIds: string[] = [];
 
   if (
     authorizedRunFiles === undefined &&
     conversationId != null &&
-    (resendFiles || wantsProvisioning)
+    (resendFiles || wantsProvisioning || wantsMCPImages)
   ) {
     const getThreadMessages = db.getMessages;
     /** Falsy anchors cannot match a parent chain, so they get no walk. */
@@ -1684,7 +1705,8 @@ export async function initializeAgent(
       parentMessageId && parentMessageId !== Constants.NO_PARENT ? parentMessageId : null;
     /* Either provisioning resource needs the anchor: deferred attachments for
      * file_search are found by thread file ids just as code files are. */
-    const needsThreadWalk = wantsProvisioning && threadAnchor != null && getThreadMessages != null;
+    const needsThreadWalk =
+      (wantsProvisioning || wantsMCPImages) && threadAnchor != null && getThreadMessages != null;
 
     /**
      * The conversation's file refs and the thread walk share no inputs, so they resolve
@@ -1697,9 +1719,15 @@ export async function initializeAgent(
      * every code-output ref.
      */
     const [convoFileIds, threadMessages] = await Promise.all([
-      readResolvedConversationFiles(runtime, conversationId) ?? db.getConvoFiles(conversationId),
+      resendFiles || wantsProvisioning
+        ? (readResolvedConversationFiles(runtime, conversationId) ??
+          db.getConvoFiles(conversationId))
+        : null,
       needsThreadWalk && getThreadMessages
-        ? getThreadMessages({ conversationId }, 'messageId parentMessageId files attachments')
+        ? getThreadMessages(
+            { conversationId },
+            'messageId parentMessageId isCreatedByUser files attachments',
+          )
         : null,
     ]);
     const fileIds = convoFileIds ?? [];
@@ -1711,9 +1739,19 @@ export async function initializeAgent(
      *  `getUserCodeFiles` — message ids no longer needed at
      *  this layer. */
     const threadFileIds =
-      threadMessages && threadMessages.length > 0
+      wantsProvisioning && threadMessages && threadMessages.length > 0
         ? getThreadData(threadMessages, threadAnchor).fileIds
         : undefined;
+
+    // 提取当前会话分支中引用的图像候选 ID，以便与本轮文件合并为单次 owner-scoped 查询
+    if (wantsMCPImages && threadMessages && threadMessages.length > 0 && threadAnchor) {
+      mcpBranchMessages = threadMessages;
+      mcpBranchCandidateIds = collectBranchImageCandidateIds({
+        messages: mcpBranchMessages,
+        parentMessageId: threadAnchor,
+        userId: requestFileOwnerId,
+      });
+    }
 
     /* Linear continuation APIs supply no anchor: the Responses API always continues via
      * `previous_response_id`, and chat completions may send `conversation_id` alone. There
@@ -1815,9 +1853,17 @@ export async function initializeAgent(
    * keep this exact snapshot authoritative for inspection, priming, and the
    * later usage update to avoid a post-inspection re-read.
    */
-  const snapshotFileIds = [...requestFileIds, ...toolFileIds, ...deferredProvisionFileIds];
+  const snapshotFileIds = [
+    ...new Set([
+      ...requestFileIds,
+      ...toolFileIds,
+      ...deferredProvisionFileIds,
+      ...mcpBranchCandidateIds,
+    ]),
+  ];
   let requestUsageFiles: IMongoFile[] = [];
   let toolUsageFiles: IMongoFile[] = [];
+  let hydratedFilesById: Map<string, IMongoFile> | undefined;
   if (authorizedRunFiles === undefined && requestFileOwnerScope && snapshotFileIds.length > 0) {
     const hydratedFiles =
       ((await db.getFiles(
@@ -1831,21 +1877,33 @@ export async function initializeAgent(
         {},
         {},
       )) as IMongoFile[] | null) ?? [];
-    const hydratedFilesById = new Map(
+    hydratedFilesById = new Map(
       hydratedFiles
         .filter((file) => snapshotFileIds.includes(file.file_id))
         .map((file) => [file.file_id, file]),
     );
     requestUsageFiles = requestFileIds
-      .map((fileId) => hydratedFilesById.get(fileId))
+      .map((fileId) => hydratedFilesById?.get(fileId))
       .filter((file): file is IMongoFile => file != null);
     toolUsageFiles = toolFileIds
-      .map((fileId) => hydratedFilesById.get(fileId))
+      .map((fileId) => hydratedFilesById?.get(fileId))
       .filter((file): file is IMongoFile => file != null);
     deferredProvisionFiles = deferredProvisionFileIds
-      .map((fileId) => hydratedFilesById.get(fileId))
+      .map((fileId) => hydratedFilesById?.get(fileId))
       .filter((file): file is IMongoFile => file != null);
   }
+  // 汇总当前分支（按 turn 排序）及本轮附件中属于当前用户的图像文件，限制最多 20 张
+  const mcpConversationImages = wantsMCPImages
+    ? collectConversationBranchImageFiles({
+        messages: mcpBranchMessages,
+        parentMessageId:
+          parentMessageId && parentMessageId !== Constants.NO_PARENT ? parentMessageId : null,
+        requestFiles: (authorizedRunFiles ?? requestFiles) as MCPImageCandidateRecord[],
+        hydratedFilesById,
+        userId: requestFileOwnerId,
+        tenantId: user?.tenantId,
+      })
+    : [];
   if (authorizedRunFiles !== undefined) {
     for (const file of authorizedRunFiles) {
       if (
@@ -2127,6 +2185,7 @@ export async function initializeAgent(
       codeExecutionContext,
       attachedEnvironmentOptOut,
       accessibleMcpServerNames: resolvedAuditNames,
+      ...(mcpConversationImages.length > 0 ? { mcpImageFiles: mcpConversationImages } : {}),
     });
 
   let loadToolsResult;
@@ -2817,6 +2876,37 @@ export async function initializeAgent(
     assertModelBoundContent({
       filters: appConfig?.filters,
       files: [{ content: queuedFileContext }],
+    });
+  }
+
+  // 若当前会话分支存在 MCP 图像文件且工具加载器尚未注入，补充构建中立图像列表并执行内容合规检查
+  if (wantsMCPImages && mcpConversationImages.length > 0) {
+    const hasLoadedMCPDefs =
+      (toolDefinitions ?? []).some((d) => d.name.includes(Constants.mcp_delimiter)) ||
+      (structuredTools ?? []).some(
+        (t) =>
+          typeof t === 'object' &&
+          t != null &&
+          'name' in t &&
+          typeof (t as { name?: unknown }).name === 'string' &&
+          (t as { name: string }).name.includes(Constants.mcp_delimiter),
+      ) ||
+      ((toolDefinitions?.length ?? 0) === 0 && (structuredTools?.length ?? 0) === 0);
+    if (hasLoadedMCPDefs && initializedAgent.dynamicToolContextMap?.mcp_image_context == null) {
+      const builtMCPImageContext = buildMCPImageToolContext({
+        imageFiles: mcpConversationImages,
+      });
+      if (builtMCPImageContext) {
+        initializedAgent.dynamicToolContextMap ??= {};
+        initializedAgent.dynamicToolContextMap.mcp_image_context = builtMCPImageContext;
+      }
+    }
+  }
+  const mcpImageContext = initializedAgent.dynamicToolContextMap?.mcp_image_context;
+  if (typeof mcpImageContext === 'string') {
+    assertModelBoundContent({
+      filters: appConfig?.filters,
+      files: [{ content: mcpImageContext }],
     });
   }
 
