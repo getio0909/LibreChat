@@ -65,6 +65,15 @@ def write_receipt(directory: Path, values: dict[str, Any]) -> None:
     os.replace(temporary, target)
 
 
+# 尽力将receipt状态更新为uncertain，忽略底层存储异常以始终保留计费警告
+def _mark_uncertain(directory: Path, values: dict[str, Any], **extra: Any) -> None:
+    values.update(state="uncertain", finished=time.time(), **extra)
+    try:
+        write_receipt(directory, values)
+    except OSError:
+        pass
+
+
 # 按原图宽高比计算1K或2K档位下符合16倍数与面积范围的目标尺寸
 def source_dimensions(
     size: str, source_size: tuple[int, int] | list[int]
@@ -423,29 +432,24 @@ async def generate_seedream(
             response = await client.post(url, json=body, headers=headers)
             raw_content = response.content
     except asyncio.CancelledError:
-        record.update(state="uncertain", finished=time.time())
-        try:
-            write_receipt(destination, record)
-        except OSError:
-            pass
+        _mark_uncertain(destination, record)
         raise
     except (httpx.TimeoutException, TimeoutError, httpx.HTTPError, OSError):
-        record.update(state="uncertain", finished=time.time())
-        write_receipt(destination, record)
+        _mark_uncertain(destination, record)
         raise GenerationUncertain(uncertain_msg) from None
 
     if response.status_code >= 500:
-        record.update(
-            state="uncertain", http_status=response.status_code, finished=time.time()
-        )
-        write_receipt(destination, record)
+        _mark_uncertain(destination, record, http_status=response.status_code)
         raise GenerationUncertain(uncertain_msg)
 
     if response.status_code >= 400:
         record.update(
             state="rejected", http_status=response.status_code, finished=time.time()
         )
-        write_receipt(destination, record)
+        try:
+            write_receipt(destination, record)
+        except OSError:
+            pass
         status_messages = {
             400: "Image generation parameters or content were rejected",
             401: "Image service authentication failed",
@@ -459,8 +463,7 @@ async def generate_seedream(
         raise RuntimeError(f"{msg}; no automatic retry was performed")
 
     if len(raw_content) > MAX_RESPONSE_BYTES:
-        record.update(state="uncertain", finished=time.time())
-        write_receipt(destination, record)
+        _mark_uncertain(destination, record)
         raise GenerationUncertain(uncertain_msg)
 
     try:
@@ -488,8 +491,7 @@ async def generate_seedream(
         binascii.Error,
         Image.DecompressionBombError,
     ):
-        record.update(state="uncertain", finished=time.time())
-        write_receipt(destination, record)
+        _mark_uncertain(destination, record)
         raise GenerationUncertain(uncertain_msg) from None
 
     original_path = destination / f"original{suffix}"
@@ -511,11 +513,7 @@ async def generate_seedream(
         )
         write_receipt(destination, record)
     except OSError:
-        record.update(state="uncertain", finished=time.time())
-        try:
-            write_receipt(destination, record)
-        except OSError:
-            pass
+        _mark_uncertain(destination, record)
         raise GenerationUncertain(uncertain_msg) from None
 
     return {

@@ -999,3 +999,78 @@ def test_cancellation_marks_uncertain_and_startup_reconciles_pending(
 
     asyncio.run(_run())
 
+
+# 校验初始pending凭据写入后若磁盘故障导致后续write_receipt报错，仍保留GenerationUncertain与计费警告
+def test_receipt_write_failure_preserves_uncertain_warning(
+    studio_env: StudioSettings, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import deploy.studio.images as images_mod
+
+    real_write_receipt = images_mod.write_receipt
+
+    # 第一次写入pending成功，之后写入抛OSError
+    def _flaky_write_receipt(directory: Path, values: dict[str, Any]) -> None:
+        if values.get("state") == "pending":
+            real_write_receipt(directory, values)
+            return
+        raise OSError("Simulated storage write failure after dispatch")
+
+    monkeypatch.setattr(images_mod, "write_receipt", _flaky_write_receipt)
+
+    async def _timeout_handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ReadTimeout("timeout after dispatch")
+
+    async def _502_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(502, content=b"bad gateway")
+
+    async def _invalid_body_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"data": []})
+
+    async def _run() -> None:
+        for idx, handler in enumerate(
+            (_timeout_handler, _502_handler, _invalid_body_handler)
+        ):
+            with pytest.raises(GenerationUncertain, match="may have been billed"):
+                await generate_seedream(
+                    studio_env,
+                    "prompt",
+                    [],
+                    size="1K",
+                    aspect="1:1",
+                    destination=tmp_path / f"flaky_{idx}",
+                    transport=httpx.MockTransport(handler),
+                )
+
+        # 通过MCP调用generate_image时同样返回uncertain状态与可能已计费提示
+        app = create_app(
+            settings=studio_env,
+            rules=load_rules(),
+            ark_transport=httpx.MockTransport(_timeout_handler),
+        )
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 21,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "generate_image",
+                        "arguments": {"prompt": "供桌设计"},
+                    },
+                },
+            )
+            assert res.status_code == 200
+            result = res.json()["result"]
+            assert result["isError"] is True
+            err_body = json.loads(result["content"][0]["text"])
+            assert err_body["state"] == "uncertain"
+            assert "may have been billed" in err_body["error"]
+
+    asyncio.run(_run())
+
+
