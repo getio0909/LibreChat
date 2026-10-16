@@ -65,6 +65,7 @@ from .regions import (
     OnnxSamSegmenter,
     build_compare_viewer_html,
     build_selection_editor_html,
+    finish_region_edit,
     is_editor_token,
     is_image_token,
     load_confirmed_selection,
@@ -252,7 +253,7 @@ STUDIO_TOOLS: list[types.Tool] = [
     ),
     types.Tool(
         name="edit_region",
-        description="基于已确认的选区（selection_id）执行局部重绘并严格保证选区外每一像素字节与原图完全一致，返回前后对比预览与结果图。",
+        description="基于已确认的选区（selection_id）执行局部重绘并严格保证选区外每一像素字节与原图完全一致，返回前后对比预览与结果图；若传入可恢复任务的 job_id 则直接复用已保存的局部裁切图完成回贴而不重复计费。",
         inputSchema={
             "type": "object",
             "properties": {
@@ -268,6 +269,10 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "type": "string",
                     "description": "局部修改说明（如需将参考图物件原样放入选区可注明“原样贴入”）",
                 },
+                "job_id": {
+                    "type": "string",
+                    "description": "可选：已保存局部裁切图的可恢复任务编号（img_<hex>），传入后直接完成本地回贴而不再次发起计费调用",
+                },
                 "references": {
                     "type": "array",
                     "items": REFERENCE_ITEM_SCHEMA,
@@ -282,7 +287,7 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "description": "局部裁切重绘尺寸档位",
                 },
             },
-            "required": ["base_id", "selection_id", "instruction"],
+            "required": [],
         },
     ),
     types.Tool(
@@ -603,7 +608,11 @@ def build_mcp_server(
                     settings, user_id, limit=limit, kb_index=active_kb
                 )
                 warnings = [
-                    f"Image job {item['id']} is in uncertain state (the request may have been billed)."
+                    (
+                        f"Image job {item['id']} is in recoverable state (the paid crop was saved; call finish_region_edit with job_id '{item['id']}' to composite without rebilling)."
+                        if item.get("state") == "recoverable"
+                        else f"Image job {item['id']} is in uncertain state (the request may have been billed)."
+                    )
                     for item in images
                     if item.get("warning")
                 ]
@@ -1255,7 +1264,82 @@ def build_mcp_server(
                     isError=False,
                 )
 
-            if name == "edit_region":
+            if name in ("edit_region", "finish_region_edit"):
+                recovery_job_id = str(args.get("job_id") or "").strip()
+                if name == "finish_region_edit" or recovery_job_id:
+                    if not recovery_job_id:
+                        raise ValueError("job_id is required")
+                    rec_result = finish_region_edit(
+                        settings, user_id, recovery_job_id
+                    )
+                    img_id = str(rec_result["id"])
+                    rec_base_id = str(rec_result["base_id"])
+                    rec_sel_id = str(rec_result["selection_id"])
+                    display_bytes, display_mime = encode_display_image(
+                        rec_result["raw_bytes"]
+                    )
+                    b64_display = base64.b64encode(display_bytes).decode("ascii")
+                    before_token, before_exp = sign_image_token(
+                        settings, user_id, rec_base_id
+                    )
+                    after_token, after_exp = sign_image_token(
+                        settings, user_id, img_id
+                    )
+                    before_url = build_signed_file_url(settings, before_token)
+                    after_url = build_signed_file_url(settings, after_token)
+                    expires_at = format_utc_timestamp(min(before_exp, after_exp))
+                    compare_html = build_compare_viewer_html(
+                        image_id=img_id,
+                        base_id=rec_base_id,
+                        selection_id=rec_sel_id,
+                        before_url=before_url,
+                        after_url=after_url,
+                        expires_at=expires_at,
+                        width=int(rec_result["width"]),
+                        height=int(rec_result["height"]),
+                        selected_pixels=int(rec_result["selected_pixels"]),
+                    )
+                    summary = {
+                        "id": img_id,
+                        "image_id": img_id,
+                        "job_id": img_id,
+                        "base_id": rec_base_id,
+                        "selection_id": rec_sel_id,
+                        "kind": "studio",
+                        "state": "saved",
+                        "recovered": True,
+                        "width": rec_result["width"],
+                        "height": rec_result["height"],
+                        "size": f"{rec_result['width']}x{rec_result['height']}",
+                        "sha256": rec_result["sha256"],
+                        "selected_pixels": rec_result["selected_pixels"],
+                        "outside_changed_pixels": 0,
+                        "before_url": before_url,
+                        "after_url": after_url,
+                        "expires_at": expires_at,
+                        "warnings": [],
+                    }
+                    return types.CallToolResult(
+                        content=[
+                            types.TextContent(
+                                type="text",
+                                text=json.dumps(summary, ensure_ascii=False),
+                            ),
+                            types.EmbeddedResource(
+                                type="resource",
+                                resource=types.TextResourceContents(
+                                    uri=f"ui://zyb_studio/compare/{img_id}",
+                                    mimeType="text/html",
+                                    text=compare_html,
+                                ),
+                            ),
+                            types.ImageContent(
+                                type="image", data=b64_display, mimeType=display_mime
+                            ),
+                        ],
+                        isError=False,
+                    )
+
                 base_id = str(args.get("base_id") or "").strip()
                 selection_id = str(args.get("selection_id") or "").strip()
                 instruction = str(args.get("instruction") or "").strip()
@@ -1288,6 +1372,7 @@ def build_mcp_server(
                 )
                 confirmed_sel_id = str(sel_record["selection_id"])
                 confirmed_selection = sel_record["selection"]
+                confirmed_proof = sel_record["proof"]
 
                 resolved_objs = [base_resolved]
                 resolved_refs: list[dict[str, Any]] = []
@@ -1351,9 +1436,12 @@ def build_mcp_server(
                         aspect="source",
                         source_size=ctx_info["size"],
                         local_composite={
+                            "base_id": base_resolved.id,
+                            "selection_id": confirmed_sel_id,
                             "base_path": base_resolved.path,
                             "selection": confirmed_selection,
                             "crop": ctx_info["crop"],
+                            "proof": confirmed_proof,
                         },
                         destination=job_dir,
                         transport=ark_transport,
@@ -1472,6 +1560,8 @@ def build_mcp_server(
             err_payload: dict[str, Any] = {
                 "error": str(exc),
                 "state": exc.state,
+                "recoverable": exc.state == "recoverable",
+                "billing_warning": "The request may have been billed.",
             }
             if exc.job_id:
                 err_payload["job_id"] = exc.job_id

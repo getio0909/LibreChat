@@ -32,6 +32,7 @@ IMAGE_PRODUCING_TOOLS: frozenset[str] = frozenset(
         "generate_image",
         "edit_image",
         "edit_region",
+        "finish_region_edit",
         "design_concepts",
         "compare_materials",
     }
@@ -617,7 +618,7 @@ def _collect_user_images(
                             height=height,
                         )
                     )
-                elif include_uncertain and state == "uncertain":
+                elif include_uncertain and state in ("uncertain", "recoverable"):
                     stat_info = receipt_file.stat(follow_symlinks=False)
                     width = int(receipt_data.get("width") or 0)
                     height = int(receipt_data.get("height") or 0)
@@ -635,7 +636,7 @@ def _collect_user_images(
                             mtime_ns=stat_info.st_mtime_ns,
                             width=width,
                             height=height,
-                            state="uncertain",
+                            state=str(state),
                             warning=True,
                         )
                     )

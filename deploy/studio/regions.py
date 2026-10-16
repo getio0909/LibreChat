@@ -22,6 +22,7 @@ from .config import StudioSettings
 from .store import (
     ensure_safe_subpath,
     read_bytes_no_follow,
+    user_librechat_images_dir,
     user_studio_dir,
     validate_user_id,
 )
@@ -32,6 +33,7 @@ MAX_SHAPES = 64
 MIN_SELECTED_PIXELS = 16
 MAX_IMAGE_PIXELS = 24_000_000
 SELECTION_ID_RE = re.compile(r"^sel_[0-9a-f]{32}$")
+JOB_ID_RE = re.compile(r"^img_[0-9a-f]{32}$")
 REGION_TOKEN_RE = re.compile(r"^([A-Za-z0-9_-]{16,512})\.([0-9a-f]{64})$")
 SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 SIZES: dict[str, int] = {"1K": 1024, "2K": 2048}
@@ -547,7 +549,7 @@ def composite_local(
         for key in ("image_sha256", "mask_sha256", "width", "height", "selected_pixels"):
             if current_proof.get(key) != expected_proof.get(key):
                 raise ValueError(
-                    "Base image or selection proof changed before local composite; refusing to composite"
+                    f"Selection proof mismatch on {key} before local composite; refusing to composite"
                 )
     original = open_image(base_bytes, keep_alpha=True)
     generated = open_image(generated_path, keep_alpha=True)
@@ -607,6 +609,179 @@ def composite_local(
         "height": result.height,
         "sha256": sha256,
         "selected_pixels": int(sum(mask.histogram()[1:])),
+        "outside_changed_pixels": 0,
+    }
+
+
+# 以0600权限和fsync原子写入局部重绘待合成恢复记录local_recovery.json
+def write_local_recovery(directory: Path, values: dict[str, Any]) -> None:
+    target = Path(directory) / "local_recovery.json"
+    temporary = Path(directory) / f"local_recovery.tmp.{secrets.token_hex(4)}"
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(values, stream, ensure_ascii=False)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            temporary.unlink(missing_ok=True)
+        raise
+
+
+# 恢复已完成付费裁切但本地合成中断的待合成任务，校验裁块与底图凭据后合回original.png且绝不重复计费调用
+def finish_region_edit(
+    settings: StudioSettings,
+    user_id: str,
+    job_id: str,
+) -> dict[str, Any]:
+    uid = validate_user_id(user_id)
+    cleaned_job = job_id.strip() if isinstance(job_id, str) else ""
+    if not JOB_ID_RE.fullmatch(cleaned_job):
+        raise ValueError("Invalid studio job ID for local region recovery")
+    studio_dir = user_studio_dir(settings, uid, create=False)
+    job_dir = studio_dir / "jobs" / cleaned_job
+    if (
+        not studio_dir.exists()
+        or studio_dir.is_symlink()
+        or not job_dir.exists()
+        or job_dir.is_symlink()
+        or not job_dir.is_dir()
+    ):
+        raise ValueError(f"Recoverable region job not found for current user: {cleaned_job}")
+    ensure_safe_subpath(job_dir, studio_dir)
+
+    receipt_path = job_dir / "receipt.json"
+    receipt_data: dict[str, Any] = {}
+    if receipt_path.is_file() and not receipt_path.is_symlink():
+        raw_rec = read_bytes_no_follow(receipt_path, studio_dir, max_bytes=1024 * 1024)
+        parsed_rec = json.loads(raw_rec.decode("utf-8"))
+        if isinstance(parsed_rec, dict):
+            receipt_data = parsed_rec
+
+    recovery_path = job_dir / "local_recovery.json"
+    if not recovery_path.exists() or recovery_path.is_symlink() or not recovery_path.is_file():
+        if receipt_data.get("state") == "saved" and (job_dir / "original.png").is_file():
+            orig_path = job_dir / "original.png"
+            raw_bytes = read_bytes_no_follow(orig_path, studio_dir)
+            return {
+                "id": cleaned_job,
+                "image_id": cleaned_job,
+                "base_id": str(receipt_data.get("base_id") or ""),
+                "selection_id": str(receipt_data.get("selection_id") or ""),
+                "path": orig_path,
+                "raw_bytes": raw_bytes,
+                "width": int(receipt_data.get("width") or 0),
+                "height": int(receipt_data.get("height") or 0),
+                "sha256": str(receipt_data.get("sha256") or hashlib.sha256(raw_bytes).hexdigest()),
+                "selected_pixels": int(receipt_data.get("selected_pixels") or 0),
+                "outside_changed_pixels": 0,
+            }
+        raise ValueError(f"No recoverable local crop record found for job: {cleaned_job}")
+
+    raw_recovery = read_bytes_no_follow(recovery_path, studio_dir, max_bytes=1024 * 1024)
+    recovery = json.loads(raw_recovery.decode("utf-8"))
+    if not isinstance(recovery, dict) or recovery.get("job_id") != cleaned_job:
+        raise ValueError("Invalid local recovery metadata")
+
+    crop_file = str(recovery.get("crop_file") or "")
+    if crop_file not in ("crop.png", "crop.jpg", "crop.webp"):
+        raise ValueError("Invalid saved crop filename in recovery metadata")
+    crop_path = job_dir / crop_file
+    if not crop_path.exists() or crop_path.is_symlink() or not crop_path.is_file():
+        raise ValueError("Saved paid crop file is missing on disk")
+    crop_bytes = read_bytes_no_follow(crop_path, studio_dir)
+    expected_crop_sha = str(recovery.get("crop_sha256") or "")
+    if (
+        not SHA256_HEX_RE.fullmatch(expected_crop_sha)
+        or hashlib.sha256(crop_bytes).hexdigest() != expected_crop_sha
+    ):
+        raise ValueError("Saved crop SHA-256 does not match recovery metadata")
+
+    base_path = Path(str(recovery.get("base_path") or ""))
+    allowed_roots = (
+        user_librechat_images_dir(settings, uid),
+        studio_dir,
+        Path(settings.kb_root),
+    )
+    matched_root: Path | None = None
+    for root in allowed_roots:
+        if not root.exists() or root.is_symlink():
+            continue
+        try:
+            ensure_safe_subpath(base_path, root)
+            matched_root = root
+            break
+        except (OSError, ValueError):
+            continue
+    if matched_root is None or not base_path.is_file() or base_path.is_symlink():
+        raise ValueError("Original base image for recoverable job is no longer accessible")
+
+    raw_crop_box = recovery.get("crop")
+    if not isinstance(raw_crop_box, list) or len(raw_crop_box) != 4:
+        raise ValueError("Invalid crop coordinates in recovery metadata")
+    crop_box = (
+        int(raw_crop_box[0]),
+        int(raw_crop_box[1]),
+        int(raw_crop_box[2]),
+        int(raw_crop_box[3]),
+    )
+    selection = selection_value(recovery.get("selection"))
+    expected_proof = (
+        recovery.get("proof") if isinstance(recovery.get("proof"), dict) else None
+    )
+    original_path = job_dir / "original.png"
+    comp = composite_local(
+        base_path,
+        crop_path,
+        selection,
+        crop_box,
+        original_path,
+        expected_proof=expected_proof,
+    )
+    final_bytes = read_bytes_no_follow(original_path, studio_dir)
+
+    receipt_data.update(
+        state="saved",
+        recoverable=False,
+        finished=time.time(),
+        width=comp["width"],
+        height=comp["height"],
+        file=original_path.name,
+        sha256=comp["sha256"],
+        selected_pixels=comp["selected_pixels"],
+        outside_changed_pixels=0,
+    )
+    receipt_Data_pop = dict(receipt_data)
+    receipt_Data_pop.pop("error", None)
+    temp_rec = job_dir / f"receipt.tmp.{secrets.token_hex(4)}"
+    fd = os.open(temp_rec, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as stream:
+            json.dump(receipt_Data_pop, stream, ensure_ascii=False)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp_rec, receipt_path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            temp_rec.unlink(missing_ok=True)
+        raise
+
+    with contextlib.suppress(OSError):
+        recovery_path.unlink(missing_ok=True)
+
+    return {
+        "id": cleaned_job,
+        "image_id": cleaned_job,
+        "base_id": str(recovery.get("base_id") or ""),
+        "selection_id": str(recovery.get("selection_id") or ""),
+        "path": original_path,
+        "raw_bytes": final_bytes,
+        "width": comp["width"],
+        "height": comp["height"],
+        "sha256": comp["sha256"],
+        "selected_pixels": comp["selected_pixels"],
         "outside_changed_pixels": 0,
     }
 

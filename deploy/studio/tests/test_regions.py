@@ -1203,3 +1203,267 @@ def test_post_files_stream_aborts_immediately_over_512kib(
 
     asyncio.run(_run())
 
+
+# 回归测试（Finding #4）：若底图在供应商生图期间被篡改，composite_local必须在落盘original.png前因proof mismatch中止
+def test_edit_region_aborts_if_base_image_mutated_during_generation(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "66666666-7777-8888-9999-aaaaaaaaaaaa"
+    base_file = user_a_lc / f"{upload_id}__mutated_midflight.png"
+    save_exact(Image.new("RGB", (320, 240), (140, 120, 100)), base_file)
+
+    selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 200, "y": 200}, {"x": 800, "y": 800}],
+            }
+        ],
+    }
+    rec = save_confirmed_selection(
+        studio_env, USER_A, upload_id, base_file, selection
+    )
+    sel_id = rec["selection_id"]
+
+    async def _mutating_ark_handler(request: httpx.Request) -> httpx.Response:
+        # 模拟并发请求在供应商响应返回前修改了底图文件字节
+        save_exact(Image.new("RGB", (320, 240), (141, 120, 100)), base_file)
+        body = json.loads(request.content.decode("utf-8"))
+        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        gen_img = Image.new("RGB", (req_w, req_h), (210, 190, 160))
+        buf = io.BytesIO()
+        gen_img.save(buf, format="PNG")
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {
+                        "b64_json": base64.b64encode(buf.getvalue()).decode(
+                            "ascii"
+                        )
+                    }
+                ]
+            },
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_mutating_ark_handler),
+    )
+
+    async def _run() -> None:
+        headers_a = {
+            "X-Studio-Token": VALID_TOKEN,
+            "X-LibreChat-User-ID": USER_A,
+        }
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            edit_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 31,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "edit_region",
+                        "arguments": {
+                            "base_id": upload_id,
+                            "selection_id": sel_id,
+                            "instruction": "替换为深色花岗岩",
+                            "size": "1K",
+                        },
+                    },
+                },
+            )
+            assert edit_res.status_code == 200
+            result = edit_res.json()["result"]
+            assert result["isError"] is True
+            err_data = json.loads(result["content"][0]["text"])
+            assert "Selection proof mismatch on image_sha256" in err_data["error"]
+            job_id = err_data["job_id"]
+            job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / job_id
+            assert not (job_dir / "original.png").exists()
+
+    asyncio.run(_run())
+
+
+# 回归测试（Finding #3）：供应商返回后若本地回贴失败，必须告警计费、暴露recoverable job_id，且finish_region_edit无需二次计费即可恢复合成
+def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishes_without_rebilling(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "77777777-8888-9999-aaaa-bbbbbbbbbbbb"
+    base_file = user_a_lc / f"{upload_id}__recoverable_base.png"
+    original_base_img = Image.new("RGB", (320, 240), (130, 115, 95))
+    save_exact(original_base_img, base_file)
+    original_base_bytes = base_file.read_bytes()
+
+    selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 250, "y": 250}, {"x": 750, "y": 750}],
+            }
+        ],
+    }
+    rec = save_confirmed_selection(
+        studio_env, USER_A, upload_id, base_file, selection
+    )
+    sel_id = rec["selection_id"]
+
+    provider_calls = 0
+
+    async def _ark_handler_then_transient_base_fault(
+        request: httpx.Request,
+    ) -> httpx.Response:
+        nonlocal provider_calls
+        provider_calls += 1
+        # 模拟供应商已成功生成并计费，但此时底图短暂被占用/替换导致回贴阶段失败
+        save_exact(Image.new("RGB", (320, 240), (99, 99, 99)), base_file)
+        body = json.loads(request.content.decode("utf-8"))
+        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        gen_img = Image.new("RGB", (req_w, req_h), (215, 185, 125))
+        buf = io.BytesIO()
+        gen_img.save(buf, format="PNG")
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {
+                        "b64_json": base64.b64encode(buf.getvalue()).decode(
+                            "ascii"
+                        )
+                    }
+                ]
+            },
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(
+            _ark_handler_then_transient_base_fault
+        ),
+    )
+
+    async def _run() -> None:
+        headers_a = {
+            "X-Studio-Token": VALID_TOKEN,
+            "X-LibreChat-User-ID": USER_A,
+        }
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            # 1. 首次调用 edit_region：供应商调用成功（provider_calls == 1），回贴阶段报错
+            fail_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 41,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "edit_region",
+                        "arguments": {
+                            "base_id": upload_id,
+                            "selection_id": sel_id,
+                            "instruction": "将中心区域替换为敦煌金浮雕",
+                            "size": "1K",
+                        },
+                    },
+                },
+            )
+            assert fail_res.status_code == 200
+            fail_result = fail_res.json()["result"]
+            assert fail_result["isError"] is True
+            err_payload = json.loads(fail_result["content"][0]["text"])
+            assert provider_calls == 1
+            assert err_payload["state"] == "recoverable"
+            assert err_payload["recoverable"] is True
+            assert "may have been billed" in err_payload["error"]
+            assert "finish_region_edit" in err_payload["error"]
+            job_id = err_payload["job_id"]
+            assert job_id.startswith("img_")
+
+            job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / job_id
+            assert (job_dir / "crop.png").is_file()
+            assert (job_dir / "local_recovery.json").is_file()
+            assert not (job_dir / "original.png").exists()
+
+            # 2. list_images 必须暴露该 job_id 为 recoverable 状态并附带计费与恢复警告
+            list_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 42,
+                    "method": "tools/call",
+                    "params": {"name": "list_images", "arguments": {}},
+                },
+            )
+            assert list_res.status_code == 200
+            list_payload = json.loads(
+                list_res.json()["result"]["content"][0]["text"]
+            )
+            rec_items = [
+                item
+                for item in list_payload["images"]
+                if item["id"] == job_id
+            ]
+            assert len(rec_items) == 1
+            assert rec_items[0]["state"] == "recoverable"
+            assert rec_items[0]["warning"] is True
+            assert any(
+                job_id in w and "finish_region_edit" in w
+                for w in list_payload["warnings"]
+            )
+
+            # 3. 恢复原底图字节后，调用 finish_region_edit(job_id) 直接用已保存的 generated_crop.png 完成回贴，不触发第二次供应商请求
+            base_file.write_bytes(original_base_bytes)
+            recover_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 43,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "finish_region_edit",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            assert recover_res.status_code == 200
+            rec_result = recover_res.json()["result"]
+            assert rec_result.get("isError") is False
+            assert provider_calls == 1
+
+            rec_summary = json.loads(rec_result["content"][0]["text"])
+            assert rec_summary["id"] == job_id
+            assert rec_summary["recovered"] is True
+            assert rec_summary["outside_changed_pixels"] == 0
+            assert (job_dir / "original.png").is_file()
+
+            # 校验选区外像素与原底图逐字节一致
+            mask = mask_for(selection, (320, 240))
+            saved_img = open_image(job_dir / "original.png")
+            assert (
+                count_outside_changes(original_base_img, saved_img, mask) == 0
+            )
+            assert saved_img.getpixel((160, 120)) == (215, 185, 125)
+
+    asyncio.run(_run())
+
+

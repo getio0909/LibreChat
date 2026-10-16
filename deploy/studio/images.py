@@ -700,6 +700,7 @@ async def generate_seedream(
         "Content-Type": "application/json",
     }
 
+    job_id = destination.name
     try:
         async with httpx.AsyncClient(
             transport=transport,
@@ -713,11 +714,11 @@ async def generate_seedream(
         raise
     except (httpx.TimeoutException, TimeoutError, httpx.HTTPError, OSError):
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg) from None
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
 
     if response.status_code >= 500:
         _mark_uncertain(destination, record, http_status=response.status_code)
-        raise GenerationUncertain(uncertain_msg)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id)
 
     if response.status_code >= 400:
         record.update(
@@ -741,7 +742,7 @@ async def generate_seedream(
 
     if len(raw_content) > MAX_RESPONSE_BYTES:
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id)
 
     try:
         parsed = json.loads(raw_content)
@@ -769,12 +770,13 @@ async def generate_seedream(
         Image.DecompressionBombError,
     ):
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg) from None
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
 
     if local_composite is not None:
-        from .regions import composite_local
+        from .regions import composite_local, write_local_recovery
 
         crop_path = destination / f"crop{suffix}"
+        crop_sha256 = hashlib.sha256(image_bytes).hexdigest()
         try:
             temp_crop = destination / "crop.part"
             desc = os.open(temp_crop, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -783,18 +785,57 @@ async def generate_seedream(
                 stream.flush()
                 os.fsync(stream.fileno())
             os.replace(temp_crop, crop_path)
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
 
-            original_path = destination / "original.png"
+        recovery_record: dict[str, Any] = {
+            "job_id": job_id,
+            "state": "recoverable",
+            "recoverable": True,
+            "created": time.time(),
+            "base_id": str(local_composite.get("base_id") or ""),
+            "base_path": str(local_composite["base_path"]),
+            "selection_id": str(local_composite.get("selection_id") or ""),
+            "selection": local_composite["selection"],
+            "proof": local_composite.get("proof"),
+            "crop": [int(v) for v in local_composite["crop"]],
+            "crop_file": crop_path.name,
+            "crop_sha256": crop_sha256,
+            "requested_size": body["size"],
+        }
+        record.update(
+            state="recoverable",
+            recoverable=True,
+            job_id=job_id,
+            base_id=recovery_record["base_id"],
+            selection_id=recovery_record["selection_id"],
+            crop_file=crop_path.name,
+            crop_sha256=crop_sha256,
+            crop_width=actual_width,
+            crop_height=actual_height,
+        )
+        try:
+            write_local_recovery(destination, recovery_record)
+            write_receipt(destination, record)
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+        original_path = destination / "original.png"
+        try:
             comp = composite_local(
                 local_composite["base_path"],
                 crop_path,
                 local_composite["selection"],
                 local_composite["crop"],
                 original_path,
+                expected_proof=local_composite.get("proof"),
             )
             final_bytes = original_path.read_bytes()
             record.update(
                 state="saved",
+                recoverable=False,
                 finished=time.time(),
                 width=comp["width"],
                 height=comp["height"],
@@ -804,12 +845,30 @@ async def generate_seedream(
                 outside_changed_pixels=0,
             )
             write_receipt(destination, record)
-        except (ValueError, RuntimeError) as exc:
-            _mark_uncertain(destination, record)
-            raise RuntimeError(str(exc)) from exc
-        except OSError:
-            _mark_uncertain(destination, record)
-            raise GenerationUncertain(uncertain_msg) from None
+            try:
+                (destination / "local_recovery.json").unlink(missing_ok=True)
+            except OSError:
+                pass
+        except (ValueError, RuntimeError, OSError) as exc:
+            recovery_record["error"] = str(exc)
+            record.update(
+                state="recoverable",
+                recoverable=True,
+                finished=time.time(),
+                error=str(exc),
+            )
+            try:
+                write_local_recovery(destination, recovery_record)
+                write_receipt(destination, record)
+            except OSError:
+                pass
+            raise GenerationUncertain(
+                f"Paid local crop was saved for job {job_id}, but local composite failed ({exc}); "
+                f"the request may have been billed and no automatic retry was performed. "
+                f"Call finish_region_edit with job_id='{job_id}' to composite the saved crop without a new paid call.",
+                job_id=job_id,
+                state="recoverable",
+            ) from exc
 
         return {
             "path": original_path,
@@ -844,7 +903,7 @@ async def generate_seedream(
         write_receipt(destination, record)
     except OSError:
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg) from None
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
 
     return {
         "path": original_path,
