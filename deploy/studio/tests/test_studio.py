@@ -1520,3 +1520,29 @@ def test_planner_instructions_consistent_for_counts_1_to_3(
                     assert legacy_field not in text_part
 
     asyncio.run(_run())
+
+
+# 校验StudioSettings拒绝过短、过长或非十六进制的shared_token，仅接受64位十六进制字符串
+def test_shared_token_64_hex_validation() -> None:
+    valid_hex = "0123456789abcdefABCDEF0123456789abcdefABCDEF0123456789abcdefABCD"
+    s = StudioSettings(
+        shared_token=valid_hex,
+        gemini_api_key="test-gemini-key",
+        ark_api_key="test-ark-key",
+    )
+    assert s.shared_token == valid_hex
+
+    for invalid_token in (
+        "x",
+        "a" * 63,
+        "a" * 65,
+        "g" * 64,
+        "a" * 32 + "-" + "a" * 31,
+        "placeholder-token",
+    ):
+        with pytest.raises(ValueError, match="64-character hexadecimal"):
+            StudioSettings(
+                shared_token=invalid_token,
+                gemini_api_key="test-gemini-key",
+                ark_api_key="test-ark-key",
+            )

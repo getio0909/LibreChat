@@ -1,15 +1,17 @@
 import asyncio
 import json
 import os
+import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-# 默认密钥配置文件路径与规则数据目录
+# 默认密钥配置文件路径、规则数据目录与共享令牌64位十六进制正则
 DEFAULT_SETTINGS_PATH = Path("/run/secrets/studio.json")
 RULES_DIR = Path(__file__).resolve().parent / "rules"
+SHARED_TOKEN_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 # 石材目录条目模型
@@ -57,8 +59,19 @@ class StudioSettings(BaseModel):
     ark_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
 
-    # 校验密钥与令牌不包含空白字符且非空
-    @field_validator("shared_token", "gemini_api_key", "ark_api_key")
+    # 校验shared_token必须为64位十六进制字符串
+    @field_validator("shared_token")
+    @classmethod
+    def _validate_shared_token(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not SHARED_TOKEN_RE.fullmatch(cleaned):
+            raise ValueError(
+                "shared_token must be an exact 64-character hexadecimal string"
+            )
+        return cleaned
+
+    # 校验API密钥不包含空白字符且非空
+    @field_validator("gemini_api_key", "ark_api_key")
     @classmethod
     def _validate_secret(cls, value: str) -> str:
         cleaned = value.strip()
