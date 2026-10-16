@@ -173,7 +173,16 @@ with urllib.request.urlopen(list_req, timeout=10) as resp:
 
 tools = tools_payload.get("result", {}).get("tools", [])
 tool_names = {tool["name"] for tool in tools}
-expected_tools = {"generate_image", "edit_image", "design_concepts", "list_images"}
+expected_tools = {
+    "generate_image",
+    "edit_image",
+    "design_concepts",
+    "list_images",
+    "search_library",
+    "compare_materials",
+}
 assert expected_tools.issubset(tool_names), f"Missing expected tools: {expected_tools - tool_names} (got {tool_names})"
+assert os.path.isdir("/kb/records"), "Expected /kb/records directory inside studio container"
+assert os.path.isfile("/kb/catalog/materials.yaml"), "Expected /kb/catalog/materials.yaml inside studio container"
 print(f"Studio smoke test passed with tools: {sorted(tool_names)}")
 PY
