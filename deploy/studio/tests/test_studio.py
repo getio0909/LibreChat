@@ -2240,11 +2240,64 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
     asyncio.run(_run_partial())
 
 
-# 构造最小合法GLB二进制字节或包含该GLB的ZIP压缩包字节
+# 构造符合glTF 2.0规范的真实GLB二进制字节（含JSON场景网格块与BIN顶点缓冲块）
 def _make_glb_bytes(extra_payload: bytes = b"TEST_MESH_DATA_0123456789ABCDEF") -> bytes:
-    header = b"glTF" + (2).to_bytes(4, "little")
-    total_len = (12 + len(extra_payload)).to_bytes(4, "little")
-    return header + total_len + extra_payload
+    import struct
+
+    positions = struct.pack(
+        "<9f",
+        -0.5,
+        0.0,
+        0.0,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.8,
+        0.0,
+    )
+    bin_pad = (-len(positions)) % 4
+    bin_chunk_data = positions + (b"\x00" * bin_pad)
+
+    gltf_dict = {
+        "asset": {
+            "version": "2.0",
+            "extras": {"tag": extra_payload.decode("latin1")},
+        },
+        "scene": 0,
+        "scenes": [{"nodes": [0]}],
+        "nodes": [{"mesh": 0}],
+        "meshes": [{"primitives": [{"attributes": {"POSITION": 0}}]}],
+        "buffers": [{"byteLength": len(positions)}],
+        "bufferViews": [
+            {
+                "buffer": 0,
+                "byteOffset": 0,
+                "byteLength": len(positions),
+                "target": 34962,
+            }
+        ],
+        "accessors": [
+            {
+                "bufferView": 0,
+                "byteOffset": 0,
+                "componentType": 5126,
+                "count": 3,
+                "type": "VEC3",
+                "min": [-0.5, 0.0, 0.0],
+                "max": [0.5, 0.8, 0.0],
+            }
+        ],
+    }
+    json_raw = json.dumps(gltf_dict, separators=(",", ":")).encode("utf-8")
+    json_pad = (-len(json_raw)) % 4
+    json_chunk_data = json_raw + (b" " * json_pad)
+
+    json_chunk = struct.pack("<II", len(json_chunk_data), 0x4E4F534A) + json_chunk_data
+    bin_chunk = struct.pack("<II", len(bin_chunk_data), 0x004E4942) + bin_chunk_data
+    total_len = 12 + len(json_chunk) + len(bin_chunk)
+    header = struct.pack("<4sII", b"glTF", 2, total_len)
+    return header + json_chunk + bin_chunk
 
 
 # 将GLB字节封装为ZIP压缩包字节（模拟方舟3D生成任务返回的压缩包结构）
@@ -4370,3 +4423,361 @@ def test_p2b_finding8_seed3d_image_prep_aspect_padding_and_min_size_rejection(
             assert posted_image_sizes == [(2048, 820)]
 
     asyncio.run(_run())
+
+
+# 回归测试P2B Finding 6：沙箱预览HTML移除无效的<a download/target=_blank>锚点，工具文本结果提供宿主可点击的下载链接并在真实Chromium沙箱iframe中完成GLB加载与下载验证
+def test_p2b_finding6_sandboxed_viewer_and_host_download_link(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    import socket
+    import subprocess
+    import threading
+    import time
+
+    import uvicorn
+    from starlette.applications import Starlette
+    from starlette.requests import Request
+    from starlette.responses import HTMLResponse, Response
+    from starlette.routing import Route
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "f6000006-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__statue.jpg").write_bytes(
+        _make_image_bytes(360, 360, fmt="JPEG")
+    )
+    raw_glb = _make_glb_bytes(b"FINDING6_REAL_GLTF2_BINARY")
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+
+    local_cfg = studio_env.model_copy(
+        update={"public_base_url": f"http://127.0.0.1:{port}"}
+    )
+
+    async def _seed3d_handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            return httpx.Response(200, json={"id": "cgt-f6-browser"})
+        if request.url.path.endswith("/cgt-f6-browser"):
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f6-browser",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f6.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    studio_app = create_app(
+        settings=local_cfg,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_seed3d_handler),
+    )
+
+    async def _call_create() -> tuple[dict[str, Any], str]:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=studio_app),
+            base_url=f"http://127.0.0.1:{port}",
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 661,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id, "detail": "standard"},
+                    },
+                },
+            )
+            result = res.json()["result"]
+            assert result["isError"] is False
+            meta = json.loads(result["content"][0]["text"])
+            viewer_html = result["content"][1]["resource"]["text"]
+            return meta, viewer_html
+
+    meta, viewer_html = asyncio.run(_call_create())
+    model_id = meta["model_id"]
+    download_url = meta["download_url"]
+    download_md = meta["download_markdown"]
+
+    # 1. 验证文本结果包含签名下载链接与Markdown链接，且viewer_html不含<a、download=或target="_blank"
+    assert download_url.startswith(f"http://127.0.0.1:{port}/studio-files/")
+    assert download_md == f"[下载 GLB 模型 ({model_id}.glb)]({download_url})"
+    assert download_md in meta["message"]
+    assert "<a " not in viewer_html
+    assert "download=" not in viewer_html
+    assert 'target="_blank"' not in viewer_html
+
+    # 2. 启动本地测试网关（模拟nginx /studio-files/<token> -> /files/<token>与本地Three.js模块解析）并在无头Chrome中验证沙箱iframe与宿主下载
+    three_module_js = """
+export const SRGBColorSpace = 'srgb';
+export const ACESFilmicToneMapping = 1;
+export const PCFSoftShadowMap = 2;
+export const MathUtils = { degToRad: (d) => (d * Math.PI) / 180 };
+export class Vector3 {
+  constructor(x = 0, y = 0, z = 0) { this.x = x; this.y = y; this.z = z; }
+  set(x, y, z) { this.x = x; this.y = y; this.z = z; return this; }
+  copy(v) { this.x = v.x; this.y = v.y; this.z = v.z; return this; }
+  length() { return Math.hypot(this.x, this.y, this.z); }
+}
+export class Box3 {
+  constructor() { this.min = new Vector3(-0.5, 0, -0.5); this.max = new Vector3(0.5, 0.8, 0.5); }
+  setFromObject() { return this; }
+  isEmpty() { return false; }
+  getSize(target) { return target.set(1.0, 0.8, 1.0); }
+  getCenter(target) { return target.set(0, 0.4, 0); }
+}
+export class Scene {
+  constructor() { this.children = []; this.environment = null; }
+  add(obj) { this.children.push(obj); }
+  remove(obj) { this.children = this.children.filter((x) => x !== obj); }
+}
+export class HemisphereLight {
+  constructor() { this.position = new Vector3(); }
+}
+export class DirectionalLight {
+  constructor() {
+    this.position = new Vector3();
+    this.castShadow = false;
+    this.shadow = { mapSize: { width: 0, height: 0 }, bias: 0 };
+  }
+}
+export class PlaneGeometry {}
+export class ShadowMaterial {}
+export class Mesh {
+  constructor() { this.rotation = { x: 0 }; this.position = new Vector3(); this.receiveShadow = false; }
+}
+export class PerspectiveCamera {
+  constructor(fov = 40, aspect = 1.6, near = 0.01, far = 100) {
+    this.fov = fov; this.aspect = aspect; this.near = near; this.far = far;
+    this.position = new Vector3();
+  }
+  updateProjectionMatrix() {}
+}
+export class PMREMGenerator {
+  fromScene() { return { texture: {} }; }
+}
+export class WebGLRenderer {
+  constructor() {
+    this.domElement = document.createElement('canvas');
+    this.shadowMap = { enabled: false, type: 0 };
+  }
+  setPixelRatio() {}
+  setSize(w, h) { this.domElement.width = w; this.domElement.height = h; }
+  render() {}
+}
+"""
+    orbit_controls_js = """
+import { Vector3 } from '/three/three.module.js';
+export class OrbitControls {
+  constructor() { this.target = new Vector3(); }
+  update() {}
+}
+"""
+    room_env_js = "export class RoomEnvironment {}"
+    gltf_loader_js = """
+import { Vector3 } from '/three/three.module.js';
+export class GLTFLoader {
+  setCrossOrigin() {}
+  load(url, onLoad, onProgress, onError) {
+    fetch(url, { mode: 'cors' })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const buf = await res.arrayBuffer();
+        if (onProgress) onProgress({ loaded: buf.byteLength, total: buf.byteLength });
+        const dv = new DataView(buf);
+        const magic = dv.getUint32(0, true);
+        const version = dv.getUint32(4, true);
+        const totalLen = dv.getUint32(8, true);
+        const jsonChunkLen = dv.getUint32(12, true);
+        const jsonChunkType = dv.getUint32(16, true);
+        if (magic !== 0x46546C67 || version !== 2 || totalLen !== buf.byteLength || jsonChunkType !== 0x4E4F534A) {
+          throw new Error('Invalid GLB structure');
+        }
+        const jsonBytes = new Uint8Array(buf, 20, jsonChunkLen);
+        const gltf = JSON.parse(new TextDecoder().decode(jsonBytes));
+        if (!gltf.meshes || !gltf.meshes.length || !gltf.accessors || !gltf.accessors.length) {
+          throw new Error('Missing glTF meshes');
+        }
+        const sceneObj = {
+          position: new Vector3(),
+          scale: { setScalar() {} },
+          traverse(cb) { cb({ isMesh: true, castShadow: false, receiveShadow: false }); },
+        };
+        window.__GLB_PARSED_EXTRAS__ = gltf.asset && gltf.asset.extras ? gltf.asset.extras.tag : '';
+        onLoad({ scene: sceneObj });
+      })
+      .catch((err) => {
+        if (onError) onError(err);
+      });
+  }
+}
+"""
+    local_viewer_html = viewer_html.replace(
+        "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        f"http://127.0.0.1:{port}/three/three.module.js",
+    ).replace(
+        "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+        f"http://127.0.0.1:{port}/three/addons/",
+    )
+
+    async def _host_page(request: Request) -> HTMLResponse:
+        import html as html_mod
+
+        escaped_srcdoc = html_mod.escape(local_viewer_html, quote=True)
+        escaped_dl = html_mod.escape(download_url, quote=True)
+        page_html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+  <script>
+    window.__HOST_UI_HEIGHT__ = 0;
+    window.addEventListener('message', (ev) => {{
+      if (ev.data && ev.data.type === 'ui-size-change' && ev.data.payload) {{
+        window.__HOST_UI_HEIGHT__ = ev.data.payload.height;
+      }}
+    }});
+  </script>
+  <iframe id="mcp-sandbox-frame" sandbox="allow-scripts" srcdoc="{escaped_srcdoc}" style="width:640px;height:440px;border:0;"></iframe>
+  <div id="chat-message">
+    <a id="host-chat-download-link" href="{escaped_dl}">下载 GLB 模型 ({model_id}.glb)</a>
+  </div>
+</body>
+</html>"""
+        return HTMLResponse(page_html)
+
+    async def _three_asset(request: Request) -> Response:
+        rel = str(request.path_params.get("rel") or "")
+        mapping = {
+            "three.module.js": three_module_js,
+            "addons/controls/OrbitControls.js": orbit_controls_js,
+            "addons/environments/RoomEnvironment.js": room_env_js,
+            "addons/loaders/GLTFLoader.js": gltf_loader_js,
+        }
+        if rel not in mapping:
+            return Response("Not Found", status_code=404)
+        return Response(
+            mapping[rel],
+            media_type="application/javascript",
+            headers={"Access-Control-Allow-Origin": "*"},
+        )
+
+    async def _proxy_studio_files(request: Request) -> Response:
+        tok = str(request.path_params.get("token") or "")
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=studio_app),
+            base_url=f"http://127.0.0.1:{port}",
+        ) as c:
+            upstream = await c.request(
+                request.method,
+                f"/files/{tok}",
+                headers={
+                    k: v
+                    for k, v in request.headers.items()
+                    if k.lower() in ("range", "if-none-match", "if-modified-since")
+                },
+            )
+            return Response(
+                upstream.content,
+                status_code=upstream.status_code,
+                headers=dict(upstream.headers),
+            )
+
+    gateway_app = Starlette(
+        routes=[
+            Route("/host", endpoint=_host_page, methods=["GET"]),
+            Route("/three/{rel:path}", endpoint=_three_asset, methods=["GET"]),
+            Route(
+                "/studio-files/{token:path}",
+                endpoint=_proxy_studio_files,
+                methods=["GET", "HEAD", "OPTIONS"],
+            ),
+        ]
+    )
+
+    uvi_cfg = uvicorn.Config(
+        gateway_app, host="127.0.0.1", port=port, log_level="error"
+    )
+    uvi_server = uvicorn.Server(uvi_cfg)
+    server_thread = threading.Thread(target=uvi_server.run, daemon=True)
+    server_thread.start()
+
+    try:
+        # 等待本地网关就绪
+        for _ in range(50):
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=0.1):
+                    break
+            except OSError:
+                time.sleep(0.05)
+
+        dl_target = tmp_path / "downloaded.glb"
+        pw_script = f"""
+const {{ chromium }} = require('playwright');
+(async () => {{
+  const browser = await chromium.launch({{
+    executablePath: '/usr/bin/google-chrome',
+    headless: true,
+    args: ['--no-sandbox', '--disable-gpu'],
+  }});
+  const context = await browser.newContext({{ acceptDownloads: true }});
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (err) => errors.push(String(err)));
+  await page.goto('http://127.0.0.1:{port}/host', {{ waitUntil: 'networkidle' }});
+
+  const frameEl = await page.$('#mcp-sandbox-frame');
+  const frame = await frameEl.contentFrame();
+  await frame.waitForFunction(
+    () => document.getElementById('loading-state').hidden === true && document.getElementById('error-state').hidden === true,
+    null,
+    {{ timeout: 5000 }}
+  );
+
+  const iframeCheck = await frame.evaluate(() => ({{
+    anchorCount: document.querySelectorAll('a, [download], [target="_blank"]').length,
+    canvasCount: document.querySelectorAll('#canvas-container canvas').length,
+    loadingHidden: document.getElementById('loading-state').hidden,
+    errorHidden: document.getElementById('error-state').hidden,
+    parsedExtras: window.__GLB_PARSED_EXTRAS__,
+  }}));
+  const hostHeight = await page.evaluate(() => window.__HOST_UI_HEIGHT__);
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download', {{ timeout: 5000 }}),
+    page.click('#host-chat-download-link'),
+  ]);
+  const suggestedFilename = download.suggestedFilename();
+  await download.saveAs({json.dumps(str(dl_target))});
+  await browser.close();
+  console.log(JSON.stringify({{ errors, iframeCheck, hostHeight, suggestedFilename }}));
+}})();
+"""
+        proc = subprocess.run(
+            ["node", "-e", pw_script],
+            cwd=str(Path(__file__).resolve().parents[3]),
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=True,
+        )
+        pw_out = json.loads(proc.stdout.strip().splitlines()[-1])
+        assert pw_out["errors"] == []
+        assert pw_out["iframeCheck"] == {
+            "anchorCount": 0,
+            "canvasCount": 1,
+            "loadingHidden": True,
+            "errorHidden": True,
+            "parsedExtras": "FINDING6_REAL_GLTF2_BINARY",
+        }
+        assert pw_out["hostHeight"] >= 360
+        assert pw_out["suggestedFilename"] == f"{model_id}.glb"
+        assert dl_target.read_bytes() == raw_glb
+    finally:
+        uvi_server.should_exit = True
+        server_thread.join(timeout=3.0)

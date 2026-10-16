@@ -442,6 +442,7 @@ def build_mcp_server(
         token, exp_ts = sign_file_token(settings, user_id, model_id)
         signed_url = build_signed_file_url(settings, token)
         expires_at = format_utc_timestamp(exp_ts)
+        download_markdown = f"[下载 GLB 模型 ({model_id}.glb)]({signed_url})"
 
         summary_payload: dict[str, Any] = {
             "model_id": model_id,
@@ -453,6 +454,8 @@ def build_mcp_server(
             "file_size": file_size,
             "bytes": file_size,
             "download_url": signed_url,
+            "download_markdown": download_markdown,
+            "message": f"3D visual preview model is ready. Include this download link in your chat response: {download_markdown}",
             "expires_at": expires_at,
             "disclaimer": VISUAL_MODEL_DISCLAIMER,
             "warnings": warnings,
@@ -1256,7 +1259,7 @@ def create_app(
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
             "Access-Control-Allow-Headers": "Range, If-None-Match, If-Modified-Since",
-            "Access-Control-Expose-Headers": "Accept-Ranges, Content-Length, Content-Range, Content-Type",
+            "Access-Control-Expose-Headers": "Accept-Ranges, Content-Disposition, Content-Length, Content-Range, Content-Type",
             "X-Content-Type-Options": "nosniff",
         }
         if extra:
@@ -1292,7 +1295,7 @@ def create_app(
             {
                 "Accept-Ranges": "bytes",
                 "Cache-Control": "private, max-age=3600",
-                "Content-Disposition": f'inline; filename="{model_id}.glb"',
+                "Content-Disposition": f'attachment; filename="{model_id}.glb"',
             }
         )
         range_header = request.headers.get("range")

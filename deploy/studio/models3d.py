@@ -512,7 +512,7 @@ def parse_byte_range(range_header: str, total_size: int) -> tuple[int, int]:
     return start, min(end, total_size - 1)
 
 
-# 生成基于固定版本Three.js CDN的自适应内联三维GLB模型预览HTML资源
+# 生成基于固定版本Three.js CDN的自适应内联三维GLB模型预览HTML资源（不含沙箱无效的下载锚点）
 def build_model_viewer_html(
     *,
     model_id: str,
@@ -522,7 +522,6 @@ def build_model_viewer_html(
     file_size: int,
 ) -> str:
     safe_model_id = html.escape(model_id, quote=True)
-    safe_url_attr = html.escape(signed_url, quote=True)
     safe_url_js = json.dumps(signed_url)
     safe_expires = html.escape(expires_at, quote=True)
     size_mb = f"{file_size / (1024 * 1024):.2f} MB"
@@ -738,15 +737,6 @@ def build_model_viewer_html(
       </div>
       <div class="controls-group">
         <button type="button" class="btn" id="reset-btn" aria-label="重置相机视角">重置视角</button>
-        <a
-          class="btn btn-primary"
-          id="download-btn"
-          href="{safe_url_attr}"
-          download="{safe_model_id}.glb"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="下载 GLB 模型文件"
-        >下载 GLB</a>
       </div>
     </div>
 
@@ -758,16 +748,9 @@ def build_model_viewer_html(
     </div>
 
     <div class="overlay" id="error-state" role="alert" hidden>
-      <div class="error-text" id="error-message">三维模型加载失败，请重试或直接下载 GLB 文件查看。</div>
+      <div class="error-text" id="error-message">三维模型加载失败，请点击重试或使用对话消息中的 GLB 下载链接。</div>
       <div class="controls-group">
         <button type="button" class="btn" id="retry-btn">重新加载</button>
-        <a
-          class="btn btn-primary"
-          href="{safe_url_attr}"
-          download="{safe_model_id}.glb"
-          target="_blank"
-          rel="noopener noreferrer"
-        >直接下载 GLB</a>
       </div>
     </div>
 
@@ -943,7 +926,7 @@ def build_model_viewer_html(
             }}
           }},
           () => {{
-            showError('三维模型加载失败或签名下载链接已过期，请点击重试或直接下载 GLB 文件。');
+            showError('三维模型加载失败或签名下载链接已过期，请点击重试或使用对话消息中的 GLB 下载链接。');
           }}
         );
       }}
@@ -973,7 +956,7 @@ def build_model_viewer_html(
       animate();
       loadModel();
     }} catch (err) {{
-      showError('浏览器三维渲染组件初始化失败，请直接点击下载 GLB 文件查看。');
+      showError('浏览器三维渲染组件初始化失败，请使用对话消息中的 GLB 下载链接查看。');
     }}
   </script>
 </body>
