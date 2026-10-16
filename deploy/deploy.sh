@@ -15,27 +15,41 @@ stage=$(mktemp -d "$deploy_root/.incoming.XXXXXX")
 had_previous=false
 activated=false
 gate=/etc/nginx/librechat-dev.provisioning
+config_files=(compose.yml librechat.yaml .env image.env studio.json)
 compose=(docker compose -p librechat-dev --project-directory "$deploy_root" \
   --env-file "$deploy_root/.env" --env-file "$deploy_root/image.env" -f "$deploy_root/compose.yml")
+
+# 将 studio.json 归属权设为非特权容器用户 10001:10001，保持 0600 权限。
+own_service_configs() {
+  if [[ -f "$deploy_root/studio.json" ]]; then
+    chown 10001:10001 "$deploy_root/studio.json"
+  fi
+}
+
 cleanup() {
   status=$?
   trap - EXIT
   if (( status != 0 )) && "$activated"; then
     if "$had_previous"; then
       restored=true
-      for file in compose.yml librechat.yaml .env image.env; do
-        if ! cp "$deploy_root/.previous/$file" "$deploy_root/$file"; then
+      for file in "${config_files[@]}"; do
+        if [[ ! -f "$deploy_root/.previous/$file" ]]; then
+          rm -f -- "$deploy_root/$file"
+        elif ! cp "$deploy_root/.previous/$file" "$deploy_root/$file"; then
           restored=false
         fi
       done
-      if "$restored" && "${compose[@]}" up -d --wait --wait-timeout 240; then
+      # 单文件挂载保留旧 inode，强制重建容器以恢复上一版本的配置文件与密钥。
+      if "$restored" && own_service_configs && "${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
         rm -f -- "$gate"
         echo 'The previous application deployment has been restored.' >&2
       else
         echo 'Restoring the previous application deployment failed.' >&2
       fi
-    elif "${compose[@]}" down; then
-      rm -f -- "$deploy_root/compose.yml" "$deploy_root/librechat.yaml" "$deploy_root/.env" "$deploy_root/image.env"
+    elif "${compose[@]}" down --remove-orphans; then
+      for file in "${config_files[@]}"; do
+        rm -f -- "$deploy_root/$file"
+      done
       echo 'The failed initial application deployment has been stopped.' >&2
     else
       echo 'Stopping the failed initial application deployment failed.' >&2
@@ -51,19 +65,31 @@ cat > "$stage/bundle.tgz"
 # 在解包之前限制归档成员，防止部署凭据被用于写入其他路径。
 while IFS= read -r member; do
   case "$member" in
-    ./|./compose.yml|./librechat.yaml|./.env|./image.env|./registry.token|./accounts.json) ;;
+    ./|./compose.yml|./librechat.yaml|./.env|./image.env|./registry.token|./accounts.json|./studio.json) ;;
     *) echo 'Unexpected deployment archive member.' >&2; exit 1 ;;
   esac
 done < <(tar -tzf "$stage/bundle.tgz")
 tar -xzf "$stage/bundle.tgz" -C "$stage" --no-same-owner --no-same-permissions
-for file in compose.yml librechat.yaml .env image.env registry.token accounts.json; do
+for file in "${config_files[@]}" registry.token accounts.json; do
   if [[ ! -f "$stage/$file" || -L "$stage/$file" ]]; then
     echo 'A required deployment file is missing or is not a regular file.' >&2
     exit 1
   fi
 done
-if ! grep -Eq '^LIBRECHAT_IMAGE=ghcr\.io/getio0909/librechat-dev@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
+if ! grep -Eq '^LIBRECHAT_IMAGE=ghcr\.io/getio0909/librechat-dev(:[A-Za-z0-9_.-]+)?@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
   echo 'The deployment must reference an immutable development image digest.' >&2
+  exit 1
+fi
+if ! grep -Eq '^STUDIO_IMAGE=ghcr\.io/getio0909/librechat-studio(:[A-Za-z0-9_.-]+)?@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
+  echo 'The deployment must reference an immutable studio image digest.' >&2
+  exit 1
+fi
+if ! jq -e '
+  (.shared_token | type == "string" and length >= 64)
+  and (.gemini_api_key | type == "string" and length >= 1)
+  and (.ark_api_key | type == "string" and length >= 1)
+' "$stage/studio.json" >/dev/null; then
+  echo 'Studio configuration settings are invalid.' >&2
   exit 1
 fi
 if ! jq -e '
@@ -85,18 +111,22 @@ docker compose -p librechat-dev --project-directory "$stage" --env-file "$stage/
   --env-file "$stage/image.env" -f "$stage/compose.yml" pull
 
 if [[ -f "$deploy_root/image.env" ]]; then
+  rm -rf -- "$deploy_root/.previous"
   mkdir -p "$deploy_root/.previous"
-  for file in compose.yml librechat.yaml .env image.env; do
-    cp "$deploy_root/$file" "$deploy_root/.previous/$file"
+  for file in "${config_files[@]}"; do
+    if [[ -f "$deploy_root/$file" ]]; then
+      cp "$deploy_root/$file" "$deploy_root/.previous/$file"
+    fi
   done
   had_previous=true
 fi
 activated=true
 # 从代理入口隔离所有登录方式，首个管理员验证通过后才恢复公开访问。
 : > "$gate"
-for file in compose.yml librechat.yaml .env image.env; do
+for file in "${config_files[@]}"; do
   install -m 600 "$stage/$file" "$deploy_root/$file"
 done
+own_service_configs
 
 # 默认账户验证完成前关闭公开注册，避免首个管理员被抢先创建。
 cat > "$stage/accounts.yml" <<'EOF'
@@ -106,7 +136,7 @@ services:
       ALLOW_REGISTRATION: 'false'
 EOF
 closed_compose=("${compose[@]}" -f "$stage/accounts.yml")
-if ! "${closed_compose[@]}" up -d --wait --wait-timeout 240; then
+if ! "${closed_compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
   echo 'Deployment health checks failed.' >&2
   exit 1
 fi
@@ -140,6 +170,6 @@ for account in admin user; do
   fi
 done
 # 账户和角色验证通过后恢复用户配置的注册设置。
-"${compose[@]}" up -d --wait --wait-timeout 240
+"${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
 rm -f -- "$gate"
 echo 'Development deployment passed health checks.'
