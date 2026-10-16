@@ -217,9 +217,19 @@ def build_stone_replacements(
         ref_path = Path(ref["path"])
         idx = unique_paths.index(ref_path) + offset
         sample = f"图{idx}"
-        note_text = f"{ref.get('note') or ''} {ref.get('id') or ''} {ref_path.stem}"
+        extra_mat_ids = " ".join(ref.get("material_ids") or ())
+        note_text = (
+            f"{ref.get('note') or ''} {ref.get('id') or ''} "
+            f"{ref.get('material_id') or ''} {extra_mat_ids} {ref_path.stem}"
+        )
         for product in rules.materials:
-            match_keys = [product.id, product.name, *product.aliases]
+            match_keys = [
+                product.id,
+                product.name,
+                *product.aliases,
+                *product.sample_asset_ids,
+                *product.all_slab_asset_ids,
+            ]
             if any(key and key in note_text for key in match_keys):
                 samples = product_samples.setdefault(product.id, [])
                 if sample not in samples:

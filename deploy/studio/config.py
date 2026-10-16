@@ -24,6 +24,8 @@ class StoneMaterial(BaseModel):
     search_terms: list[str] = Field(default_factory=list)
     group: str = ""
     notes: list[str] = Field(default_factory=list)
+    sample_asset_ids: list[str] = Field(default_factory=list)
+    all_slab_asset_ids: list[str] = Field(default_factory=list)
 
 
 # 从规则目录加载的提示词与业务规则数据
@@ -56,6 +58,7 @@ class StudioSettings(BaseModel):
     planner_timeout_seconds: int = Field(default=540, ge=5, le=600)
     librechat_images_dir: Path = Path("/librechat/images")
     data_dir: Path = Path("/data")
+    kb_root: Path = Path("/kb")
     ark_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
 

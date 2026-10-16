@@ -1,0 +1,32 @@
+schema: 1
+id: "5555555555555551"
+title_zh: 唐风须弥座佛坛供桌
+library_type: 家具木作
+studio_roles:
+  - 造型
+  - 物件
+  - 参考
+category_l1: 佛堂家具
+category_l2: 供桌
+materials:
+  - 敦煌金
+  - 老榆木
+colors:
+  - 深胡桃
+  - 暖金
+style:
+  - 唐宋禅意
+tags:
+  - 须弥座
+  - 佛坛
+  - 束腰供案
+summary_zh: 唐式束腰须弥座石木结合供桌，台面嵌敦煌金石材。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: unreviewed

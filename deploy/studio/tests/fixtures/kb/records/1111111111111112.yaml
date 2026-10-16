@@ -1,0 +1,29 @@
+schema: 1
+id: "1111111111111112"
+title_zh: 敦煌金奢石大板样板B
+library_type: 材质纹理
+studio_roles:
+  - 材质
+  - 参考
+category_l1: 材质纹理
+category_l2: 石材样板
+materials:
+  - 敦煌金
+material_ids:
+  - dunhuang-gold
+colors:
+  - 金黄
+style:
+  - 传统禅意
+tags:
+  - 样板
+summary_zh: 敦煌金石材第二张标准样板图。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: approved

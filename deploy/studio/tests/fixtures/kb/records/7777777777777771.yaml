@@ -1,0 +1,26 @@
+schema: 1
+id: "7777777777777771"
+title_zh: 带水印低清须弥座纹样
+library_type: 石刻纹样
+studio_roles:
+  - 纹样
+category_l1: 须弥座
+materials:
+  - 青石
+colors:
+  - 灰青
+style:
+  - 传统
+tags:
+  - 须弥座
+  - 莲花纹
+summary_zh: 外部采集带水印且低分辨率的须弥座石刻图。
+provenance:
+  license: customer-supplied-unverified
+  license_status: unconfirmed
+quality:
+  ai_generated: false
+  third_party_watermark: true
+  low_res: true
+review:
+  status: unreviewed

@@ -12,6 +12,7 @@ from typing import Any
 from PIL import Image, ImageOps
 
 from .config import StudioSettings
+from .kb import KB_ID_RE, KnowledgeBaseIndex, load_kb_index
 
 # 用户编号与图像编号的格式校验正则
 USER_ID_RE = re.compile(r"^[a-f0-9]{24}$")
@@ -33,7 +34,7 @@ PLACEHOLDER_CONVERSATION_IDS = {
 }
 
 
-# 解析后的用户图像记录结构
+# 解析后的用户或知识库图像记录结构
 @dataclass(frozen=True)
 class ResolvedImage:
     id: str
@@ -45,6 +46,18 @@ class ResolvedImage:
     height: int
     state: str = "saved"
     warning: bool = False
+    warning_reasons: tuple[str, ...] = ()
+    material_ids: tuple[str, ...] = ()
+
+    # 若知识库资产带有质量或审核驳回标记，生成明确的英文警告说明
+    def flag_warning_message(self) -> str | None:
+        if self.kind == "library" and self.warning_reasons:
+            joined = ", ".join(self.warning_reasons)
+            return (
+                f"Library asset {self.id} is flagged ({joined}); "
+                "verify quality and rights before use."
+            )
+        return None
 
     # 转换为对外的无敏感信息字典结构
     def to_public_dict(self) -> dict[str, Any]:
@@ -337,9 +350,7 @@ def _collect_user_images(
                     if original_path.is_symlink() or not original_path.is_file():
                         continue
                     stat_info = original_path.stat(follow_symlinks=False)
-                    width, height = _read_image_dimensions(
-                        original_path, studio_dir
-                    )
+                    width, height = _read_image_dimensions(original_path, studio_dir)
                     results.append(
                         ResolvedImage(
                             id=job_dir.name,
@@ -380,9 +391,13 @@ def _collect_user_images(
     return results
 
 
-# 在当前用户隔离目录内解析指定图片编号
+# 在当前用户隔离目录或只读知识库目录内解析指定图片编号
 def resolve_image(
-    settings: StudioSettings, user_id: str, image_id: str
+    settings: StudioSettings,
+    user_id: str,
+    image_id: str,
+    *,
+    kb_index: KnowledgeBaseIndex | None = None,
 ) -> ResolvedImage:
     uid = validate_user_id(user_id)
     cleaned_id = validate_image_id(image_id)
@@ -400,6 +415,38 @@ def resolve_image(
         if not uploads:
             raise ValueError("No uploaded images found for current user")
         return uploads[0]
+
+    # 匹配只读知识库资产编号 kb_<16位小写十六进制>
+    if cleaned_id.startswith("kb_"):
+        kb_match = KB_ID_RE.fullmatch(cleaned_id)
+        if kb_match is None:
+            raise ValueError(f"Invalid library asset ID format: {cleaned_id}")
+        asset_id = kb_match.group(1)
+        kb_root = Path(settings.kb_root)
+        if kb_root.is_symlink() or not kb_root.is_dir():
+            raise ValueError(f"Library asset not found: {cleaned_id}")
+        active_kb = kb_index if kb_index is not None else load_kb_index(kb_root)
+        kb_rec = active_kb.get(asset_id)
+        if kb_rec is None:
+            raise ValueError(f"Library asset not found: {cleaned_id}")
+        ref_path = kb_root / "assets" / "ref2048" / f"{asset_id}.jpg"
+        if ref_path.is_symlink() or not ref_path.is_file():
+            raise ValueError(f"Library asset file not found: {cleaned_id}")
+        ensure_safe_subpath(ref_path, kb_root)
+        stat_info = ref_path.stat(follow_symlinks=False)
+        width, height = _read_image_dimensions(ref_path, kb_root)
+        return ResolvedImage(
+            id=cleaned_id,
+            kind="library",
+            path=ref_path.resolve(strict=True),
+            created=_format_mtime_ns(stat_info.st_mtime_ns),
+            mtime_ns=stat_info.st_mtime_ns,
+            width=width,
+            height=height,
+            warning=kb_rec.is_flagged,
+            warning_reasons=kb_rec.exclusion_flags,
+            material_ids=kb_rec.material_ids,
+        )
 
     # 优先匹配工作台原图编号 img_<hex>
     if cleaned_id.startswith("img_"):
@@ -423,9 +470,7 @@ def resolve_image(
                     original_path = job_dir / original_name
                     ensure_safe_subpath(original_path, studio_dir)
                     stat_info = original_path.stat(follow_symlinks=False)
-                    width, height = _read_image_dimensions(
-                        original_path, studio_dir
-                    )
+                    width, height = _read_image_dimensions(original_path, studio_dir)
                     return ResolvedImage(
                         id=cleaned_id,
                         kind="studio",
