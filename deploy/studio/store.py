@@ -208,6 +208,19 @@ def allocate_studio_job(settings: StudioSettings, user_id: str) -> tuple[str, Pa
     return image_id, job_dir
 
 
+# 为单次三维模型生成分配唯一编号与专属目录
+def allocate_model_job(settings: StudioSettings, user_id: str) -> tuple[str, Path]:
+    user_dir = user_studio_dir(settings, user_id, create=True)
+    models_dir = user_dir / "models"
+    if models_dir.exists() and models_dir.is_symlink():
+        raise ValueError("User models directory must not be a symlink")
+    models_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
+    model_id = f"mdl_{uuid.uuid4().hex}"
+    model_dir = models_dir / model_id
+    model_dir.mkdir(parents=False, mode=0o700, exist_ok=False)
+    return model_id, model_dir
+
+
 # 解析LibreChat图片文件名中的UUID file_id与类型（仅接受<uuid>__或<uuid>-前缀）
 def _parse_librechat_filename(filename: str) -> tuple[str, str] | None:
     lower = filename.lower()
@@ -234,7 +247,7 @@ def _write_receipt_atomic(directory: Path, values: dict[str, Any]) -> None:
     os.replace(temporary, target)
 
 
-# 启动时扫描所有用户的任务目录，将残留的pending状态凭据标记为uncertain
+# 启动时扫描所有用户的图像与三维模型目录，将残留的未完成凭据标记为uncertain
 def reconcile_pending_receipts(settings: StudioSettings) -> int:
     base = Path(settings.data_dir)
     if not base.exists() or base.is_symlink() or not base.is_dir():
@@ -251,35 +264,43 @@ def reconcile_pending_receipts(settings: StudioSettings) -> int:
             or not USER_ID_RE.fullmatch(user_dir.name)
         ):
             continue
-        jobs_dir = user_dir / "jobs"
-        if not jobs_dir.exists() or jobs_dir.is_symlink() or not jobs_dir.is_dir():
-            continue
-        for job_dir in jobs_dir.iterdir():
+        for subdir_name, prefix, pending_states in (
+            ("jobs", "img_", ("pending",)),
+            ("models", "mdl_", ("pending", "running")),
+        ):
+            category_dir = user_dir / subdir_name
             if (
-                job_dir.is_symlink()
-                or not job_dir.is_dir()
-                or not job_dir.name.startswith("img_")
+                not category_dir.exists()
+                or category_dir.is_symlink()
+                or not category_dir.is_dir()
             ):
                 continue
-            receipt_file = job_dir / "receipt.json"
-            if receipt_file.is_symlink() or not receipt_file.is_file():
-                continue
-            try:
-                ensure_safe_subpath(receipt_file, user_dir)
-                receipt_data = json.loads(
-                    read_bytes_no_follow(receipt_file, user_dir).decode("utf-8")
-                )
+            for item_dir in category_dir.iterdir():
                 if (
-                    not isinstance(receipt_data, dict)
-                    or receipt_data.get("state") != "pending"
+                    item_dir.is_symlink()
+                    or not item_dir.is_dir()
+                    or not item_dir.name.startswith(prefix)
                 ):
                     continue
-                receipt_data["state"] = "uncertain"
-                receipt_data["finished"] = now
-                _write_receipt_atomic(job_dir, receipt_data)
-                reconciled_count += 1
-            except (OSError, ValueError, TypeError, json.JSONDecodeError):
-                continue
+                receipt_file = item_dir / "receipt.json"
+                if receipt_file.is_symlink() or not receipt_file.is_file():
+                    continue
+                try:
+                    ensure_safe_subpath(receipt_file, user_dir)
+                    receipt_data = json.loads(
+                        read_bytes_no_follow(receipt_file, user_dir).decode("utf-8")
+                    )
+                    if (
+                        not isinstance(receipt_data, dict)
+                        or receipt_data.get("state") not in pending_states
+                    ):
+                        continue
+                    receipt_data["state"] = "uncertain"
+                    receipt_data["finished"] = now
+                    _write_receipt_atomic(item_dir, receipt_data)
+                    reconciled_count += 1
+                except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                    continue
     return reconciled_count
 
 

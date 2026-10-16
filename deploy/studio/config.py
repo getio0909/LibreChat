@@ -6,7 +6,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 # 默认密钥配置文件路径、规则数据目录与共享令牌64位十六进制正则
 DEFAULT_SETTINGS_PATH = Path("/run/secrets/studio.json")
@@ -47,30 +47,52 @@ class StudioSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     shared_token: str
+    file_signing_key: str
+    public_base_url: str = "https://dev.xuqian.io"
+    file_token_ttl_seconds: int = Field(default=86400, ge=60, le=604800)
     gemini_api_key: str
     ark_api_key: str
     seedream_model: str = "doubao-seedream-5-0-pro-260628"
+    seed3d_model: str = "doubao-seed3d-2-0-260328"
     planner_model: str = "gemini-4-argon"
     planner_thinking_level: str = "HIGH"
     max_parallel_per_user: int = Field(default=3, ge=1, le=10)
     global_max_parallel: int = Field(default=12, ge=1, le=64)
+    seed3d_max_parallel: int = Field(default=5, ge=1, le=32)
     seedream_timeout_seconds: int = Field(default=240, ge=5, le=600)
     planner_timeout_seconds: int = Field(default=540, ge=5, le=600)
+    seed3d_poll_timeout_seconds: float = Field(default=480.0, gt=0.0, le=600.0)
+    seed3d_poll_initial_seconds: float = Field(default=2.0, gt=0.0, le=60.0)
+    seed3d_poll_max_interval_seconds: float = Field(default=15.0, gt=0.0, le=60.0)
+    seed3d_background_timeout_seconds: float = Field(default=1800.0, gt=0.0, le=3600.0)
     librechat_images_dir: Path = Path("/librechat/images")
     data_dir: Path = Path("/data")
     kb_root: Path = Path("/kb")
     ark_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
 
-    # 校验shared_token必须为64位十六进制字符串
-    @field_validator("shared_token")
+    # 校验shared_token与file_signing_key必须为64位十六进制字符串
+    @field_validator("shared_token", "file_signing_key")
     @classmethod
-    def _validate_shared_token(cls, value: str) -> str:
+    def _validate_hex_64_key(cls, value: str, info: ValidationInfo) -> str:
         cleaned = value.strip()
         if not SHARED_TOKEN_RE.fullmatch(cleaned):
             raise ValueError(
-                "shared_token must be an exact 64-character hexadecimal string"
+                f"{info.field_name} must be an exact 64-character hexadecimal string"
             )
+        return cleaned
+
+    # 校验public_base_url为合法的HTTP/HTTPS基础地址并移除末尾斜杠
+    @field_validator("public_base_url")
+    @classmethod
+    def _validate_public_base_url(cls, value: str) -> str:
+        cleaned = value.strip().rstrip("/")
+        if (
+            not cleaned
+            or any(ch.isspace() for ch in cleaned)
+            or not cleaned.startswith(("https://", "http://"))
+        ):
+            raise ValueError("public_base_url must be a valid http(s) base URL")
         return cleaned
 
     # 校验API密钥不包含空白字符且非空

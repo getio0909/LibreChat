@@ -23,11 +23,19 @@ from deploy.studio.images import (
     source_dimensions,
 )
 from deploy.studio.kb import load_kb_index
+from deploy.studio.models3d import (
+    build_seed3d_create_payload,
+    extract_glb_bytes,
+    parse_seed3d_create_response,
+    parse_seed3d_query_response,
+    sign_file_token,
+)
 from deploy.studio.planner import build_planner_system_prompt, plan_concepts
 from deploy.studio.store import list_user_images, resolve_image
 
 # 测试固定常量定义
 VALID_TOKEN = "a" * 64
+VALID_SIGNING_KEY = "f" * 64
 USER_A = "65f00000000000000000000a"
 USER_B = "65f00000000000000000000b"
 FIXTURE_KB_TEMPLATE = Path(__file__).resolve().parent / "fixtures" / "kb"
@@ -91,11 +99,15 @@ def studio_env(tmp_path: Path) -> StudioSettings:
     secret_file = tmp_path / "studio.json"
     secret_data = {
         "shared_token": VALID_TOKEN,
+        "file_signing_key": VALID_SIGNING_KEY,
+        "public_base_url": "https://dev.xuqian.io",
         "gemini_api_key": "test-gemini-key-no-spaces",
         "ark_api_key": "test-ark-key-no-spaces",
         "librechat_images_dir": str(lc_dir),
         "data_dir": str(data_dir),
         "kb_root": str(kb_dir),
+        "seed3d_poll_initial_seconds": 0.01,
+        "seed3d_poll_max_interval_seconds": 0.02,
     }
     secret_file.write_text(json.dumps(secret_data), encoding="utf-8")
     secret_file.chmod(0o600)
@@ -109,6 +121,7 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
         json.dumps(
             {
                 "shared_token": VALID_TOKEN,
+                "file_signing_key": VALID_SIGNING_KEY,
                 "gemini_api_key": "gkey",
                 "ark_api_key": "akey",
             }
@@ -122,9 +135,13 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
     secret_file.chmod(0o600)
     loaded = load_settings(secret_file)
     assert loaded.seedream_model == "doubao-seedream-5-0-pro-260628"
+    assert loaded.seed3d_model == "doubao-seed3d-2-0-260328"
     assert loaded.planner_model == "gemini-4-argon"
     assert loaded.planner_thinking_level == "HIGH"
     assert loaded.max_parallel_per_user == 3
+    assert loaded.seed3d_max_parallel == 5
+    assert loaded.public_base_url == "https://dev.xuqian.io"
+    assert loaded.file_token_ttl_seconds == 86400
     assert loaded.seedream_timeout_seconds == 240
     assert loaded.planner_timeout_seconds == 540
     assert loaded.kb_root == Path("/kb")
@@ -669,7 +686,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
         ):
             assert app.state.session_manager is not None
             assert getattr(app.state.session_manager, "_task_group", None) is not None
-            # 1. 验证tools/list返回恰好6个工具且Schema完全扁平
+            # 1. 验证tools/list返回恰好8个工具且Schema完全扁平
             list_res = await client.post(
                 "/mcp",
                 headers=headers,
@@ -684,12 +701,16 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 "list_images",
                 "search_library",
                 "compare_materials",
+                "create_3d_model",
+                "check_3d_model",
             ]
             for tool in tools:
                 _assert_flat_schema(tool["inputSchema"])
                 serialized = json.dumps(tool, ensure_ascii=False).casefold()
                 for forbidden_vendor in (
                     "seedream",
+                    "seed3d",
+                    "volcengine",
                     "doubao",
                     "ark",
                     "gemini",
@@ -1555,15 +1576,17 @@ def test_planner_instructions_consistent_for_counts_1_to_3(
     asyncio.run(_run())
 
 
-# 校验StudioSettings拒绝过短、过长或非十六进制的shared_token，仅接受64位十六进制字符串
+# 校验StudioSettings拒绝过短、过长或非十六进制的shared_token与file_signing_key，仅接受64位十六进制字符串
 def test_shared_token_64_hex_validation() -> None:
     valid_hex = "0123456789abcdefABCDEF0123456789abcdefABCDEF0123456789abcdefABCD"
     s = StudioSettings(
         shared_token=valid_hex,
+        file_signing_key=valid_hex,
         gemini_api_key="test-gemini-key",
         ark_api_key="test-ark-key",
     )
     assert s.shared_token == valid_hex
+    assert s.file_signing_key == valid_hex
 
     for invalid_token in (
         "x",
@@ -1576,6 +1599,14 @@ def test_shared_token_64_hex_validation() -> None:
         with pytest.raises(ValueError, match="64-character hexadecimal"):
             StudioSettings(
                 shared_token=invalid_token,
+                file_signing_key=valid_hex,
+                gemini_api_key="test-gemini-key",
+                ark_api_key="test-ark-key",
+            )
+        with pytest.raises(ValueError, match="64-character hexadecimal"):
+            StudioSettings(
+                shared_token=valid_hex,
+                file_signing_key=invalid_token,
                 gemini_api_key="test-gemini-key",
                 ark_api_key="test-ark-key",
             )
@@ -2206,3 +2237,762 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
             assert len(payload["warnings"]) == 1
 
     asyncio.run(_run_partial())
+
+
+# 构造最小合法GLB二进制字节或包含该GLB的ZIP压缩包字节
+def _make_glb_bytes(extra_payload: bytes = b"TEST_MESH_DATA_0123456789ABCDEF") -> bytes:
+    header = b"glTF" + (2).to_bytes(4, "little")
+    total_len = (12 + len(extra_payload)).to_bytes(4, "little")
+    return header + total_len + extra_payload
+
+
+# 将GLB字节封装为ZIP压缩包字节（模拟方舟3D生成任务返回的压缩包结构）
+def _make_zip_with_glb(glb_bytes: bytes, entry_name: str = "output/mesh.glb") -> bytes:
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(entry_name, glb_bytes)
+        zf.writestr("output/preview.txt", b"preview metadata")
+    return buf.getvalue()
+
+
+# 校验Seed3D请求构造、响应解析与GLB/ZIP字节提取适配器
+def test_seed3d_adapters_and_glb_extraction() -> None:
+    payload_std, sub_std, faces_std = build_seed3d_create_payload(
+        model="doubao-seed3d-2-0-260328",
+        image_data_uri="data:image/jpeg;base64,AAAA",
+        detail="standard",
+    )
+    assert sub_std == "low"
+    assert faces_std == 100_000
+    assert payload_std == {
+        "model": "doubao-seed3d-2-0-260328",
+        "content": [
+            {
+                "type": "text",
+                "text": "--subdivisionlevel low --fileformat glb",
+            },
+            {
+                "type": "image_url",
+                "image_url": {"url": "data:image/jpeg;base64,AAAA"},
+            },
+        ],
+    }
+
+    payload_high, sub_high, faces_high = build_seed3d_create_payload(
+        model="doubao-seed3d-2-0-260328",
+        image_data_uri="data:image/jpeg;base64,BBBB",
+        detail="high",
+    )
+    assert sub_high == "medium"
+    assert faces_high == 500_000
+    assert (
+        payload_high["content"][0]["text"]
+        == "--subdivisionlevel medium --fileformat glb"
+    )
+
+    with pytest.raises(ValueError, match="detail must be 'standard' or 'high'"):
+        build_seed3d_create_payload(
+            model="doubao-seed3d-2-0-260328",
+            image_data_uri="data:image/jpeg;base64,AAAA",
+            detail="ultra",
+        )
+
+    assert (
+        parse_seed3d_create_response({"id": "cgt-20261016-001"}) == "cgt-20261016-001"
+    )
+    with pytest.raises(RuntimeError, match="missing required task id field"):
+        parse_seed3d_create_response({"id": ""})
+
+    q_running = parse_seed3d_query_response({"id": "cgt-1", "status": "running"})
+    assert q_running == {"status": "running"}
+
+    q_ok = parse_seed3d_query_response(
+        {
+            "id": "cgt-1",
+            "status": "succeeded",
+            "content": {"file_url": "https://cdn.example.test/out.zip"},
+        }
+    )
+    assert q_ok == {
+        "status": "succeeded",
+        "file_url": "https://cdn.example.test/out.zip",
+    }
+
+    q_fail = parse_seed3d_query_response(
+        {
+            "id": "cgt-1",
+            "status": "failed",
+            "error": {"code": "InvalidImage", "message": "unusable subject"},
+        }
+    )
+    assert q_fail["status"] == "failed"
+    assert q_fail["error_code"] == "InvalidImage"
+
+    with pytest.raises(RuntimeError, match="missing valid content.file_url"):
+        parse_seed3d_query_response(
+            {"id": "cgt-1", "status": "succeeded", "content": {}}
+        )
+
+    raw_glb = _make_glb_bytes()
+    assert extract_glb_bytes(raw_glb) == raw_glb
+    zipped_glb = _make_zip_with_glb(raw_glb)
+    assert extract_glb_bytes(zipped_glb) == raw_glb
+    with pytest.raises(
+        RuntimeError,
+        match="neither a valid GLB binary nor a ZIP archive",
+    ):
+        extract_glb_bytes(b"not-a-glb-or-zip")
+
+
+# 校验create_3d_model端到端成功流程（标准100k与高精度500k、直出GLB与ZIP内嵌GLB）、MCP UI资源与无密钥/厂商泄露
+def test_create_3d_model_success_ui_resource_and_no_secret_leak(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    upload_id = "dddddddd-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__censer.jpg").write_bytes(
+        _make_image_bytes(180, 140, color=(150, 120, 90), fmt="JPEG")
+    )
+
+    raw_glb = _make_glb_bytes(b"CENSER_GLB_BINARY_PAYLOAD_BLOCKS_0123456789")
+    zipped_glb = _make_zip_with_glb(raw_glb)
+    create_payloads: list[dict[str, Any]] = []
+    poll_counts: dict[str, int] = {}
+
+    async def _seed3d_handler(request: httpx.Request) -> httpx.Response:
+        if (
+            request.method == "POST"
+            and request.url.path == "/api/v3/contents/generations/tasks"
+        ):
+            body = json.loads(request.content.decode("utf-8"))
+            create_payloads.append(body)
+            task_id = f"cgt-task-{len(create_payloads)}"
+            poll_counts[task_id] = 0
+            return httpx.Response(200, json={"id": task_id})
+
+        if request.method == "GET" and request.url.path.startswith(
+            "/api/v3/contents/generations/tasks/"
+        ):
+            task_id = request.url.path.rsplit("/", 1)[-1]
+            poll_counts[task_id] = poll_counts.get(task_id, 0) + 1
+            if poll_counts[task_id] == 1:
+                return httpx.Response(200, json={"id": task_id, "status": "queued"})
+            if poll_counts[task_id] == 2:
+                return httpx.Response(200, json={"id": task_id, "status": "running"})
+            ext = "zip" if task_id.endswith("-1") else "glb"
+            return httpx.Response(
+                200,
+                json={
+                    "id": task_id,
+                    "status": "succeeded",
+                    "content": {
+                        "file_url": f"https://tos.example.test/models/{task_id}.{ext}"
+                    },
+                },
+            )
+
+        if request.method == "GET" and request.url.host == "tos.example.test":
+            if request.url.path.endswith(".zip"):
+                return httpx.Response(200, content=zipped_glb)
+            return httpx.Response(200, content=raw_glb)
+
+        return httpx.Response(404)
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_seed3d_handler),
+    )
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            # 1. 标准精度（100k faces / low）+ ZIP内嵌GLB解包
+            res_std = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 401,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {
+                            "image_id": upload_id,
+                            "detail": "standard",
+                            "note": "三足石雕香炉三维预览",
+                        },
+                    },
+                },
+            )
+            assert res_std.status_code == 200
+            result_std = res_std.json()["result"]
+            assert result_std.get("isError") is False
+            blocks = result_std["content"]
+            assert len(blocks) == 3
+            assert blocks[0]["type"] == "text"
+            assert blocks[1]["type"] == "resource"
+            assert blocks[2]["type"] == "image"
+
+            meta = json.loads(blocks[0]["text"])
+            model_id = meta["model_id"]
+            assert model_id.startswith("mdl_")
+            assert meta["state"] == "saved"
+            assert meta["detail"] == "standard"
+            assert meta["faces"] == 100_000
+            assert meta["file_size"] == len(raw_glb)
+            assert meta["source_image_id"] == upload_id
+            assert meta["download_url"].startswith(
+                "https://dev.xuqian.io/studio-files/"
+            )
+            assert "visual" in meta["disclaimer"].casefold()
+            assert "not a manufacturing" in meta["disclaimer"].casefold()
+
+            # 校验UI Resource结构、签名URL嵌入、Three.js 0.170.0固定版本、交互控件与无密钥/厂商泄露
+            ui_res = blocks[1]["resource"]
+            assert ui_res["uri"] == f"ui://zyb_studio/model/{model_id}"
+            assert ui_res["mimeType"] == "text/html"
+            html_text = ui_res["text"]
+            assert meta["download_url"] in html_text
+            assert "three@0.170.0" in html_text
+            assert "OrbitControls" in html_text
+            assert "RoomEnvironment" in html_text
+            assert "ui-size-change" in html_text
+            assert "仅供视觉预览（非工程制造模型）" in html_text
+            for secret_or_vendor in (
+                VALID_TOKEN,
+                VALID_SIGNING_KEY,
+                studio_env.ark_api_key,
+                studio_env.gemini_api_key,
+                "seed3d",
+                "volcengine",
+                "doubao",
+                "seedream",
+                "gemini",
+                "argon",
+            ):
+                assert secret_or_vendor not in html_text.casefold()
+                assert secret_or_vendor not in blocks[0]["text"].casefold()
+
+            # 校验落盘GLB与receipt权限均为0600
+            model_dir = studio_env.data_dir / "users" / USER_A / "models" / model_id
+            glb_file = model_dir / "model.glb"
+            receipt_file = model_dir / "receipt.json"
+            assert glb_file.read_bytes() == raw_glb
+            assert (glb_file.stat().st_mode & 0o777) == 0o600
+            assert (receipt_file.stat().st_mode & 0o777) == 0o600
+
+            # 2. 高精度（500k faces / medium）+ 知识库图片kb_<id>
+            res_high = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 402,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {
+                            "image_id": "kb_5555555555555551",
+                            "detail": "high",
+                        },
+                    },
+                },
+            )
+            assert res_high.status_code == 200
+            result_high = res_high.json()["result"]
+            assert result_high.get("isError") is False
+            meta_high = json.loads(result_high["content"][0]["text"])
+            assert meta_high["detail"] == "high"
+            assert meta_high["faces"] == 500_000
+            assert (
+                create_payloads[0]["content"][0]["text"]
+                == "三足石雕香炉三维预览 --subdivisionlevel low --fileformat glb"
+            )
+            assert (
+                create_payloads[1]["content"][0]["text"]
+                == "--subdivisionlevel medium --fileformat glb"
+            )
+
+    asyncio.run(_run())
+
+
+# 校验GET /files/<token>签名校验、过期、篡改、跨用户隔离、目录枚举404、Range分片与仅在该路由返回CORS头
+def test_signed_file_endpoint_auth_expiry_tamper_cross_user_range_and_cors(
+    studio_env: StudioSettings,
+) -> None:
+    model_id = "mdl_0123456789abcdef0123456789abcdef"
+    model_dir = studio_env.data_dir / "users" / USER_A / "models" / model_id
+    model_dir.mkdir(parents=True, mode=0o700)
+    glb_bytes = _make_glb_bytes(
+        b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_RANGE_TEST_BYTES"
+    )
+    (model_dir / "model.glb").write_bytes(glb_bytes)
+    (model_dir / "model.glb").chmod(0o600)
+    (model_dir / "receipt.json").write_text(
+        json.dumps(
+            {
+                "state": "saved",
+                "user_id": USER_A,
+                "model_id": model_id,
+                "file": "model.glb",
+                "bytes": len(glb_bytes),
+            }
+        ),
+        encoding="utf-8",
+    )
+    (model_dir / "receipt.json").chmod(0o600)
+
+    valid_tok, _ = sign_file_token(
+        studio_env,
+        USER_A,
+        model_id,
+        expires_at=1_700_003_600,
+    )
+    expired_tok, _ = sign_file_token(
+        studio_env,
+        USER_A,
+        model_id,
+        expires_at=1_699_999_940,
+    )
+    other_user_tok, _ = sign_file_token(
+        studio_env,
+        USER_B,
+        model_id,
+        expires_at=1_700_003_600,
+    )
+    missing_model_tok, _ = sign_file_token(
+        studio_env,
+        USER_A,
+        "mdl_ffffffffffffffffffffffffffffffff",
+        expires_at=1_700_003_600,
+    )
+    payload_part, sig_part = valid_tok.split(".", 1)
+    tampered_sig_tok = f"{payload_part}.{'0' * 64}"
+    tampered_payload_tok = f"e30.{sig_part}"
+
+    import deploy.studio.models3d as models3d_mod
+
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            orig_time = models3d_mod.time.time
+            models3d_mod.time.time = lambda: 1_700_000_010.0
+            try:
+                # 1. 合法签名URL下载完整GLB，验证Content-Type、Accept-Ranges与CORS头
+                res_ok = await client.get(f"/files/{valid_tok}")
+                assert res_ok.status_code == 200
+                assert res_ok.content == glb_bytes
+                assert res_ok.headers["content-type"] == "model/gltf-binary"
+                assert res_ok.headers["accept-ranges"] == "bytes"
+                assert res_ok.headers["access-control-allow-origin"] == "*"
+                assert int(res_ok.headers["content-length"]) == len(glb_bytes)
+
+                # 2. HEAD与OPTIONS请求支持
+                res_head = await client.head(f"/files/{valid_tok}")
+                assert res_head.status_code == 200
+                assert res_head.content == b""
+                assert res_head.headers["access-control-allow-origin"] == "*"
+
+                res_opt = await client.options(f"/files/{valid_tok}")
+                assert res_opt.status_code == 204
+                assert res_opt.headers["access-control-allow-origin"] == "*"
+                assert "Range" in res_opt.headers["access-control-allow-headers"]
+
+                # 3. Range请求支持（前缀区间、开放区间、后缀区间及非法Range 416）
+                res_r1 = await client.get(
+                    f"/files/{valid_tok}", headers={"Range": "bytes=0-15"}
+                )
+                assert res_r1.status_code == 206
+                assert res_r1.content == glb_bytes[:16]
+                assert res_r1.headers["content-range"] == f"bytes 0-15/{len(glb_bytes)}"
+                assert res_r1.headers["access-control-allow-origin"] == "*"
+
+                res_r2 = await client.get(
+                    f"/files/{valid_tok}", headers={"Range": "bytes=20-"}
+                )
+                assert res_r2.status_code == 206
+                assert res_r2.content == glb_bytes[20:]
+                assert (
+                    res_r2.headers["content-range"]
+                    == f"bytes 20-{len(glb_bytes) - 1}/{len(glb_bytes)}"
+                )
+
+                res_r3 = await client.get(
+                    f"/files/{valid_tok}", headers={"Range": "bytes=-12"}
+                )
+                assert res_r3.status_code == 206
+                assert res_r3.content == glb_bytes[-12:]
+
+                for bad_range in ("bytes=9999-10000", "bytes=30-10", "items=0-5"):
+                    res_416 = await client.get(
+                        f"/files/{valid_tok}", headers={"Range": bad_range}
+                    )
+                    assert res_416.status_code == 416
+                    assert (
+                        res_416.headers["content-range"] == f"bytes */{len(glb_bytes)}"
+                    )
+                    assert res_416.headers["access-control-allow-origin"] == "*"
+
+                # 4. 过期令牌、篡改令牌、跨用户令牌、不存在模型及目录枚举一律返回404
+                for bad_path in (
+                    f"/files/{expired_tok}",
+                    f"/files/{tampered_sig_tok}",
+                    f"/files/{tampered_payload_tok}",
+                    f"/files/{other_user_tok}",
+                    f"/files/{missing_model_tok}",
+                    "/files/not-a-valid-token",
+                    "/files/a/b",
+                    "/files",
+                    "/files/",
+                ):
+                    res_404 = await client.get(bad_path)
+                    assert res_404.status_code == 404, (
+                        f"Expected 404 for {bad_path}, got {res_404.status_code}"
+                    )
+
+                # 5. 验证Access-Control-Allow-Origin: * 仅出现在/files路由，不出现在/health或/mcp
+                res_health = await client.get("/health")
+                assert "access-control-allow-origin" not in res_health.headers
+                res_mcp = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 499,
+                        "method": "tools/list",
+                        "params": {},
+                    },
+                )
+                assert "access-control-allow-origin" not in res_mcp.headers
+            finally:
+                models3d_mod.time.time = orig_time
+
+    asyncio.run(_run())
+
+
+# 校验Seed3D上游失败、超时转uncertain不自动重提、后台继续轮询返回job_id与check_3d_model恢复
+def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    upload_id = "eeeeeeee-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__pagoda.jpg").write_bytes(
+        _make_image_bytes(160, 160, fmt="JPEG")
+    )
+    raw_glb = _make_glb_bytes(b"PAGODA_GLB_MODEL")
+
+    # 1. 上游任务返回status="failed"时记录failed且不自动重试
+    failed_create_calls = 0
+
+    async def _failed_task_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal failed_create_calls
+        if request.method == "POST":
+            failed_create_calls += 1
+            return httpx.Response(200, json={"id": "cgt-fail-1"})
+        return httpx.Response(
+            200,
+            json={
+                "id": "cgt-fail-1",
+                "status": "failed",
+                "error": {"code": "MeshFailed", "message": "failed to reconstruct"},
+            },
+        )
+
+    app_fail = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_failed_task_handler),
+    )
+
+    # 2. 创建任务请求超时（已发出POST但未收到响应） -> 转为uncertain且绝不自动重新提交
+    timeout_create_calls = 0
+
+    async def _timeout_create_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal timeout_create_calls
+        timeout_create_calls += 1
+        raise httpx.ReadTimeout("timeout after POST create-task")
+
+    app_uncertain = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_timeout_create_handler),
+    )
+
+    # 3. 首次工具调用轮询窗口超时后返回job_id并在后台继续轮询，随后通过check_3d_model获取完成结果
+    slow_polls = 0
+    release_slow_task = asyncio.Event()
+
+    async def _slow_task_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal slow_polls
+        if request.method == "POST":
+            return httpx.Response(200, json={"id": "cgt-slow-1"})
+        if request.url.path.endswith("/cgt-slow-1"):
+            slow_polls += 1
+            if not release_slow_task.is_set():
+                return httpx.Response(
+                    200, json={"id": "cgt-slow-1", "status": "running"}
+                )
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-slow-1",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/slow.glb"},
+                },
+            )
+        if request.url.host == "tos.example.test":
+            return httpx.Response(200, content=raw_glb)
+        return httpx.Response(404)
+
+    short_poll_settings = studio_env.model_copy(
+        update={
+            "seed3d_poll_timeout_seconds": 0.03,
+            "seed3d_poll_initial_seconds": 0.01,
+            "seed3d_poll_max_interval_seconds": 0.01,
+        }
+    )
+    app_slow = create_app(
+        settings=short_poll_settings,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_slow_task_handler),
+    )
+
+    async def _run() -> None:
+        # 验证1：上游failed
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app_fail), base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 501,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            result = res.json()["result"]
+            assert result["isError"] is True
+            assert failed_create_calls == 1
+
+        # 验证2：POST超时转uncertain且不重提
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app_uncertain),
+            base_url="http://studio:8000",
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 502,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            result = res.json()["result"]
+            assert result["isError"] is True
+            err_payload = json.loads(result["content"][0]["text"])
+            assert err_payload["state"] == "uncertain"
+            assert "may have been billed" in err_payload["error"]
+            assert timeout_create_calls == 1
+
+        # 验证3：窗口超时返回job_id + 后台轮询完成 + check_3d_model获取结果与跨用户隔离
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app_slow), base_url="http://studio:8000"
+        ) as client:
+            res_create = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 503,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": upload_id, "detail": "standard"},
+                    },
+                },
+            )
+            result_create = res_create.json()["result"]
+            assert result_create.get("isError") is False
+            pending_meta = json.loads(result_create["content"][0]["text"])
+            assert pending_meta["state"] == "running"
+            job_id = pending_meta["job_id"]
+            assert job_id.startswith("mdl_")
+
+            # 用户B不能查询用户A的job_id
+            res_other = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_B},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 504,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            assert res_other.json()["result"]["isError"] is True
+
+            # 放行后台轮询任务并调用check_3d_model等待完成
+            release_slow_task.set()
+            await asyncio.sleep(0.05)
+            res_check = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 505,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "check_3d_model",
+                        "arguments": {"job_id": job_id},
+                    },
+                },
+            )
+            result_check = res_check.json()["result"]
+            assert result_check.get("isError") is False
+            check_blocks = result_check["content"]
+            assert len(check_blocks) == 3
+            check_meta = json.loads(check_blocks[0]["text"])
+            assert check_meta["model_id"] == job_id
+            assert check_meta["state"] == "saved"
+            assert check_blocks[1]["type"] == "resource"
+            assert check_blocks[2]["type"] == "image"
+
+        # 验证4：进程重启时残留的running/pending模型receipt在create_app启动时被标记为uncertain
+        abandoned_model_dir = (
+            studio_env.data_dir
+            / "users"
+            / USER_A
+            / "models"
+            / "mdl_abandoned0123456789abcdef012345"
+        )
+        abandoned_model_dir.mkdir(parents=True, mode=0o700)
+        (abandoned_model_dir / "receipt.json").write_text(
+            json.dumps({"state": "running", "task_id": "cgt-abandoned"}),
+            encoding="utf-8",
+        )
+        create_app(settings=studio_env, rules=load_rules())
+        reconciled = json.loads(
+            (abandoned_model_dir / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert reconciled["state"] == "uncertain"
+
+    asyncio.run(_run())
+
+
+# 校验Seed3D与每用户并发限制器共享配额且受全局seed3d_max_parallel约束
+def test_seed3d_per_user_and_global_concurrency_limits(
+    studio_env: StudioSettings,
+) -> None:
+    user_c = "65f00000000000000000000c"
+    for uid in (USER_A, USER_B, user_c):
+        ulc = studio_env.librechat_images_dir / uid
+        ulc.mkdir(parents=True, mode=0o700)
+        (ulc / "11111111-1111-1111-1111-111111111111__src.jpg").write_bytes(
+            _make_image_bytes(64, 64, fmt="JPEG")
+        )
+
+    capped = studio_env.model_copy(
+        update={"max_parallel_per_user": 2, "seed3d_max_parallel": 3}
+    )
+    raw_glb = _make_glb_bytes()
+    active_seed3d = 0
+    max_seed3d_observed = 0
+    task_seq = 0
+
+    async def _concurrency_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal active_seed3d, max_seed3d_observed, task_seq
+        if request.method == "POST":
+            task_seq += 1
+            active_seed3d += 1
+            max_seed3d_observed = max(max_seed3d_observed, active_seed3d)
+            await asyncio.sleep(0.04)
+            active_seed3d -= 1
+            return httpx.Response(200, json={"id": f"cgt-conc-{task_seq}"})
+        if request.url.path.startswith("/api/v3/contents/generations/tasks/"):
+            tid = request.url.path.rsplit("/", 1)[-1]
+            return httpx.Response(
+                200,
+                json={
+                    "id": tid,
+                    "status": "succeeded",
+                    "content": {"file_url": f"https://tos.example.test/{tid}.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    app = create_app(
+        settings=capped,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_concurrency_handler),
+    )
+
+    async def _call_3d(client: httpx.AsyncClient, uid: str, req_id: int) -> None:
+        res = await client.post(
+            "/mcp",
+            headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": uid},
+            json={
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "method": "tools/call",
+                "params": {
+                    "name": "create_3d_model",
+                    "arguments": {
+                        "image_id": "11111111-1111-1111-1111-111111111111",
+                        "detail": "standard",
+                    },
+                },
+            },
+        )
+        assert res.status_code == 200
+        assert res.json()["result"]["isError"] is False
+
+    async def _run() -> None:
+        nonlocal max_seed3d_observed
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 单用户发起4个并发请求，受max_parallel_per_user=2限制
+            max_seed3d_observed = 0
+            await asyncio.gather(*(_call_3d(client, USER_A, i) for i in range(1, 5)))
+            assert max_seed3d_observed == 2
+
+            # 三用户各发起2个并发请求（共6个），受seed3d_max_parallel=3限制
+            max_seed3d_observed = 0
+            await asyncio.gather(
+                _call_3d(client, USER_A, 11),
+                _call_3d(client, USER_A, 12),
+                _call_3d(client, USER_B, 13),
+                _call_3d(client, USER_B, 14),
+                _call_3d(client, user_c, 15),
+                _call_3d(client, user_c, 16),
+            )
+            assert max_seed3d_observed == 3
+
+    asyncio.run(_run())
