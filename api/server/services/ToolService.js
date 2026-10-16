@@ -1615,6 +1615,18 @@ async function loadToolDefinitionsWrapper({
         dynamicToolContextMap.gemini_image_gen = toolContext;
       }
     }
+
+    // 当挂载了 MCP 服务且存在图片文件时，注入图片 ID 与文件名供 MCP 工具引用
+    if (hasFilteredMCPTools) {
+      const toolContext = buildImageToolContext({
+        imageFiles,
+        toolName: 'MCP image tools',
+        contextDescription: 'MCP tools',
+      });
+      if (toolContext) {
+        dynamicToolContextMap.mcp_image_context = toolContext;
+      }
+    }
   }
 
   approvalMetadata.attach(toolDefinitions);
@@ -1874,6 +1886,19 @@ async function loadAgentTools({
     fileStrategy: appConfig.fileStrategy,
     imageOutputType: appConfig.imageOutputType,
   });
+
+  // 当非仅定义模式同样挂载了 MCP 服务且存在图片文件时，补充注入图片上下文
+  const runtimeImageFiles = tool_resources?.[EToolResources.image_edit]?.files ?? [];
+  if (mcpServerContext && runtimeImageFiles.length > 0 && dynamicToolContextMap) {
+    const toolContext = buildImageToolContext({
+      imageFiles: runtimeImageFiles,
+      toolName: 'MCP image tools',
+      contextDescription: 'MCP tools',
+    });
+    if (toolContext) {
+      dynamicToolContextMap.mcp_image_context = toolContext;
+    }
+  }
 
   /** Build tool registry from MCP tools and create PTC/tool search tools if configured */
   const deferredToolsEnabled = checkCapability(AgentCapabilities.deferred_tools);

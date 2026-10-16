@@ -11,7 +11,7 @@ export function buildImageToolContext({
   toolName,
   contextDescription = 'image context',
 }: {
-  imageFiles: Array<{ file_id: string }>;
+  imageFiles: Array<{ file_id: string; filename?: string }>;
   toolName: string;
   contextDescription?: string;
 }): string {
@@ -28,7 +28,9 @@ export function buildImageToolContext({
     if (i === 0) {
       toolContext = `Image files provided in this request (their image IDs listed in order of appearance) available for ${contextDescription}:`;
     }
-    toolContext += `\n\t- ${file.file_id}`;
+    // 附带文件名以便模型准确识别并引用会话中的图片
+    const filenameSuffix = file.filename ? ` (${file.filename})` : '';
+    toolContext += `\n\t- ${file.file_id}${filenameSuffix}`;
     if (i === imageFiles.length - 1) {
       toolContext += `\n\nInclude any you need in the \`image_ids\` array when calling \`${toolName}\` to use them as visual context for generation. You may also include previously referenced or generated image IDs.`;
     }
