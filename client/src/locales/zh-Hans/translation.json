@@ -299,6 +299,7 @@
   "com_endpoint_max_output_tokens": "最大输出词元数",
   "com_endpoint_message": "发送消息给",
   "com_endpoint_message_new": "发送消息给 {{0}}",
+  "com_endpoint_message_placeholder": "输入设计需求，或上传参考图…",
   "com_endpoint_message_not_appendable": "编辑您的消息内容或重新生成。",
   "com_endpoint_my_preset": "我的预设",
   "com_endpoint_no_presets": "暂无预设，使用设置按钮创建一个",

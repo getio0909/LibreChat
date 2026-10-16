@@ -93,7 +93,8 @@ export default function useSideNavLinks({
     permissionType: PermissionTypes.SCHEDULES,
     permission: Permissions.USE,
   });
-  const { availableMCPServers } = useMCPServerManager();
+  // 仅当存在允许在聊天中选择的 MCP 服务或用户拥有创建权限时才显示侧边栏 MCP 设置面板。
+  const { selectableServers } = useMCPServerManager();
 
   const { agentsConfig } = useGetAgentsConfig({ endpointsConfig });
   const { skillsEnabled } = useAgentCapabilities(agentsConfig?.capabilities);
@@ -211,7 +212,7 @@ export default function useSideNavLinks({
     }
 
     if (
-      (hasAccessToUseMCPSettings && availableMCPServers && availableMCPServers.length > 0) ||
+      (hasAccessToUseMCPSettings && selectableServers && selectableServers.length > 0) ||
       hasAccessToCreateMCP
     ) {
       links.push({
@@ -250,7 +251,7 @@ export default function useSideNavLinks({
     interfaceConfig.parameters,
     endpointType,
     hasAccessToBookmarks,
-    availableMCPServers,
+    selectableServers,
     hasAccessToUseMCPSettings,
     hasAccessToCreateMCP,
     includeHidePanel,
