@@ -241,10 +241,11 @@ def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -
         with pytest.raises(ValueError):
             resolve_image(studio_env, USER_A, invalid_id)
 
-    symlink_file = user_a_lc / "symid__link.jpg"
+    sym_uuid = "dddddddd-eeee-ffff-0000-111111111111"
+    symlink_file = user_a_lc / f"{sym_uuid}__link.jpg"
     symlink_file.symlink_to(img_upload_b)
     with pytest.raises(ValueError):
-        resolve_image(studio_env, USER_A, "symid")
+        resolve_image(studio_env, USER_A, sym_uuid)
 
 
 # 校验参考图规范化（CMYK转sRGB、EXIF方向旋转并剥离、长边缩放至<=2048px、>40MP拒绝）
@@ -1170,6 +1171,39 @@ def test_planner_concurrency_caps_single_and_multi_user(
             assert max_planner_observed == 3
 
     asyncio.run(_run())
+
+
+# 校验LibreChat用户目录中的头像文件（avatar-*、agent-*-avatar-*）与非UUID前缀文件不会被列出或成为@latest
+def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+
+    valid_upload_id = "12345678-1234-1234-1234-123456789abc"
+    valid_file = user_lc / f"{valid_upload_id}__design.png"
+    valid_file.write_bytes(_make_image_bytes(100, 100, fmt="PNG"))
+    os.utime(valid_file, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000))
+
+    # 写入更新时间戳的头像与非UUID文件，验证不会抢占@latest或进入列表
+    for bogus_name in (
+        "avatar-1700000999.png",
+        "agent-xyz123-avatar-1700000999.png",
+        "customprefix__photo.jpg",
+        "not-a-uuid-at-all.webp",
+    ):
+        bogus_file = user_lc / bogus_name
+        bogus_file.write_bytes(_make_image_bytes(64, 64, fmt="PNG"))
+        os.utime(bogus_file, ns=(1_700_000_999_000_000_000, 1_700_000_999_000_000_000))
+
+    listed = list_user_images(studio_env, USER_A, limit=20)
+    assert [item["id"] for item in listed] == [valid_upload_id]
+
+    latest = resolve_image(studio_env, USER_A, "@latest")
+    assert latest.id == valid_upload_id
+
+    for bad_lookup in ("avatar", "agent", "customprefix", "avatar-1700000999"):
+        with pytest.raises(ValueError, match="not found"):
+            resolve_image(studio_env, USER_A, bad_lookup)
+
 
 
 

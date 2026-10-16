@@ -16,8 +16,11 @@ from .config import StudioSettings
 # 用户编号与图像编号的格式校验正则
 USER_ID_RE = re.compile(r"^[a-f0-9]{24}$")
 IMAGE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,128}$")
-UUID_PREFIX_RE = re.compile(
-    r"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})-(.+)$"
+UUID_RE = re.compile(
+    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+)
+LIBRECHAT_FILE_RE = re.compile(
+    r"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(__|-)(.+)$"
 )
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp")
 PLACEHOLDER_CONVERSATION_IDS = {
@@ -192,26 +195,18 @@ def allocate_studio_job(settings: StudioSettings, user_id: str) -> tuple[str, Pa
     return image_id, job_dir
 
 
-# 解析LibreChat图片文件名中的file_id与类型
+# 解析LibreChat图片文件名中的UUID file_id与类型（仅接受<uuid>__或<uuid>-前缀）
 def _parse_librechat_filename(filename: str) -> tuple[str, str] | None:
     lower = filename.lower()
     suffix = next((ext for ext in IMAGE_SUFFIXES if lower.endswith(ext)), None)
     if suffix is None:
         return None
     stem = filename[: -len(suffix)]
-    if "__" in stem:
-        file_id, _ = stem.split("__", 1)
-        if file_id and IMAGE_ID_RE.fullmatch(file_id):
-            return file_id, "upload"
+    match = LIBRECHAT_FILE_RE.match(stem)
+    if match is None:
         return None
-    uuid_match = UUID_PREFIX_RE.match(stem)
-    if uuid_match:
-        return uuid_match.group(1), "generated"
-    if "-" in stem:
-        file_id, _ = stem.split("-", 1)
-        if file_id and IMAGE_ID_RE.fullmatch(file_id):
-            return file_id, "generated"
-    return None
+    file_id, sep, _ = match.groups()
+    return file_id, ("upload" if sep == "__" else "generated")
 
 
 # 以0600权限原子写入receipt.json文件
@@ -447,41 +442,37 @@ def resolve_image(
                         height=height,
                     )
 
-    # 在用户LibreChat图片目录内按 <file_id>__ 或 <file_id>- 前缀匹配
-    lc_dir = user_librechat_images_dir(settings, uid)
-    if lc_dir.is_dir() and not lc_dir.is_symlink():
-        matches: list[ResolvedImage] = []
-        upload_prefix = f"{cleaned_id}__"
-        gen_prefix = f"{cleaned_id}-"
-        for entry in lc_dir.iterdir():
-            if entry.is_symlink() or not entry.is_file():
-                continue
-            lower_name = entry.name.lower()
-            if not any(lower_name.endswith(ext) for ext in IMAGE_SUFFIXES):
-                continue
-            if entry.name.startswith(upload_prefix):
-                kind = "upload"
-            elif entry.name.startswith(gen_prefix):
-                kind = "generated"
-            else:
-                continue
-            ensure_safe_subpath(entry, lc_dir)
-            stat_info = entry.stat(follow_symlinks=False)
-            width, height = _read_image_dimensions(entry, lc_dir)
-            matches.append(
-                ResolvedImage(
-                    id=cleaned_id,
-                    kind=kind,
-                    path=entry.resolve(strict=True),
-                    created=_format_mtime_ns(stat_info.st_mtime_ns),
-                    mtime_ns=stat_info.st_mtime_ns,
-                    width=width,
-                    height=height,
+    # 在用户LibreChat图片目录内按UUID <file_id>__ 或 <file_id>- 前缀匹配
+    if UUID_RE.fullmatch(cleaned_id):
+        lc_dir = user_librechat_images_dir(settings, uid)
+        if lc_dir.is_dir() and not lc_dir.is_symlink():
+            matches: list[ResolvedImage] = []
+            for entry in lc_dir.iterdir():
+                if entry.is_symlink() or not entry.is_file():
+                    continue
+                parsed = _parse_librechat_filename(entry.name)
+                if parsed is None:
+                    continue
+                file_id, kind = parsed
+                if file_id != cleaned_id:
+                    continue
+                ensure_safe_subpath(entry, lc_dir)
+                stat_info = entry.stat(follow_symlinks=False)
+                width, height = _read_image_dimensions(entry, lc_dir)
+                matches.append(
+                    ResolvedImage(
+                        id=cleaned_id,
+                        kind=kind,
+                        path=entry.resolve(strict=True),
+                        created=_format_mtime_ns(stat_info.st_mtime_ns),
+                        mtime_ns=stat_info.st_mtime_ns,
+                        width=width,
+                        height=height,
+                    )
                 )
-            )
-        if matches:
-            matches.sort(key=lambda item: item.mtime_ns, reverse=True)
-            return matches[0]
+            if matches:
+                matches.sort(key=lambda item: item.mtime_ns, reverse=True)
+                return matches[0]
 
     raise ValueError(f"Image not found for current user: {cleaned_id}")
 
