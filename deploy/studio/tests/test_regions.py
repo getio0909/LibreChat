@@ -217,9 +217,9 @@ def test_outside_selection_pixels_identical_after_composite_property(
     for trial in range(25):
         w = rng.randint(96, 320)
         h = rng.randint(96, 320)
-        base_arr = np.frombuffer(
-            rng.randbytes(w * h * 3), dtype=np.uint8
-        ).reshape((h, w, 3))
+        base_arr = np.frombuffer(rng.randbytes(w * h * 3), dtype=np.uint8).reshape(
+            (h, w, 3)
+        )
         base_img = Image.fromarray(base_arr, mode="RGB")
         base_path = tmp_path / f"base_{trial}.png"
         save_exact(base_img, base_path)
@@ -295,9 +295,7 @@ def test_outside_selection_pixels_identical_after_composite_property(
         save_exact(gen_img, gen_path)
 
         dest_path = tmp_path / f"out_{trial}.png"
-        comp = composite_local(
-            base_path, gen_path, selection, ctx["crop"], dest_path
-        )
+        comp = composite_local(base_path, gen_path, selection, ctx["crop"], dest_path)
         assert comp["width"] == w
         assert comp["height"] == h
         assert comp["outside_changed_pixels"] == 0
@@ -436,9 +434,7 @@ def test_selection_proof_mismatch_rejection_and_per_user_isolation(
             }
         ],
     }
-    rec_a = save_confirmed_selection(
-        studio_env, USER_A, uid_a1, path_a1, selection
-    )
+    rec_a = save_confirmed_selection(studio_env, USER_A, uid_a1, path_a1, selection)
     sel_id = rec_a["selection_id"]
     assert sel_id.startswith("sel_")
 
@@ -706,21 +702,15 @@ def test_segmentation_adapter_mocked_and_endpoint(
         "source": MODEL_REPO,
         "revision": MODEL_REVISION,
         "files": {
-            "model.safetensors": {
-                "sha256": hashlib.sha256(weights_bytes).hexdigest()
-            },
+            "model.safetensors": {"sha256": hashlib.sha256(weights_bytes).hexdigest()},
             "config.json": {"sha256": hashlib.sha256(cfg_bytes).hexdigest()},
             "preprocessor_config.json": {
                 "sha256": hashlib.sha256(pre_bytes).hexdigest()
             },
-            "processor_config.json": {
-                "sha256": hashlib.sha256(proc_bytes).hexdigest()
-            },
+            "processor_config.json": {"sha256": hashlib.sha256(proc_bytes).hexdigest()},
         },
     }
-    (model_dir / "manifest.json").write_text(
-        json.dumps(manifest), encoding="utf-8"
-    )
+    (model_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
 
     # 1. 验证严禁目录中存在任何非safetensors的pickle权重文件（.bin/.pt/.pth/.ckpt/.pkl）
     bad_pickle_weight = model_dir / "pytorch_model.bin"
@@ -959,9 +949,15 @@ def test_palette_png_with_trns_preserves_alpha_outside_selection(
     w, h = 160, 120
     pal_img = Image.new("P", (w, h), 0)
     palette: list[int] = [
-        10, 20, 30,     # 索引0：完全透明背景
-        180, 140, 90,   # 索引1：半透明边框
-        60, 130, 190,   # 索引2：不透明主体
+        10,
+        20,
+        30,  # 索引0：完全透明背景
+        180,
+        140,
+        90,  # 索引1：半透明边框
+        60,
+        130,
+        190,  # 索引2：不透明主体
     ] + [0] * (768 - 9)
     pal_img.putpalette(palette)
     draw = ImageDraw.Draw(pal_img)
@@ -1251,9 +1247,7 @@ def test_token_capability_separation_and_single_use_editor_confirm(
             fresh_edt_tok, _ = sign_editor_token(
                 studio_env, USER_A, upload_id, base_sha
             )
-            save_exact(
-                Image.new("RGB", (240, 180), (141, 120, 100)), base_file
-            )
+            save_exact(Image.new("RGB", (240, 180), (141, 120, 100)), base_file)
             stale_sha_res = await client.post(
                 f"/files/{fresh_edt_tok}",
                 json={"action": "confirm", "selection": sel_second},
@@ -1341,9 +1335,7 @@ def test_edit_region_aborts_if_base_image_mutated_during_generation(
             }
         ],
     }
-    rec = save_confirmed_selection(
-        studio_env, USER_A, upload_id, base_file, selection
-    )
+    rec = save_confirmed_selection(studio_env, USER_A, upload_id, base_file, selection)
     sel_id = rec["selection_id"]
 
     async def _mutating_ark_handler(request: httpx.Request) -> httpx.Response:
@@ -1357,13 +1349,7 @@ def test_edit_region_aborts_if_base_image_mutated_during_generation(
         return httpx.Response(
             200,
             json={
-                "data": [
-                    {
-                        "b64_json": base64.b64encode(buf.getvalue()).decode(
-                            "ascii"
-                        )
-                    }
-                ]
+                "data": [{"b64_json": base64.b64encode(buf.getvalue()).decode("ascii")}]
             },
         )
 
@@ -1434,9 +1420,7 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             }
         ],
     }
-    rec = save_confirmed_selection(
-        studio_env, USER_A, upload_id, base_file, selection
-    )
+    rec = save_confirmed_selection(studio_env, USER_A, upload_id, base_file, selection)
     sel_id = rec["selection_id"]
 
     provider_calls = 0
@@ -1456,22 +1440,14 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
         return httpx.Response(
             200,
             json={
-                "data": [
-                    {
-                        "b64_json": base64.b64encode(buf.getvalue()).decode(
-                            "ascii"
-                        )
-                    }
-                ]
+                "data": [{"b64_json": base64.b64encode(buf.getvalue()).decode("ascii")}]
             },
         )
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(
-            _ark_handler_then_transient_base_fault
-        ),
+        ark_transport=httpx.MockTransport(_ark_handler_then_transient_base_fault),
     )
 
     async def _run() -> None:
@@ -1531,13 +1507,9 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
                 },
             )
             assert list_res.status_code == 200
-            list_payload = json.loads(
-                list_res.json()["result"]["content"][0]["text"]
-            )
+            list_payload = json.loads(list_res.json()["result"]["content"][0]["text"])
             rec_items = [
-                item
-                for item in list_payload["images"]
-                if item["id"] == job_id
+                item for item in list_payload["images"] if item["id"] == job_id
             ]
             assert len(rec_items) == 1
             assert rec_items[0]["state"] == "recoverable"
@@ -1576,9 +1548,7 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             # 校验选区外像素与原底图逐字节一致
             mask = mask_for(selection, (320, 240))
             saved_img = open_image(job_dir / "original.png")
-            assert (
-                count_outside_changes(original_base_img, saved_img, mask) == 0
-            )
+            assert count_outside_changes(original_base_img, saved_img, mask) == 0
             assert saved_img.getpixel((160, 120)) == (215, 185, 125)
 
     asyncio.run(_run())
@@ -1593,9 +1563,8 @@ def test_selection_editor_subtract_renders_zero_alpha_and_disables_confirm_on_fu
     base_img = Image.new("RGB", (300, 200), (150, 130, 110))
     buf = io.BytesIO()
     base_img.save(buf, format="PNG")
-    data_uri = (
-        "data:image/png;base64,"
-        + base64.b64encode(buf.getvalue()).decode("ascii")
+    data_uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode(
+        "ascii"
     )
     editor_html = build_selection_editor_html(
         image_id="img_subtract_test",
@@ -1693,4 +1662,450 @@ def test_selection_editor_subtract_renders_zero_alpha_and_disables_confirm_on_fu
             browser.close()
 
 
+# 回归测试（Finding #9）：在真实uvicorn测试服务器与Playwright Chromium <iframe sandbox="allow-scripts" srcdoc="...">中验证null-origin CORS预检、框选+减选遮罩与mask_for一致性、以及confirm -> postMessage(prompt) -> ask宿主桥接
+def test_playwright_sandboxed_selection_editor_null_origin_cors_subtract_and_prompt_handoff(
+    studio_env: StudioSettings,
+) -> None:
+    import html as html_mod
+    import socket
+    import threading
+    import time as _time
 
+    import uvicorn
+    from playwright.sync_api import sync_playwright
+    from starlette.applications import Starlette
+    from starlette.requests import Request
+    from starlette.responses import HTMLResponse, Response
+    from starlette.routing import Route
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "f9000009-1111-2222-3333-444444444444"
+    base_file = user_lc / f"{upload_id}__playwright_base.png"
+    base_img = Image.new("RGB", (360, 240), (145, 130, 115))
+    save_exact(base_img, base_file)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = int(sock.getsockname()[1])
+
+    local_cfg = studio_env.model_copy(
+        update={"public_base_url": f"http://127.0.0.1:{port}"}
+    )
+
+    async def _mock_ark_handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        gen_img = Image.new("RGB", (req_w, req_h), (225, 190, 140))
+        buf = io.BytesIO()
+        gen_img.save(buf, format="PNG")
+        b64_png = base64.b64encode(buf.getvalue()).decode("ascii")
+        return httpx.Response(200, json={"data": [{"b64_json": b64_png}]})
+
+    studio_app = create_app(
+        settings=local_cfg,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_mock_ark_handler),
+    )
+
+    def _call_mcp_http(
+        tool_name: str, arguments: dict[str, Any]
+    ) -> tuple[dict[str, Any], str]:
+        res = httpx.post(
+            f"http://127.0.0.1:{port}/mcp",
+            headers={
+                "X-Studio-Token": VALID_TOKEN,
+                "X-LibreChat-User-ID": USER_A,
+            },
+            json={
+                "jsonrpc": "2.0",
+                "id": 901,
+                "method": "tools/call",
+                "params": {
+                    "name": tool_name,
+                    "arguments": arguments,
+                },
+            },
+            timeout=10.0,
+        )
+        assert res.status_code == 200
+        result = res.json()["result"]
+        assert result.get("isError") is False
+        meta = json.loads(result["content"][0]["text"])
+        resource_html = result["content"][1]["resource"]["text"]
+        return meta, resource_html
+
+    server_seen_requests: list[dict[str, Any]] = []
+    current_srcdoc: dict[str, str] = {"html": ""}
+
+    async def _host_page(request: Request) -> HTMLResponse:
+        del request
+        escaped_srcdoc = html_mod.escape(current_srcdoc["html"], quote=True)
+        page_html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+  <iframe
+    id="mcp-sandbox-frame"
+    title="MCP HTML Resource (Embedded Content)"
+    sandbox="allow-scripts"
+    srcdoc="{escaped_srcdoc}"
+    style="width:820px;height:680px;border:0;"
+  ></iframe>
+  <iframe
+    id="mcp-compare-frame"
+    title="MCP Compare Resource"
+    sandbox="allow-scripts"
+    style="width:820px;height:680px;border:0;"
+  ></iframe>
+  <script>
+    window.__receivedMessages = [];
+    window.__askSubmissions = [];
+    function ask(submission) {{
+      window.__askSubmissions.push(submission);
+    }}
+    window.addEventListener('message', (event) => {{
+      if (!event.data || typeof event.data !== 'object') return;
+      window.__receivedMessages.push({{
+        origin: event.origin,
+        data: event.data
+      }});
+      if (event.data.type === 'prompt' && event.data.payload && typeof event.data.payload.prompt === 'string') {{
+        const prompt = event.data.payload.prompt;
+        const messageText = `The user clicked a button in an embedded UI Resource, and we got a message of type \\`prompt\\`.\\nThe prompt is:\\n\\n\\`\\`\\`\\n${{prompt}}\\n\\`\\`\\`\\n\\nExecute the intention of the prompt that is mentioned in the message using the tools available to you.`;
+        ask({{ text: messageText, rawPrompt: prompt }});
+      }}
+    }});
+  </script>
+</body>
+</html>"""
+        return HTMLResponse(page_html)
+
+    async def _proxy_studio_files(request: Request) -> Response:
+        tok = str(request.path_params.get("token") or "")
+        raw_body = await request.body()
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=studio_app),
+            base_url=f"http://127.0.0.1:{port}",
+        ) as c:
+            upstream = await c.request(
+                request.method,
+                f"/files/{tok}",
+                content=raw_body,
+                headers={
+                    k: v
+                    for k, v in request.headers.items()
+                    if k.lower()
+                    in (
+                        "origin",
+                        "access-control-request-method",
+                        "access-control-request-headers",
+                        "content-type",
+                        "range",
+                        "if-none-match",
+                        "if-modified-since",
+                    )
+                },
+            )
+            server_seen_requests.append(
+                {
+                    "method": request.method,
+                    "path": request.url.path,
+                    "headers": {k.lower(): v for k, v in request.headers.items()},
+                    "status": upstream.status_code,
+                    "response_headers": {
+                        k.lower(): v for k, v in upstream.headers.items()
+                    },
+                }
+            )
+            return Response(
+                upstream.content,
+                status_code=upstream.status_code,
+                headers=dict(upstream.headers),
+            )
+
+    async def _proxy_mcp(request: Request) -> Response:
+        raw_body = await request.body()
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=studio_app),
+            base_url=f"http://127.0.0.1:{port}",
+        ) as c:
+            upstream = await c.request(
+                request.method,
+                "/mcp",
+                content=raw_body,
+                headers={
+                    k: v
+                    for k, v in request.headers.items()
+                    if k.lower()
+                    in (
+                        "x-studio-token",
+                        "x-librechat-user-id",
+                        "x-librechat-conversation-id",
+                        "content-type",
+                        "accept",
+                    )
+                },
+            )
+            return Response(
+                upstream.content,
+                status_code=upstream.status_code,
+                headers=dict(upstream.headers),
+            )
+
+    gateway_app = Starlette(
+        routes=[
+            Route("/host", endpoint=_host_page, methods=["GET"]),
+            Route("/mcp", endpoint=_proxy_mcp, methods=["POST", "GET", "DELETE"]),
+            Route(
+                "/studio-files/{token:path}",
+                endpoint=_proxy_studio_files,
+                methods=["GET", "HEAD", "POST", "OPTIONS"],
+            ),
+        ]
+    )
+
+    config = uvicorn.Config(
+        gateway_app,
+        host="127.0.0.1",
+        port=port,
+        log_level="error",
+    )
+    server = uvicorn.Server(config)
+    server_thread = threading.Thread(target=server.run, daemon=True)
+    server_thread.start()
+
+    try:
+        for _ in range(50):
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=0.1):
+                    break
+            except OSError:
+                _time.sleep(0.05)
+
+        sel_meta, sel_html = _call_mcp_http("select_region", {"image_id": upload_id})
+        image_id = sel_meta["image_id"]
+        assert image_id == upload_id
+        assert not is_editor_token(sel_meta["preview_url"].rsplit("/", 1)[-1])
+        current_srcdoc["html"] = sel_html
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                executable_path="/usr/bin/chromium",
+                headless=True,
+                args=["--no-sandbox", "--disable-gpu"],
+            )
+            try:
+                page = browser.new_page(viewport={"width": 900, "height": 800})
+                page.goto(f"http://127.0.0.1:{port}/host", wait_until="networkidle")
+
+                frame = page.frame_locator("#mcp-sandbox-frame")
+                frame.locator("#confirmBtn").wait_for(state="visible")
+                frame.locator("#baseImg").evaluate(
+                    """(img) => new Promise((resolve, reject) => {
+                        if (img.complete && img.naturalWidth > 0) return resolve(true);
+                        img.addEventListener('load', () => resolve(true), { once: true });
+                        img.addEventListener('error', () => reject(new Error('baseImg load error')), { once: true });
+                    })"""
+                )
+                page.wait_for_timeout(100)
+
+                # 1. 验证null-origin下从baseImg读取Canvas像素不会触发CORS污染SecurityError
+                img_pixel = frame.locator("#baseImg").evaluate(
+                    """(img) => {
+                        const c = document.createElement('canvas');
+                        c.width = img.naturalWidth;
+                        c.height = img.naturalHeight;
+                        const ctx = c.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        return Array.from(ctx.getImageData(10, 10, 1, 1).data);
+                    }"""
+                )
+                assert img_pixel == [145, 130, 115, 255]
+
+                canvas_box = frame.locator("#overlayCanvas").bounding_box()
+                assert canvas_box is not None
+                cx = canvas_box["x"]
+                cy = canvas_box["y"]
+                cw = canvas_box["width"]
+                ch = canvas_box["height"]
+
+                # 2. 在画布上框选(add) [0.15, 0.15] -> [0.85, 0.85]
+                page.mouse.move(cx + cw * 0.15, cy + ch * 0.15)
+                page.mouse.down()
+                page.mouse.move(cx + cw * 0.85, cy + ch * 0.85, steps=8)
+                page.mouse.up()
+
+                # 3. 切换到减选(subtract)，挖除中心右半块 [0.50, 0.25] -> [0.80, 0.75]
+                frame.locator('[data-op="subtract"]').click()
+                page.mouse.move(cx + cw * 0.50, cy + ch * 0.25)
+                page.mouse.down()
+                page.mouse.move(cx + cw * 0.80, cy + ch * 0.75, steps=8)
+                page.mouse.up()
+
+                # 填写局部修改要求并点击“确认选区”
+                frame.locator("#instructionInput").fill("将选区替换为浅色橡木纹理")
+                frame.locator("#confirmBtn").click()
+
+                # 等待父页面收到来自null-origin iframe的postMessage(type='prompt')并触发ask
+                page.wait_for_function(
+                    "() => window.__askSubmissions && window.__askSubmissions.length === 1",
+                    timeout=5000,
+                )
+
+                # 读取前端overlayCanvas尺寸与二值化Alpha掩码
+                overlay_snapshot = frame.locator("#overlayCanvas").evaluate(
+                    """(canvas) => {
+                        const w = canvas.width;
+                        const h = canvas.height;
+                        const rgba = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+                        const alpha = [];
+                        for (let i = 3; i < rgba.length; i += 4) {
+                            alpha.push(rgba[i] > 0 ? 1 : 0);
+                        }
+                        return {
+                            width: w,
+                            height: h,
+                            alpha,
+                            keptSample: rgba[((Math.round(h * 0.50) * w + Math.round(w * 0.30)) * 4) + 3],
+                            subtractedSample: rgba[((Math.round(h * 0.50) * w + Math.round(w * 0.65)) * 4) + 3],
+                            outsideSample: rgba[((Math.round(h * 0.05) * w + Math.round(w * 0.05)) * 4) + 3]
+                        };
+                    }"""
+                )
+                assert overlay_snapshot["keptSample"] > 60
+                assert overlay_snapshot["subtractedSample"] == 0
+                assert overlay_snapshot["outsideSample"] == 0
+
+                # 4. 核对服务端真实收到的null-origin OPTIONS预检请求与POST确认请求
+                preflight_reqs = [
+                    r
+                    for r in server_seen_requests
+                    if r["method"] == "OPTIONS" and "/studio-files/" in r["path"]
+                ]
+                assert len(preflight_reqs) >= 1
+                assert preflight_reqs[0]["headers"].get("origin") == "null"
+                assert (
+                    preflight_reqs[0]["headers"]
+                    .get("access-control-request-method", "")
+                    .upper()
+                    == "POST"
+                )
+                assert preflight_reqs[0]["status"] == 204
+                assert (
+                    preflight_reqs[0]["response_headers"].get(
+                        "access-control-allow-origin"
+                    )
+                    == "*"
+                )
+
+                post_reqs = [
+                    r
+                    for r in server_seen_requests
+                    if r["method"] == "POST" and "/studio-files/" in r["path"]
+                ]
+                assert len(post_reqs) == 1
+                assert post_reqs[0]["headers"].get("origin") == "null"
+                assert post_reqs[0]["status"] == 200
+                assert (
+                    post_reqs[0]["response_headers"].get("access-control-allow-origin")
+                    == "*"
+                )
+
+                # 5. 核对confirm -> postMessage({ type: 'prompt', payload: { prompt } }) -> ask宿主交接
+                messages = page.evaluate("() => window.__receivedMessages")
+                prompt_msgs = [m for m in messages if m["data"].get("type") == "prompt"]
+                assert len(prompt_msgs) == 1
+                assert prompt_msgs[0]["origin"] == "null"
+                prompt_str = prompt_msgs[0]["data"]["payload"]["prompt"]
+
+                ask_calls = page.evaluate("() => window.__askSubmissions")
+                assert len(ask_calls) == 1
+                assert prompt_str in ask_calls[0]["text"]
+                assert "将选区替换为浅色橡木纹理" in prompt_str
+                assert image_id in prompt_str
+
+                sel_match = re.search(r"sel_[0-9a-f]{32}", prompt_str)
+                assert sel_match is not None
+                confirmed_sel_id = sel_match.group(0)
+
+                # 6. 核对前端Canvas渲染遮罩与后端mask_for生成的掩码逐像素高度一致
+                confirmed_record = load_confirmed_selection(
+                    local_cfg,
+                    USER_A,
+                    confirmed_sel_id,
+                    base_image_id=image_id,
+                )
+                cw_int = int(overlay_snapshot["width"])
+                ch_int = int(overlay_snapshot["height"])
+                backend_mask = (
+                    np.asarray(
+                        mask_for(confirmed_record["selection"], (cw_int, ch_int))
+                    )
+                    > 0
+                ).astype(np.uint8)
+                frontend_mask = np.asarray(
+                    overlay_snapshot["alpha"], dtype=np.uint8
+                ).reshape((ch_int, cw_int))
+                agreement = float(np.mean(backend_mask == frontend_mask))
+                assert agreement >= 0.985
+                assert (
+                    int(backend_mask[round(ch_int * 0.50), round(cw_int * 0.30)]) == 1
+                )
+                assert (
+                    int(backend_mask[round(ch_int * 0.50), round(cw_int * 0.65)]) == 0
+                )
+                assert (
+                    int(backend_mask[round(ch_int * 0.05), round(cw_int * 0.05)]) == 0
+                )
+
+                # 7. 调用edit_region并将返回的对比器HTML挂载入第二个sandbox="allow-scripts" iframe，验证双图CORS像素差分正常
+                _, cmp_html = _call_mcp_http(
+                    "edit_region",
+                    {
+                        "base_id": image_id,
+                        "selection_id": confirmed_sel_id,
+                        "instruction": "将选区替换为浅色橡木纹理",
+                        "size": "1K",
+                    },
+                )
+                page.eval_on_selector(
+                    "#mcp-compare-frame",
+                    "(el, html) => { el.srcdoc = html; }",
+                    cmp_html,
+                )
+                cmp_frame = page.frame_locator("#mcp-compare-frame")
+                cmp_frame.locator("#compareCanvas").wait_for(state="visible")
+                cmp_frame.locator("#compareCanvas").evaluate(
+                    """(canvas) => new Promise((resolve, reject) => {
+                        const deadline = Date.now() + 5000;
+                        function check() {
+                            if (canvas.width === 360 && canvas.height === 240) {
+                                return resolve(true);
+                            }
+                            if (Date.now() > deadline) {
+                                return reject(new Error('Timeout waiting for compareCanvas load'));
+                            }
+                            setTimeout(check, 50);
+                        }
+                        check();
+                    })"""
+                )
+                cmp_frame.locator("#diffCheck").check()
+                cmp_pixels = cmp_frame.locator("#compareCanvas").evaluate(
+                    """(canvas) => {
+                        const ctx = canvas.getContext('2d');
+                        const kept = Array.from(ctx.getImageData(Math.round(360 * 0.30), Math.round(240 * 0.50), 1, 1).data);
+                        const subtracted = Array.from(ctx.getImageData(Math.round(360 * 0.65), Math.round(240 * 0.50), 1, 1).data);
+                        return { kept, subtracted };
+                    }"""
+                )
+                # 选区内已修改像素经buildDiffOverlay标红（R通道显著高于原图145且高于G/B），而subtract挖空区保持原图(145, 130, 115)
+                assert cmp_pixels["kept"][0] > 230
+                assert cmp_pixels["kept"][0] > cmp_pixels["kept"][1] + 100
+                assert cmp_pixels["subtracted"] == [145, 130, 115, 255]
+            finally:
+                browser.close()
+    finally:
+        server.should_exit = True
+        server_thread.join(timeout=5.0)

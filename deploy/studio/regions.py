@@ -118,7 +118,9 @@ def selection_value(value: Any) -> dict[str, Any]:
                 pt for idx, pt in enumerate(coords) if idx == 0 or pt != coords[idx - 1]
             ]
             if len(dedup) < 3:
-                raise ValueError("Polygon selection requires at least 3 distinct points")
+                raise ValueError(
+                    "Polygon selection requires at least 3 distinct points"
+                )
             normalized.append({"type": "polygon", "op": op, "points": dedup})
         else:
             radius = shape.get("radius", 18)
@@ -367,11 +369,11 @@ def match_color(
     ref = reference.convert("RGB")
     src_alpha = source.getchannel("A") if "A" in source.getbands() else None
     src_mask = (
-        src_alpha.point(lambda p: 255 if p > 24 else 0) if src_alpha is not None else None
+        src_alpha.point(lambda p: 255 if p > 24 else 0)
+        if src_alpha is not None
+        else None
     )
-    ref_mask = (
-        mask.point(lambda p: 255 if p > 0 else 0) if mask is not None else None
-    )
+    ref_mask = mask.point(lambda p: 255 if p > 0 else 0) if mask is not None else None
 
     src_stat = ImageStat.Stat(rgb, mask=src_mask)
     ref_stat = ImageStat.Stat(ref, mask=ref_mask)
@@ -393,8 +395,7 @@ def match_color(
                 min(
                     255,
                     round(
-                        val * 0.65
-                        + ((val - src_mean) * gain + src_mean + shift) * 0.35
+                        val * 0.65 + ((val - src_mean) * gain + src_mean + shift) * 0.35
                     ),
                 ),
             )
@@ -559,7 +560,13 @@ def composite_local(
     base_bytes = Path(base_path).read_bytes()
     if expected_proof is not None:
         current_proof = selection_proof(base_bytes, selection)
-        for key in ("image_sha256", "mask_sha256", "width", "height", "selected_pixels"):
+        for key in (
+            "image_sha256",
+            "mask_sha256",
+            "width",
+            "height",
+            "selected_pixels",
+        ):
             if current_proof.get(key) != expected_proof.get(key):
                 raise ValueError(
                     f"Selection proof mismatch on {key} before local composite; refusing to composite"
@@ -605,9 +612,7 @@ def composite_local(
         saved.size != original.size
         or saved.mode != original.mode
         or count_outside_changes(original, saved, mask) != 0
-        or count_outside_changes(
-            original.convert("RGBA"), saved.convert("RGBA"), mask
-        )
+        or count_outside_changes(original.convert("RGBA"), saved.convert("RGBA"), mask)
         != 0
     ):
         with contextlib.suppress(OSError):
@@ -662,7 +667,9 @@ def finish_region_edit(
         or job_dir.is_symlink()
         or not job_dir.is_dir()
     ):
-        raise ValueError(f"Recoverable region job not found for current user: {cleaned_job}")
+        raise ValueError(
+            f"Recoverable region job not found for current user: {cleaned_job}"
+        )
     ensure_safe_subpath(job_dir, studio_dir)
 
     receipt_path = job_dir / "receipt.json"
@@ -674,8 +681,15 @@ def finish_region_edit(
             receipt_data = parsed_rec
 
     recovery_path = job_dir / "local_recovery.json"
-    if not recovery_path.exists() or recovery_path.is_symlink() or not recovery_path.is_file():
-        if receipt_data.get("state") == "saved" and (job_dir / "original.png").is_file():
+    if (
+        not recovery_path.exists()
+        or recovery_path.is_symlink()
+        or not recovery_path.is_file()
+    ):
+        if (
+            receipt_data.get("state") == "saved"
+            and (job_dir / "original.png").is_file()
+        ):
             orig_path = job_dir / "original.png"
             raw_bytes = read_bytes_no_follow(orig_path, studio_dir)
             return {
@@ -687,13 +701,19 @@ def finish_region_edit(
                 "raw_bytes": raw_bytes,
                 "width": int(receipt_data.get("width") or 0),
                 "height": int(receipt_data.get("height") or 0),
-                "sha256": str(receipt_data.get("sha256") or hashlib.sha256(raw_bytes).hexdigest()),
+                "sha256": str(
+                    receipt_data.get("sha256") or hashlib.sha256(raw_bytes).hexdigest()
+                ),
                 "selected_pixels": int(receipt_data.get("selected_pixels") or 0),
                 "outside_changed_pixels": 0,
             }
-        raise ValueError(f"No recoverable local crop record found for job: {cleaned_job}")
+        raise ValueError(
+            f"No recoverable local crop record found for job: {cleaned_job}"
+        )
 
-    raw_recovery = read_bytes_no_follow(recovery_path, studio_dir, max_bytes=1024 * 1024)
+    raw_recovery = read_bytes_no_follow(
+        recovery_path, studio_dir, max_bytes=1024 * 1024
+    )
     recovery = json.loads(raw_recovery.decode("utf-8"))
     if not isinstance(recovery, dict) or recovery.get("job_id") != cleaned_job:
         raise ValueError("Invalid local recovery metadata")
@@ -729,7 +749,9 @@ def finish_region_edit(
         except (OSError, ValueError):
             continue
     if matched_root is None or not base_path.is_file() or base_path.is_symlink():
-        raise ValueError("Original base image for recoverable job is no longer accessible")
+        raise ValueError(
+            "Original base image for recoverable job is no longer accessible"
+        )
 
     raw_crop_box = recovery.get("crop")
     if not isinstance(raw_crop_box, list) or len(raw_crop_box) != 4:
@@ -816,7 +838,9 @@ def verify_sam2_model_dir(
 
     for child in base.iterdir():
         if child.is_symlink():
-            raise ValueError(f"Symlink file is not allowed in SAM 2.1 model directory: {child}")
+            raise ValueError(
+                f"Symlink file is not allowed in SAM 2.1 model directory: {child}"
+            )
         if child.suffix.lower() in DISALLOWED_WEIGHT_SUFFIXES:
             raise ValueError(
                 f"Disallowed non-safetensors weight file in SAM 2.1 model directory: {child.name}"
@@ -839,7 +863,9 @@ def verify_sam2_model_dir(
                 if isinstance(entry, str)
                 else ""
             )
-            if not isinstance(sha, str) or not SHA256_HEX_RE.fullmatch(sha.strip().lower()):
+            if not isinstance(sha, str) or not SHA256_HEX_RE.fullmatch(
+                sha.strip().lower()
+            ):
                 raise ValueError(
                     f"SAM 2.1 manifest entry for {name} is missing a pinned 64-hex sha256"
                 )
@@ -859,7 +885,11 @@ def verify_sam2_model_dir(
             raise ValueError(f"SAM 2.1 model SHA-256 mismatch for {required_name}")
         verified_paths[required_name] = file_path
 
-    for cfg_name in ("config.json", "preprocessor_config.json", "processor_config.json"):
+    for cfg_name in (
+        "config.json",
+        "preprocessor_config.json",
+        "processor_config.json",
+    ):
         cfg_path = base / cfg_name
         if not cfg_path.exists() or cfg_path.is_symlink() or not cfg_path.is_file():
             raise ValueError(f"SAM 2.1 config file not found: {cfg_path}")
@@ -942,9 +972,7 @@ def _mask_shapes(
 
     # 无OpenCV环境下的纯Pillow轮廓提取回退：按行采样左右边界构造闭合多边形
     mask_img = (
-        mask
-        if isinstance(mask, Image.Image)
-        else Image.fromarray(binary, mode="L")
+        mask if isinstance(mask, Image.Image) else Image.fromarray(binary, mode="L")
     )
     box = mask_img.getbbox()
     if box is None:
@@ -1072,7 +1100,9 @@ class Segmenter:
             label = point.get("label", 1)
             if label not in (0, 1) or isinstance(label, bool):
                 raise ValueError("Segmentation point label must be 0 or 1")
-            normalized_pts.append((_coord(point.get("x")), _coord(point.get("y")), label))
+            normalized_pts.append(
+                (_coord(point.get("x")), _coord(point.get("y")), label)
+            )
         if not any(label == 1 for _, _, label in normalized_pts):
             raise ValueError("At least one foreground point (label=1) is required")
         if operation == "subtract" and not existing:
@@ -1149,7 +1179,9 @@ class Segmenter:
         final_mask = mask_for({"version": 1, "shapes": shapes}, full_size)
         selected_pixels = int(sum(final_mask.histogram()[1:]))
         if selected_pixels < MIN_SELECTED_PIXELS:
-            raise ValueError("Point segmentation did not leave a valid active selection")
+            raise ValueError(
+                "Point segmentation did not leave a valid active selection"
+            )
         return {
             "version": 1,
             "shapes": shapes,
@@ -1285,7 +1317,9 @@ def load_confirmed_selection(
         or selections_root.is_symlink()
         or not selections_root.is_dir()
     ):
-        raise ValueError(f"Confirmed selection not found for current user: {selection_id}")
+        raise ValueError(
+            f"Confirmed selection not found for current user: {selection_id}"
+        )
 
     cleaned_id = selection_id.strip() if isinstance(selection_id, str) else ""
     if cleaned_id == "@latest":
@@ -1343,7 +1377,13 @@ def load_confirmed_selection(
 
     if base_path is not None:
         current_proof = selection_proof(base_path, normalized_sel)
-        for key in ("image_sha256", "mask_sha256", "width", "height", "selected_pixels"):
+        for key in (
+            "image_sha256",
+            "mask_sha256",
+            "width",
+            "height",
+            "selected_pixels",
+        ):
             if stored_proof.get(key) != current_proof.get(key):
                 raise ValueError(
                     f"Selection proof mismatch on {key}: the base image or selection mask does not match the confirmed proof"
@@ -1462,9 +1502,7 @@ def sign_editor_token(
 ) -> tuple[str, int]:
     uid = validate_user_id(user_id)
     cleaned_img = _validate_token_image_id(image_id)
-    cleaned_sha = (
-        image_sha256.strip().lower() if isinstance(image_sha256, str) else ""
-    )
+    cleaned_sha = image_sha256.strip().lower() if isinstance(image_sha256, str) else ""
     if not SHA256_HEX_RE.fullmatch(cleaned_sha):
         raise ValueError("Invalid base image SHA-256 for editor token")
     token_nonce = (
@@ -1576,7 +1614,11 @@ def build_selection_editor_html(
     segment_ready_js = "true" if segment_ready else "false"
     default_tool = "point" if segment_ready else "rect"
     default_tool_js = json.dumps(default_tool)
-    point_btn_disabled = "" if segment_ready else 'disabled title="当前环境未挂载离线分割模型，请使用框选、套索或画笔"'
+    point_btn_disabled = (
+        ""
+        if segment_ready
+        else 'disabled title="当前环境未挂载离线分割模型，请使用框选、套索或画笔"'
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">

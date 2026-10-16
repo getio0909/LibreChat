@@ -1208,12 +1208,8 @@ def build_mcp_server(
                 resolved = resolve_image(
                     settings, user_id, image_id, kb_index=active_kb
                 )
-                base_sha256 = hashlib.sha256(
-                    resolved.path.read_bytes()
-                ).hexdigest()
-                preview_token, _ = sign_image_token(
-                    settings, user_id, resolved.id
-                )
+                base_sha256 = hashlib.sha256(resolved.path.read_bytes()).hexdigest()
+                preview_token, _ = sign_image_token(settings, user_id, resolved.id)
                 preview_url = build_signed_file_url(settings, preview_token)
                 editor_token, exp_ts = sign_editor_token(
                     settings, user_id, resolved.id, base_sha256
@@ -1269,9 +1265,7 @@ def build_mcp_server(
                 if name == "finish_region_edit" or recovery_job_id:
                     if not recovery_job_id:
                         raise ValueError("job_id is required")
-                    rec_result = finish_region_edit(
-                        settings, user_id, recovery_job_id
-                    )
+                    rec_result = finish_region_edit(settings, user_id, recovery_job_id)
                     img_id = str(rec_result["id"])
                     rec_base_id = str(rec_result["base_id"])
                     rec_sel_id = str(rec_result["selection_id"])
@@ -1282,9 +1276,7 @@ def build_mcp_server(
                     before_token, before_exp = sign_image_token(
                         settings, user_id, rec_base_id
                     )
-                    after_token, after_exp = sign_image_token(
-                        settings, user_id, img_id
-                    )
+                    after_token, after_exp = sign_image_token(settings, user_id, img_id)
                     before_url = build_signed_file_url(settings, before_token)
                     after_url = build_signed_file_url(settings, after_token)
                     expires_at = format_utc_timestamp(min(before_exp, after_exp))
@@ -1398,7 +1390,9 @@ def build_mcp_server(
 
                 if resolved_refs and (
                     "原样贴入" in instruction
-                    or any("原样贴入" in str(r.get("note") or "") for r in resolved_refs)
+                    or any(
+                        "原样贴入" in str(r.get("note") or "") for r in resolved_refs
+                    )
                 ):
                     ctx_info = object_placement(
                         base_resolved.path,
