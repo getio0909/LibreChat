@@ -35,6 +35,7 @@ from .images import (
     GenerationUncertain,
     build_edit_prompt,
     build_generate_prompt,
+    build_local_edit_prompt,
     build_stone_replacements,
     comparison_target,
     encode_display_image,
@@ -58,9 +59,22 @@ from .models3d import (
     verify_file_token,
 )
 from .planner import plan_concepts
+from .regions import (
+    OnnxSamSegmenter,
+    build_compare_viewer_html,
+    build_selection_editor_html,
+    is_image_token,
+    load_confirmed_selection,
+    local_context,
+    object_placement,
+    save_confirmed_selection,
+    sign_image_token,
+    verify_image_token,
+)
 from .store import (
     ResolvedImage,
     allocate_studio_job,
+    ensure_safe_subpath,
     list_user_images,
     normalize_conversation_id,
     read_bytes_no_follow,
@@ -86,7 +100,7 @@ _request_ctx_var: ContextVar[RequestContext | None] = ContextVar(
 )
 
 
-# 六个固定MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
+# 十个固定MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
 REFERENCE_ITEM_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -215,6 +229,55 @@ STUDIO_TOOLS: list[types.Tool] = [
                 },
             },
             "required": ["base_id", "instruction"],
+        },
+    ),
+    types.Tool(
+        name="select_region",
+        description="打开内联局部选区编辑器，支持框选、多边形套索、画笔涂抹加减选（及离线点选分割就绪时的点选识别），确认选区后生成绑定的选区编号（selection_id）。",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "type": "string",
+                    "description": "待框选局部区域的底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
+                },
+            },
+            "required": ["image_id"],
+        },
+    ),
+    types.Tool(
+        name="edit_region",
+        description="基于已确认的选区（selection_id）执行局部重绘并严格保证选区外每一像素字节与原图完全一致，返回前后对比预览与结果图。",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "base_id": {
+                    "type": "string",
+                    "description": "底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
+                },
+                "selection_id": {
+                    "type": "string",
+                    "description": "已确认的选区编号（sel_<hex> 或 @latest）",
+                },
+                "instruction": {
+                    "type": "string",
+                    "description": "局部修改说明（如需将参考图物件原样放入选区可注明“原样贴入”）",
+                },
+                "references": {
+                    "type": "array",
+                    "items": REFERENCE_ITEM_SCHEMA,
+                    "maxItems": 9,
+                    "default": [],
+                    "description": "补充参考图片列表（最多9张）",
+                },
+                "size": {
+                    "type": "string",
+                    "enum": ["1K", "2K"],
+                    "default": "2K",
+                    "description": "局部裁切重绘尺寸档位",
+                },
+            },
+            "required": ["base_id", "selection_id", "instruction"],
         },
     ),
     types.Tool(
@@ -370,7 +433,7 @@ def _get_active_context(mcp_server: Server) -> RequestContext:
     return ctx
 
 
-# 构建并绑定MCP底层Server与八个设计工具处理器
+# 构建并绑定MCP底层Server与十个设计工具处理器
 def build_mcp_server(
     settings: StudioSettings,
     rules: StudioRules,
@@ -378,6 +441,7 @@ def build_mcp_server(
     *,
     kb_index: KnowledgeBaseIndex | None = None,
     model_manager: ModelJobManager | None = None,
+    segmenter: OnnxSamSegmenter | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Server:
@@ -397,6 +461,7 @@ def build_mcp_server(
         limiter,
         ark_transport=ark_transport,
     )
+    active_segmenter = segmenter or OnnxSamSegmenter()
 
     # 注册tools/list处理器，返回固定扁平Schema的工具列表
     @mcp_server.list_tools()
@@ -1122,6 +1187,226 @@ def build_mcp_server(
                     isError=is_err,
                 )
 
+            if name == "select_region":
+                image_id = str(args.get("image_id") or "").strip()
+                if not image_id:
+                    raise ValueError("image_id is required")
+                resolved = resolve_image(
+                    settings, user_id, image_id, kb_index=active_kb
+                )
+                token, exp_ts = sign_image_token(settings, user_id, resolved.id)
+                signed_url = build_signed_file_url(settings, token)
+                expires_at = format_utc_timestamp(exp_ts)
+                seg_ready = active_segmenter.ready()
+                editor_html = build_selection_editor_html(
+                    image_id=resolved.id,
+                    signed_url=signed_url,
+                    expires_at=expires_at,
+                    width=resolved.width,
+                    height=resolved.height,
+                    segment_ready=seg_ready,
+                )
+                summary = {
+                    "image_id": resolved.id,
+                    "width": resolved.width,
+                    "height": resolved.height,
+                    "size": f"{resolved.width}x{resolved.height}",
+                    "segment_ready": seg_ready,
+                    "segmentation_mode": (
+                        "onnx_sam2_tiny" if seg_ready else "manual_tools_only"
+                    ),
+                    "editor_url": signed_url,
+                    "expires_at": expires_at,
+                    "message": (
+                        "Inline selection editor is ready. Draw or refine the selection in the UI "
+                        "and click '确认选区' to generate a selection_id before calling edit_region."
+                    ),
+                    "warnings": _collect_flag_warnings([resolved]),
+                }
+                return types.CallToolResult(
+                    content=[
+                        types.TextContent(
+                            type="text",
+                            text=json.dumps(summary, ensure_ascii=False),
+                        ),
+                        types.EmbeddedResource(
+                            type="resource",
+                            resource=types.TextResourceContents(
+                                uri=f"ui://zyb_studio/selection/{resolved.id}",
+                                mimeType="text/html",
+                                text=editor_html,
+                            ),
+                        ),
+                    ],
+                    isError=False,
+                )
+
+            if name == "edit_region":
+                base_id = str(args.get("base_id") or "").strip()
+                selection_id = str(args.get("selection_id") or "").strip()
+                instruction = str(args.get("instruction") or "").strip()
+                if not base_id or not selection_id or not instruction:
+                    raise ValueError(
+                        "base_id, selection_id, and instruction are required"
+                    )
+                size = str(args.get("size", "2K"))
+                if size not in NATIVE:
+                    raise ValueError("Invalid size parameter")
+                raw_refs = args.get("references") or []
+                if (
+                    not isinstance(raw_refs, list)
+                    or len(raw_refs) > MAX_EDIT_REFERENCES
+                ):
+                    raise ValueError(
+                        f"At most {MAX_EDIT_REFERENCES} additional references are allowed"
+                    )
+
+                base_resolved = resolve_image(
+                    settings, user_id, base_id, kb_index=active_kb
+                )
+                # 强制核对当前用户的已确认选区及其底图/掩码SHA256凭据
+                sel_record = load_confirmed_selection(
+                    settings,
+                    user_id,
+                    selection_id,
+                    base_image_id=base_resolved.id,
+                    base_path=base_resolved.path,
+                )
+                confirmed_sel_id = str(sel_record["selection_id"])
+                confirmed_selection = sel_record["selection"]
+
+                resolved_objs = [base_resolved]
+                resolved_refs: list[dict[str, Any]] = []
+                for item in raw_refs:
+                    if not isinstance(item, dict):
+                        raise TypeError("Each reference must be an object")
+                    resolved = resolve_image(
+                        settings,
+                        user_id,
+                        str(item.get("id") or ""),
+                        kb_index=active_kb,
+                    )
+                    resolved_objs.append(resolved)
+                    resolved_refs.append(
+                        {
+                            "id": resolved.id,
+                            "path": resolved.path,
+                            "use": str(item.get("use") or "参考"),
+                            "note": str(item.get("note") or ""),
+                            "material_ids": resolved.material_ids,
+                        }
+                    )
+
+                if resolved_refs and (
+                    "原样贴入" in instruction
+                    or any("原样贴入" in str(r.get("note") or "") for r in resolved_refs)
+                ):
+                    ctx_info = object_placement(
+                        base_resolved.path,
+                        confirmed_selection,
+                        resolved_refs[0]["path"],
+                    )
+                    placement_note: str | None = str(ctx_info.get("instruction") or "")
+                else:
+                    ctx_info = local_context(base_resolved.path, confirmed_selection)
+                    placement_note = None
+
+                full_prompt, unique_paths = build_local_edit_prompt(
+                    instruction,
+                    resolved_refs,
+                    active_rules,
+                    region_bbox=ctx_info["region"],
+                    placement_instruction=placement_note,
+                )
+                extra_uris = [
+                    normalize_reference(p, allowed_roots) for p in unique_paths
+                ]
+                all_uris = [ctx_info["data_uri"], *extra_uris]
+                if len(all_uris) > MAX_REFERENCES:
+                    raise ValueError(
+                        f"Total images including base crop exceed limit of {MAX_REFERENCES}"
+                    )
+
+                async with limiter.acquire(user_id):
+                    img_id, job_dir = allocate_studio_job(settings, user_id)
+                    gen_result = await generate_seedream(
+                        settings,
+                        full_prompt,
+                        all_uris,
+                        size=size,
+                        aspect="source",
+                        source_size=ctx_info["size"],
+                        local_composite={
+                            "base_path": base_resolved.path,
+                            "selection": confirmed_selection,
+                            "crop": ctx_info["crop"],
+                        },
+                        destination=job_dir,
+                        transport=ark_transport,
+                    )
+
+                display_bytes, display_mime = encode_display_image(
+                    gen_result["raw_bytes"]
+                )
+                b64_display = base64.b64encode(display_bytes).decode("ascii")
+
+                before_token, before_exp = sign_image_token(
+                    settings, user_id, base_resolved.id
+                )
+                after_token, after_exp = sign_image_token(settings, user_id, img_id)
+                before_url = build_signed_file_url(settings, before_token)
+                after_url = build_signed_file_url(settings, after_token)
+                expires_at = format_utc_timestamp(min(before_exp, after_exp))
+
+                compare_html = build_compare_viewer_html(
+                    image_id=img_id,
+                    base_id=base_resolved.id,
+                    selection_id=confirmed_sel_id,
+                    before_url=before_url,
+                    after_url=after_url,
+                    expires_at=expires_at,
+                    width=gen_result["width"],
+                    height=gen_result["height"],
+                    selected_pixels=int(gen_result["selected_pixels"]),
+                )
+                summary = {
+                    "id": img_id,
+                    "image_id": img_id,
+                    "base_id": base_resolved.id,
+                    "selection_id": confirmed_sel_id,
+                    "kind": "studio",
+                    "width": gen_result["width"],
+                    "height": gen_result["height"],
+                    "size": f"{gen_result['width']}x{gen_result['height']}",
+                    "sha256": gen_result["sha256"],
+                    "selected_pixels": gen_result["selected_pixels"],
+                    "outside_changed_pixels": 0,
+                    "before_url": before_url,
+                    "after_url": after_url,
+                    "expires_at": expires_at,
+                    "warnings": _collect_flag_warnings(resolved_objs),
+                }
+                return types.CallToolResult(
+                    content=[
+                        types.TextContent(
+                            type="text",
+                            text=json.dumps(summary, ensure_ascii=False),
+                        ),
+                        types.EmbeddedResource(
+                            type="resource",
+                            resource=types.TextResourceContents(
+                                uri=f"ui://zyb_studio/compare/{img_id}",
+                                mimeType="text/html",
+                                text=compare_html,
+                            ),
+                        ),
+                        types.ImageContent(
+                            type="image", data=b64_display, mimeType=display_mime
+                        ),
+                    ],
+                    isError=False,
+                )
+
             if name == "create_3d_model":
                 image_id = str(args.get("image_id") or "").strip()
                 if not image_id:
@@ -1204,6 +1489,7 @@ def create_app(
     settings: StudioSettings | None = None,
     rules: StudioRules | None = None,
     *,
+    segmenter: OnnxSamSegmenter | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Starlette:
@@ -1222,12 +1508,14 @@ def create_app(
         limiter,
         ark_transport=ark_transport,
     )
+    active_segmenter = segmenter or OnnxSamSegmenter()
     mcp_server = build_mcp_server(
         active_settings,
         active_rules,
         limiter,
         kb_index=kb_index,
         model_manager=model_manager,
+        segmenter=active_segmenter,
         ark_transport=ark_transport,
         gemini_transport=gemini_transport,
     )
@@ -1266,8 +1554,8 @@ def create_app(
     ) -> dict[str, str]:
         headers = {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-            "Access-Control-Allow-Headers": "Range, If-None-Match, If-Modified-Since",
+            "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Range, If-None-Match, If-Modified-Since",
             "Access-Control-Expose-Headers": "Accept-Ranges, Content-Disposition, Content-Length, Content-Range, Content-Type",
             "X-Content-Type-Options": "nosniff",
         }
@@ -1281,7 +1569,7 @@ def create_app(
             "Not Found", status_code=404, headers=_signed_file_cors_headers()
         )
 
-    # 校验HMAC签名令牌并提供支持Range分段传输与CORS的GLB二进制下载服务
+    # 校验HMAC签名令牌并提供3D模型GLB下载及局部选区图片预览、点选分割与选区确认服务
     async def signed_file_endpoint(request: Request) -> Response:
         token = str(request.path_params.get("token") or "")
         if not token or "/" in token or "\\" in token or ".." in token:
@@ -1290,6 +1578,151 @@ def create_app(
             )
         if request.method == "OPTIONS":
             return Response(b"", status_code=204, headers=_signed_file_cors_headers())
+
+        if is_image_token(token):
+            try:
+                user_id, image_id, _ = verify_image_token(active_settings, token)
+                resolved = resolve_image(
+                    active_settings, user_id, image_id, kb_index=kb_index
+                )
+            except (ValueError, RuntimeError, OSError):
+                return PlainTextResponse(
+                    "Not Found", status_code=404, headers=_signed_file_cors_headers()
+                )
+
+            if request.method in ("GET", "HEAD"):
+                allowed_roots = (
+                    user_librechat_images_dir(active_settings, user_id),
+                    user_studio_dir(active_settings, user_id, create=False),
+                    Path(active_settings.kb_root),
+                )
+                matched_root: Path | None = None
+                for root in allowed_roots:
+                    if not root.exists() or root.is_symlink():
+                        continue
+                    try:
+                        ensure_safe_subpath(resolved.path, root)
+                        matched_root = root
+                        break
+                    except (OSError, ValueError):
+                        continue
+                if matched_root is None:
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                try:
+                    img_bytes = read_bytes_no_follow(resolved.path, matched_root)
+                except (OSError, ValueError):
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                suffix = resolved.path.suffix.lower()
+                media_type = {
+                    ".png": "image/png",
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".webp": "image/webp",
+                }.get(suffix, "application/octet-stream")
+                img_headers = _signed_file_cors_headers(
+                    {
+                        "Cache-Control": "private, max-age=3600",
+                        "Content-Length": str(len(img_bytes)),
+                    }
+                )
+                return Response(
+                    b"" if request.method == "HEAD" else img_bytes,
+                    status_code=200,
+                    media_type=media_type,
+                    headers=img_headers,
+                )
+
+            if request.method == "POST":
+                raw_body = await request.body()
+                if len(raw_body) > 512 * 1024:
+                    return JSONResponse(
+                        {"error": "Request body exceeds maximum allowed size"},
+                        status_code=413,
+                        headers=_signed_file_cors_headers(),
+                    )
+                try:
+                    payload = json.loads(raw_body.decode("utf-8"))
+                except (ValueError, UnicodeDecodeError):
+                    return JSONResponse(
+                        {"error": "Invalid JSON request body"},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                if not isinstance(payload, dict):
+                    return JSONResponse(
+                        {"error": "Request body must be a JSON object"},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                action = payload.get("action")
+                if action == "segment":
+                    try:
+                        seg_out = await asyncio.to_thread(
+                            active_segmenter.segment,
+                            resolved.path,
+                            payload.get("points"),
+                        )
+                        return JSONResponse(
+                            seg_out,
+                            status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except (ValueError, RuntimeError, OSError) as exc:
+                        return JSONResponse(
+                            {"error": str(exc)},
+                            status_code=400,
+                            headers=_signed_file_cors_headers(),
+                        )
+                if action == "confirm":
+                    try:
+                        rec = save_confirmed_selection(
+                            active_settings,
+                            user_id,
+                            resolved.id,
+                            resolved.path,
+                            payload.get("selection"),
+                        )
+                        return JSONResponse(
+                            {
+                                "selection_id": rec["selection_id"],
+                                "image_id": rec["image_id"],
+                                "proof": rec["proof"],
+                            },
+                            status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except (ValueError, RuntimeError, OSError) as exc:
+                        return JSONResponse(
+                            {"error": str(exc)},
+                            status_code=400,
+                            headers=_signed_file_cors_headers(),
+                        )
+                return JSONResponse(
+                    {"error": "Unsupported region action"},
+                    status_code=400,
+                    headers=_signed_file_cors_headers(),
+                )
+
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
+
+        if request.method not in ("GET", "HEAD"):
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
 
         try:
             user_id, model_id, _ = verify_file_token(active_settings, token)
@@ -1417,7 +1850,7 @@ def create_app(
             Route(
                 "/files/{token:path}",
                 endpoint=signed_file_endpoint,
-                methods=["GET", "HEAD", "OPTIONS"],
+                methods=["GET", "HEAD", "POST", "OPTIONS"],
             ),
             Route(
                 "/mcp", endpoint=_MCPASGIHandler(), methods=["POST", "GET", "DELETE"]
@@ -1430,5 +1863,6 @@ def create_app(
     app.state.kb_index = kb_index
     app.state.limiter = limiter
     app.state.model_manager = model_manager
+    app.state.segmenter = active_segmenter
     app.state.session_manager = None
     return app

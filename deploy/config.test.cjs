@@ -22,11 +22,13 @@ const VENDOR_NAME_PATTERN =
 // 禁止残留的旧版 CAD 服务或容器标识。
 const LEGACY_CAD_PATTERN = /freecad|blender|design_tools|dufs|compile_drawing_sheet/i;
 
-// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3、WP-P2a 与 WP-P2b 扩展）。
+// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3、WP-P2a、WP-P2b 与 WP-P3a 扩展）。
 const CONTRACT_IDENTIFIERS = new Set([
   'design_concepts',
   'generate_image',
   'edit_image',
+  'select_region',
+  'edit_region',
   'list_images',
   'search_library',
   'compare_materials',
@@ -34,6 +36,8 @@ const CONTRACT_IDENTIFIERS = new Set([
   'check_3d_model',
   'prompt',
   'base_id',
+  'selection_id',
+  'instruction',
   'references',
   'id',
   'use',
@@ -132,7 +136,7 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
     assert.doesNotMatch(spec.preset.modelLabel || '', VENDOR_NAME_PATTERN);
     assert.doesNotMatch(spec.preset.promptPrefix || '', VENDOR_NAME_PATTERN);
 
-    // 验证中文提示词精简且包含八个核心工具名。
+    // 验证中文提示词精简且包含十个核心工具名。
     const prefix = spec.preset.promptPrefix || '';
     const chineseChars = (prefix.match(/[\u4e00-\u9fff]/g) || []).length;
     assert.ok(
@@ -144,6 +148,8 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
       'design_concepts',
       'generate_image',
       'edit_image',
+      'select_region',
+      'edit_region',
       'list_images',
       'search_library',
       'compare_materials',
@@ -167,6 +173,8 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
       );
     }
     assert.ok(prefix.includes('base_id'), 'promptPrefix must mention base_id');
+    assert.ok(prefix.includes('selection_id'), 'promptPrefix must mention selection_id');
+    assert.ok(prefix.includes('instruction'), 'promptPrefix must mention instruction');
     assert.ok(prefix.includes('references'), 'promptPrefix must mention references');
     assert.ok(prefix.includes('reference_ids'), 'promptPrefix must mention reference_ids');
     assert.ok(prefix.includes('kb_'), 'promptPrefix must mention kb_ IDs');

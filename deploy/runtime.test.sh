@@ -181,6 +181,8 @@ tool_names = {tool["name"] for tool in tools}
 expected_tools = {
     "generate_image",
     "edit_image",
+    "select_region",
+    "edit_region",
     "design_concepts",
     "list_images",
     "search_library",
