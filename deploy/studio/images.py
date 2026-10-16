@@ -200,6 +200,147 @@ def normalize_reference(
     return data_uri
 
 
+# 火山方舟创建3D生成任务API输入图片限制（官方文档：https://docs.volcengine.com/docs/ark/create-3d-generation-task-api?lang=zh 与 https://www.volcengine.com/docs/82379/1593703）
+SEED3D_MIN_ASPECT_RATIO = 0.4
+SEED3D_MAX_ASPECT_RATIO = 2.5
+SEED3D_MIN_EDGE_PX = 300
+SEED3D_MAX_EDGE_PX = 6000
+SEED3D_MAX_NORMALIZED_EDGE_PX = 2048
+SEED3D_MAX_IMAGE_BYTES = 10 * 1024 * 1024
+SEED3D_PAD_COLOR = (240, 238, 233)
+
+
+# 为3D模型生成准备输入图片：拒绝任一边小于300px（禁止放大），以中性背景填充使宽高比落入0.4–2.5并限制长边不超过2048px
+def prepare_seed3d_image_with_size(
+    path: str | Path, allowed_roots: tuple[Path, ...]
+) -> tuple[str, tuple[int, int]]:
+    candidate = Path(path)
+    matched_root: Path | None = None
+    for root in allowed_roots:
+        if not root.exists():
+            continue
+        try:
+            ensure_safe_subpath(candidate, root)
+            matched_root = root
+            break
+        except (OSError, ValueError):
+            continue
+    if matched_root is None:
+        raise ValueError("Reference image is outside allowed directories")
+
+    raw_bytes = read_bytes_no_follow(
+        candidate, matched_root, max_bytes=SEED3D_MAX_IMAGE_BYTES
+    )
+    previous_max = Image.MAX_IMAGE_PIXELS
+    Image.MAX_IMAGE_PIXELS = MAX_INPUT_PIXELS
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", Image.DecompressionBombWarning)
+            with Image.open(io.BytesIO(raw_bytes)) as source:
+                if source.format not in ("JPEG", "PNG", "WEBP"):
+                    raise ValueError("Unsupported reference image format")
+                if source.width * source.height > MAX_INPUT_PIXELS:
+                    raise ValueError(
+                        "Reference image exceeds 40 MP maximum resolution limit"
+                    )
+                im = ImageOps.exif_transpose(source)
+                src_w, src_h = im.size
+                if src_w < SEED3D_MIN_EDGE_PX or src_h < SEED3D_MIN_EDGE_PX:
+                    raise ValueError(
+                        f"Source image dimensions ({src_w}x{src_h} px) are too small for 3D model generation; "
+                        f"both width and height must be at least {SEED3D_MIN_EDGE_PX} px (upscaling is not permitted). "
+                        "Please select or generate a higher-resolution image (>= 300x300 px)."
+                    )
+
+                has_alpha = "A" in im.getbands() or "transparency" in im.info
+                alpha = im.convert("RGBA").getchannel("A") if has_alpha else None
+                icc_bytes = source.info.get("icc_profile")
+                if icc_bytes:
+                    profile = ImageCms.ImageCmsProfile(io.BytesIO(icc_bytes))
+                    space = profile.profile.xcolor_space.strip()
+                    mode = {
+                        "RGB": "RGB",
+                        "CMYK": "CMYK",
+                        "GRAY": "L",
+                        "LAB": "LAB",
+                    }.get(space, im.mode)
+                    color = im if im.mode == mode else im.convert(mode)
+                    im = ImageCms.profileToProfile(
+                        color,
+                        profile,
+                        ImageCms.createProfile("sRGB"),
+                        outputMode="RGB",
+                    )
+                elif im.mode != "RGB":
+                    im = im.convert("RGB")
+                im = im.convert("RGBA")
+                if alpha is not None:
+                    im.putalpha(alpha)
+                im = Image.alpha_composite(
+                    Image.new("RGBA", im.size, (*SEED3D_PAD_COLOR, 255)), im
+                ).convert("RGB")
+
+            # 若宽高比超出[0.4, 2.5]，使用中性石材浅灰背景居中填充至合法宽高比范围
+            aspect = src_w / src_h
+            if aspect < SEED3D_MIN_ASPECT_RATIO:
+                padded_w = max(src_w, math.ceil(src_h * SEED3D_MIN_ASPECT_RATIO))
+                padded_h = src_h
+                canvas = Image.new("RGB", (padded_w, padded_h), SEED3D_PAD_COLOR)
+                canvas.paste(im, ((padded_w - src_w) // 2, 0))
+                im = canvas
+            elif aspect > SEED3D_MAX_ASPECT_RATIO:
+                padded_w = src_w
+                padded_h = max(src_h, math.ceil(src_w / SEED3D_MAX_ASPECT_RATIO))
+                canvas = Image.new("RGB", (padded_w, padded_h), SEED3D_PAD_COLOR)
+                canvas.paste(im, (0, (padded_h - src_h) // 2))
+                im = canvas
+
+            # 将长边限制在2048px以内，并确保整数舍入后宽高比仍在[0.4, 2.5]且短边>=300px
+            cur_w, cur_h = im.size
+            max_edge = max(cur_w, cur_h)
+            if max_edge > SEED3D_MAX_NORMALIZED_EDGE_PX:
+                scale = SEED3D_MAX_NORMALIZED_EDGE_PX / max_edge
+                new_w = max(SEED3D_MIN_EDGE_PX, round(cur_w * scale))
+                new_h = max(SEED3D_MIN_EDGE_PX, round(cur_h * scale))
+                if new_w / new_h < SEED3D_MIN_ASPECT_RATIO:
+                    new_w = max(
+                        SEED3D_MIN_EDGE_PX, math.ceil(new_h * SEED3D_MIN_ASPECT_RATIO)
+                    )
+                elif new_w / new_h > SEED3D_MAX_ASPECT_RATIO:
+                    new_h = max(
+                        SEED3D_MIN_EDGE_PX, math.ceil(new_w / SEED3D_MAX_ASPECT_RATIO)
+                    )
+                im = im.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+            im.info.clear()
+            final_size = (im.width, im.height)
+            output = io.BytesIO()
+            im.save(output, format="JPEG", quality=92)
+            encoded = output.getvalue()
+            if len(encoded) > SEED3D_MAX_IMAGE_BYTES:
+                output = io.BytesIO()
+                im.save(output, format="JPEG", quality=82, optimize=True)
+                encoded = output.getvalue()
+    except (Image.DecompressionBombError, Image.DecompressionBombWarning):
+        raise ValueError(
+            "Reference image exceeds 40 MP maximum resolution limit"
+        ) from None
+    except ValueError:
+        raise
+    except (OSError, ImageCms.PyCMSError):
+        raise ValueError("Reference image cannot be safely decoded") from None
+    finally:
+        Image.MAX_IMAGE_PIXELS = previous_max
+    data_uri = "data:image/jpeg;base64," + base64.b64encode(encoded).decode("ascii")
+    return data_uri, final_size
+
+
+# 为3D模型生成准备输入图片并返回Data URI
+def prepare_seed3d_image(path: str | Path, allowed_roots: tuple[Path, ...]) -> str:
+    data_uri, _ = prepare_seed3d_image_with_size(path, allowed_roots)
+    return data_uri
+
+
 # 校验材质对比部位名称：限制40字符以内，拒绝石材名称/别名/检索词以及附加的增删改否定指令
 def comparison_target(value: Any, catalog: Any) -> str:
     if (

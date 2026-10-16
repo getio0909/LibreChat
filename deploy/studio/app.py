@@ -42,6 +42,7 @@ from .images import (
     neutralize_stone_names,
     normalize_reference,
     normalize_reference_with_size,
+    prepare_seed3d_image,
 )
 from .kb import LIBRARY_TYPES, KnowledgeBaseIndex, load_kb_index
 from .models3d import (
@@ -1123,7 +1124,7 @@ def build_mcp_server(
                 source_resolved = resolve_image(
                     settings, user_id, image_id, kb_index=active_kb
                 )
-                image_data_uri = normalize_reference(
+                image_data_uri = prepare_seed3d_image(
                     source_resolved.path, allowed_roots
                 )
                 outcome = await active_model_manager.create_model(

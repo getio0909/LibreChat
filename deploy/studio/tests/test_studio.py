@@ -2355,7 +2355,10 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
     user_lc.mkdir(parents=True, mode=0o700)
     upload_id = "dddddddd-1111-2222-3333-444444444444"
     (user_lc / f"{upload_id}__censer.jpg").write_bytes(
-        _make_image_bytes(180, 140, color=(150, 120, 90), fmt="JPEG")
+        _make_image_bytes(360, 320, color=(150, 120, 90), fmt="JPEG")
+    )
+    (studio_env.kb_root / "assets" / "ref2048" / "5555555555555551.jpg").write_bytes(
+        _make_image_bytes(360, 320, color=(140, 115, 85), fmt="JPEG")
     )
 
     raw_glb = _make_glb_bytes(b"CENSER_GLB_BINARY_PAYLOAD_BLOCKS_0123456789")
@@ -2692,7 +2695,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
     user_lc.mkdir(parents=True, mode=0o700)
     upload_id = "eeeeeeee-1111-2222-3333-444444444444"
     (user_lc / f"{upload_id}__pagoda.jpg").write_bytes(
-        _make_image_bytes(160, 160, fmt="JPEG")
+        _make_image_bytes(360, 360, fmt="JPEG")
     )
     raw_glb = _make_glb_bytes(b"PAGODA_GLB_MODEL")
 
@@ -2916,7 +2919,7 @@ def test_seed3d_per_user_and_global_concurrency_limits(
         ulc = studio_env.librechat_images_dir / uid
         ulc.mkdir(parents=True, mode=0o700)
         (ulc / "11111111-1111-1111-1111-111111111111__src.jpg").write_bytes(
-            _make_image_bytes(64, 64, fmt="JPEG")
+            _make_image_bytes(320, 320, fmt="JPEG")
         )
 
     capped = studio_env.model_copy(
@@ -4208,5 +4211,162 @@ def test_p2b_finding5_admission_held_across_background_handoff_until_terminal(
             body2 = json.loads(res2.json()["result"]["content"][0]["text"])
             assert body2["state"] == "saved"
             assert created_tasks == ["cgt-f5-1", "cgt-f5-2"]
+
+    asyncio.run(_run())
+
+
+# 回归测试P2B Finding 8：3D模型输入预处理对宽高比超出[0.4, 2.5]的图片使用中性背景填充，对任一边小于300px的图片拒绝放大并返回明确错误
+def test_p2b_finding8_seed3d_image_prep_aspect_padding_and_min_size_rejection(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    from deploy.studio.images import (
+        SEED3D_MAX_ASPECT_RATIO,
+        SEED3D_MIN_ASPECT_RATIO,
+        SEED3D_MIN_EDGE_PX,
+        SEED3D_PAD_COLOR,
+        prepare_seed3d_image_with_size,
+    )
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+
+    # 1. 过宽图片（2048x617，对应知识库kb_40f3282b9c3d5887，宽高比3.32 > 2.5）-> 中性背景填充至2048x820
+    wide_id = "f8000001-1111-2222-3333-444444444444"
+    wide_path = user_lc / f"{wide_id}__wide.jpg"
+    wide_path.write_bytes(_make_image_bytes(2048, 617, color=(120, 80, 60), fmt="JPEG"))
+    allowed_roots = (
+        studio_env.librechat_images_dir,
+        studio_env.data_dir,
+        studio_env.kb_root,
+    )
+    wide_uri, wide_size = prepare_seed3d_image_with_size(wide_path, allowed_roots)
+    assert wide_size == (2048, 820)
+    assert (
+        SEED3D_MIN_ASPECT_RATIO
+        <= wide_size[0] / wide_size[1]
+        <= SEED3D_MAX_ASPECT_RATIO
+    )
+    with Image.open(
+        io.BytesIO(base64.b64decode(wide_uri.split(",", 1)[1]))
+    ) as padded_wide:
+        assert padded_wide.size == (2048, 820)
+        # 顶部填充带像素接近中性背景色SEED3D_PAD_COLOR
+        top_px = padded_wide.getpixel((1024, 10))
+        assert all(abs(a - b) <= 6 for a, b in zip(top_px, SEED3D_PAD_COLOR))
+
+    # 同时验证仓库内真实的kb_40f3282b9c3d5887资产（2048x617）经过预处理后符合API规格
+    repo_kb_root = Path(__file__).resolve().parents[3] / "knowledge"
+    real_wide_asset = repo_kb_root / "assets" / "ref2048" / "40f3282b9c3d5887.jpg"
+    if real_wide_asset.is_file():
+        _, real_wide_size = prepare_seed3d_image_with_size(
+            real_wide_asset, (repo_kb_root,)
+        )
+        assert real_wide_size == (2048, 820)
+        assert (
+            SEED3D_MIN_ASPECT_RATIO
+            <= real_wide_size[0] / real_wide_size[1]
+            <= SEED3D_MAX_ASPECT_RATIO
+        )
+
+    # 2. 过窄图片（534x2048，对应知识库kb_12612762af5b8f99，宽高比0.261 < 0.4）-> 中性背景填充至820x2048
+    narrow_id = "f8000002-1111-2222-3333-444444444444"
+    narrow_path = user_lc / f"{narrow_id}__narrow.jpg"
+    narrow_path.write_bytes(
+        _make_image_bytes(534, 2048, color=(90, 110, 130), fmt="JPEG")
+    )
+    narrow_uri, narrow_size = prepare_seed3d_image_with_size(narrow_path, allowed_roots)
+    assert narrow_size == (820, 2048)
+    assert (
+        SEED3D_MIN_ASPECT_RATIO
+        <= narrow_size[0] / narrow_size[1]
+        <= SEED3D_MAX_ASPECT_RATIO
+    )
+    with Image.open(
+        io.BytesIO(base64.b64decode(narrow_uri.split(",", 1)[1]))
+    ) as padded_narrow:
+        assert padded_narrow.size == (820, 2048)
+        left_px = padded_narrow.getpixel((10, 1024))
+        assert all(abs(a - b) <= 6 for a, b in zip(left_px, SEED3D_PAD_COLOR))
+
+    # 3. 尺寸过小图片（180x140与400x240，短边<300px）-> 拒绝放大并抛出可操作的ValueError
+    small_id = "f8000003-1111-2222-3333-444444444444"
+    small_path = user_lc / f"{small_id}__small.jpg"
+    small_path.write_bytes(_make_image_bytes(180, 140, fmt="JPEG"))
+    with pytest.raises(ValueError, match="at least 300 px"):
+        prepare_seed3d_image_with_size(small_path, allowed_roots)
+
+    kb_small_path = studio_env.kb_root / "assets" / "ref2048" / "1111111111111111.jpg"
+    kb_small_path.write_bytes(_make_image_bytes(400, 240, fmt="JPEG"))
+    with pytest.raises(ValueError, match="400x240 px"):
+        prepare_seed3d_image_with_size(kb_small_path, allowed_roots)
+
+    # 4. 通过MCP端到端调用create_3d_model：过宽图自动填充成功提交，过小图被本地拦截（零上游请求）
+    posted_image_sizes: list[tuple[int, int]] = []
+    raw_glb = _make_glb_bytes(b"FINDING8_PADDED_GLB")
+
+    async def _handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            body = json.loads(request.content.decode("utf-8"))
+            img_uri = body["content"][1]["image_url"]["url"]
+            raw_img = base64.b64decode(img_uri.split(",", 1)[1])
+            with Image.open(io.BytesIO(raw_img)) as decoded:
+                posted_image_sizes.append(decoded.size)
+            return httpx.Response(200, json={"id": "cgt-f8-ok"})
+        if request.url.path.endswith("/cgt-f8-ok"):
+            return httpx.Response(
+                200,
+                json={
+                    "id": "cgt-f8-ok",
+                    "status": "succeeded",
+                    "content": {"file_url": "https://tos.example.test/f8.glb"},
+                },
+            )
+        return httpx.Response(200, content=raw_glb)
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_handler),
+    )
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            res_small = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 681,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": small_id},
+                    },
+                },
+            )
+            assert res_small.json()["result"]["isError"] is True
+            err_msg = json.loads(res_small.json()["result"]["content"][0]["text"])[
+                "error"
+            ]
+            assert f"{SEED3D_MIN_EDGE_PX} px" in err_msg
+            assert posted_image_sizes == []
+
+            res_wide = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 682,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": wide_id},
+                    },
+                },
+            )
+            assert res_wide.json()["result"]["isError"] is False
+            assert posted_image_sizes == [(2048, 820)]
 
     asyncio.run(_run())
