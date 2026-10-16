@@ -95,6 +95,11 @@ printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
+# 重部署成功时应更新 studio.json 中的新配置，但保留服务器已持久化的 file_signing_key。
+mkdir -p "$work/redeployed"
+cp "$work/bundle/compose.yml" "$work/bundle/librechat.yaml" "$work/bundle/.env" "$work/bundle/image.env" "$work/redeployed/"
+jq --arg key "$(printf 'c%.0s' {1..64})" '.file_signing_key = $key' "$work/bundle/studio.json" > "$work/redeployed/studio.json"
+
 for scenario in none health command login role final first-none first-login first-role; do
   failure=${scenario#first-}
   root="$work/$scenario"
@@ -112,12 +117,22 @@ for scenario in none health command login role final first-none first-login firs
     test "$status" != 0
     grep -q 'The failed initial application deployment has been stopped.' "$work/output.log"
     grep -q '^down:' "$DEPLOY_TEST_LOG"
-    for file in compose.yml librechat.yaml .env image.env studio.json; do test ! -f "$root/$file"; done
+    for file in compose.yml librechat.yaml .env image.env studio.json .file_signing_key; do test ! -f "$root/$file"; done
     test -f "$DEPLOY_TEST_GATE"
   elif [[ "$failure" == none ]]; then
     test "$status" = 0
-    expected="$work/bundle"
+    if [[ "$scenario" == first-none ]]; then
+      expected="$work/bundle"
+      expected_signing_key="$(printf 'd%.0s' {1..64})"
+    else
+      expected="$work/redeployed"
+      expected_signing_key="$(printf 'c%.0s' {1..64})"
+    fi
     grep -q '^up:false:.*11111111' "$DEPLOY_TEST_LOG"
+    test -f "$root/.file_signing_key"
+    test "$(stat -c '%a' "$root/.file_signing_key")" = 600
+    test "$(tr -d '\r\n' < "$root/.file_signing_key")" = "$expected_signing_key"
+    test "$(jq -r '.file_signing_key' "$root/studio.json")" = "$expected_signing_key"
   else
     test "$status" != 0
     expected="$work/previous"
@@ -136,6 +151,20 @@ for scenario in none health command login role final first-none first-login firs
   test -z "$(find "$root" -maxdepth 1 -name '.incoming.*' -print -quit)"
   printf 'Deployment recovery test passed: %s\n' "$scenario"
 done
+
+# 验证首次部署生成的签名密钥在后续重部署时不会被新归档中的随机密钥覆盖。
+mkdir -p "$work/bundle2"
+cp "$work/bundle/"* "$work/bundle/.env" "$work/bundle2/"
+jq --arg token "$(printf 'e%.0s' {1..64})" --arg key "$(printf 'f%.0s' {1..64})" \
+  '.shared_token = $token | .file_signing_key = $key' "$work/bundle/studio.json" > "$work/bundle2/studio.json"
+tar -czf "$work/bundle2.tgz" -C "$work/bundle2" .
+export DEPLOY_TEST_FAILURE=none
+SSH_ORIGINAL_COMMAND="deploy $work/first-none" bash "$work/deploy.sh" "$work/first-none" \
+  < "$work/bundle2.tgz" > "$work/output.log" 2>&1
+test "$(jq -r '.shared_token' "$work/first-none/studio.json")" = "$(printf 'e%.0s' {1..64})"
+test "$(jq -r '.file_signing_key' "$work/first-none/studio.json")" = "$(printf 'd%.0s' {1..64})"
+test "$(tr -d '\r\n' < "$work/first-none/.file_signing_key")" = "$(printf 'd%.0s' {1..64})"
+echo 'Deployment signing key persistence test passed.'
 
 printf 'unexpected\n' > "$work/bundle/unexpected.txt"
 tar -czf "$work/invalid.tgz" -C "$work/bundle" .

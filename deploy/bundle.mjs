@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 
@@ -57,10 +57,26 @@ function resolveStudioSharedToken() {
   return provided;
 }
 
-// 解析或生成 32 字节（64 位十六进制）的三维模型文件 HMAC 签名密钥。
-function resolveFileSigningKey() {
+// 解析或生成 32 字节（64 位十六进制）的三维模型文件 HMAC 签名密钥；若目标目录已存在有效密钥则优先复用。
+function resolveFileSigningKey(targetDir) {
   const provided = process.env.STUDIO_FILE_SIGNING_KEY;
   if (!provided) {
+    if (targetDir) {
+      const existingStudioPath = path.join(targetDir, 'studio.json');
+      if (existsSync(existingStudioPath)) {
+        try {
+          const existing = JSON.parse(readFileSync(existingStudioPath, 'utf8'));
+          if (
+            typeof existing.file_signing_key === 'string' &&
+            /^[0-9a-fA-F]{64}$/.test(existing.file_signing_key)
+          ) {
+            return existing.file_signing_key;
+          }
+        } catch {
+          // 忽略损坏的旧配置并生成新密钥。
+        }
+      }
+    }
     return randomBytes(32).toString('hex');
   }
   if (!/^[0-9a-fA-F]{64}$/.test(provided)) {
@@ -93,7 +109,7 @@ const arkApiKey = requireSafeSingleLineSecret('ARK_API_KEY');
 const librechatImage = requireImageReference('LIBRECHAT_IMAGE');
 const studioImage = requireImageReference('STUDIO_IMAGE');
 const sharedToken = resolveStudioSharedToken();
-const fileSigningKey = resolveFileSigningKey();
+const fileSigningKey = resolveFileSigningKey(target);
 const publicBaseUrl = resolvePublicBaseUrl();
 const accounts = {
   admin: requireAccountConfig('ADMIN'),

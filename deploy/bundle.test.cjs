@@ -126,3 +126,47 @@ test('bundle rejects missing or malformed image references, URLs, signing keys, 
   assert.notEqual(runBundle({ ADMIN_EMAIL: 'invalid-email' }).result.status, 0);
   assert.notEqual(runBundle({ USER_PASSWORD: 'short' }).result.status, 0);
 });
+
+test('bundle reuses existing file_signing_key when studio.json already exists in target directory', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-bundle-reuse-'));
+  try {
+    const baseEnv = {
+      PATH: process.env.PATH,
+      RUNNER_TEMP: root,
+      LIBRECHAT_ENV: 'APP_TITLE=LibreChat',
+      GEMINI_API_KEY: 'fixture-gemini-key',
+      OPENROUTER_API_KEY: 'fixture-openrouter-key',
+      ARK_API_KEY: 'fixture-ark-key',
+      LIBRECHAT_IMAGE:
+        'ghcr.io/getio0909/librechat-dev@sha256:1111111111111111111111111111111111111111111111111111111111111111',
+      STUDIO_IMAGE:
+        'ghcr.io/getio0909/librechat-studio:sha-abc123@sha256:2222222222222222222222222222222222222222222222222222222222222222',
+      ADMIN_EMAIL: 'admin@example.test',
+      ADMIN_USERNAME: 'admin',
+      ADMIN_PASSWORD: 'fixture-admin-password',
+      USER_EMAIL: 'user@example.test',
+      USER_USERNAME: 'user',
+      USER_PASSWORD: 'fixture-user-password',
+    };
+    const first = spawnSync(process.execPath, ['deploy/bundle.mjs'], {
+      encoding: 'utf8',
+      env: baseEnv,
+    });
+    assert.equal(first.status, 0, first.stderr);
+    const studioPath = path.join(root, 'bundle', 'studio.json');
+    const firstStudio = JSON.parse(fs.readFileSync(studioPath, 'utf8'));
+
+    const second = spawnSync(process.execPath, ['deploy/bundle.mjs'], {
+      encoding: 'utf8',
+      env: baseEnv,
+    });
+    assert.equal(second.status, 0, second.stderr);
+    const secondStudio = JSON.parse(fs.readFileSync(studioPath, 'utf8'));
+
+    assert.equal(secondStudio.file_signing_key, firstStudio.file_signing_key);
+    assert.notEqual(secondStudio.shared_token, firstStudio.shared_token);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+

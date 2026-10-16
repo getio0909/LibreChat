@@ -4781,3 +4781,204 @@ const {{ chromium }} = require('playwright');
     finally:
         uvi_server.should_exit = True
         server_thread.join(timeout=3.0)
+
+
+# 回归测试P2b Finding 7：首次部署持久化file_signing_key，后续重部署不会覆盖该密钥且旧签名下载令牌依然有效
+def test_p2b_finding7_persisted_signing_key_preserves_token_across_redeploy(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    import os
+    import subprocess
+    import tarfile
+
+    repo_root = Path(__file__).resolve().parents[3]
+    deploy_sh_src = repo_root / "deploy" / "deploy.sh"
+    bundle_mjs = repo_root / "deploy" / "bundle.mjs"
+
+    work = tmp_path / "redeploy_test"
+    bin_dir = work / "bin"
+    deploy_root = work / "server_root"
+    gate_file = work / "provisioning"
+    bin_dir.mkdir(parents=True)
+    deploy_root.mkdir(parents=True)
+
+    # 构造仅替换外部容器与HTTP探针的真实deploy.sh脚本
+    patched_deploy_sh = work / "deploy.sh"
+    patched_deploy_sh.write_text(
+        deploy_sh_src.read_text(encoding="utf-8").replace(
+            "gate=/etc/nginx/librechat-dev.provisioning",
+            f"gate='{gate_file}'",
+        ),
+        encoding="utf-8",
+    )
+
+    docker_stub = bin_dir / "docker"
+    docker_stub.write_text(
+        "#!/usr/bin/env bash\n"
+        "set -euo pipefail\n"
+        'if [[ "$1" == login ]]; then cat >/dev/null; exit 0; fi\n'
+        "while (( $# > 0 )); do\n"
+        '  case "$1" in\n'
+        "    up|config|pull|ps|down) exit 0 ;;\n"
+        "    exec) cat >/dev/null; echo 'A user with that email or username already exists!' >&2; exit 1 ;;\n"
+        "    *) shift ;;\n"
+        "  esac\n"
+        "done\n",
+        encoding="utf-8",
+    )
+    curl_stub = bin_dir / "curl"
+    curl_stub.write_text(
+        "#!/usr/bin/env bash\n"
+        "set -euo pipefail\n"
+        'while [[ "$1" != -o ]]; do shift; done\n'
+        "output=$2\n"
+        "email=$(jq -r .email)\n"
+        "role=USER\n"
+        'if [[ "$email" == admin@example.test ]]; then role=ADMIN; fi\n'
+        'jq -n --arg role "$role" \'{user: {role: $role}}\' > "$output"\n',
+        encoding="utf-8",
+    )
+    chown_stub = bin_dir / "chown"
+    chown_stub.write_text(
+        '#!/usr/bin/env bash\nset -euo pipefail\ntest -f "$2"\n',
+        encoding="utf-8",
+    )
+    for stub in (docker_stub, curl_stub, chown_stub):
+        stub.chmod(0o755)
+
+    # 生成两个独立的CI构建产物归档（均不传STUDIO_FILE_SIGNING_KEY，模拟两次独立的GitHub Actions运行）
+    def _build_bundle_archive(run_idx: int) -> tuple[Path, dict[str, Any]]:
+        runner_temp = work / f"runner_{run_idx}"
+        bundle_dir = runner_temp / "bundle"
+        bundle_dir.mkdir(parents=True)
+        env = {
+            "PATH": f"{bin_dir}:{os.environ.get('PATH', '')}",
+            "RUNNER_TEMP": str(runner_temp),
+            "LIBRECHAT_ENV": "ALLOW_REGISTRATION=false",
+            "GEMINI_API_KEY": f"gemini-key-v{run_idx}",
+            "OPENROUTER_API_KEY": f"openrouter-key-v{run_idx}",
+            "ARK_API_KEY": f"ark-key-v{run_idx}",
+            "LIBRECHAT_IMAGE": (
+                f"ghcr.io/getio0909/librechat-dev@sha256:{str(run_idx) * 64}"
+            ),
+            "STUDIO_IMAGE": (
+                f"ghcr.io/getio0909/librechat-studio:sha-v{run_idx}@sha256:{str(run_idx + 2) * 64}"
+            ),
+            "ADMIN_EMAIL": "admin@example.test",
+            "ADMIN_USERNAME": "admin",
+            "ADMIN_PASSWORD": "test-password-123",
+            "USER_EMAIL": "user@example.test",
+            "USER_USERNAME": "user",
+            "USER_PASSWORD": "test-password-123",
+        }
+        subprocess.run(
+            ["node", str(bundle_mjs)],
+            cwd=str(repo_root),
+            env=env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        (bundle_dir / "compose.yml").write_text("services: {}\n", encoding="utf-8")
+        (bundle_dir / "librechat.yaml").write_text("version: 1.2.1\n", encoding="utf-8")
+        (bundle_dir / "registry.token").write_text("ghp_dummy\n", encoding="utf-8")
+        studio_cfg = json.loads(
+            (bundle_dir / "studio.json").read_text(encoding="utf-8")
+        )
+        archive_path = work / f"bundle_v{run_idx}.tgz"
+        with tarfile.open(archive_path, "w:gz") as tf:
+            for item in sorted(bundle_dir.iterdir()):
+                tf.add(item, arcname=f"./{item.name}")
+        return archive_path, studio_cfg
+
+    archive_v1, bundle_cfg_v1 = _build_bundle_archive(1)
+    archive_v2, bundle_cfg_v2 = _build_bundle_archive(2)
+    assert bundle_cfg_v1["file_signing_key"] != bundle_cfg_v2["file_signing_key"]
+
+    deploy_env = {
+        **os.environ,
+        "PATH": f"{bin_dir}:{os.environ.get('PATH', '')}",
+        "SSH_ORIGINAL_COMMAND": f"deploy {deploy_root}",
+    }
+
+    # 1. 首次部署：生成并持久化file_signing_key
+    with archive_v1.open("rb") as f_in:
+        subprocess.run(
+            ["bash", str(patched_deploy_sh), str(deploy_root)],
+            stdin=f_in,
+            env=deploy_env,
+            check=True,
+            capture_output=True,
+        )
+    deployed_cfg_v1 = json.loads(
+        (deploy_root / "studio.json").read_text(encoding="utf-8")
+    )
+    assert deployed_cfg_v1["file_signing_key"] == bundle_cfg_v1["file_signing_key"]
+    assert (deploy_root / ".file_signing_key").read_text(
+        encoding="utf-8"
+    ).strip() == bundle_cfg_v1["file_signing_key"]
+
+    # 使用首次部署的studio.json签发3D模型下载令牌并落盘模型文件
+    settings_v1 = studio_env.model_copy(
+        update={
+            "shared_token": deployed_cfg_v1["shared_token"],
+            "file_signing_key": deployed_cfg_v1["file_signing_key"],
+            "public_base_url": deployed_cfg_v1["public_base_url"],
+        }
+    )
+    model_id = "mdl_77777777777777777777777777777777"
+    model_dir = settings_v1.data_dir / "users" / USER_A / "models" / model_id
+    model_dir.mkdir(parents=True, mode=0o700)
+    raw_glb = _make_glb_bytes(b"REDEPLOY_PERSISTED_SIGNING_KEY_GLB")
+    (model_dir / "model.glb").write_bytes(raw_glb)
+    (model_dir / "model.glb").chmod(0o600)
+    (model_dir / "receipt.json").write_text(
+        json.dumps(
+            {
+                "state": "saved",
+                "user_id": USER_A,
+                "model_id": model_id,
+                "file": "model.glb",
+                "bytes": len(raw_glb),
+            }
+        ),
+        encoding="utf-8",
+    )
+    token_before_redeploy, _ = sign_file_token(settings_v1, USER_A, model_id)
+
+    # 2. 第二次部署（重部署）：归档携带全新的随机file_signing_key，但服务器必须保留首次部署持久化的密钥
+    with archive_v2.open("rb") as f_in:
+        subprocess.run(
+            ["bash", str(patched_deploy_sh), str(deploy_root)],
+            stdin=f_in,
+            env=deploy_env,
+            check=True,
+            capture_output=True,
+        )
+    deployed_cfg_v2 = json.loads(
+        (deploy_root / "studio.json").read_text(encoding="utf-8")
+    )
+    assert deployed_cfg_v2["shared_token"] == bundle_cfg_v2["shared_token"]
+    assert deployed_cfg_v2["ark_api_key"] == "ark-key-v2"
+    assert deployed_cfg_v2["file_signing_key"] == bundle_cfg_v1["file_signing_key"]
+
+    # 3. 使用重部署后的studio.json配置启动服务，验证重部署前签发的下载令牌依然返回200 OK
+    settings_v2 = studio_env.model_copy(
+        update={
+            "shared_token": deployed_cfg_v2["shared_token"],
+            "file_signing_key": deployed_cfg_v2["file_signing_key"],
+            "public_base_url": deployed_cfg_v2["public_base_url"],
+        }
+    )
+    app_v2 = create_app(settings=settings_v2, rules=load_rules())
+
+    async def _verify_download() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app_v2),
+            base_url="http://studio:8000",
+        ) as client:
+            res = await client.get(f"/files/{token_before_redeploy}")
+            assert res.status_code == 200
+            assert res.content == raw_glb
+
+    asyncio.run(_verify_download())
