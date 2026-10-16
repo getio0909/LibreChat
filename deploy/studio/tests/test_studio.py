@@ -691,7 +691,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
         ):
             assert app.state.session_manager is not None
             assert getattr(app.state.session_manager, "_task_group", None) is not None
-            # 1. 验证tools/list返回恰好8个工具且Schema完全扁平
+            # 1. 验证tools/list返回恰好10个工具且Schema完全扁平
             list_res = await client.post(
                 "/mcp",
                 headers=headers,
@@ -703,6 +703,8 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 "design_concepts",
                 "generate_image",
                 "edit_image",
+                "select_region",
+                "edit_region",
                 "list_images",
                 "search_library",
                 "compare_materials",
