@@ -1322,6 +1322,97 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
     asyncio.run(_run())
 
 
+# 校验概念方案渲染时即使规划器的image_prompt遗漏了必选副件与空间布局，仍会附带原始brief作为design_constraints发送给生图接口
+def test_concept_rendering_includes_binding_design_constraints(
+    studio_env: StudioSettings,
+) -> None:
+    ark_prompts: list[str] = []
+    small_jpg = _make_image_bytes(64, 48, fmt="JPEG")
+
+    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        ark_prompts.append(body["prompt"])
+        return httpx.Response(
+            200,
+            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
+        )
+
+    # 模拟规划器在image_prompt中遗漏了“配套三足香炉”和“禅堂全景布局”，只写了孤立供桌
+    async def _omitting_gemini_handler(request: httpx.Request) -> httpx.Response:
+        concept = {
+            "title": "极简石案",
+            "positioning": "主供桌定位",
+            "description": "石质供桌配三足香炉",
+            "materials": "青石（待确认）",
+            "key_details": "直腿内收",
+            "image_prompt": "An isolated stone altar table in a neutral studio.",
+        }
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "text": json.dumps(
+                                        {"concepts": [concept]}, ensure_ascii=False
+                                    )
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_omitting_gemini_handler),
+    )
+
+    brief_text = "设计禅堂中轴线上的石材供桌，桌面正中必须放置配套三足香炉，保留完整禅堂空间布局"
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 30,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "design_concepts",
+                        "arguments": {
+                            "brief": brief_text,
+                            "count": 1,
+                            "with_images": True,
+                        },
+                    },
+                },
+            )
+            assert res.status_code == 200
+            assert res.json()["result"]["isError"] is False
+            assert len(ark_prompts) == 1
+            sent_prompt = ark_prompts[0]
+            assert "design_constraints" in sent_prompt
+            assert (
+                json.dumps({"design_constraints": brief_text}, ensure_ascii=False)
+                in sent_prompt
+            )
+            assert "配套三足香炉" in sent_prompt
+            assert "完整禅堂空间布局" in sent_prompt
+
+    asyncio.run(_run())
+
+
+
 
 
 

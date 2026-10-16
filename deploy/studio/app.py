@@ -505,7 +505,12 @@ def build_mcp_server(
                 warnings: list[str] = []
 
                 if with_images:
-                    # 按每用户并发上限并发生成各概念方案的效果图
+                    # 按每用户并发上限并发生成各概念方案的效果图，并附带原始brief作为硬性design_constraints
+                    clean_brief = neutralize_stone_names(brief, stone_map)
+                    constraints_line = json.dumps(
+                        {"design_constraints": clean_brief}, ensure_ascii=False
+                    )
+
                     async def _render_concept(
                         concept_item: dict[str, str],
                     ) -> tuple[dict[str, Any] | None, str | None]:
@@ -515,6 +520,7 @@ def build_mcp_server(
                         full_prompt = rules.render_prefix + raw_img_prompt
                         if ref_uris:
                             full_prompt = f"{full_prompt}\n{rules.reference_rules}"
+                        full_prompt = f"{full_prompt}\n{constraints_line}"
                         try:
                             async with limiter.acquire(user_id):
                                 img_id, job_dir = allocate_studio_job(settings, user_id)
