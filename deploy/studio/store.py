@@ -31,6 +31,7 @@ IMAGE_PRODUCING_TOOLS: frozenset[str] = frozenset(
     {
         "generate_image",
         "edit_image",
+        "edit_region",
         "design_concepts",
         "compare_materials",
     }

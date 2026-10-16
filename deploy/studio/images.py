@@ -547,6 +547,27 @@ def build_edit_prompt(
     return full_prompt, unique_paths
 
 
+# 组装局部选区修改提示词（附加局部裁切框内的归一化<bbox>约束及可选原样贴入说明）
+def build_local_edit_prompt(
+    instruction: str,
+    references: list[dict[str, Any]],
+    rules: StudioRules,
+    *,
+    region_bbox: tuple[int, int, int, int],
+    placement_instruction: str | None = None,
+) -> tuple[str, list[Path]]:
+    base_prompt, unique_paths = build_edit_prompt(instruction, references, rules)
+    rx1, ry1, rx2, ry2 = region_bbox
+    region_line = (
+        f"图1是原场景的局部裁图。仅修改 <bbox>{rx1} {ry1} {rx2} {ry2}</bbox> 内的指定内容，"
+        "保持构图位置、边缘结构与周围光线一致，不添加选区标记。"
+    )
+    extra_parts = [
+        part for part in (placement_instruction, region_line) if part and part.strip()
+    ]
+    return "\n".join([base_prompt, *extra_parts]), unique_paths
+
+
 # 生成用于MCP结果展示的压缩图片（JPEG或WebP，严格不超过3MB），不修改原图字节
 def encode_display_image(
     raw_bytes: bytes, max_bytes: int = MAX_DISPLAY_BYTES
@@ -577,7 +598,7 @@ def encode_display_image(
             return data, "image/jpeg"
 
 
-# 调用云端图像生成接口并原子保存原始字节与receipt.json
+# 调用云端图像生成接口并原子保存原始字节与receipt.json（支持局部选区回贴与选区外像素零改动校验）
 async def generate_seedream(
     settings: StudioSettings,
     prompt: str,
@@ -587,6 +608,7 @@ async def generate_seedream(
     destination: Path,
     *,
     source_size: tuple[int, int] | None = None,
+    local_composite: dict[str, Any] | None = None,
     transport: httpx.AsyncBaseTransport | None = None,
 ) -> dict[str, Any]:
     if size not in NATIVE or (aspect != "source" and aspect not in NATIVE[size]):
@@ -715,6 +737,59 @@ async def generate_seedream(
     ):
         _mark_uncertain(destination, record)
         raise GenerationUncertain(uncertain_msg) from None
+
+    if local_composite is not None:
+        from .regions import composite_local
+
+        crop_path = destination / f"crop{suffix}"
+        try:
+            temp_crop = destination / "crop.part"
+            desc = os.open(temp_crop, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(desc, "wb") as stream:
+                stream.write(image_bytes)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temp_crop, crop_path)
+
+            original_path = destination / "original.png"
+            comp = composite_local(
+                local_composite["base_path"],
+                crop_path,
+                local_composite["selection"],
+                local_composite["crop"],
+                original_path,
+            )
+            final_bytes = original_path.read_bytes()
+            record.update(
+                state="saved",
+                finished=time.time(),
+                width=comp["width"],
+                height=comp["height"],
+                file=original_path.name,
+                sha256=comp["sha256"],
+                selected_pixels=comp["selected_pixels"],
+                outside_changed_pixels=0,
+            )
+            write_receipt(destination, record)
+        except (ValueError, RuntimeError) as exc:
+            _mark_uncertain(destination, record)
+            raise RuntimeError(str(exc)) from exc
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg) from None
+
+        return {
+            "path": original_path,
+            "raw_bytes": final_bytes,
+            "width": comp["width"],
+            "height": comp["height"],
+            "sha256": comp["sha256"],
+            "selected_pixels": comp["selected_pixels"],
+            "outside_changed_pixels": 0,
+            "requested_size": body["size"],
+            "reference_count": len(references),
+            "watermark": False,
+        }
 
     original_path = destination / f"original{suffix}"
     try:
