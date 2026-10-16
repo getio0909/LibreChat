@@ -4,16 +4,27 @@ const assert = require('node:assert/strict');
 const yaml = require('js-yaml');
 const {
   configSchema,
+  EModelEndpoint,
   fileConfig: defaultFileConfig,
   mergeFileConfig,
   getEndpointFileConfig,
 } = require('librechat-data-provider');
-const { getGoogleConfig, processMCPEnv, buildMCPImageToolContext } = require('@librechat/api');
+const {
+  getGoogleConfig,
+  processMCPEnv,
+  buildMCPImageToolContext,
+  applyModelSpecPreset,
+  initializeAgent,
+  isChatSelectableMCPServer,
+} = require('@librechat/api');
 
 const rawYaml = fs.readFileSync('librechat.yaml', 'utf8');
 const parsedYaml = yaml.load(rawYaml);
 const rawCompose = fs.readFileSync('deploy/compose.yml', 'utf8');
 const parsedCompose = yaml.load(rawCompose);
+const zhHansTranslations = JSON.parse(
+  fs.readFileSync('client/src/locales/zh-Hans/translation.json', 'utf8'),
+);
 
 // 禁止在面向用户的名称、描述或提示词中出现的厂商与模型标识。
 const VENDOR_NAME_PATTERN =
@@ -73,11 +84,16 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
   const [defaultSpec, fastSpec] = config.modelSpecs.list;
   assert.equal(defaultSpec.name, 'zyb-design');
   assert.equal(defaultSpec.default, true);
+  assert.equal(defaultSpec.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(defaultSpec.hideBadgeRow, true);
   assert.equal(defaultSpec.preset.endpoint, 'google');
   assert.equal(defaultSpec.preset.model, 'gemini-4-argon');
+  assert.equal(defaultSpec.preset.iconURL, '/assets/zybc-seal.svg');
   assert.equal(defaultSpec.preset.thinking, true);
   assert.equal(defaultSpec.preset.thinkingLevel, 'high');
   assert.equal(defaultSpec.preset.thinkingBudget, undefined);
+  assert.equal(defaultSpec.preset.maxContextTokens, 200000);
+  assert.equal(defaultSpec.preset.maxOutputTokens, 65536);
 
   // 验证 Google LLM 配置为 Gemini 4 Argon 生成 HIGH thinkingLevel 且不发送 thinkingBudget。
   const { llmConfig } = getGoogleConfig(
@@ -99,17 +115,142 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
 
   assert.equal(fastSpec.name, 'zyb-design-fast');
   assert.equal(fastSpec.default, false);
+  assert.equal(fastSpec.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(fastSpec.hideBadgeRow, true);
   assert.equal(fastSpec.preset.endpoint, 'OpenRouter');
   assert.equal(fastSpec.preset.model, 'anthropic/claude-haiku-5.5');
+  assert.equal(fastSpec.preset.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(fastSpec.preset.maxContextTokens, 200000);
+  assert.equal(fastSpec.preset.max_tokens, 32000);
 
   // 验证 OpenRouter 与轻量级标题端点配置。
   const openRouterEndpoint = config.endpoints.custom.find((ep) => ep.name === 'OpenRouter');
   const titleEndpoint = config.endpoints.custom.find((ep) => ep.name === 'OpenRouterTitles');
   assert.ok(openRouterEndpoint, 'OpenRouter custom endpoint must exist');
   assert.ok(titleEndpoint, 'OpenRouterTitles custom endpoint must exist');
+  assert.equal(openRouterEndpoint.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(titleEndpoint.iconURL, '/assets/zybc-seal.svg');
   assert.equal(openRouterEndpoint.titleConvo, true);
   assert.equal(openRouterEndpoint.titleEndpoint, 'OpenRouterTitles');
   assert.deepEqual(openRouterEndpoint.models.default, ['anthropic/claude-haiku-5.5']);
+  assert.ok(config.endpoints.all?.titlePrompt?.includes('{convo}'));
+  assert.ok(config.endpoints.google?.titlePrompt?.includes('{convo}'));
+  assert.ok(openRouterEndpoint.titlePrompt?.includes('{convo}'));
+});
+
+test('both modelSpecs compute large effective context budgets via initializeAgent and never collapse to 1024', async () => {
+  const config = configSchema.parse(parsedYaml);
+  const previousGoogleKey = process.env.GOOGLE_KEY;
+  const previousOpenRouterKey = process.env.OPENROUTER_API_KEY;
+  process.env.GOOGLE_KEY = 'fixture-google-key';
+  process.env.OPENROUTER_API_KEY = 'fixture-openrouter-key';
+
+  try {
+    const appConfig = {
+      endpoints: {
+        ...config.endpoints,
+        custom: config.endpoints.custom,
+      },
+    };
+    const db = {
+      getProjectFiles: async () => [],
+      getFiles: async () => [],
+      getConvoFiles: async () => [],
+      updateFilesUsage: async () => [],
+      getUserKey: async () => 'fixture-key',
+      getUserKeyValues: async () => ({ apiKey: 'fixture-key' }),
+      getToolFilesByIds: async () => [],
+    };
+    const loadTools = async () => ({
+      tools: [],
+      toolContextMap: {},
+      dynamicToolContextMap: {},
+      toolDefinitions: [],
+      hasDeferredTools: false,
+    });
+
+    // 预估系统提示词与 8 个 MCP 工具 schema 的总词元开销上限（实测约 1,813 tokens，此处按 5,000 保守预留）。
+    const instructionAndToolTokensReserve = 5000;
+
+    for (const spec of config.modelSpecs.list) {
+      const endpoint = spec.preset.endpoint;
+      const endpointType =
+        endpoint === EModelEndpoint.google ? EModelEndpoint.google : EModelEndpoint.custom;
+      const { parsedBody } = applyModelSpecPreset({
+        modelSpec: spec,
+        parsedBody: { spec: spec.name },
+        endpoint,
+        endpointType,
+        includePresetDefaults: true,
+      });
+      const {
+        spec: _s,
+        iconURL: _i,
+        agent_id: _a,
+        chatProjectId: _c,
+        ...model_parameters
+      } = parsedBody;
+      const agent = {
+        id: EModelEndpoint.agents,
+        name: spec.label,
+        provider: endpoint,
+        model: spec.preset.model,
+        instructions: spec.preset.promptPrefix,
+        tools: [],
+        model_parameters,
+      };
+      const initialized = await initializeAgent(
+        {
+          req: { user: { id: 'user-1' }, config: appConfig, body: {} },
+          res: {},
+          agent,
+          loadTools,
+          endpointOption: { endpoint, endpointType, model_parameters },
+          allowedProviders: new Set([endpoint, 'google', 'openAI', 'custom']),
+          isInitialAgent: true,
+        },
+        db,
+      );
+
+      assert.notEqual(
+        initialized.maxContextTokens,
+        1024,
+        `${spec.name} maxContextTokens must not collapse to the 1024 floor`,
+      );
+      assert.ok(
+        initialized.baseContextTokens >= 100000,
+        `${spec.name} baseContextTokens must remain >= 100k, got ${initialized.baseContextTokens}`,
+      );
+      const availableForMessages = initialized.maxContextTokens - instructionAndToolTokensReserve;
+      assert.ok(
+        availableForMessages >= 100000,
+        `${spec.name} availableForMessages must be at least 100k, got ${availableForMessages}`,
+      );
+
+      if (spec.name === 'zyb-design') {
+        // gemini-4-argon：上下文上限 200,000 - 最大输出 65,536 = 134,464 可用于输入
+        assert.equal(initialized.maxContextTokens, 200000);
+        assert.equal(initialized.baseContextTokens, 134464);
+        assert.equal(initialized.model_parameters.maxOutputTokens, 65536);
+      } else if (spec.name === 'zyb-design-fast') {
+        // anthropic/claude-haiku-5.5：上下文上限 200,000 - 最大输出 32,000 = 168,000 可用于输入
+        assert.equal(initialized.maxContextTokens, 200000);
+        assert.equal(initialized.baseContextTokens, 168000);
+        assert.equal(initialized.model_parameters.maxTokens, 32000);
+      }
+    }
+  } finally {
+    if (previousGoogleKey === undefined) {
+      delete process.env.GOOGLE_KEY;
+    } else {
+      process.env.GOOGLE_KEY = previousGoogleKey;
+    }
+    if (previousOpenRouterKey === undefined) {
+      delete process.env.OPENROUTER_API_KEY;
+    } else {
+      process.env.OPENROUTER_API_KEY = previousOpenRouterKey;
+    }
+  }
 });
 
 test('only zyb_studio is attached and no CAD servers or prompts remain', () => {
@@ -125,6 +266,23 @@ test('only zyb_studio is attached and no CAD servers or prompts remain', () => {
 test('customer-facing labels, descriptions, welcome text, and promptPrefix contain no vendor names', () => {
   const config = configSchema.parse(parsedYaml);
   assert.doesNotMatch(config.interface.customWelcome || '', VENDOR_NAME_PATTERN);
+  assert.equal(parsedYaml.interface.customFooter, '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考');
+  assert.equal(
+    parsedCompose.services.api.environment.CUSTOM_FOOTER,
+    '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考',
+  );
+  assert.doesNotMatch(parsedYaml.interface.customFooter, VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(parsedYaml.interface.customFooter, /librechat|every ai for everyone/i);
+  assert.doesNotMatch(config.interface.mcpServers?.placeholder || '', VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(config.mcpServers.zyb_studio.title || '', VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(config.endpoints.all?.titlePrompt || '', VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(config.endpoints.google?.titlePrompt || '', VENDOR_NAME_PATTERN);
+  assert.match(
+    zhHansTranslations.com_endpoint_message_placeholder || '',
+    /[\u4e00-\u9fff]/,
+    'zh-Hans composer placeholder must be Chinese',
+  );
+  assert.notEqual(zhHansTranslations.com_endpoint_message_placeholder, 'Message');
 
   for (const spec of config.modelSpecs.list) {
     assert.doesNotMatch(spec.label, VENDOR_NAME_PATTERN);
@@ -210,7 +368,13 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   const studioServer = config.mcpServers.zyb_studio;
   assert.equal(studioServer.type, 'streamable-http');
   assert.equal(studioServer.url, 'http://studio:8000/mcp');
-  assert.equal(studioServer.timeout, 600000);
+  assert.equal(studioServer.title, '庄严宝刹设计工坊');
+  assert.equal(studioServer.chatMenu, false);
+  assert.equal(studioServer.requiresOAuth, false);
+  // 超时时间须大于规划（540s）与生图（240s）之和 780,000ms。
+  assert.equal(studioServer.timeout, 900000);
+  assert.ok(studioServer.timeout >= (540 + 240) * 1000);
+  assert.equal(isChatSelectableMCPServer(studioServer), false);
   assert.deepEqual(studioServer.headers, {
     'X-LibreChat-User-ID': '{{LIBRECHAT_USER_ID}}',
     'X-LibreChat-Conversation-ID': '{{LIBRECHAT_BODY_CONVERSATIONID}}',

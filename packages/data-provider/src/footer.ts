@@ -6,7 +6,9 @@ import type { TStartupConfig } from './config';
  * serves the HTML shell, reading this field off its own configuration instead
  * of assembling a startup payload it has no request for.
  */
-export type TConfiguredFooterSource = Pick<Partial<TStartupConfig>, 'customFooter'>;
+export type TConfiguredFooterSource = Pick<Partial<TStartupConfig>, 'customFooter'> & {
+  interface?: Pick<NonNullable<TStartupConfig['interface']>, 'customFooter'>;
+};
 
 /**
  * Whether a deployment configured footer content of its own.
@@ -27,5 +29,12 @@ export type TConfiguredFooterSource = Pick<Partial<TStartupConfig>, 'customFoote
  * exists to remove.
  */
 export function hasConfiguredFooter(source?: TConfiguredFooterSource | null): boolean {
-  return typeof source?.customFooter === 'string' && source.customFooter.trim() !== '';
+  // 同时支持顶层 customFooter 与 interface.customFooter 配置
+  const footer =
+    typeof source?.customFooter === 'string'
+      ? source.customFooter
+      : typeof source?.interface?.customFooter === 'string'
+        ? source.interface.customFooter
+        : undefined;
+  return typeof footer === 'string' && footer.trim() !== '';
 }
