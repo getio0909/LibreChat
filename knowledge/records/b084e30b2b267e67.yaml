@@ -1,0 +1,81 @@
+id: b084e30b2b267e67
+title_zh: 西藏骨质双面手鼓达玛如
+source:
+  original_path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏骨质双面手鼓达玛如-cma98700.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/05-中国藏区·藏传佛教法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏骨质双面手鼓达玛如-cma98700.jpg
+  sha256: b084e30b2b267e67e0cf791ff05ff40a01001737ae7be2a03629989ade0e6980
+  bytes: 1724330
+  width: 3400
+  height: 2989
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b084e30b2b267e67.jpg
+    sha256: bc0f6586a7e92c6ea7c791a9ede03100cf0af14ba555acf8021afaf940dd8797
+    bytes: 371941
+    width: 2048
+    height: 1800
+  thumb512:
+    path: assets/thumb512/b084e30b2b267e67.webp
+    sha256: e0bb875931f847fb2da8ea2c57d0c47479f80d580354a8cfdcdc7205600395ba
+    bytes: 14340
+    width: 512
+    height: 450
+library_type: 法器供器
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 西藏骨质双面手鼓达玛如
+entity_type: 实物对象写实
+summary_zh: 【图中可见】上下两个半球状鼓身在腰部相接，上面覆平鼓皮，腰间伸出两条带坠细绳，表面斑驳。【来源著录】Ritual Drum (damaru)；文化或地点依据：馆方著录为Tibet；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 颅骨
+- 布
+- 麻纤维
+- 皮革
+- 皮膜
+colors:
+- 黄褐色
+- 米白色
+style: 中国藏区·藏传佛教传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，上下两个半球状鼓身在腰部相接，上面覆平鼓皮，腰间伸出两条带坠细绳，表面斑驳。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Ritual Drum (damaru). Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏骨质双面手鼓达玛如
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1918.391
+  download_url: https://openaccess-cdn.clevelandart.org/1918.391/1918.391_print.jpg
+  credit: The Charles G. King Jr. collection; Gift of Ralph King in memory of Charles G. King Jr.
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2989
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

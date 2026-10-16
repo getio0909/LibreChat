@@ -1,0 +1,85 @@
+id: 43a947d13ccd7b5c
+title_zh: 苏式吴氏厅堂与供案座椅陈设
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-苏式吴氏厅堂与供案座椅陈设-commons77413448.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-苏式吴氏厅堂与供案座椅陈设-commons77413448.jpg
+  sha256: 43a947d13ccd7b5c679c8826ddc7d87a4a3f183b6ab4b85bcf028e47789ece5d
+  bytes: 2071263
+  width: 3840
+  height: 2996
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/43a947d13ccd7b5c.jpg
+    sha256: 8a045cc4065aacec26afddec467d8be6211ef9dc50de8eb0df865ddc19e850f5
+    bytes: 560996
+    width: 2048
+    height: 1598
+  thumb512:
+    path: assets/thumb512/43a947d13ccd7b5c.webp
+    sha256: 8109914503b0d9f2f19bf1d06aada2823c583b71806eb39715302319364f237e
+    bytes: 27838
+    width: 512
+    height: 399
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 苏式吴氏厅堂与供案座椅陈设
+entity_type: 实物对象写实
+summary_zh: 【图中可见】深色木梁架下，正中长案与前方小供桌沿中轴布置，两侧成排木扶手椅，案前挂红色龙纹织物，白墙上悬画像和书法。【来源著录】The Wu Family Reception Hall, early 17th century.jpg；文化或地点依据：来源说明为原处苏州东洞庭、今东山附近的吴氏厅堂，馆内复原。来源题名为early
+  17th century，正文却记early 1700s，断代有冲突，本条不作确定年代。
+materials:
+- 木
+- 陶瓷
+- 瓦
+- 灰泥
+- 漆
+- 石（来源说明；图中为复原陈设）
+colors:
+- 深褐色
+- 红色
+- 米白色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，深色木梁架下，正中长案与前方小供桌沿中轴布置，两侧成排木扶手椅，案前挂红色龙纹织物，白墙上悬画像和书法。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of The Wu Family Reception Hall, early 17th century.jpg.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 苏式吴氏厅堂与供案座椅陈设
+- CC BY 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:The Wu Family Reception Hall, early 17th century.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/The_Wu_Family_Reception_Hall%2C_early_17th_century.jpg/3840px-The_Wu_Family_Reception_Hall%2C_early_17th_century.jpg
+  credit: unknown artisans. Photo by museum; https://collections.artsmia.org/art/9413/the-wu-family-reception-hall-china
+  license: cc-by-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2996
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

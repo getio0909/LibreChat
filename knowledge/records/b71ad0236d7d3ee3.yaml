@@ -1,0 +1,80 @@
+id: b71ad0236d7d3ee3
+title_zh: 西藏彩绘乌木普巴杵与三角座
+source:
+  original_path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏彩绘乌木普巴杵与三角座-met75826.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/05-中国藏区·藏传佛教法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏彩绘乌木普巴杵与三角座-met75826.jpg
+  sha256: b71ad0236d7d3ee3806b65db05506a2ecb9130efc7930cf1ddbae2cea20efd8a
+  bytes: 1369440
+  width: 3002
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b71ad0236d7d3ee3.jpg
+    sha256: d1c89a2577610de10738cc8d0d769e9f25fdd7b4280412cb7ba962f5a128c92e
+    bytes: 238989
+    width: 1537
+    height: 2048
+  thumb512:
+    path: assets/thumb512/b71ad0236d7d3ee3.webp
+    sha256: c5b67cd187c1223f0a9e0443486d63d1f02db5a1799ad0f41fd21f3a0736fb96
+    bytes: 9486
+    width: 384
+    height: 512
+library_type: 法器供器
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 西藏彩绘乌木普巴杵与三角座
+entity_type: 实物对象写实
+summary_zh: 【图中可见】器物上方为三面忿怒头像，下接交织结形握部、莲瓣结节及三棱尖部，深色主体保留红金线饰。【来源著录】Ritual Dagger (Phurba) and Stand；文化或地点依据：馆方著录为Tibet；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 乌木
+- 彩绘
+colors:
+- 黑褐色
+- 朱红色
+- 金黄色
+style: 中国藏区·藏传佛教传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，器物上方为三面忿怒头像，下接交织结形握部、莲瓣结节及三棱尖部，深色主体保留红金线饰。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Ritual Dagger (Phurba) and Stand. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 法器供器
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏彩绘乌木普巴杵与三角座
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/75826
+  download_url: https://images.metmuseum.org/CRDImages/as/original/DP-19666-006.jpg
+  credit: Purchase, Friends of Asian Art and Mr. and Mrs. Richard L. Chilton Jr. Gifts, 2019
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3002
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

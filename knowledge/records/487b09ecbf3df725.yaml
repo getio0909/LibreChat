@@ -1,0 +1,78 @@
+id: 487b09ecbf3df725
+title_zh: 拜占庭帘幕与贝壳拱龛祭坛前板
+source:
+  original_path: 石刻纹样开放授权实物参考/西方-拜占庭帘幕与贝壳拱龛祭坛前板-cma126030.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/01-西方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/西方-拜占庭帘幕与贝壳拱龛祭坛前板-cma126030.jpg
+  sha256: 487b09ecbf3df725f0aa2e76524d065f4570e19ee674803f2edbaa7dbc735ce3
+  bytes: 3773181
+  width: 3400
+  height: 2171
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/487b09ecbf3df725.jpg
+    sha256: ad5b72149b93db2e5d8f64b11d5c05d8796ccfcc0f9c30cf1289c00cf91baecc
+    bytes: 342581
+    width: 2048
+    height: 1308
+  thumb512:
+    path: assets/thumb512/487b09ecbf3df725.webp
+    sha256: 8adde8bf0ef679d3ae0669958a1094b1c2dbc84cb4050303bcfbc690e10dc54b
+    bytes: 21534
+    width: 512
+    height: 327
+library_type: 石刻纹样
+region: 西方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 拜占庭帘幕与贝壳拱龛祭坛前板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】横长石板以细柱分隔，左右各有大十字，上沿为贝壳形拱龛、对向动物与三角山花，中部帘幕下方已缺失。【来源著录】Altar Front；文化或地点依据：early Byzantium, Constantinople
+  or Ravenna, Byzantine period, 6th century。
+materials:
+- 大理石
+colors:
+- 灰白色
+- 赭红色
+style: 西方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，横长石板以细柱分隔，左右各有大十字，上沿为贝壳形拱龛、对向动物与三角山花，中部帘幕下方已缺失。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Altar Front. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 西方
+- 开放授权
+- 真实摄影
+- 拜占庭帘幕与贝壳拱龛祭坛前板
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1948.25
+  download_url: https://openaccess-cdn.clevelandart.org/1948.25/1948.25_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2171
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

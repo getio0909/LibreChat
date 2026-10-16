@@ -1,0 +1,79 @@
+id: 2e08ef4af3dccdd0
+title_zh: 龙门奉先寺冠饰菩萨立像普贤题名
+source:
+  original_path: 造像雕塑开放授权实物参考/中国北方-龙门奉先寺冠饰菩萨立像普贤题名-commons97425600.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/03-中国北方造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/中国北方-龙门奉先寺冠饰菩萨立像普贤题名-commons97425600.jpg
+  sha256: 2e08ef4af3dccdd0e2ecd8726ab1f3cc636e9ba34ccda828044287a779375308
+  bytes: 2366894
+  width: 2592
+  height: 3888
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2e08ef4af3dccdd0.jpg
+    sha256: f7cf721cf02f8731d11377234ecd54d81b0f9cc9ed2d0f0a07a327f3622bc12c
+    bytes: 571941
+    width: 1365
+    height: 2048
+  thumb512:
+    path: assets/thumb512/2e08ef4af3dccdd0.webp
+    sha256: 6e826bb5943a038944cd39d7e42fe03880be8015702167b9afc4c4531b928e96
+    bytes: 35892
+    width: 341
+    height: 512
+library_type: 造像雕塑
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 龙门奉先寺冠饰菩萨立像普贤题名
+entity_type: 实物对象写实
+summary_zh: 【图中可见】冠饰菩萨正面立于岩壁，一侧手臂残失，另一手在腹前，裙带层层下垂，头光外围有火焰纹。【来源著录】Ancient Buddhist Grottoes at Longmen- Fengxian Temple, Samantabhadra
+  (Bodhisattva of Universal Kindness) - 10240303986.jpg；文化或地点依据：World Heritage Site with over 100,000 buddha images carved
+  on cliffs between 490s and c. 900 AD, Luoyang, Henan Province, China. Complete indexed photo collection at WorldHistoryPics.com.。
+materials:
+- 石材（具体品种来源未注明）
+colors:
+- 灰褐色
+style: 中国北方传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，冠饰菩萨正面立于岩壁，一侧手臂残失，另一手在腹前，裙带层层下垂，头光外围有火焰纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Ancient Buddhist Grottoes at Longmen- Fengxian Temple,
+  Samantabhadra (Bodhisattva of Universal Kindness) - 10240303986.jpg. Preserve the visible silhouette, ornament spacing and
+  surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 中国北方
+- 开放授权
+- 真实摄影
+- 龙门奉先寺冠饰菩萨立像普贤题名
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Ancient_Buddhist_Grottoes_at_Longmen-_Fengxian_Temple,_Samantabhadra_(Bodhisattva_of_Universal_Kindness)_-_10240303986.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/b/b7/Ancient_Buddhist_Grottoes_at_Longmen-_Fengxian_Temple%2C_Samantabhadra_%28Bodhisattva_of_Universal_Kindness%29_-_10240303986.jpg
+  credit: Gary Todd; https://www.flickr.com/photos/101561334@N08/10240303986/
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 2592
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

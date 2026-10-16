@@ -10,6 +10,8 @@ This repository stores:
 - Proprietary stone catalog (`catalog/materials.yaml`) and curated style packs (`catalog/styles.yaml`).
 - Deterministic build and validation tooling (`tools/`) producing `dist/index.jsonl`, `dist/views/*.md`, and `dist/originals-v1.tar.zst`.
 
+The library now contains **607 records**: the original 368 plus 239 audited open-license references. The additions comprise 55 sculptures, 50 ritual objects, 41 carved-stone references, 42 architectural scenes and 51 furniture/woodwork references. All 239 additions have confirmed licences and draft reviews. Four additions carry `low_res` flags under the existing 800-pixel short-side threshold. One original is an MPO container with a `.jpg` filename; its bytes and format are preserved, and derivatives use the primary image.
+
 ## 2. Repository Layout / 目录结构
 
 ```text

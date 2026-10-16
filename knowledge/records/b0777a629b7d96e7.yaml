@@ -1,0 +1,76 @@
+id: b0777a629b7d96e7
+title_zh: 法国盾徽卷草木雕壁板
+source:
+  original_path: 家具木作开放授权实物参考/西方-法国盾徽卷草木雕壁板-cma100043.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/01-西方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/西方-法国盾徽卷草木雕壁板-cma100043.jpg
+  sha256: b0777a629b7d96e7ab64fdceede324529e8819baa945276f5ebe3a01a09e3bb1
+  bytes: 6328539
+  width: 3360
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b0777a629b7d96e7.jpg
+    sha256: 4b5a5d0826f6c175f9ee3bde9be44a05615d6365e475abc0f3dfd07f85a10711
+    bytes: 687636
+    width: 2024
+    height: 2048
+  thumb512:
+    path: assets/thumb512/b0777a629b7d96e7.webp
+    sha256: 6dbd8610055bfb5b9cfd10a251fe6898e5fee162e7b64a87279f2bbecff1f1fb
+    bytes: 41520
+    width: 506
+    height: 512
+library_type: 家具木作
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 法国盾徽卷草木雕壁板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】拱顶壁板上方并列两枚盾形纹，下方以卷枝、珠串与中央小瓶作对称组织，表面有文字浮雕。【来源著录】Carved Wood Panel；文化或地点依据：France。
+materials:
+- 木材
+colors:
+- 深褐色
+style: 西方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，拱顶壁板上方并列两枚盾形纹，下方以卷枝、珠串与中央小瓶作对称组织，表面有文字浮雕。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Carved Wood Panel. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 西方
+- 开放授权
+- 真实摄影
+- 法国盾徽卷草木雕壁板
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1919.586
+  download_url: https://openaccess-cdn.clevelandart.org/1919.586/1919.586_print.jpg
+  credit: Gift of P. W. French and Company
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3360
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,79 @@
+id: 6beb0c249dca7cb1
+title_zh: 河南安阳可能产商代鸟纹提梁方卣
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-河南安阳可能产商代鸟纹提梁方卣-cma138689.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-河南安阳可能产商代鸟纹提梁方卣-cma138689.jpg
+  sha256: 6beb0c249dca7cb15f9ebb9de9eec052f087738e65dbe035b343a288e1b7da54
+  bytes: 5255531
+  width: 2427
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6beb0c249dca7cb1.jpg
+    sha256: 1385e36cbc93a286cfc18558d8c40ad2de231b6d855ae72a0223647aa00b9143
+    bytes: 534672
+    width: 1462
+    height: 2048
+  thumb512:
+    path: assets/thumb512/6beb0c249dca7cb1.webp
+    sha256: ef8783dbef588c1eb37ded22fc08606987e2fe14960b2342e2234a766b9e89d9
+    bytes: 26498
+    width: 365
+    height: 512
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 河南安阳可能产商代鸟纹提梁方卣
+entity_type: 实物对象写实
+summary_zh: 【图中可见】方形盛酒器配高提梁和四坡盖，盖、颈、腹以突出扉棱分区，主体纹饰为大眼卷尾鸟形及密集方折底纹。【来源著录】Square Wine Container (Fangyou)；文化或地点依据：馆方明确著录 China,
+  Henan province, probably Anyang；保留安阳产地的可能性措辞。
+materials:
+- 青铜
+colors:
+- 青绿
+- 深褐
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，方形盛酒器配高提梁和四坡盖，盖、颈、腹以突出扉棱分区，主体纹饰为大眼卷尾鸟形及密集方折底纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Square Wine Container (Fangyou). Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 河南安阳可能产商代鸟纹提梁方卣
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1963.103
+  download_url: https://openaccess-cdn.clevelandart.org/1963.103/1963.103_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2427
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

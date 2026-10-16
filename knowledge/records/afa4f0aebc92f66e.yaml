@@ -1,0 +1,81 @@
+id: afa4f0aebc92f66e
+title_zh: 西藏酥油灯座立式木柜
+source:
+  original_path: 家具木作开放授权实物参考/中国藏区·藏传佛教-西藏酥油灯座立式木柜-lacma151298.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/05-中国藏区·藏传佛教家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国藏区·藏传佛教-西藏酥油灯座立式木柜-lacma151298.jpg
+  sha256: afa4f0aebc92f66e0cfdfbe95d960ca37272d2cd13230dff98663c75fdb392f7
+  bytes: 5209385
+  width: 4086
+  height: 6100
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/afa4f0aebc92f66e.jpg
+    sha256: ec06923d6f914847cbaccf298d2f7ee4aed0e00e0c9ec82f3e7ae9a508164add
+    bytes: 309483
+    width: 1372
+    height: 2048
+  thumb512:
+    path: assets/thumb512/afa4f0aebc92f66e.webp
+    sha256: 4b057f098c15c1cf928818863afefd4bffdf2f7f0e73edf686b192b77b7c874c
+    bytes: 12852
+    width: 343
+    height: 512
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 西藏酥油灯座立式木柜
+entity_type: 实物对象写实
+summary_zh: 【图中可见】高窄矩形木柜有外挑顶板，正面上下两扇门，红底上连续黑色花朵与卷枝，侧面有椭圆形图案。【来源著录】Butter Lamp Stand and Cabinet；文化或地点依据：馆方著录为Tibet；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 木材
+- 矿物颜料
+- 石膏底层与黄铜配件
+colors:
+- 红色
+- 黑色
+style: 中国藏区·藏传佛教传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，高窄矩形木柜有外挑顶板，正面上下两扇门，红底上连续黑色花朵与卷枝，侧面有椭圆形图案。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Butter Lamp Stand and Cabinet. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏酥油灯座立式木柜
+- Public domain
+material_ids: []
+provenance:
+  source: museum
+  url: https://collections.lacma.org/object/151298
+  download_url: https://collections-images.lacma.org/images/151298/151298-1-print.tif
+  credit: Los Angeles County Museum of Art (www.lacma.org); Gift of the 2010 Collectors Committee; Unknown, Butter Lamp Stand
+    and Cabinet , late 17th-early 18th century, Los Angeles County Museum of Art, Gift of the 2010 Collectors Committee, photo
+    © Museum Associates/LACMA
+  license: public-domain
+  license_url: https://www.lacma.org/about/contact-us/terms-use
+  license_status: confirmed
+quality:
+  min_side_px: 4086
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

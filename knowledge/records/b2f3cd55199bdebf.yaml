@@ -1,0 +1,79 @@
+id: b2f3cd55199bdebf
+title_zh: 斯里兰卡丹布勒金色佛坐像仰视
+source:
+  original_path: 造像雕塑开放授权实物参考/东南亚与南亚-斯里兰卡丹布勒金色佛坐像仰视-commons83937845.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/02-东南亚与南亚造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/东南亚与南亚-斯里兰卡丹布勒金色佛坐像仰视-commons83937845.jpg
+  sha256: b2f3cd55199bdebfd2106f515d6c8fda1097263a7f5bfdc544ed3c5d768d7fd2
+  bytes: 591017
+  width: 1920
+  height: 1440
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b2f3cd55199bdebf.jpg
+    sha256: 0b1e0aeb8c23f94fcfbf63c98de4eaad4934b1f554abede0ae0f4f3c3bcfe06c
+    bytes: 577716
+    width: 1920
+    height: 1440
+  thumb512:
+    path: assets/thumb512/b2f3cd55199bdebf.webp
+    sha256: 29540f0446acf8c7bdd2d8593c708a827fe31cebe88e025a77baa753416c3ee0
+    bytes: 31132
+    width: 512
+    height: 384
+library_type: 造像雕塑
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 斯里兰卡丹布勒金色佛坐像仰视
+entity_type: 实物对象写实
+summary_zh: 【图中可见】大型金色佛像盘腿坐于建筑上方，右手上举掌心向外，左手横于胸前，身披密集斜向平行衣褶，面部有深色眼部和卷粒发饰。【来源著录】Dambulla Cave Temple01.jpg；文化或地点依据：来源题名为 Dambulla
+  Cave Temple，说明为该处 Buddha Statue；按斯里兰卡丹布勒地点归类。
+materials:
+- 来源未注明；金色表面
+colors:
+- 金色
+- 黑色
+- 浅蓝色
+style: 东南亚/南亚传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，大型金色佛像盘腿坐于建筑上方，右手上举掌心向外，左手横于胸前，身披密集斜向平行衣褶，面部有深色眼部和卷粒发饰。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Dambulla Cave Temple01.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 斯里兰卡丹布勒金色佛坐像仰视
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Dambulla_Cave_Temple01.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Dambulla_Cave_Temple01.jpg/1920px-Dambulla_Cave_Temple01.jpg
+  credit: Wishmithak; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1440
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

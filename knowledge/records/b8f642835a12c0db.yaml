@@ -1,0 +1,79 @@
+id: b8f642835a12c0db
+title_zh: 高棉牛背人物与卡拉面卷草门楣
+source:
+  original_path: 石刻纹样开放授权实物参考/东南亚与南亚-高棉牛背人物与卡拉面卷草门楣-commons5690994.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/02-东南亚与南亚石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/东南亚与南亚-高棉牛背人物与卡拉面卷草门楣-commons5690994.jpg
+  sha256: b8f642835a12c0db865e3e848d9502e52c80c5a7817342733f28ea6df2acd658
+  bytes: 704157
+  width: 1920
+  height: 871
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b8f642835a12c0db.jpg
+    sha256: f589c4ffe9c108fb12f17b19860c9f1efd38df6e5a35b57304d598c89f366a9a
+    bytes: 693129
+    width: 1920
+    height: 871
+  thumb512:
+    path: assets/thumb512/b8f642835a12c0db.webp
+    sha256: 7bd82d803bbe0b4137e7de3bf614465d2f263a0c9dab712e1f958fcab0c5a7d0
+    bytes: 51402
+    width: 512
+    height: 232
+library_type: 石刻纹样
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 高棉牛背人物与卡拉面卷草门楣
+entity_type: 实物对象写实
+summary_zh: 【图中可见】横长门楣中部为牛形动物及其背上人物，下方为大圆眼兽面，两侧卷草沿弧形茎秆翻出叶尖，顶部排列叶瓣形小单元。【来源著录】Guimet-JAN09-Linteau Khmer-6.jpg；文化或地点依据：来源说明为巴黎吉美博物馆
+  Khmer lintel；未提供具体年代、材种和神名。
+materials:
+- 石材（图中可见）
+colors:
+- 红褐色
+- 黄褐色
+style: 东南亚/南亚传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，横长门楣中部为牛形动物及其背上人物，下方为大圆眼兽面，两侧卷草沿弧形茎秆翻出叶尖，顶部排列叶瓣形小单元。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Guimet-JAN09-Linteau Khmer-6.jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 石刻纹样
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 高棉牛背人物与卡拉面卷草门楣
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Guimet-JAN09-Linteau_Khmer-6.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Guimet-JAN09-Linteau_Khmer-6.jpg/1920px-Guimet-JAN09-Linteau_Khmer-6.jpg
+  credit: Ddalbiez; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 871
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

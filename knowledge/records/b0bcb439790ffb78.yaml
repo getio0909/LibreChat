@@ -1,0 +1,77 @@
+id: b0bcb439790ffb78
+title_zh: 晚商安阳文化兽面纹三足青铜鼎
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-晚商安阳文化兽面纹三足青铜鼎-cma138016.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-晚商安阳文化兽面纹三足青铜鼎-cma138016.jpg
+  sha256: b0bcb439790ffb78eb5d83718a998fe690f5747296bd4826820f8ce8c83ef423
+  bytes: 1989642
+  width: 3400
+  height: 3310
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b0bcb439790ffb78.jpg
+    sha256: 07ade2ef1c30e08091dfc9f50fd83a00007e2315936d77f8bf6f915b04eeb92e
+    bytes: 409355
+    width: 2048
+    height: 1994
+  thumb512:
+    path: assets/thumb512/b0bcb439790ffb78.webp
+    sha256: 2a00d1f951fcfaf389c5f1b15b7faab632ce44f5e5cd104aa4272f2132b6db32
+    bytes: 16688
+    width: 512
+    height: 498
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 晚商安阳文化兽面纹三足青铜鼎
+entity_type: 实物对象写实
+summary_zh: 【图中可见】圆腹鼎有两只直立耳和三根柱状足，腹部兽面纹以突出扉棱分隔，口下另有数道平行弦纹。【来源著录】Tripod (Ding)；文化或地点依据：馆方文化著录为商代安阳期，按河南安阳为中心的北方中原礼制传统归类；具体出土地未注明。
+materials:
+- 青铜
+colors:
+- 青绿
+- 褐色
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，圆腹鼎有两只直立耳和三根柱状足，腹部兽面纹以突出扉棱分隔，口下另有数道平行弦纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Tripod (Ding). Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 晚商安阳文化兽面纹三足青铜鼎
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1962.281
+  download_url: https://openaccess-cdn.clevelandart.org/1962.281/1962.281_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3310
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

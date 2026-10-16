@@ -1,0 +1,81 @@
+id: e2d9895d6e0459da
+title_zh: 西藏金银装普巴杵
+source:
+  original_path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏金银装普巴杵-walters52.311.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/05-中国藏区·藏传佛教法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏金银装普巴杵-walters52.311.jpg
+  sha256: e2d9895d6e0459dac613eb899130278b984fcc6911b69b1e8f1c9f19a09c2005
+  bytes: 76660
+  width: 671
+  height: 1800
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e2d9895d6e0459da.jpg
+    sha256: acbe17dd3b43558c2195e3b856b9b6b2963d838e768806f48622577b3c7a0e67
+    bytes: 89470
+    width: 671
+    height: 1800
+  thumb512:
+    path: assets/thumb512/e2d9895d6e0459da.webp
+    sha256: d6e260da8c03c9255f5a3d0d1b22a8edd62cef2ee1d3608354c4e5f05df1db76
+    bytes: 6522
+    width: 191
+    height: 512
+library_type: 法器供器
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 西藏金银装普巴杵
+entity_type: 实物对象写实
+summary_zh: 【图中可见】细长仪式杵上端为忿怒面首，中段葫芦形与莲瓣形构件交替，下端尖刃上有两条细长蜿蜒纹。【来源著录】Ritual Dagger；文化或地点依据：馆方著录为Tibet (Place of Origin)；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 钢
+- 银
+- 金与铜
+colors:
+- 银色
+- 金色
+- 深褐色
+style: 中国藏区·藏传佛教传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，细长仪式杵上端为忿怒面首，中段葫芦形与莲瓣形构件交替，下端尖刃上有两条细长蜿蜒纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Ritual Dagger. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏金银装普巴杵
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://art.thewalters.org/object/52.311/
+  download_url: https://art.thewalters.org/images/art/PS1_52.311_SideA_DD_T17-tms.jpg
+  credit: The Walters Art Museum; Gift of John and Berthe Ford, 2002
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 671
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review
+  - low_resolution

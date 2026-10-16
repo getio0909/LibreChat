@@ -1,0 +1,81 @@
+id: e754247c158bf9c7
+title_zh: 兰斯圣雷米教堂双塔石砌立面
+source:
+  original_path: 建筑景观开放授权实景参考/西方-兰斯圣雷米教堂双塔石砌立面-commons40022267.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/01-西方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/西方-兰斯圣雷米教堂双塔石砌立面-commons40022267.jpg
+  sha256: e754247c158bf9c76fa5d539fac2989c61fab74e09ac8eaad07ffc25b217e1da
+  bytes: 909227
+  width: 1920
+  height: 1963
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e754247c158bf9c7.jpg
+    sha256: 440bfa30c98883d6edb6777076440a59fbf033d16f9ac07550fff8b0c9208817
+    bytes: 881714
+    width: 1920
+    height: 1963
+  thumb512:
+    path: assets/thumb512/e754247c158bf9c7.webp
+    sha256: bcfabb2fd51dcecb76d5a34fdefa29dbe9f02b1dd71dcddf310561cc6e6727a7
+    bytes: 36498
+    width: 501
+    height: 512
+library_type: 建筑景观
+region: 西方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 兰斯圣雷米教堂双塔石砌立面
+entity_type: 空间场景设计
+summary_zh: 【图中可见】正立面两侧为高尖顶塔楼，中间山墙下设圆形放射窗，入口及窗洞按竖向层级排列，浅灰石墙可见不同色块。【来源著录】Basilique Saint-Remi de Reims Exterior 1, Reims, France
+  - Diliff.jpg；文化或地点依据：来源题名为法国 Reims 的 Basilique Saint-Remi 外观。
+materials:
+- 石材（图中可见砌块）
+- 玻璃
+colors:
+- 灰白色
+- 深灰色
+- 蓝色
+style: 西方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，正立面两侧为高尖顶塔楼，中间山墙下设圆形放射窗，入口及窗洞按竖向层级排列，浅灰石墙可见不同色块。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Basilique Saint-Remi de Reims Exterior 1, Reims, France
+  - Diliff.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 西方
+- 开放授权
+- 真实摄影
+- 兰斯圣雷米教堂双塔石砌立面
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Basilique_Saint-Remi_de_Reims_Exterior_1,_Reims,_France_-_Diliff.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Basilique_Saint-Remi_de_Reims_Exterior_1%2C_Reims%2C_France_-_Diliff.jpg/1920px-Basilique_Saint-Remi_de_Reims_Exterior_1%2C_Reims%2C_France_-_Diliff.jpg
+  credit: Diliff; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1920
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

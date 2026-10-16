@@ -1,0 +1,77 @@
+id: 63ed58a35f4e918b
+title_zh: 韦兹莱圣玛德莱娜教堂会议厅石拱顶
+source:
+  original_path: 建筑景观开放授权实景参考/西方-韦兹莱圣玛德莱娜教堂会议厅石拱顶-commons179324866.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/01-西方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/西方-韦兹莱圣玛德莱娜教堂会议厅石拱顶-commons179324866.jpg
+  sha256: 63ed58a35f4e918b921b52e95469169fba8ffbfbf455ffe5105bb0d9939ea4b5
+  bytes: 10923765
+  width: 4464
+  height: 5952
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/63ed58a35f4e918b.jpg
+    sha256: 7bb938c87875e7baa6bd109267dc20072d85fb2b10cae8a90216eb7c91aec772
+    bytes: 701981
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/63ed58a35f4e918b.webp
+    sha256: 9a95391da3d1811d7a9486ae466b557e5501d6cd2662eab85669cd468af7a331
+    bytes: 32322
+    width: 384
+    height: 512
+library_type: 建筑景观
+region: 西方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 韦兹莱圣玛德莱娜教堂会议厅石拱顶
+entity_type: 空间场景设计
+summary_zh: 【图中可见】石砌拱顶有交叉肋条，中央圆形雕刻与四周圆形人物兽纹对应，长方石块按拱面排布。【来源著录】Vézelay - Basilique Sainte-Marie-Madeleine - Intérieur - 09.jpg；文化或地点依据：Commons标题与来源记录明确标识法国该宗教建筑。
+materials:
+- 石材（具体品种来源未注明）
+colors:
+- 灰白色
+style: 西方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，石砌拱顶有交叉肋条，中央圆形雕刻与四周圆形人物兽纹对应，长方石块按拱面排布。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Vézelay - Basilique Sainte-Marie-Madeleine - Intérieur
+  - 09.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 西方
+- 开放授权
+- 真实摄影
+- 韦兹莱圣玛德莱娜教堂会议厅石拱顶
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:V%C3%A9zelay_-_Basilique_Sainte-Marie-Madeleine_-_Int%C3%A9rieur_-_09.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/4/4a/V%C3%A9zelay_-_Basilique_Sainte-Marie-Madeleine_-_Int%C3%A9rieur_-_09.jpg
+  credit: Benjamin Smith; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 4464
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,79 @@
+id: d0fd650d54fccfa5
+title_zh: 西藏鎏金银法器箱
+source:
+  original_path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏鎏金银法器箱-walters57.2299.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/05-中国藏区·藏传佛教法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国藏区·藏传佛教-西藏鎏金银法器箱-walters57.2299.jpg
+  sha256: d0fd650d54fccfa553596231764f15f48fee018fcff033b0558d377e4c999a29
+  bytes: 1138093
+  width: 1800
+  height: 1645
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d0fd650d54fccfa5.jpg
+    sha256: 2936519f86e7a2e0753c7c9dde9ebfe79432f5df3b4136c11c3f7cff967c5df7
+    bytes: 873155
+    width: 1800
+    height: 1645
+  thumb512:
+    path: assets/thumb512/d0fd650d54fccfa5.webp
+    sha256: cc6a453a3fe964a8fa286ec2e134af95c7ec12dee43c2657685ac3c592bc2bc9
+    bytes: 48034
+    width: 512
+    height: 468
+library_type: 法器供器
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 西藏鎏金银法器箱
+entity_type: 实物对象写实
+summary_zh: 【图中可见】斜壁矩形金属箱盖上有浮起的纹饰，正面密布骑乘人物、兽形与器物，边框连排骷髅，中央扣件嵌蓝绿小石。【来源著录】Ritual Box；文化或地点依据：馆方著录为Tibet (Place of Origin)；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 鎏金银
+- 绿松石
+colors:
+- 金色
+- 银色
+- 蓝绿色
+style: 中国藏区·藏传佛教传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，斜壁矩形金属箱盖上有浮起的纹饰，正面密布骑乘人物、兽形与器物，边框连排骷髅，中央扣件嵌蓝绿小石。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Ritual Box. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏鎏金银法器箱
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://art.thewalters.org/object/57.2299/
+  download_url: https://art.thewalters.org/images/art/PS1_57.2299_FntATDD_T17-tms.jpg
+  credit: The Walters Art Museum; Gift of John and Berthe Ford, 2007
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1645
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

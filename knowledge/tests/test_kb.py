@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+from collections import Counter
 from pathlib import Path
 
 import yaml
@@ -270,18 +271,18 @@ def test_validator_fails_on_empty_summary(tmp_path: Path) -> None:
     assert any("schema error at studio_roles" in err for err in errors_req)
 
 
-# 测试真实仓库的368条记录完整性以及索引与分类视图生成无重复和无绝对路径
+# 测试真实仓库的607条记录完整性以及索引与分类视图生成无重复和无绝对路径
 def test_build_views_and_live_repository(tmp_path: Path) -> None:
     errors = validate_repository(REPO_ROOT, check_images=False)
     assert errors == []
 
     records = load_all_records(REPO_ROOT)
-    assert len(records) == 368
+    assert len(records) == 607
 
     dist_out = tmp_path / "dist"
     idx_path = build_index_jsonl(REPO_ROOT, records, dist_out)
     idx_lines = idx_path.read_text(encoding="utf-8").strip().splitlines()
-    assert len(idx_lines) == 368
+    assert len(idx_lines) == 607
 
     views = build_markdown_views(records, dist_out)
     assert len(views) == 9
@@ -296,8 +297,8 @@ def test_build_views_and_live_repository(tmp_path: Path) -> None:
                 aid = line.split(" — ")[0].replace("## ", "").strip()
                 seen_in_views.append(aid)
 
-    assert len(seen_in_views) == 368
-    assert len(set(seen_in_views)) == 368
+    assert len(seen_in_views) == 607
+    assert len(set(seen_in_views)) == 607
 
 
 # 构造带真实字节、地域标签和审计侧录的最小新增素材批次
@@ -522,3 +523,76 @@ def test_delta_archive_members_and_source_integrity(tmp_path):
     (wiki / "-new original.jpg").write_bytes(b"modified original")
     with pytest.raises(ValueError, match="SHA256/size mismatch"):
         build_originals_archive(selected, repo / "dist", wiki, delta=True)
+
+
+# 核对已合并批次的真实覆盖量及全部索引、来源字段，防止迁移时丢失审计信息
+def test_open_license_corpus_metadata():
+    records = load_all_records(REPO_ROOT)
+    additions = [
+        record for record in records if record["source"].get("import_manifest")
+    ]
+    assert len(additions) == 239
+    assert Counter(record["library_type"] for record in additions) == {
+        "造像雕塑": 55,
+        "法器供器": 50,
+        "石刻纹样": 41,
+        "建筑景观": 42,
+        "家具木作": 51,
+    }
+    assert Counter(record["region"] for record in additions) == {
+        "西方": 50,
+        "南亚东南亚": 58,
+        "中国北方": 58,
+        "中国南方": 53,
+        "中国藏区": 20,
+    }
+    manifests = {record["source"]["import_manifest"] for record in additions}
+    assert len(manifests) == 1
+    items = [
+        json.loads(line)
+        for line in (REPO_ROOT / manifests.pop()).read_text().splitlines()
+    ]
+    by_id = {item["id"]: item for item in items}
+    assert set(by_id) == {record["id"] for record in additions}
+    for record in additions:
+        item = by_id[record["id"]]
+        entry = item["index"]
+        source = item["provenance"]
+        assert len(entry) == 17
+        for field in (
+            "summary_zh",
+            "materials",
+            "colors",
+            "style",
+            "ai_design_usage",
+            "prompt_zh",
+            "prompt_en",
+            "tags",
+        ):
+            assert record[field] == entry[field]
+        assert record["original"]["sha256"] == source["sha256"]
+        assert record["provenance"]["url"] == source["source_record_url"]
+        assert record["provenance"]["download_url"] == source["source_url"]
+        assert record["provenance"]["license_url"] == source["license_url"]
+        assert record["provenance"]["credit"] == source["credit_line"]
+        assert record["provenance"]["license_status"] == "confirmed"
+        assert record["review"]["status"] == "draft"
+
+
+# 保留带有多图容器信息的原始字节，衍生图只使用容器中的主图
+def test_mpo_original_preserved_and_primary_frame_used(tmp_path):
+    repo = _init_temp_repo(tmp_path / "kb")
+    source = tmp_path / "multi-picture.jpg"
+    primary = Image.new("RGB", (1000, 900), "red")
+    secondary = Image.new("RGB", (1000, 900), "blue")
+    primary.save(source, format="MPO", save_all=True, append_images=[secondary])
+    original_bytes = source.read_bytes()
+    record_path = create_draft_record(source, repo)
+    record = yaml.safe_load(record_path.read_text())
+    assert record["original"]["format"] == "MPO"
+    assert source.read_bytes() == original_bytes
+    assert record["original"]["sha256"] == hashlib.sha256(original_bytes).hexdigest()
+    with Image.open(repo / record["derivatives"]["ref2048"]["path"]) as derivative:
+        red, green, blue = derivative.getpixel((500, 400))
+        assert red > 240 and green < 10 and blue < 10
+    assert validate_repository(repo) == []

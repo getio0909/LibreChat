@@ -1,0 +1,76 @@
+id: 7321d61fdc272bdd
+title_zh: 四川汉代禽兽与斜线地纹石刻板
+source:
+  original_path: 石刻纹样开放授权实物参考/中国南方-四川汉代禽兽与斜线地纹石刻板-cma138015.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/04-中国南方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国南方-四川汉代禽兽与斜线地纹石刻板-cma138015.jpg
+  sha256: 7321d61fdc272bdd2bf999382d6e8e460cc3a71567bea5fd95d60fd104efab04
+  bytes: 2218443
+  width: 1866
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7321d61fdc272bdd.jpg
+    sha256: 4674282eabec7a05e04055d04ee1e78b30a37f60f4966a2a69ffb5ccf92cbdba
+    bytes: 492849
+    width: 1124
+    height: 2048
+  thumb512:
+    path: assets/thumb512/7321d61fdc272bdd.webp
+    sha256: 033b8bfc07d66b792f904bc68eb668df52674446e3f69c599e6b2b7c1b342af6
+    bytes: 22458
+    width: 281
+    height: 512
+library_type: 石刻纹样
+region: 中国南方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 四川汉代禽兽与斜线地纹石刻板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】竖长石板以鸟形和四足兽形错落排列，主体轮廓为浅浮雕，背景布满成组斜线，边缘以细长线条围合。【来源著录】Relief；文化或地点依据：克利夫兰艺术博物馆文化字段记为中国四川、汉代。
+materials:
+- 石材（馆方著录）
+colors:
+- 灰褐色
+style: 中国南方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，竖长石板以鸟形和四足兽形错落排列，主体轮廓为浅浮雕，背景布满成组斜线，边缘以细长线条围合。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Relief. Preserve the visible silhouette, ornament spacing
+  and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 石刻纹样
+- 中国南方
+- 开放授权
+- 真实摄影
+- 四川汉代禽兽与斜线地纹石刻板
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1962.280
+  download_url: https://openaccess-cdn.clevelandart.org/1962.280/1962.280_print.jpg
+  credit: John L. Severance Collection
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1866
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

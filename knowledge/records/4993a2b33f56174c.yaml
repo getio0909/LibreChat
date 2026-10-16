@@ -1,0 +1,81 @@
+id: 4993a2b33f56174c
+title_zh: 正定隆兴寺单间琉璃顶门楼
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-正定隆兴寺单间琉璃顶门楼-commons152708700.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-正定隆兴寺单间琉璃顶门楼-commons152708700.jpg
+  sha256: 4993a2b33f56174cad9b41c9f91eb46f013da41f3267e7c0ae6bf29c205c4a65
+  bytes: 820938
+  width: 1920
+  height: 1440
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4993a2b33f56174c.jpg
+    sha256: 203945df941ec02e8847b5cf9e9aec7a631501ec11c4070ebbbe9ecdf2b4da13
+    bytes: 799986
+    width: 1920
+    height: 1440
+  thumb512:
+    path: assets/thumb512/4993a2b33f56174c.webp
+    sha256: ef5fcf23db93bcfc2c956bf78d0ace5089c5bf7439621efe40fc45419b68d68f
+    bytes: 39744
+    width: 512
+    height: 384
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 正定隆兴寺单间琉璃顶门楼
+entity_type: 空间场景设计
+summary_zh: 【图中可见】红色围墙中嵌一座单间门楼，绿色筒瓦和短脊饰覆盖密集叠置的斗拱形构件，门额有彩绘分格和金字匾，后方为树木与楼阁。【来源著录】Longxing Temple, Zhengding 1.jpg；文化或地点依据：来源题名及说明为河北正定
+  Longxing Temple；未另定此门楼的建造年代。
+materials:
+- 瓦及彩绘饰层；构件材质来源未注明
+colors:
+- 红色
+- 绿色
+- 灰色
+- 金色
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，红色围墙中嵌一座单间门楼，绿色筒瓦和短脊饰覆盖密集叠置的斗拱形构件，门额有彩绘分格和金字匾，后方为树木与楼阁。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Longxing Temple, Zhengding 1.jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 正定隆兴寺单间琉璃顶门楼
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Longxing_Temple,_Zhengding_1.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Longxing_Temple%2C_Zhengding_1.jpg/1920px-Longxing_Temple%2C_Zhengding_1.jpg
+  credit: E2568; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 1440
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

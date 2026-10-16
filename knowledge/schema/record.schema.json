@@ -86,7 +86,7 @@
         },
         "format": {
           "type": "string",
-          "enum": ["JPEG", "PNG", "WEBP"]
+          "enum": ["JPEG", "PNG", "WEBP", "MPO"]
         },
         "color_mode": {
           "type": "string",

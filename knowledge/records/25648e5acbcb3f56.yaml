@@ -1,0 +1,79 @@
+id: 25648e5acbcb3f56
+title_zh: 匈牙利哥特式花丝珐琅圣杯
+source:
+  original_path: 法器供器开放授权实物参考/西方-匈牙利哥特式花丝珐琅圣杯-cma155580.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/01-西方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/西方-匈牙利哥特式花丝珐琅圣杯-cma155580.jpg
+  sha256: 25648e5acbcb3f56b5bb8f5c59628690560c2e9456461146cc389ce289182e99
+  bytes: 5217810
+  width: 2627
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/25648e5acbcb3f56.jpg
+    sha256: 592b7ddbdcc8304fccd05496e9af6269b53d89f9cf5121e5ef4906142d73ab8f
+    bytes: 400306
+    width: 1582
+    height: 2048
+  thumb512:
+    path: assets/thumb512/25648e5acbcb3f56.webp
+    sha256: b6c1128354ea5b4556376d8c5f4f4bcd2feaeddd67ed40ae54cc58a7e9ceb88b
+    bytes: 19896
+    width: 396
+    height: 512
+library_type: 法器供器
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 匈牙利哥特式花丝珐琅圣杯
+entity_type: 实物对象写实
+summary_zh: 【图中可见】金色杯口下方用尖叶透饰围住，杯身下半与六瓣足分布彩色花朵和扭丝纹，柄心为多角结节。【来源著录】Chalice；文化或地点依据：Hungary, Budapest?, 15th century。
+materials:
+- 鎏金银
+- 花丝珐琅
+colors:
+- 金黄色
+- 蓝绿色
+- 多色
+style: 西方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，金色杯口下方用尖叶透饰围住，杯身下半与六瓣足分布彩色花朵和扭丝纹，柄心为多角结节。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Chalice. Preserve the visible silhouette, ornament spacing
+  and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 西方
+- 开放授权
+- 真实摄影
+- 匈牙利哥特式花丝珐琅圣杯
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1990.3.1
+  download_url: https://openaccess-cdn.clevelandart.org/1990.3.1/1990.3.1_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2627
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

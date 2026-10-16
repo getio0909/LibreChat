@@ -1,0 +1,81 @@
+id: 2d5061b546f3e618
+title_zh: 泉州开元寺藏经阁重层柱廊与檐下木构
+source:
+  original_path: 建筑景观开放授权实景参考/中国南方-泉州开元寺藏经阁重层柱廊与檐下木构-commons177573463.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/04-中国南方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国南方-泉州开元寺藏经阁重层柱廊与檐下木构-commons177573463.jpg
+  sha256: 2d5061b546f3e618a1cf333227f945ff964930944523b0a04c08c21b30feccd3
+  bytes: 1453912
+  width: 3840
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2d5061b546f3e618.jpg
+    sha256: dec9c44aa9d432e30cc3272831d7bc960b606fb7788ec5dbddd757b595e6ab10
+    bytes: 537977
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/2d5061b546f3e618.webp
+    sha256: 2f1daae8cfe3f14ce427c7d5d582a8d4943e37f7abbdc491c24004b183b1a083
+    bytes: 31806
+    width: 512
+    height: 384
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 泉州开元寺藏经阁重层柱廊与檐下木构
+entity_type: 空间场景设计
+summary_zh: 【图中可见】楼阁立面为两层柱廊，上层白色栏杆连成横带；中央屋面抬高并上翘，红褐梁架外露，底层以柱列分隔门面。【来源著录】20231021 Zangjing Ge, Kaiyuan Si.jpg；文化或地点依据：来源题名与说明为泉州开元寺藏经阁；按福建所在地归中国南方。
+materials:
+- 木构件
+- 瓦
+- 石材（外观依据）
+colors:
+- 红褐色
+- 白色
+- 灰色
+style: 中国南方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，楼阁立面为两层柱廊，上层白色栏杆连成横带；中央屋面抬高并上翘，红褐梁架外露，底层以柱列分隔门面。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 20231021 Zangjing Ge, Kaiyuan Si.jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 建筑景观
+- 中国南方
+- 开放授权
+- 真实摄影
+- 泉州开元寺藏经阁重层柱廊与檐下木构
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20231021_Zangjing_Ge,_Kaiyuan_Si.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/20231021_Zangjing_Ge%2C_Kaiyuan_Si.jpg/3840px-20231021_Zangjing_Ge%2C_Kaiyuan_Si.jpg
+  credit: Yumeto; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2880
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review
