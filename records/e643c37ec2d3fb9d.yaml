@@ -51,10 +51,10 @@ tags:
 - 线性灯带走廊
 material_ids: []
 provenance:
-  source: unknown
+  source: ai_generated
   url: null
   credit: null
-  license: unknown
+  license: ai_generated
   license_status: unconfirmed
 quality:
   min_side_px: 1054
