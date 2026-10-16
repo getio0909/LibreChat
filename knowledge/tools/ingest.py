@@ -169,7 +169,13 @@ GEMINI_RESPONSE_SCHEMA: dict[str, Any] = {
         },
         "detected_stone_hint": {
             "type": ["string", "null"],
-            "enum": ["dunhuang-gold", "dunhuang-wall", "gold-jade", "blue-gold-grey", None],
+            "enum": [
+                "dunhuang-gold",
+                "dunhuang-wall",
+                "gold-jade",
+                "blue-gold-grey",
+                None,
+            ],
         },
         "is_ai_generated_suspect": {"type": "boolean"},
         "watermark_detected": {"type": "boolean"},
@@ -210,9 +216,15 @@ def normalize_image(source: Image.Image) -> Image.Image:
             space = src_profile.profile.xcolor_space.strip()
             mode_map = {"RGB": "RGB", "CMYK": "CMYK", "GRAY": "L", "LAB": "LAB"}
             target_mode = mode_map.get(space, transposed.mode)
-            color_img = transposed if transposed.mode == target_mode else transposed.convert(target_mode)
+            color_img = (
+                transposed
+                if transposed.mode == target_mode
+                else transposed.convert(target_mode)
+            )
             srgb_profile = ImageCms.createProfile("sRGB")
-            converted = ImageCms.profileToProfile(color_img, src_profile, srgb_profile, outputMode="RGB")
+            converted = ImageCms.profileToProfile(
+                color_img, src_profile, srgb_profile, outputMode="RGB"
+            )
         except (ImageCms.PyCMSError, OSError, ValueError):
             converted = transposed.convert("RGB")
     elif converted.mode != "RGB":
@@ -225,7 +237,9 @@ def normalize_image(source: Image.Image) -> Image.Image:
         converted = Image.alpha_composite(white_bg, rgba_img).convert("RGB")
 
     clean_img = Image.new("RGB", converted.size)
-    clean_img.putdata(list(converted.getdata())) if converted.size[0] * converted.size[1] <= 1024 else clean_img.paste(converted)
+    clean_img.putdata(list(converted.getdata())) if converted.size[0] * converted.size[
+        1
+    ] <= 1024 else clean_img.paste(converted)
     return clean_img
 
 
@@ -268,9 +282,9 @@ def generate_derivatives(
     thumb_bytes = thumb_abs_path.read_bytes()
     thumb_sha256 = hashlib.sha256(thumb_bytes).hexdigest()
 
-    rel_path_str = original_rel_path if original_rel_path else src.name
-    if rel_path_str.startswith("wiki/"):
-        rel_path_str = rel_path_str[len("wiki/") :]
+    rel_path_str = (original_rel_path if original_rel_path else src.name).removeprefix(
+        "wiki/"
+    )
 
     return {
         "id": asset_id,
@@ -393,7 +407,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--source",
         default="unknown",
-        choices=["own_product", "own_project", "web", "museum", "ai_generated", "unknown"],
+        choices=[
+            "own_product",
+            "own_project",
+            "web",
+            "museum",
+            "ai_generated",
+            "unknown",
+        ],
         help="Provenance source type for the ingested assets.",
     )
     parser.add_argument(

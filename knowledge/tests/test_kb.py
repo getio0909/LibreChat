@@ -5,13 +5,22 @@ import hashlib
 import io
 import json
 import shutil
+import sys
 from pathlib import Path
 
-import pytest
 import yaml
 from PIL import Image
 
-from tools.build import build_index_jsonl, build_markdown_views, load_all_records
+# 指向知识库根目录的常量路径并加入模块搜索路径以支持从仓库根目录运行测试
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.build import (
+    build_index_jsonl,
+    build_markdown_views,
+    load_all_records,
+)
 from tools.ingest import (
     GEMINI_RESPONSE_SCHEMA,
     create_draft_record,
@@ -19,9 +28,6 @@ from tools.ingest import (
     generate_derivatives,
 )
 from tools.validate import validate_repository
-
-# 指向当前仓库根目录的常量路径
-REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 # 辅助函数：在临时目录中初始化最小合法知识库结构
@@ -142,14 +148,16 @@ def test_exif_orientation_transpose_and_strip(tmp_path: Path) -> None:
     src_file = tmp_path / "rotated_photo.jpg"
     raw_img.save(src_file, format="JPEG", quality=95, exif=exif.tobytes())
 
-    meta = generate_derivatives(src_file, repo, original_rel_path="folder/rotated_photo.jpg")
+    meta = generate_derivatives(
+        src_file, repo, original_rel_path="folder/rotated_photo.jpg"
+    )
     ref_path = repo / meta["derivatives"]["ref2048"]["path"]
     thumb_path = repo / meta["derivatives"]["thumb512"]["path"]
 
     with Image.open(ref_path) as ref_im:
         assert ref_im.size == (800, 1200)
         assert len(ref_im.getexif()) == 0
-        r_tr, g_tr, b_tr = ref_im.getpixel((750, 50))
+        r_tr, _g_tr, b_tr = ref_im.getpixel((750, 50))
         assert r_tr > 180 and b_tr < 80
 
     with Image.open(thumb_path) as thumb_im:
@@ -191,10 +199,16 @@ def test_validator_catches_failure_cases(tmp_path: Path) -> None:
     # 构造包含wiki/前缀、绝对路径、未知石材ID和模拟密钥的违规记录
     bad_data = json.loads(json.dumps(base_data))
     bad_data["source"]["original_path"] = "wiki/folder/small.jpg"
-    bad_data["original"]["path"] = "/home/wangtinghu/workspace/zybc/wiki/folder/small.jpg"
+    bad_data["original"]["path"] = (
+        "/home/wangtinghu/workspace/zybc/wiki/folder/small.jpg"
+    )
     bad_data["material_ids"] = ["non-existent-stone"]
-    bad_data["quality"]["notes"] = "Leaked token sk-1234567890abcdefghijklmno and file:///tmp/a"
-    rec_path.write_text(yaml.safe_dump(bad_data, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    bad_data["quality"]["notes"] = (
+        "Leaked token sk-1234567890abcdefghijklmno and file:///tmp/a"
+    )
+    rec_path.write_text(
+        yaml.safe_dump(bad_data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
 
     # 篡改衍生图文件内容以触发SHA256不匹配，并写入孤儿衍生图文件
     ref_file = repo / base_data["derivatives"]["ref2048"]["path"]
@@ -221,7 +235,9 @@ def test_validator_fails_on_empty_summary(tmp_path: Path) -> None:
     src_file = tmp_path / "sample.jpg"
     img.save(src_file, format="JPEG", quality=85)
 
-    rec_path = create_draft_record(src_file, repo, original_rel_path="folder/sample.jpg")
+    rec_path = create_draft_record(
+        src_file, repo, original_rel_path="folder/sample.jpg"
+    )
     base_data = yaml.safe_load(rec_path.read_text(encoding="utf-8"))
     assert validate_repository(repo, check_images=False) == []
 
@@ -276,4 +292,3 @@ def test_build_views_and_live_repository(tmp_path: Path) -> None:
 
     assert len(seen_in_views) == 368
     assert len(set(seen_in_views)) == 368
-

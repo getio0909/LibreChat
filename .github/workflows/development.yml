@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/development.yml'
       - 'deploy/**'
+      - 'knowledge/**'
       - 'librechat.yaml'
       - 'packages/**'
       - 'api/**'
@@ -45,7 +46,9 @@ jobs:
       - name: Verify studio service and deployment configuration
         run: |
           node --test deploy/*.test.cjs
-          pip install -r deploy/studio/requirements.txt pytest
+          pip install -r deploy/studio/requirements.txt jsonschema pytest
+          python knowledge/tools/validate.py
+          pytest knowledge/tests
           pytest deploy/studio
       - name: Check changed code
         env:

@@ -19,7 +19,10 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("AWS access key ID", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
     ("GitHub personal access token", re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}\b")),
     ("Google API key", re.compile(r"\bAIza[0-9A-Za-z\-_]{35}\b")),
-    ("Private key block", re.compile(r"-----BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----")),
+    (
+        "Private key block",
+        re.compile(r"-----BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----"),
+    ),
 ]
 
 # 定义绝对路径与禁止URI前缀的正则表达式模式
@@ -53,7 +56,9 @@ def _iter_strings(obj: Any, prefix: str = "") -> list[tuple[str, str]]:
 
 
 # 扫描文本内容是否包含敏感密钥或禁止的绝对路径
-def _scan_text_security_and_paths(text: str, rel_file: str, check_paths: bool = True) -> list[str]:
+def _scan_text_security_and_paths(
+    text: str, rel_file: str, check_paths: bool = True
+) -> list[str]:
     errors: list[str] = []
     for label, pattern in SECRET_PATTERNS:
         if pattern.search(text):
@@ -84,7 +89,12 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
     try:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         validator = jsonschema.Draft202012Validator(schema)
-    except Exception as exc:
+    except (
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+        jsonschema.exceptions.SchemaError,
+    ) as exc:
         errors.append(f"Invalid JSON schema in schema/record.schema.json: {exc}")
         return errors
 
@@ -96,24 +106,42 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
     else:
         try:
             mat_text = materials_path.read_text(encoding="utf-8")
-            errors.extend(_scan_text_security_and_paths(mat_text, "catalog/materials.yaml"))
+            errors.extend(
+                _scan_text_security_and_paths(mat_text, "catalog/materials.yaml")
+            )
             mat_data = yaml.safe_load(mat_text)
-            if not isinstance(mat_data, dict) or not isinstance(mat_data.get("materials"), list):
+            if not isinstance(mat_data, dict) or not isinstance(
+                mat_data.get("materials"), list
+            ):
                 errors.append("catalog/materials.yaml must contain a 'materials' list")
             else:
                 for entry in mat_data["materials"]:
                     mid = entry.get("id")
                     if not mid or not isinstance(mid, str):
-                        errors.append("catalog/materials.yaml entry missing string 'id'")
+                        errors.append(
+                            "catalog/materials.yaml entry missing string 'id'"
+                        )
                     elif mid in catalog_material_ids:
-                        errors.append(f"catalog/materials.yaml duplicate material id: {mid}")
+                        errors.append(
+                            f"catalog/materials.yaml duplicate material id: {mid}"
+                        )
                     else:
                         catalog_material_ids.add(mid)
                     for aid in entry.get("sample_asset_ids", []) or []:
-                        referenced_catalog_assets.append(("catalog/materials.yaml", aid))
+                        referenced_catalog_assets.append(
+                            ("catalog/materials.yaml", aid)
+                        )
                     for aid in entry.get("all_slab_asset_ids", []) or []:
-                        referenced_catalog_assets.append(("catalog/materials.yaml", aid))
-        except Exception as exc:
+                        referenced_catalog_assets.append(
+                            ("catalog/materials.yaml", aid)
+                        )
+        except (
+            OSError,
+            UnicodeDecodeError,
+            yaml.YAMLError,
+            AttributeError,
+            TypeError,
+        ) as exc:
             errors.append(f"Failed to parse catalog/materials.yaml: {exc}")
 
     if not styles_path.is_file():
@@ -121,7 +149,9 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
     else:
         try:
             sty_text = styles_path.read_text(encoding="utf-8")
-            errors.extend(_scan_text_security_and_paths(sty_text, "catalog/styles.yaml"))
+            errors.extend(
+                _scan_text_security_and_paths(sty_text, "catalog/styles.yaml")
+            )
             sty_data = yaml.safe_load(sty_text)
             if not isinstance(sty_data, dict):
                 errors.append("catalog/styles.yaml must parse to a mapping")
@@ -133,13 +163,21 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
                 for pack in sty_data.get("packs", []) or []:
                     for aid in pack.get("asset_ids", []) or []:
                         referenced_catalog_assets.append(("catalog/styles.yaml", aid))
-        except Exception as exc:
+        except (
+            OSError,
+            UnicodeDecodeError,
+            yaml.YAMLError,
+            AttributeError,
+            TypeError,
+        ) as exc:
             errors.append(f"Failed to parse catalog/styles.yaml: {exc}")
 
     readme_path = root / "README.md"
     if readme_path.is_file():
         errors.extend(
-            _scan_text_security_and_paths(readme_path.read_text(encoding="utf-8"), "README.md")
+            _scan_text_security_and_paths(
+                readme_path.read_text(encoding="utf-8"), "README.md"
+            )
         )
 
     if not records_dir.is_dir():
@@ -160,7 +198,7 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
         rel_rec = f"records/{rec_file.name}"
         try:
             raw_text = rec_file.read_text(encoding="utf-8")
-        except Exception as exc:
+        except (OSError, UnicodeDecodeError) as exc:
             errors.append(f"{rel_rec}: failed to read UTF-8 text: {exc}")
             continue
 
@@ -168,7 +206,7 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
 
         try:
             data = yaml.safe_load(raw_text)
-        except Exception as exc:
+        except yaml.YAMLError as exc:
             errors.append(f"{rel_rec}: YAML parse error: {exc}")
             continue
 
@@ -181,24 +219,31 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
             errors.append(f"{rel_rec}: schema error at {loc}: {v_err.message}")
 
         for field_path, str_val in _iter_strings(data):
-            is_web_url = field_path == "provenance.url" and str_val.startswith(("https://", "http://"))
+            is_web_url = field_path == "provenance.url" and str_val.startswith(
+                ("https://", "http://")
+            )
             if str_val.startswith("wiki/") or (not is_web_url and "/wiki/" in str_val):
-                errors.append(f"{rel_rec}: forbidden 'wiki/' prefix in {field_path}: {str_val}")
+                errors.append(
+                    f"{rel_rec}: forbidden 'wiki/' prefix in {field_path}: {str_val}"
+                )
             if field_path in (
                 "source.original_path",
                 "original.path",
                 "derivatives.ref2048.path",
                 "derivatives.thumb512.path",
-            ):
-                if str_val.startswith("/") or ".." in Path(str_val).parts:
-                    errors.append(f"{rel_rec}: non-relative or traversal path in {field_path}: {str_val}")
+            ) and (str_val.startswith("/") or ".." in Path(str_val).parts):
+                errors.append(
+                    f"{rel_rec}: non-relative or traversal path in {field_path}: {str_val}"
+                )
 
         rec_id = data.get("id")
         if not isinstance(rec_id, str):
             continue
 
         if rec_file.stem != rec_id:
-            errors.append(f"{rel_rec}: filename stem '{rec_file.stem}' does not match record id '{rec_id}'")
+            errors.append(
+                f"{rel_rec}: filename stem '{rec_file.stem}' does not match record id '{rec_id}'"
+            )
 
         if rec_id in seen_ids:
             errors.append(f"{rel_rec}: duplicate record id '{rec_id}'")
@@ -235,7 +280,9 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
 
         for mid in data.get("material_ids") or []:
             if mid not in catalog_material_ids:
-                errors.append(f"{rel_rec}: unknown material_id '{mid}' not in catalog/materials.yaml")
+                errors.append(
+                    f"{rel_rec}: unknown material_id '{mid}' not in catalog/materials.yaml"
+                )
 
         derivs = data.get("derivatives") or {}
         ref_meta = derivs.get("ref2048") or {}
@@ -247,9 +294,13 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
         expected_thumbs.add(f"{rec_id}.webp")
 
         if ref_meta.get("path") != exp_ref_rel:
-            errors.append(f"{rel_rec}: derivatives.ref2048.path must be '{exp_ref_rel}'")
+            errors.append(
+                f"{rel_rec}: derivatives.ref2048.path must be '{exp_ref_rel}'"
+            )
         if thumb_meta.get("path") != exp_thumb_rel:
-            errors.append(f"{rel_rec}: derivatives.thumb512.path must be '{exp_thumb_rel}'")
+            errors.append(
+                f"{rel_rec}: derivatives.thumb512.path must be '{exp_thumb_rel}'"
+            )
 
         ref_file = root / exp_ref_rel
         if not ref_file.is_file() or ref_file.is_symlink():
@@ -272,14 +323,18 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
                                 f"{rel_rec}: {exp_ref_rel} must be RGB JPEG (got {im.format} {im.mode})"
                             )
                         if max(im.size) > 2048:
-                            errors.append(f"{rel_rec}: {exp_ref_rel} exceeds 2048px ({im.size})")
+                            errors.append(
+                                f"{rel_rec}: {exp_ref_rel} exceeds 2048px ({im.size})"
+                            )
                         if im.size != (ref_meta.get("width"), ref_meta.get("height")):
                             errors.append(
                                 f"{rel_rec}: {exp_ref_rel} dimensions {im.size} != metadata {(ref_meta.get('width'), ref_meta.get('height'))}"
                             )
                         if im.getexif():
-                            errors.append(f"{rel_rec}: {exp_ref_rel} still contains EXIF data")
-                except Exception as exc:
+                            errors.append(
+                                f"{rel_rec}: {exp_ref_rel} still contains EXIF data"
+                            )
+                except (OSError, ValueError, SyntaxError) as exc:
                     errors.append(f"{rel_rec}: failed to open {exp_ref_rel}: {exc}")
 
         thumb_file = root / exp_thumb_rel
@@ -303,12 +358,17 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
                                 f"{rel_rec}: {exp_thumb_rel} must be RGB WEBP (got {im.format} {im.mode})"
                             )
                         if max(im.size) > 512:
-                            errors.append(f"{rel_rec}: {exp_thumb_rel} exceeds 512px ({im.size})")
-                        if im.size != (thumb_meta.get("width"), thumb_meta.get("height")):
+                            errors.append(
+                                f"{rel_rec}: {exp_thumb_rel} exceeds 512px ({im.size})"
+                            )
+                        if im.size != (
+                            thumb_meta.get("width"),
+                            thumb_meta.get("height"),
+                        ):
                             errors.append(
                                 f"{rel_rec}: {exp_thumb_rel} dimensions {im.size} != metadata {(thumb_meta.get('width'), thumb_meta.get('height'))}"
                             )
-                except Exception as exc:
+                except (OSError, ValueError, SyntaxError) as exc:
                     errors.append(f"{rel_rec}: failed to open {exp_thumb_rel}: {exc}")
 
     if ref_dir.is_dir():
@@ -330,7 +390,9 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
 
 # 命令行入口：执行仓库校验并输出校验统计结果
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Validate the zybc-knowledge repository.")
+    parser = argparse.ArgumentParser(
+        description="Validate the zybc-knowledge repository."
+    )
     parser.add_argument(
         "--repo-root",
         default=str(Path(__file__).resolve().parent.parent),
