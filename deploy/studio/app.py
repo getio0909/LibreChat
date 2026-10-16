@@ -34,6 +34,7 @@ from .images import (
     GenerationUncertain,
     build_edit_prompt,
     build_generate_prompt,
+    build_stone_replacements,
     encode_display_image,
     generate_seedream,
     neutralize_stone_names,
@@ -483,12 +484,18 @@ def build_mcp_server(
                         transport=gemini_transport,
                     )
 
-                stone_map = {
-                    alias: "图1所示石材"
-                    for product in rules.materials
-                    for alias in [product.name, *product.aliases]
-                    if alias
-                }
+                concept_refs = [
+                    {
+                        "id": item.id,
+                        "path": item.path,
+                        "use": "参考",
+                        "note": item.path.stem,
+                    }
+                    for item in resolved_ref_items
+                ]
+                stone_map = build_stone_replacements(
+                    rules, unique_ref_paths, concept_refs, has_base=False
+                )
 
                 public_concepts: list[dict[str, Any]] = []
                 image_blocks: list[types.ImageContent] = []

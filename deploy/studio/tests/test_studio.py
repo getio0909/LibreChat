@@ -735,7 +735,9 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                         "arguments": {
                             "base_id": "@latest",
                             "instruction": "将顶部线脚改为天川金材质",
-                            "references": [{"id": upload_id, "use": "材质"}],
+                            "references": [
+                                {"id": upload_id, "use": "材质", "note": "天川金样板"}
+                            ],
                             "size": "1K",
                         },
                     },
@@ -1203,6 +1205,48 @@ def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
     for bad_lookup in ("avatar", "agent", "customprefix", "avatar-1700000999"):
         with pytest.raises(ValueError, match="not found"):
             resolve_image(studio_env, USER_A, bad_lookup)
+
+
+# 校验石材名称仅在提供匹配目录材质参考图时才替换为图N所示石材，无参考或无关参考时保留原词
+def test_stone_neutralization_only_for_matching_references(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    rules = load_rules()
+    unrelated_ref = tmp_path / "wooden_chair.jpg"
+    unrelated_ref.write_bytes(_make_image_bytes(32, 32))
+    matched_ref = tmp_path / "vangogh_sample.jpg"
+    matched_ref.write_bytes(_make_image_bytes(32, 32))
+
+    # 1. 无参考图生图：保留客户原文“敦煌金”，不得凭空生成“图1所示石材”
+    no_ref_prompt, no_ref_paths = build_generate_prompt(
+        "用敦煌金设计供桌", [], rules
+    )
+    assert no_ref_paths == []
+    assert "敦煌金" in no_ref_prompt
+    assert "所示石材" not in no_ref_prompt
+
+    # 2. 无额外参考图改图：保留客户原文“敦煌金”，不得指向底图“图1所示石材”
+    no_ref_edit, no_ref_edit_paths = build_edit_prompt(
+        "把台面换成敦煌金", [], rules
+    )
+    assert no_ref_edit_paths == []
+    assert "敦煌金" in no_ref_edit
+    assert "所示石材" not in no_ref_edit
+
+    # 3. 含无关参考图与另一款匹配石材参考图：只替换匹配的梵高皇/敦煌壁，保留未匹配的敦煌金
+    mixed_prompt, _ = build_generate_prompt(
+        "台面用敦煌金，背板用梵高皇",
+        [
+            {"id": "u1", "path": unrelated_ref, "use": "造型", "note": "明式束腰造型"},
+            {"id": "u2", "path": matched_ref, "use": "材质", "note": "梵高皇样板"},
+        ],
+        rules,
+    )
+    assert "敦煌金" in mixed_prompt
+    assert "图1所示石材" not in mixed_prompt
+    assert "梵高皇" not in mixed_prompt
+    assert "图2所示石材" in mixed_prompt
+
 
 
 

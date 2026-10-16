@@ -192,8 +192,8 @@ def neutralize_stone_names(text: str, replacements: dict[str, str]) -> str:
     return result
 
 
-# 根据石材目录与参考图列表构建石材名称替换表
-def _build_stone_replacements(
+# 仅当提供了匹配目录石材的参考图时，将该石材名称与别名映射为图N所示石材
+def build_stone_replacements(
     rules: StudioRules,
     unique_paths: list[Path],
     references: list[dict[str, Any]],
@@ -201,29 +201,29 @@ def _build_stone_replacements(
     has_base: bool,
 ) -> dict[str, str]:
     offset = 2 if has_base else 1
-    replacements: dict[str, str] = {}
-    material_sample: str | None = None
-    first_sample: str | None = f"图{offset}" if unique_paths else "图1"
+    product_samples: dict[str, list[str]] = {}
 
     for ref in references:
         ref_path = Path(ref["path"])
         idx = unique_paths.index(ref_path) + offset
         sample = f"图{idx}"
-        if ref.get("use") == "材质" and material_sample is None:
-            material_sample = sample
-        note_text = f"{ref.get('note') or ''} {ref.get('id') or ''}"
+        note_text = f"{ref.get('note') or ''} {ref.get('id') or ''} {ref_path.stem}"
         for product in rules.materials:
-            all_names = [product.name, *product.aliases]
-            if any(name and name in note_text for name in all_names):
-                for name in all_names:
-                    if name:
-                        replacements[name] = f"{sample}所示石材"
+            match_keys = [product.id, product.name, *product.aliases]
+            if any(key and key in note_text for key in match_keys):
+                samples = product_samples.setdefault(product.id, [])
+                if sample not in samples:
+                    samples.append(sample)
 
-    fallback_sample = material_sample or first_sample or "图1"
+    replacements: dict[str, str] = {}
     for product in rules.materials:
+        samples = product_samples.get(product.id)
+        if not samples:
+            continue
+        target = "、".join(samples) + "所示石材"
         for name in [product.name, *product.aliases]:
-            if name and name not in replacements:
-                replacements[name] = f"{fallback_sample}所示石材"
+            if name:
+                replacements[name] = target
     return replacements
 
 
@@ -244,7 +244,7 @@ def build_generate_prompt(
         if p not in unique_paths:
             unique_paths.append(p)
 
-    replacements = _build_stone_replacements(
+    replacements = build_stone_replacements(
         rules, unique_paths, references, has_base=False
     )
     clean_prompt = neutralize_stone_names(prompt.strip(), replacements)
@@ -294,7 +294,7 @@ def build_edit_prompt(
         if p not in unique_paths:
             unique_paths.append(p)
 
-    replacements = _build_stone_replacements(
+    replacements = build_stone_replacements(
         rules, unique_paths, references, has_base=True
     )
     clean_instruction = neutralize_stone_names(instruction.strip(), replacements)
