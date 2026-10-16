@@ -44,7 +44,7 @@ from .images import (
     normalize_reference_with_size,
     prepare_seed3d_image,
 )
-from .kb import LIBRARY_TYPES, KnowledgeBaseIndex, load_kb_index
+from .kb import LIBRARY_REGIONS, LIBRARY_TYPES, KnowledgeBaseIndex, load_kb_index
 from .models3d import (
     DETAIL_SPECS,
     VISUAL_MODEL_DISCLAIMER,
@@ -253,6 +253,11 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "type": "string",
                     "enum": list(REFERENCE_USES),
                     "description": "参考用途角色筛选",
+                },
+                "region": {
+                    "type": "string",
+                    "enum": list(LIBRARY_REGIONS),
+                    "description": "文化地域筛选",
                 },
                 "limit": {
                     "type": "integer",
@@ -556,6 +561,7 @@ def build_mcp_server(
                     else None
                 )
                 role = str(args["role"]) if args.get("role") is not None else None
+                region = str(args["region"]) if args.get("region") is not None else None
                 raw_limit = args.get("limit", 6)
                 if isinstance(raw_limit, bool) or not isinstance(raw_limit, int):
                     raise ValueError("limit must be an integer between 1 and 12")
@@ -565,12 +571,13 @@ def build_mcp_server(
                     query,
                     library_type=library_type,
                     role=role,
+                    region=region,
                     limit=raw_limit,
                     include_flagged=include_flagged,
                 )
-                record_search_previews(settings, user_id, matched, kb_root)
                 result_items: list[dict[str, Any]] = []
                 thumb_blocks: list[types.ImageContent] = []
+                emitted_records = []
                 for rec in matched:
                     result_items.append(rec.to_search_dict())
                     if (
@@ -585,6 +592,8 @@ def build_mcp_server(
                                 mimeType="image/webp",
                             )
                         )
+                        emitted_records.append(rec)
+                record_search_previews(settings, user_id, emitted_records)
 
                 search_payload = {
                     "results": result_items,

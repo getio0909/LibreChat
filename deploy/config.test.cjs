@@ -43,6 +43,7 @@ const CONTRACT_IDENTIFIERS = new Set([
   'query',
   'library_type',
   'role',
+  'region',
   'limit',
   'include_flagged',
   'target',

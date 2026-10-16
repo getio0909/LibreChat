@@ -4,6 +4,7 @@ import io
 import json
 import os
 import shutil
+import time
 from pathlib import Path
 from typing import Any
 
@@ -221,7 +222,10 @@ def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -
     img_upload_a.write_bytes(_make_image_bytes(120, 90))
     os.utime(img_upload_a, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000_000))
 
-    img_gen_a = user_a_lc / f"{gen_id_a}-generate_image_img_AbCdEf123.webp"
+    img_gen_a = (
+        user_a_lc
+        / f"{gen_id_a}-generate_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-myT.webp"
+    )
     img_gen_a.write_bytes(_make_image_bytes(160, 120, fmt="WEBP"))
     os.utime(img_gen_a, ns=(1_700_000_005_000_000_000, 1_700_000_005_000_000_000))
 
@@ -3336,16 +3340,17 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
             thumb_unflagged_raw = base64.b64decode(s_blocks[1 + idx_unflagged]["data"])
             thumb_flagged_raw = base64.b64decode(s_blocks[1 + idx_flagged]["data"])
 
-            # 2. 模拟LibreChat将MCP返回的ImageContent保存至/librechat/images/<userId>/<uuid>-search_library_img_*.webp
-            # 其中一张模拟sharp重新编码为WebP，另一张直接写入原始WebP字节，时间戳均晚于用户上传图
+            # 2. 模拟LibreChat将MCP返回的ImageContent经resizeImageBuffer重编码后保存至
+            # /librechat/images/<userId>/<uuid>-search_library_mcp_zyb_studio_img_<nanoid>.webp
             preview_uuid_1 = "bbbb1111-2222-3333-4444-555555555555"
             preview_file_1 = (
-                user_lc / f"{preview_uuid_1}-search_library_img_AbCdEf01.webp"
+                user_lc
+                / f"{preview_uuid_1}-search_library_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-my1.webp"
             )
             with Image.open(io.BytesIO(thumb_unflagged_raw)) as im:
-                reencoded = io.BytesIO()
-                im.save(reencoded, format="WEBP", quality=85)
-                preview_file_1.write_bytes(reencoded.getvalue())
+                reencoded_1 = io.BytesIO()
+                im.resize((96, 72)).save(reencoded_1, format="WEBP", quality=75)
+                preview_file_1.write_bytes(reencoded_1.getvalue())
             os.utime(
                 preview_file_1,
                 ns=(1_700_000_050_000_000_000, 1_700_000_050_000_000_000),
@@ -3353,9 +3358,13 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
 
             preview_uuid_2 = "cccc1111-2222-3333-4444-555555555555"
             preview_file_2 = (
-                user_lc / f"{preview_uuid_2}-search_library_img_AbCdEf02.webp"
+                user_lc
+                / f"{preview_uuid_2}-search_library_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-my2.webp"
             )
-            preview_file_2.write_bytes(thumb_flagged_raw)
+            with Image.open(io.BytesIO(thumb_flagged_raw)) as im:
+                reencoded_2 = io.BytesIO()
+                im.resize((96, 72)).save(reencoded_2, format="WEBP", quality=72)
+                preview_file_2.write_bytes(reencoded_2.getvalue())
             os.utime(
                 preview_file_2,
                 ns=(1_700_000_060_000_000_000, 1_700_000_060_000_000_000),
@@ -4982,3 +4991,312 @@ def test_p2b_finding7_persisted_signing_key_preserves_token_across_redeploy(
             assert res.content == raw_glb
 
     asyncio.run(_verify_download())
+
+
+# 校验LibreChat工具输出仅将四类产图工具计为generated，排除search_library/3D工具，且重编码后的search_library输出按顺序和时间映射回kb_<id>
+def test_librechat_tool_output_classification_and_reencoded_search_previews(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+
+    # 1. 创建上传图与四类产图工具输出（模拟LibreChat resizeImageBuffer重编码后的真实文件名与WebP字节）
+    upload_id = "10000000-1111-2222-3333-444444444444"
+    (user_lc / f"{upload_id}__client_photo.jpg").write_bytes(
+        _make_image_bytes(140, 100, color=(90, 80, 70), fmt="JPEG")
+    )
+    os.utime(
+        user_lc / f"{upload_id}__client_photo.jpg",
+        ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000_000),
+    )
+
+    producing_specs = [
+        (
+            "20000001-1111-2222-3333-444444444444",
+            "generate_image",
+            "V1StGXR8_Z5jdHi6B-gn1",
+            10,
+        ),
+        (
+            "20000002-1111-2222-3333-444444444444",
+            "edit_image",
+            "V1StGXR8_Z5jdHi6B-ed2",
+            20,
+        ),
+        (
+            "20000003-1111-2222-3333-444444444444",
+            "design_concepts",
+            "V1StGXR8_Z5jdHi6B-dc3",
+            30,
+        ),
+        (
+            "20000004-1111-2222-3333-444444444444",
+            "compare_materials",
+            "V1StGXR8_Z5jdHi6B-cm4",
+            40,
+        ),
+    ]
+    for fid, tool_name, nanoid, sec in producing_specs:
+        fpath = user_lc / f"{fid}-{tool_name}_mcp_zyb_studio_img_{nanoid}.webp"
+        with Image.open(
+            io.BytesIO(_make_image_bytes(200, 150, color=(sec, 100, 150), fmt="PNG"))
+        ) as im:
+            reencoded = io.BytesIO()
+            im.resize((160, 120)).save(reencoded, format="WEBP", quality=78)
+            fpath.write_bytes(reencoded.getvalue())
+        ts_ns = (1_700_000_000 + sec) * 1_000_000_000
+        os.utime(fpath, ns=(ts_ns, ts_ns))
+
+    # 2. 创建非产图工具输出（create_3d_model、check_3d_model、其他工具、其他MCP服务），时间戳更晚但必须被排除
+    excluded_specs = [
+        (
+            "30000001-1111-2222-3333-444444444444",
+            "create_3d_model_mcp_zyb_studio_img_V1StGXR8_3d1",
+            50,
+        ),
+        (
+            "30000002-1111-2222-3333-444444444444",
+            "check_3d_model_mcp_zyb_studio_img_V1StGXR8_3d2",
+            60,
+        ),
+        (
+            "30000003-1111-2222-3333-444444444444",
+            "list_images_mcp_zyb_studio_img_V1StGXR8_ls3",
+            70,
+        ),
+        (
+            "30000004-1111-2222-3333-444444444444",
+            "generate_image_mcp_other_server_img_V1StGXR8_ot4",
+            80,
+        ),
+    ]
+    for fid, suffix_stem, sec in excluded_specs:
+        fpath = user_lc / f"{fid}-{suffix_stem}.webp"
+        fpath.write_bytes(_make_image_bytes(128, 96, color=(200, sec, 50), fmt="WEBP"))
+        ts_ns = (1_700_000_000 + sec) * 1_000_000_000
+        os.utime(fpath, ns=(ts_ns, ts_ns))
+
+    # 验证list_images与@latest仅包含上传图与四类产图工具输出，且@latest指向最新的compare_materials输出
+    listed = list_user_images(studio_env, USER_A, limit=20)
+    listed_ids = [item["id"] for item in listed]
+    assert listed_ids == [
+        "20000004-1111-2222-3333-444444444444",
+        "20000003-1111-2222-3333-444444444444",
+        "20000002-1111-2222-3333-444444444444",
+        "20000001-1111-2222-3333-444444444444",
+        upload_id,
+    ]
+    for fid, _, _, _ in producing_specs:
+        resolved_prod = resolve_image(studio_env, USER_A, fid)
+        assert resolved_prod.id == fid
+        assert resolved_prod.kind == "generated"
+    for fid, _, _ in excluded_specs:
+        with pytest.raises(ValueError, match="Image not found"):
+            resolve_image(studio_env, USER_A, fid)
+
+    latest_resolved = resolve_image(studio_env, USER_A, "@latest")
+    assert latest_resolved.id == "20000004-1111-2222-3333-444444444444"
+    assert latest_resolved.kind == "generated"
+
+    # 3. 连续执行两次search_library，模拟LibreChat对返回的缩略图进行彻底重编码（甚至改变像素与尺寸，使哈希与感知指纹完全不同）
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run_searches() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            # 第一次检索：返回金镶玉记录
+            res1 = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 601,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "search_library",
+                        "arguments": {
+                            "query": "金镶玉",
+                            "include_flagged": True,
+                            "limit": 6,
+                        },
+                    },
+                },
+            )
+            assert res1.status_code == 200
+            batch1_ids = [
+                item["id"]
+                for item in json.loads(res1.json()["result"]["content"][0]["text"])[
+                    "results"
+                ]
+            ]
+            assert len(batch1_ids) >= 2
+
+            # 模拟LibreChat重编码并保存第一次检索的前两张缩略图（使用与原图毫无关系的像素字节以证明绝不依赖哈希/像素比对）
+            s1_uuid_0 = "40000001-1111-2222-3333-444444444444"
+            s1_uuid_1 = "40000002-1111-2222-3333-444444444444"
+            s1_file_0 = (
+                user_lc
+                / f"{s1_uuid_0}-search_library_mcp_zyb_studio_img_V1StGXR8_s1a.webp"
+            )
+            s1_file_1 = (
+                user_lc
+                / f"{s1_uuid_1}-search_library_mcp_zyb_studio_img_V1StGXR8_s1b.webp"
+            )
+            s1_file_0.write_bytes(
+                _make_image_bytes(77, 55, color=(1, 2, 3), fmt="WEBP")
+            )
+            t1_ns = time.time_ns() + 1_000_000
+            os.utime(s1_file_0, ns=(t1_ns, t1_ns))
+            s1_file_1.write_bytes(
+                _make_image_bytes(77, 55, color=(250, 251, 252), fmt="WEBP")
+            )
+            os.utime(s1_file_1, ns=(t1_ns + 1_000_000, t1_ns + 1_000_000))
+
+            # 第二次检索：返回蓝金灰记录
+            res2 = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 602,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "search_library",
+                        "arguments": {
+                            "query": "蓝金灰",
+                            "include_flagged": False,
+                            "limit": 6,
+                        },
+                    },
+                },
+            )
+            assert res2.status_code == 200
+            batch2_ids = [
+                item["id"]
+                for item in json.loads(res2.json()["result"]["content"][0]["text"])[
+                    "results"
+                ]
+            ]
+            assert len(batch2_ids) >= 1
+
+            s2_uuid_0 = "50000001-1111-2222-3333-444444444444"
+            s2_file_0 = (
+                user_lc
+                / f"{s2_uuid_0}-search_library_mcp_zyb_studio_img_V1StGXR8_s2a.webp"
+            )
+            s2_file_0.write_bytes(
+                _make_image_bytes(93, 61, color=(123, 45, 67), fmt="WEBP")
+            )
+            t2_ns = time.time_ns() + 5_000_000
+            os.utime(s2_file_0, ns=(t2_ns, t2_ns))
+
+            # 验证search_library输出不进入list_images或@latest，但resolve_image按批次与顺序精确映射回各自的kb_<id>
+            after_list = list_user_images(studio_env, USER_A, limit=20)
+            after_ids = [item["id"] for item in after_list]
+            assert s1_uuid_0 not in after_ids
+            assert s1_uuid_1 not in after_ids
+            assert s2_uuid_0 not in after_ids
+            assert resolve_image(studio_env, USER_A, "@latest").id == (
+                "20000004-1111-2222-3333-444444444444"
+            )
+
+            mapped_s1_0 = resolve_image(studio_env, USER_A, s1_uuid_0)
+            mapped_s1_1 = resolve_image(studio_env, USER_A, s1_uuid_1)
+            mapped_s2_0 = resolve_image(studio_env, USER_A, s2_uuid_0)
+            assert mapped_s1_0.id == batch1_ids[0]
+            assert mapped_s1_0.kind == "library"
+            assert mapped_s1_1.id == batch1_ids[1]
+            assert mapped_s1_1.kind == "library"
+            assert mapped_s2_0.id == batch2_ids[0]
+            assert mapped_s2_0.kind == "library"
+
+    asyncio.run(_run_searches())
+
+
+# 校验合并后的607条真实知识库索引加载与search_library的region文化地域枚举筛选
+def test_kb_index_and_search_library_with_607_records_and_region_filter(
+    studio_env: StudioSettings,
+) -> None:
+    real_kb_root = Path(__file__).resolve().parents[3] / "knowledge"
+    assert (real_kb_root / "catalog" / "materials.yaml").is_file()
+
+    real_index = load_kb_index(real_kb_root)
+    assert len(real_index.records) == 607
+    assert len(real_index.materials) == 4
+
+    real_env = studio_env.model_copy(update={"kb_root": real_kb_root})
+    app = create_app(settings=real_env, rules=load_rules())
+
+    expected_regions = ["西方", "南亚东南亚", "中国北方", "中国南方", "中国藏区"]
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            tools_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 700,
+                    "method": "tools/list",
+                    "params": {},
+                },
+            )
+            assert tools_res.status_code == 200
+            tools = tools_res.json()["result"]["tools"]
+            search_tool = next(t for t in tools if t["name"] == "search_library")
+            region_prop = search_tool["inputSchema"]["properties"]["region"]
+            assert region_prop["type"] == "string"
+            assert region_prop["enum"] == expected_regions
+
+            for idx, reg in enumerate(expected_regions):
+                res = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 701 + idx,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "search_library",
+                            "arguments": {
+                                "query": "",
+                                "region": reg,
+                                "limit": 12,
+                            },
+                        },
+                    },
+                )
+                assert res.status_code == 200
+                result = res.json()["result"]
+                assert result.get("isError") is False
+                payload = json.loads(result["content"][0]["text"])
+                assert payload["count"] > 0
+                assert all(item["region"] == reg for item in payload["results"])
+
+            # 非法region枚举值应返回清晰的验证错误
+            bad_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 799,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "search_library",
+                        "arguments": {
+                            "query": "造像",
+                            "region": "无效地域",
+                        },
+                    },
+                },
+            )
+            assert bad_res.status_code == 200
+            assert bad_res.json()["result"].get("isError") is True
+
+    asyncio.run(_run())

@@ -11,8 +11,8 @@ import tarfile
 from collections import Counter
 from pathlib import Path
 
-import yaml
 import pytest
+import yaml
 from PIL import Image
 
 # 指向知识库根目录的常量路径并加入模块搜索路径以支持从仓库根目录运行测试
@@ -500,14 +500,18 @@ def test_delta_archive_members_and_source_integrity(tmp_path):
         with pytest.raises(ValueError):
             select_archive_records(records, bad_ids)
     archive = build_originals_archive(selected, repo / "dist", wiki, delta=True)
-    if archive.name.endswith(".zst"):
-        raw = subprocess.run(
+    raw = (
+        subprocess.run(
             ["zstd", "-dc", str(archive)], check=True, capture_output=True
         ).stdout
-        tar = tarfile.open(fileobj=io.BytesIO(raw), mode="r:")
-    else:
-        tar = tarfile.open(archive, "r:gz")
-    with tar:
+        if archive.name.endswith(".zst")
+        else None
+    )
+    with (
+        tarfile.open(fileobj=io.BytesIO(raw), mode="r:")
+        if raw is not None
+        else tarfile.open(archive, "r:gz")
+    ) as tar:
         assert set(tar.getnames()) == {
             "originals-manifest.json",
             "SHA256SUMS",

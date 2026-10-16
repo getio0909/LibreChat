@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,7 +9,7 @@ import yaml
 
 from .config import StoneMaterial
 
-# 标准图库九大分类与角色枚举定义
+# 标准图库九大分类、角色与文化地域枚举定义
 LIBRARY_TYPES: tuple[str, ...] = (
     "造像雕塑",
     "石刻纹样",
@@ -23,6 +22,13 @@ LIBRARY_TYPES: tuple[str, ...] = (
     "矿山车间",
 )
 STUDIO_ROLES: tuple[str, ...] = ("参考", "物件", "造型", "材质", "纹样", "风格")
+LIBRARY_REGIONS: tuple[str, ...] = (
+    "西方",
+    "南亚东南亚",
+    "中国北方",
+    "中国南方",
+    "中国藏区",
+)
 ASSET_ID_RE = re.compile(r"^[0-9a-f]{16}$")
 KB_ID_RE = re.compile(r"^kb_([0-9a-f]{16})$")
 TOKEN_RE = re.compile(r"[a-z0-9]+|[\u4e00-\u9fff]+")
@@ -55,6 +61,7 @@ class KBRecord:
     kb_id: str
     title_zh: str
     library_type: str
+    region: str
     studio_roles: tuple[str, ...]
     category_l1: str
     category_l2: str
@@ -86,7 +93,6 @@ class KBRecord:
     search_all: str
     is_catalog_sample: bool = False
     is_catalog_slab: bool = False
-    thumb_sha256: str = ""
 
     # 返回导致默认排除的质量或审核标记名称元组
     @property
@@ -113,6 +119,7 @@ class KBRecord:
             "id": self.kb_id,
             "title": self.title_zh,
             "library_type": self.library_type,
+            "region": self.region,
             "roles": list(self.studio_roles),
             "summary": self.short_summary,
             "materials": list(self.materials),
@@ -142,10 +149,10 @@ class KnowledgeBaseIndex:
         self.materials = materials
         self._split_terms = self._build_split_terms(materials)
 
-    # 构建用于拆分复合中文查询词的已知石材名、分类名与角色词表
+    # 构建用于拆分复合中文查询词的已知石材名、分类名、角色与地域词表
     @staticmethod
     def _build_split_terms(materials: list[StoneMaterial]) -> list[str]:
-        terms: set[str] = set(LIBRARY_TYPES) | set(STUDIO_ROLES)
+        terms: set[str] = set(LIBRARY_TYPES) | set(STUDIO_ROLES) | set(LIBRARY_REGIONS)
         for mat in materials:
             for val in (mat.name, *mat.aliases, *mat.search_terms):
                 if val:
@@ -200,6 +207,7 @@ class KnowledgeBaseIndex:
         *,
         library_type: str | None = None,
         role: str | None = None,
+        region: str | None = None,
         limit: int = 6,
         include_flagged: bool = False,
     ) -> list[KBRecord]:
@@ -215,6 +223,9 @@ class KnowledgeBaseIndex:
         clean_role = (role or "").strip()
         if clean_role and clean_role not in STUDIO_ROLES:
             raise ValueError(f"Invalid role: {clean_role}")
+        clean_region = (region or "").strip()
+        if clean_region and clean_region not in LIBRARY_REGIONS:
+            raise ValueError(f"Invalid region: {clean_region}")
 
         clean_query = str(query or "").strip()
         tokens = self._tokenize_query(clean_query)
@@ -236,6 +247,8 @@ class KnowledgeBaseIndex:
             if clean_type and rec.library_type != clean_type:
                 continue
             if clean_role and clean_role not in rec.studio_roles:
+                continue
+            if clean_region and rec.region != clean_region:
                 continue
             if tokens and not all(_token_matches(t, rec.search_all) for t in tokens):
                 continue
@@ -360,6 +373,7 @@ def load_kb_index(
 
         title_zh = str(data.get("title_zh") or "").strip()
         library_type = str(data.get("library_type") or "").strip()
+        region = str(data.get("region") or "未知").strip() or "未知"
         studio_roles = tuple(
             str(r).strip() for r in (data.get("studio_roles") or []) if str(r).strip()
         )
@@ -441,20 +455,11 @@ def load_kb_index(
         ref_meta = (
             derivs.get("ref2048") if isinstance(derivs.get("ref2048"), dict) else {}
         )
-        thumb_meta = (
-            derivs.get("thumb512") if isinstance(derivs.get("thumb512"), dict) else {}
-        )
         ref_width = int(ref_meta.get("width") or 0)
         ref_height = int(ref_meta.get("height") or 0)
 
         ref2048_path = root / "assets" / "ref2048" / f"{rec_id}.jpg"
         thumb512_path = root / "assets" / "thumb512" / f"{rec_id}.webp"
-        thumb_sha256 = str(thumb_meta.get("sha256") or "").strip().lower()
-        if thumb512_path.is_file() and not thumb512_path.is_symlink():
-            try:
-                thumb_sha256 = hashlib.sha256(thumb512_path.read_bytes()).hexdigest()
-            except OSError:
-                pass
 
         search_title = title_zh.casefold()
         search_primary = " ".join(
@@ -463,6 +468,7 @@ def load_kb_index(
         search_secondary = " ".join(
             (
                 library_type,
+                region,
                 category_l1,
                 category_l2,
                 entity_type,
@@ -488,6 +494,7 @@ def load_kb_index(
             kb_id=f"kb_{rec_id}",
             title_zh=title_zh,
             library_type=library_type,
+            region=region,
             studio_roles=studio_roles,
             category_l1=category_l1,
             category_l2=category_l2,
@@ -519,7 +526,6 @@ def load_kb_index(
             search_all=search_all,
             is_catalog_sample=(rec_id in sample_ids_to_mat),
             is_catalog_slab=(rec_id in slab_ids_to_mat),
-            thumb_sha256=thumb_sha256,
         )
 
     return KnowledgeBaseIndex(root, records, materials)
