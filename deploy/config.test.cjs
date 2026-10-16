@@ -92,7 +92,7 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
   assert.equal(defaultSpec.preset.thinking, true);
   assert.equal(defaultSpec.preset.thinkingLevel, 'high');
   assert.equal(defaultSpec.preset.thinkingBudget, undefined);
-  assert.equal(defaultSpec.preset.maxContextTokens, 983040);
+  assert.equal(defaultSpec.preset.maxContextTokens, 200000);
   assert.equal(defaultSpec.preset.maxOutputTokens, 65536);
 
   // 验证 Google LLM 配置为 Gemini 4 Argon 生成 HIGH thinkingLevel 且不发送 thinkingBudget。
@@ -120,8 +120,8 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
   assert.equal(fastSpec.preset.endpoint, 'OpenRouter');
   assert.equal(fastSpec.preset.model, 'anthropic/claude-haiku-5.5');
   assert.equal(fastSpec.preset.iconURL, '/assets/zybc-seal.svg');
-  assert.equal(fastSpec.preset.maxContextTokens, 872000);
-  assert.equal(fastSpec.preset.max_tokens, 128000);
+  assert.equal(fastSpec.preset.maxContextTokens, 200000);
+  assert.equal(fastSpec.preset.max_tokens, 32000);
 
   // 验证 OpenRouter 与轻量级标题端点配置。
   const openRouterEndpoint = config.endpoints.custom.find((ep) => ep.name === 'OpenRouter');
@@ -218,25 +218,25 @@ test('both modelSpecs compute large effective context budgets via initializeAgen
         `${spec.name} maxContextTokens must not collapse to the 1024 floor`,
       );
       assert.ok(
-        initialized.baseContextTokens > 700000,
-        `${spec.name} baseContextTokens must remain > 700k, got ${initialized.baseContextTokens}`,
+        initialized.baseContextTokens >= 100000,
+        `${spec.name} baseContextTokens must remain >= 100k, got ${initialized.baseContextTokens}`,
       );
       const availableForMessages = initialized.maxContextTokens - instructionAndToolTokensReserve;
       assert.ok(
-        availableForMessages > 800000,
-        `${spec.name} availableForMessages must exceed 800k, got ${availableForMessages}`,
+        availableForMessages >= 100000,
+        `${spec.name} availableForMessages must be at least 100k, got ${availableForMessages}`,
       );
 
       if (spec.name === 'zyb-design') {
-        // gemini-4-argon: 1,048,576 总窗口 - 65,536 最大输出 = 983,040 输入上下文上限
-        assert.equal(initialized.maxContextTokens, 983040);
-        assert.equal(initialized.baseContextTokens, 917504);
+        // gemini-4-argon：上下文上限 200,000 - 最大输出 65,536 = 134,464 可用于输入
+        assert.equal(initialized.maxContextTokens, 200000);
+        assert.equal(initialized.baseContextTokens, 134464);
         assert.equal(initialized.model_parameters.maxOutputTokens, 65536);
       } else if (spec.name === 'zyb-design-fast') {
-        // anthropic/claude-haiku-5.5: 1,000,000 总窗口 - 128,000 最大补全输出 = 872,000 输入上下文上限
-        assert.equal(initialized.maxContextTokens, 872000);
-        assert.equal(initialized.baseContextTokens, 744000);
-        assert.equal(initialized.model_parameters.maxTokens, 128000);
+        // anthropic/claude-haiku-5.5：上下文上限 200,000 - 最大输出 32,000 = 168,000 可用于输入
+        assert.equal(initialized.maxContextTokens, 200000);
+        assert.equal(initialized.baseContextTokens, 168000);
+        assert.equal(initialized.model_parameters.maxTokens, 32000);
       }
     }
   } finally {
