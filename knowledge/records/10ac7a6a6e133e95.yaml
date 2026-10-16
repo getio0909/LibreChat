@@ -1,0 +1,74 @@
+id: 10ac7a6a6e133e95
+title_zh: 大型白色纹理石材展示图
+source:
+  original_path: 常用石材大板/大型白色纹理石材展示图.jpg
+original:
+  path: 常用石材大板/大型白色纹理石材展示图.jpg
+  sha256: 10ac7a6a6e133e954af86c76f244da913a31e3949e5dee9e1e9c63464289cc46
+  bytes: 166325
+  width: 853
+  height: 640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/10ac7a6a6e133e95.jpg
+    sha256: 4f6dba8ea5634d06bd7a1bf6c7d2b7b246083471ed0cb42fc3c1cba46317cb18
+    bytes: 79209
+    width: 853
+    height: 640
+  thumb512:
+    path: assets/thumb512/10ac7a6a6e133e95.webp
+    sha256: ede97d23f6c63e428b3ceb623c6561add87c0f8a868646a60812b2f18fab864c
+    bytes: 18464
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-白底飘逸斜纹系
+entity_type: 实物对象写实
+summary_zh: 本图为放置在室内明亮厂房铁架与木托上的大型白底飘逸斜纹大理石大板（整扎荒料首板写实）。
+materials:
+- 天然大理石
+- 雪花白大理石
+- 高光抛光石材
+colors:
+- 高纯雪白
+- 浅银灰色
+- 淡青灰色
+style: 现代奢石展陈 / 极简净土风
+ai_design_usage: 四拼钻石纹/山形纹背景墙生成 / 白衣观音/西方三圣殿洁白背景墙贴图 / 现代极简茶台桌面材质
+prompt_zh: 大型高白度天然大理石大板正面特写，纯净雪白色基底，从左上角向右下角斜向流淌着飘逸的浅银灰色与淡青灰色丝带状纹理，犹如冰川流水与水墨云带，高光泽抛光表面，明亮石材展厅实拍，适合做对称连纹背景墙，8K高清材质。
+tags:
+- 雪花白大理石
+- 丝带斜纹
+- 高白度大板
+- 对纹背景墙
+- 净土风石材
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 640
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 灰蓝与金黄交织流体纹大理石大板实拍（与#303同场景另一角度），原图853x640分辨率偏低，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 853x640 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（853x640，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印

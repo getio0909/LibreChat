@@ -1,0 +1,69 @@
+id: 0ec93174938c7fa2
+title_zh: 展览中的黄色纹理石材样品
+source:
+  original_path: 天川金大板自家产品/展览中的黄色纹理石材样品.jpg
+original:
+  path: 天川金大板自家产品/展览中的黄色纹理石材样品.jpg
+  sha256: 0ec93174938c7fa2b6bcb3163ff7cea6f03dfad720ce328be1fc7a877ba400ae
+  bytes: 5159677
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0ec93174938c7fa2.jpg
+    sha256: 82440b1b9401009190564d588f3a2974bac57e2201a9f4a27871f98639260170
+    bytes: 1082798
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/0ec93174938c7fa2.webp
+    sha256: 90956ba2bdb062ad557171450f51ff7be01247cb9f00e7be69882d27ed7d8afa
+    bytes: 59262
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为阿利坦石材展厅内陈列的经典明黄色系「天川金」整块大板正视标准照。
+materials:
+- 天川金大板
+colors:
+- 帝王明黄底
+- 深褐赤金蛛网纹
+- 左上烟灰云斑
+style: 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 传统寺院金堂/大雄宝殿辉煌背景墙材质 / 藏传佛教坛城空间墙面贴图 / 须弥座台面与拜台石材设计
+prompt_zh: 阿利坦展厅正面4K超清摄影，一块完整的天川金天然大理石大板竖立在黑色方钢支架与白色鹅卵石上，饱满富丽的帝王明黄色与黄金色基底，左上角伴生一片深邃的烟灰褐色云团，全板密布刚劲细密的深褐金与铁锈红蛛网状矿物裂隙纹，镜面抛光质感，尽显皇家佛教殿堂的辉煌庄严。
+tags:
+- 天川金
+- 帝王黄大理石
+- 金丝蛛网纹
+- 阿利坦石材
+- 金碧辉煌背景墙
+- 整板标准照
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 自家产品“天川金”（dunhuang-gold）黄褐金脉天然奢石大板仓库微距实拍，画面干净清晰。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

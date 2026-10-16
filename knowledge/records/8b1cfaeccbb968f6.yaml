@@ -1,0 +1,75 @@
+id: 8b1cfaeccbb968f6
+title_zh: 藏式雕花餐桌及茶具布置
+source:
+  original_path: 佛教家具与陈设素材/藏式雕花餐桌及茶具布置.jpg
+original:
+  path: 佛教家具与陈设素材/藏式雕花餐桌及茶具布置.jpg
+  sha256: 8b1cfaeccbb968f685298694ef81783205158dbf368c601cb687ccd094d4ff66
+  bytes: 373770
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8b1cfaeccbb968f6.jpg
+    sha256: fd352e2fb63aac4e38dfce0ae2ca418972f4c73572737279148dda336c26bf82
+    bytes: 403510
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/8b1cfaeccbb968f6.webp
+    sha256: 1a9576616f35ee702dc2e7dea9fa976548ca9098700923814c4b448f8f4fdb19
+    bytes: 42834
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 纯白背景（上半部留白）下以高机位纵深一点透视拍摄的一套大型藏式宫廷风“玻璃覆面内嵌立体坛城木雕”十人位长方形餐桌/禅茶桌椅与茶具布置组合（Tibetan Carved Mandala-Inlaid Dining & Tea
+  Table Set）。该设计巧妙解决了传统重工深浮雕桌面无法平稳摆放杯盘的痛点——在深凹的实木雕花槽上方平铺一整块高透超白钢化玻璃，既使整张桌面成为一件可俯瞰鉴赏的巨型立体坛城艺术品，又具备完美平整的现代实用台面。
+materials:
+- 实木雕花
+- 钢化玻璃
+- 坛城浮雕内芯
+colors:
+- 金黄棕配五彩唐卡色
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 玻璃覆面内嵌立体木雕/石雕茶桌餐桌设计 / 藏式贵宾宴会厅与禅茶室家具组合生成 / 传统浮雕桌面实用化改良参考
+prompt_zh: 一点透视高角度产品摄影，一套奢华的藏式雕花长方形十人位餐桌兼禅茶桌椅组合，琥珀金棕色实木框架，长方形桌面平铺高透钢化玻璃，玻璃下方内嵌极其繁复的立体彩绘木雕曼陀罗坛城、几何唐卡锦纹与金色卷草，桌裙雕刻红宝石莲瓣与绿色吉祥结，四周环绕十张镶嵌青绿山水圆屏与织锦坐垫的雕花太师椅，玻璃桌面上对称摆放黄釉与青花瓷茶杯及中式干花花瓶，8K超清细节。
+tags:
+- 藏式雕花餐桌
+- 内嵌坛城茶桌
+- 玻璃覆面雕花
+- 藏式茶具布置
+- 吉祥结牙板
+- 素斋堂宴会家具
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated image (豆包AI生成 watermark in bottom-right) of a long Tibetan carved mandala dining/tea table with glass
+    top, carved chairs, and tea bowls. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

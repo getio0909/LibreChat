@@ -1,0 +1,75 @@
+id: 71b91e9bb16ffc73
+title_zh: 佛教主题展览空间设计-09
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-09.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-09.jpg
+  sha256: 71b91e9bb16ffc735db4537586474e2b48a4292df978a2a29328b876ba1cedfd
+  bytes: 358883
+  width: 1030
+  height: 344
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/71b91e9bb16ffc73.jpg
+    sha256: 9e74bdbef029be246c0b42d167ddd5ea33b78ca47fb95732a045e27052a6a8e8
+    bytes: 96391
+    width: 1030
+    height: 344
+  thumb512:
+    path: assets/thumb512/71b91e9bb16ffc73.webp
+    sha256: 080c6f985a34a240026280f375e156e2c1411d91b2181f942070a069ac3251cf
+    bytes: 20132
+    width: 512
+    height: 171
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 弧形万佛墙与金身财宝天王殿
+entity_type: 空间场景设计
+summary_zh: 辉煌暖金与青白玉 / 巨型青玉莲花座、金身财神/天王像、叠级圆角藻井
+materials:
+- 青白玉整雕巨型仰莲座
+- 24K真金贴金造像
+- 汉白玉圆形浮雕挂盘
+- 弧形木雕花格
+- 深啡网大理石
+colors:
+- 辉煌鎏金
+- 青白玉色
+- 深啡色
+- 汉白玉白
+style: 皇家金碧辉煌椭圆形祈福大殿风
+ai_design_usage: 财宝天王/佛教财神殿全景立面设计 / 椭圆形弧形万佛墙空间布局 / 青白玉巨型莲花座与真金造像搭配
+prompt_zh: 超宽幅全景对称的佛教财宝天王祈福大殿正立面设计，大殿中央是一座巨大的青白玉精雕仰莲宝座，其上供奉金光闪耀的金身财宝天王坐像与满盆金元宝、金色莲瓣背光，左右两侧是环抱式的弧形高墙，密布发着暖金光芒的万佛小龛并镶嵌白色圆形玉石浮雕挂盘，外侧对称设置弧形中式木雕花格屏风，顶部为圆角叠级金色藻井，深褐色高光大理石地面，富丽堂皇，8k全景图。
+tags:
+- 财宝天王殿
+- 弧形万佛墙
+- 青白玉莲座
+- 宽幅全景立面
+- 金碧辉煌
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 344
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res panoramic elevation render (1030x344) of a golden Buddhist wealth-deity hall enshrining Vaiśravaṇa/Jambhala
+    flanked by lotus ponds, golden trees, and Eight Horsemen wall reliefs.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

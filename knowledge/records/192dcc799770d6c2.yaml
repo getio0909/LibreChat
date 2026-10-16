@@ -1,0 +1,70 @@
+id: 192dcc799770d6c2
+title_zh: 佛教石材雕刻展示台
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材雕刻展示台.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材雕刻展示台.jpg
+  sha256: 192dcc799770d6c22389001cadc77d41c5192dedc48ac7ef4cdc6d7551b682db
+  bytes: 5198822
+  width: 3000
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/192dcc799770d6c2.jpg
+    sha256: 56246c7ab7aa19ee912f3ed0c1fe6f96bbf550e9cabc451ac99628d6ea183e2d
+    bytes: 961111
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/192dcc799770d6c2.webp
+    sha256: 36d8f80d78671b8af972fbf6df15e3298ad6f833648366fc7e9912ab70f3ae72
+    bytes: 63428
+    width: 384
+    height: 512
+library_type: 石刻纹样
+studio_roles:
+- 纹样
+- 材质
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-敦煌金供桌高浮雕微距
+entity_type: 实物对象写实
+summary_zh: 本图为 D立面核心展品——“天然玉石 · 敦煌金”高浮雕须弥座供桌左前侧的微距刀工与材质特写。近距离展示了天然黄玉石在精雕细琢与高抛光打磨后的温润玉质感，以及传统佛教石雕在数厘米深浮雕空间内的多层叠压技艺。
+materials:
+- 天然玉石敦煌金深浮雕（宝瓶牡丹）
+colors:
+- 蜜蜡琥珀黄
+- 红棕石筋
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 天然黄玉石油脂光泽肌理与束腰宝瓶牡丹高浮雕刀工微距生图参考
+prompt_zh: 微距特写镜头，低角度斜拍一座“敦煌金”天然黄玉石精雕的佛教须弥座供桌正面局部，近距离展示极致精湛的中国传统石雕高浮雕刀工：顶部如意卷草纹，上层肥厚立体的双层仰莲花瓣，中间束腰在回纹边框内深浮雕净瓶（宝瓶）与盛开的缠枝牡丹花，下层立体覆莲花瓣，底部几何回纹基座，天然黄玉石呈现温润通透的蜜蜡油脂光泽与天然红棕色矿物脉络，台面上摆放着鲜花与绿色玻璃矿泉水瓶，浅景深效果，8K超高清文物级细节摄影。
+tags:
+- 26年春季佛事展
+- 敦煌金玉石
+- 石雕微距特写
+- 高浮雕刀工
+- 宝瓶牡丹纹
+- 仰覆莲瓣
+material_ids:
+- dunhuang-gold
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展敦煌金五层高浮雕须弥座供桌左前侧宝瓶牡丹与莲瓣微距特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,74 @@
+id: 3b020f71e7b60ddc
+title_zh: 藏式木质雕刻陈列柜
+source:
+  original_path: 佛教家具与陈设素材/藏式木质雕刻陈列柜.jpg
+original:
+  path: 佛教家具与陈设素材/藏式木质雕刻陈列柜.jpg
+  sha256: 3b020f71e7b60ddc125a6f705095c755301c8f60ee7a7eb5fa88f619bc4c2161
+  bytes: 425750
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3b020f71e7b60ddc.jpg
+    sha256: 5407e157fbbb6b290b2771191dee6caa1022e0be15ba63f91355659365efe6d6
+    bytes: 458190
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/3b020f71e7b60ddc.webp
+    sha256: d30df8ad87f68eb205d40f194aecf4cd85b2d7cd0165ae77d5f116479ad99530
+    bytes: 45810
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 三层阶梯式坛城陈列柜的“纯实木原木本色浮雕（Unpainted Solid Wood Relief）”版本。针对偏好新中式原木风、明式家具风或现代禅意风（反感浓烈藏式红绿彩绘与满铺宝石）的客户群体，本方案将三层阶梯柜的所有雕花统一为与柜体同材质的琥珀红棕实木本色雕刻。
+materials:
+- 缅甸花梨木
+- 本色浮雕
+- 南红玛瑙点缀
+colors:
+- 琥珀红棕木色
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 彩绘藏式家具向新中式原木本色浮雕转换（De-polychroming） / 纯实木佛堂陈列柜设计参考
+prompt_zh: 室内实景家具摄影，一座新中式与藏式融合的纯缅甸花梨木本色雕刻三层阶梯式陈列柜，通体采用温暖琥珀色纹理清晰的实木打造，无繁杂彩绘，顶层与中层束腰精雕本色实木护法力士、十字金刚杵与缠枝莲纹，局部低调点缀暗红南红玛瑙小珠，底层四面柜门高浮雕立体木质海棠形宝相花，生漆烫蜡温润光泽，8K超清。
+tags:
+- 缅甸花梨木
+- 本色木雕
+- 三层陈列柜
+- 去彩绘化设计
+- 新中式佛堂家具
+- 海棠开光木雕
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) showing an unpainted solid wood relief version of the 3-tier
+    stepped Tibetan cabinet. Labeled entity_type as 实物对象写实 and style as 藏传佛教传统重工彩绘风 despite being unpainted wood.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

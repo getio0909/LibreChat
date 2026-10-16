@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zybc.local/schema/record.schema.json",
+  "title": "ZYBC Knowledge Base Asset Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title_zh",
+    "source",
+    "original",
+    "derivatives",
+    "library_type",
+    "studio_roles",
+    "category_l1",
+    "category_l2",
+    "entity_type",
+    "summary_zh",
+    "materials",
+    "colors",
+    "style",
+    "ai_design_usage",
+    "prompt_zh",
+    "material_ids",
+    "provenance",
+    "quality",
+    "review"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "Stable 16-char lowercase hex prefix of original file SHA256."
+    },
+    "title_zh": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["original_path"],
+      "properties": {
+        "original_path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!wiki/)(?!/)(?!file://).+$"
+        }
+      }
+    },
+    "original": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes", "width", "height", "format", "color_mode"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!wiki/)(?!/)(?!file://).+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "format": {
+          "type": "string",
+          "enum": ["JPEG", "PNG", "WEBP"]
+        },
+        "color_mode": {
+          "type": "string",
+          "enum": ["RGB", "RGBA", "CMYK", "L", "P"]
+        }
+      }
+    },
+    "derivatives": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref2048", "thumb512"],
+      "properties": {
+        "ref2048": {
+          "$ref": "#/$defs/derivative"
+        },
+        "thumb512": {
+          "$ref": "#/$defs/derivative"
+        }
+      }
+    },
+    "library_type": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "造像雕塑",
+        "石刻纹样",
+        "法器供器",
+        "家具木作",
+        "建筑景观",
+        "空间展陈",
+        "材质纹理",
+        "工程图纸",
+        "矿山车间"
+      ]
+    },
+    "studio_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "enum": ["参考", "物件", "造型", "材质", "纹样", "风格"]
+      }
+    },
+    "category_l1": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category_l2": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": ["实物对象写实", "空间场景设计", "工程设计图纸"]
+    },
+    "summary_zh": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "materials": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "colors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "style": {
+      "type": "string"
+    },
+    "ai_design_usage": {
+      "type": "string"
+    },
+    "prompt_zh": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "material_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "url", "license", "license_status"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["own_product", "own_project", "web", "museum", "ai_generated", "unknown"]
+        },
+        "url": {
+          "type": ["string", "null"]
+        },
+        "credit": {
+          "type": ["string", "null"]
+        },
+        "license": {
+          "type": "string",
+          "enum": [
+            "unknown",
+            "own",
+            "cc0",
+            "cc-by-3.0",
+            "cc-by-sa-3.0",
+            "cc-by-sa-4.0",
+            "ai_generated"
+          ]
+        },
+        "license_status": {
+          "type": "string",
+          "enum": ["confirmed", "unconfirmed"]
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_side_px",
+        "low_res",
+        "ai_generated",
+        "third_party_watermark",
+        "text_overlay",
+        "notes"
+      ],
+      "properties": {
+        "min_side_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "low_res": {
+          "type": "boolean"
+        },
+        "ai_generated": {
+          "type": "boolean"
+        },
+        "third_party_watermark": {
+          "type": "boolean"
+        },
+        "text_overlay": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewer", "reviewed_at", "issues"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["draft", "reviewed", "rejected"]
+        },
+        "reviewer": {
+          "type": ["string", "null"]
+        },
+        "reviewed_at": {
+          "type": ["string", "null"]
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "derivative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes", "width", "height"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^assets/(ref2048/[0-9a-f]{16}\\.jpg|thumb512/[0-9a-f]{16}\\.webp)$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

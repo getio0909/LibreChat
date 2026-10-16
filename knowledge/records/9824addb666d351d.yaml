@@ -1,0 +1,70 @@
+id: 9824addb666d351d
+title_zh: 佛教雕刻供器展示
+source:
+  original_path: 佛教家具与陈设素材/佛教雕刻供器展示.jpg
+original:
+  path: 佛教家具与陈设素材/佛教雕刻供器展示.jpg
+  sha256: 9824addb666d351d690655b5ab8d9f7be9876f30c85eec54e26c35512a79b39e
+  bytes: 471942
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9824addb666d351d.jpg
+    sha256: efcdf4bc2d2c0a898c1635d018bfcdf6930c1ae0fb34c32cd5d2222ee1024e80
+    bytes: 510024
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/9824addb666d351d.webp
+    sha256: fe9015911f254d0aaec89436f853287a90b9fdc5f25f9637723d20606e191102
+    bytes: 58944
+    width: 384
+    height: 512
+library_type: 法器供器
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 陈设于展厅实木方柜顶部的大型藏传佛教“双龙双凤耳、双狮捧法轮”斗式木雕彩绘供器/聚宝盆法器（右前 45° 斜角视图）。该器型源于中国古代量器“方斗（聚宝斗）”与藏传佛教大型曼扎供盘、护法供斗的结合，气势磅礴，集圆雕、透雕、深浮雕与彩绘贴金工艺于一身。
+materials:
+- 红木圆雕
+- 浮雕彩绘
+- 彩石莲瓣
+colors:
+- 枣红木配黑金彩绘
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 大型藏式木雕供器/聚宝盆法器3D建模参考（右前视角） / 龙耳与雪狮护法轮雕刻细节生成
+prompt_zh: 室内展品特写摄影，右斜45度视角，一件极具视觉冲击力的大型藏传佛教斗式木雕彩绘供器，深枣红色实木方斗造型，左侧盘曲一条威猛的立体圆雕黑金游龙耳柄手握火珠，右侧雕瑞凤耳柄，顶部交叉斜插两支镂空雕刻宝瓶如意长杵，倒梯形斗腹高浮雕两尊白身绿鬃雪狮拱护金色法轮与双鱼，须弥底座雕彩色莲瓣与金色怒目瑞兽饕餮面，背景为藏式雕花天花板展厅，8K超清。
+tags:
+- 藏式木雕供器
+- 双龙耳聚宝斗
+- 雪狮捧法轮
+- 饕餮兽面底座
+- 宝瓶如意杵
+- 3D多视角素材
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a large Tibetan carved and polychrome painted wooden斗-shaped offering vessel with dragon/phoenix
+    handles and snow lions holding a dharma wheel (45-degree view).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,75 @@
+id: be353221b983e7c4
+title_zh: 佛教大殿佛像展示场景-02
+source:
+  original_path: 佛教空间设计案例/佛教大殿佛像展示场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿佛像展示场景-02.jpg
+  sha256: be353221b983e7c4733b8c2e814c859888e964d120e6074ae7408f65147d8373
+  bytes: 4028961
+  width: 4225
+  height: 2628
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/be353221b983e7c4.jpg
+    sha256: 47ac0b9bf40ef3f49d3df062b010baabac4b416d8c18ebebbadc43fcd4a53981
+    bytes: 387548
+    width: 2048
+    height: 1274
+  thumb512:
+    path: assets/thumb512/be353221b983e7c4.webp
+    sha256: 68208d70d9ebc7b8ac02d64595d2977396923c32781ab3f376107f235033d06e
+    bytes: 32240
+    width: 512
+    height: 318
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 以整面鱼肚白大理石为主佛背景墙、供奉三世佛与二弟子及两侧文殊普贤金像、两壁设发光万佛墙的现代中式大雄宝殿。
+materials:
+- 鱼肚白大理石
+- 铜鎏金佛像
+- 红木雕花梁架
+- 汉白玉柱础
+- 汉白玉小观音像
+- 深色抛光地砖
+colors:
+- 辉煌金
+- 鱼肚白
+- 红木棕
+- 深褐黑
+style: 传统木构与现代白石材融合大殿
+ai_design_usage: 大雄宝殿“三世佛+二弟子+文殊普贤”七尊组合陈设范式、鱼肚白大理石佛像背景墙与木构结合设计
+prompt_zh: 中式大雄宝殿室内设计正面对称效果图，正中整面鱼肚白大理石背景墙前供奉三尊金身三世佛坐像与阿难迦叶二弟子立像，左右两侧白色大理石拱龛内分别供奉金身文殊菩萨骑狮像与普贤菩萨骑象像，两侧侧墙为发光金色万佛墙且中央嵌有白色汉白玉观音小像，两根红木大柱包镶鎏金雕花柱箍与汉白玉柱础，前方整齐排列红木供桌与米白色方蒲团，顶部为传统雕花木梁架与发光方格天花，深色抛光石砖地面，庄严大气，8K渲染
+tags:
+- 一佛二弟子
+- 三世佛
+- 鱼肚白背景墙
+- 文殊普贤龛
+- 万佛墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2628
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a Mahavira Hall with a white marble relief screen behind Three-Ages golden Buddhas and two disciples,
+    flanked by Manjusri and Samantabhadra niches and 10,000-Buddha side walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

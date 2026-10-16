@@ -1,0 +1,73 @@
+id: 8426a59a5172cad5
+title_zh: 禅意佛教展览空间设计
+source:
+  original_path: 佛教空间设计案例/禅意佛教展览空间设计.jpg
+original:
+  path: 佛教空间设计案例/禅意佛教展览空间设计.jpg
+  sha256: 8426a59a5172cad526e02cf0392d34caefdf8287525abbb46be76b6dd410a5d8
+  bytes: 2903752
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8426a59a5172cad5.jpg
+    sha256: c68b32925686140ac764aedceac40a9555495dc41e87b621f302f1de9a402d37
+    bytes: 376322
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/8426a59a5172cad5.webp
+    sha256: 8b6486c440b503cc7cffcaffeec2d33c58c970be8800a2d6c7c9ebf5271a6eeb
+    bytes: 22678
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 7937x5613超清极简禅宗冥想堂与茶道展厅，胡桃木背景墙中央设巨型内发光“一圆相（Enso）”圆环，下置低矮禅茶台与蒲团，两侧对称陈列黑陶枯枝。
+materials:
+- 中央巨型发光圆相（Enso）背景墙
+- 低矮禅修茶台与蒲团
+- 对称黑陶枯枝花器
+- 竖向木格栅
+colors:
+- 胡桃木暖棕
+- 暖白光
+style: 当代极简禅宗一圆相（Enso）冥想风
+ai_design_usage: 极简禅宗美学冥想堂/茶道展厅设计、7937×5613超清“一圆相”暗藏光带端景设计参考
+prompt_zh: 超高清现代极简禅宗佛教展览空间与茶道冥想室设计，广角中轴对称透视，正面胡桃木背景墙中央设有一轮巨大的禅宗“一圆相”圆形内凹造型，圆环内壁暗藏温暖柔和的环形光带，宛如满月；圆相正下方设一张低矮厚重的实木禅修茶台，摆放极简白瓷茶具，台前与台后对称布置深褐色方形打坐蒲团；背景墙左右两侧对称陈列一对大型黑色粗陶花器，插有苍劲禅意枯枝；两侧墙面为竖向原木格栅与透光障子门，顶部木格栅吊顶嵌两条线性灯带，空灵纯粹，8K大师级建筑渲染
+tags:
+- 禅意展览空间
+- 一圆相背景墙
+- 极简冥想室
+- 茶道空间设计
+- 枯枝禅意美学
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代禅修抄经堂全景渲染图（#255的完整原图）。左下角带有半透明“一圆居空间设计”印章水印；此外summary_zh与materials称背景设“对称黑陶枯枝造景”及案面摆“茶席器物”，实际画面为右侧单一黑瓶插黄梅枝，且7张矮桌整齐摆放经卷笔墨（抄经席而非茶席）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 左下角存在第三方“一圆居空间设计”印章水印
+  - summary_zh与materials描述偏差（将抄经桌案误作茶席器物，将单侧黄梅花瓶误作对称黑陶枯枝造景）

@@ -1,0 +1,76 @@
+id: 97aa6a841e174263
+title_zh: 佛教主题展览大厅
+source:
+  original_path: 佛教空间设计案例/佛教主题展览大厅.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览大厅.jpg
+  sha256: 97aa6a841e1742639c02f881846c16ef6d1a9f3159522ed28768e2d9cab371a6
+  bytes: 3930041
+  width: 4200
+  height: 2553
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/97aa6a841e174263.jpg
+    sha256: d87f1ee22665d4bf5693cf93eb22b7ae6484b7c928e3ee02cf4173d9e650034f
+    bytes: 387910
+    width: 2048
+    height: 1245
+  thumb512:
+    path: assets/thumb512/97aa6a841e174263.webp
+    sha256: ad4aa93905ba163c2e0ec00b12ed091ae7953686de25eca5b960dcc39e5976c7
+    bytes: 32354
+    width: 512
+    height: 311
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 药师琉璃佛与护法殿堂全景
+entity_type: 空间场景设计
+summary_zh: 深褐木色与琉璃宝蓝 / 蓝色琉璃药师佛、橙玉护法像、绿纹大理石地面
+materials:
+- 深胡桃木框架
+- 白色抹灰山墙
+- 定制佛像艺术壁纸
+- 深灰哑光地砖
+- 棉麻软包
+colors:
+- 素白
+- 深胡桃木色
+- 暖金
+- 深炭灰
+style: 现代东方美学禅修会馆风
+ai_design_usage: 4K大跨度佛教殿堂全景生成 / 高反光绿色奢石地面与透光云石背景搭配 / 青石浮雕柱础参考
+prompt_zh: 4K超高清药师琉璃佛大殿全景室内设计，宽阔的多柱网殿堂，地面铺设高光镜面墨绿色奢石大理石，粗壮的深木色方柱配青石深浮雕须弥柱础与镂空雀替，正中佛坛供奉宝蓝色琉璃药师佛与橙玉胁侍菩萨，背后是巨幅发光山水纹透光云石，两侧柱间陈列橙黄色玉石护法神将雕像，四周为蓝黄发光万佛墙，8k建筑效果图。
+tags:
+- 药师宝殿全景
+- 墨绿奢石地面
+- 透光云石大板
+- 琉璃造像
+- 青石浮雕柱础
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 4K 3D interior rendering (same scene as 1b0626c35b822487) of the Medicine Buddha hall with blue liuli Medicine
+    Buddha, orange jade guardian statues, thousand-Buddha walls, and green marble floor. Metadata materials/colors fields
+    are misaligned (claiming 白色抹灰山墙/棉麻软包/深灰哑光地砖).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials/colors/style fields claim 白色抹灰山墙/棉麻软包/深灰哑光地砖 which are absent'

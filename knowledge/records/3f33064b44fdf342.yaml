@@ -1,0 +1,75 @@
+id: 3f33064b44fdf342
+title_zh: 佛教主题展览空间设计-04
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-04.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-04.jpg
+  sha256: 3f33064b44fdf3423fc80089d077dd9f4bf5c093d4f9dab4aa11a95de28209f2
+  bytes: 2580612
+  width: 3746
+  height: 2574
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3f33064b44fdf342.jpg
+    sha256: aeea8fb475a69b8e54ee8bcf2e9b3ad81182b0068b8871a59f52b1b95bf9272c
+    bytes: 251898
+    width: 2048
+    height: 1407
+  thumb512:
+    path: assets/thumb512/3f33064b44fdf342.webp
+    sha256: 59c559c36f2280d27cea3183698911ddbe208f3ac91d8704085a39d903587a90
+    bytes: 20502
+    width: 512
+    height: 352
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 幽蓝万佛格中轴过渡门厅
+entity_type: 空间场景设计
+summary_zh: 幽蓝冷光与深灰石木 / 蓝光琉璃砖柱、观音壁画龛、楼梯通道与禅意造景
+materials:
+- 宝蓝透光压花琉璃砖
+- 黑色半透镜面玻璃
+- 工笔重彩壁画
+- 深胡桃木线条
+- 深灰哑光石材
+colors:
+- 宝蓝色
+- 镜面幽黑
+- 重彩朱红
+- 暖金灯光
+style: 现代暗调佛教博物馆过渡门厅风
+ai_design_usage: 佛教展厅过渡门厅三开间立面设计 / 蓝色发光琉璃砖壁柱细部参考 / 黑玻镜像莲花供灯龛设计
+prompt_zh: 暗调佛教主题展览空间过渡门厅正立面设计，上方是两排发着幽蓝冷光的万佛拱龛，下方由四根镶嵌宝蓝色发光琉璃方砖的竖向灯柱划分为三个开间：左侧开间为通往上层的石材楼梯并挂有三幅水墨禅画，中央开间为深邃的黑色镜面玻璃龛并倒映出两排温暖的金色莲花灯，右侧开间是一幅精美的工笔重彩立佛壁画，深灰色石材地面，冷暖光影交织，8k效果图。
+tags:
+- 展厅过渡空间
+- 琉璃发光柱
+- 镜面莲花灯龛
+- 重彩佛像壁画
+- 三开间立面
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2574
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of the same Medicine Buddha hall at a wider diagonal angle showing a backlit standing Buddha mural
+    panel on the right wall.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh misidentifies the right-hand standing Buddha mural panel as ''观音壁画龛'''

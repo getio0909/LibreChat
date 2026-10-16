@@ -1,0 +1,71 @@
+id: f88b2f16e9247e0c
+title_zh: 佛教穹顶装饰设计
+source:
+  original_path: 佛教空间设计案例/佛教穹顶装饰设计.jpg
+original:
+  path: 佛教空间设计案例/佛教穹顶装饰设计.jpg
+  sha256: f88b2f16e9247e0c8d02d827d5d12bb249350767d73f39b6c6ed128a7eb95561
+  bytes: 3088637
+  width: 2462
+  height: 2645
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f88b2f16e9247e0c.jpg
+    sha256: 0fa2f99435ac670db78efee47417ef99ec3ab70394a89113977d46b6315681bb
+    bytes: 557539
+    width: 1906
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f88b2f16e9247e0c.webp
+    sha256: 11103baffcec1d86ea7a257b2ddc79a007ee23ffd899721e9b3a06c9edfa7bb2
+    bytes: 42812
+    width: 477
+    height: 512
+library_type: 建筑景观
+studio_roles:
+- 造型
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统八角斗拱与阿拉伯/梵式莲瓣龛星空穹顶构件写实
+entity_type: 实物对象写实
+summary_zh: 本图为大型佛教殿堂顶部核心“八角斗拱莲花星空穹顶（藻井）”仰视写实特写。设计巧妙融合了中国传统古建八角木构斗拱、古印度/丝路石窟的菩提叶尖拱壁龛、佛教仰覆莲花座以及现代光纤LED“浩瀚星空”天幕，在殿堂顶部浓缩展现了佛教“三千大千世界、华藏庄严海”的宏大宇宙观。
+  构件下部与中部采用温暖的浅胡桃木/金丝楠木色实木雕刻与米黄色砂岩/GRG浮雕构件，配合各层暗藏的2700K暖黄洗墙灯带，呈现出温润醇厚的暖金色调；而穹顶最核心的圆形天心则采用深邃浓郁的宝蓝色/午夜蓝吸音天幕涂装，并嵌入数十颗高亮度纯白光纤星光点，形成强…
+materials:
+- 雕花木斗拱
+- 莲瓣发光壁龛
+- LED星空天幕
+colors:
+- 暖金木石色
+- 深邃星空宝蓝
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：佛教大殿/圆通殿顶部星空穹顶藻井设计 / 传统八角木作斗拱与莲瓣发光壁龛组合参考 / 宗教建筑顶部仰视构图生成；推荐搭配：金丝楠木/柚木八角斗拱构件 + 米黄GRG/砂岩莲花瓣浮雕环与尖拱壁龛 + 宝蓝色光纤满天星LED圆形天幕
+  + 2700K暗藏洗墙灯带
+prompt_zh: 佛教殿堂顶部圆形星空穹顶与八角斗拱藻井装饰设计仰视特写，由下至上分为四层结构：最下层为八角形雕花木梁与密集排列的传统木作斗拱，后衬暖黄发光竖条格栅；第二层为环绕穹顶一周的八个大型菩提叶尖拱形内凹暖光壁龛；第三层为双圈高浮雕仰莲花瓣圆环；最中心顶部为深邃的宝蓝色圆形夜空天幕，上面闪烁着数十颗璀璨的白色光纤星光点，温暖的金色木石结构与深邃的蓝色星空形成强烈对比，庄严神秘，8K超高清细节。
+tags:
+- 佛教星空穹顶
+- 八角斗拱藻井
+- 莲瓣发光壁龛
+- 光纤星空天幕
+- 大殿吊顶设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2462
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 藏式红白金建筑山门夜景渲染图，牌匾题字“甘丹曲林”属于建筑自身构件，画面干净无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

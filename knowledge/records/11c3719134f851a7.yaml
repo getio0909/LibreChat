@@ -1,0 +1,71 @@
+id: 11c3719134f851a7
+title_zh: 佛教展位平面与3D效果图
+source:
+  original_path: 26年春季佛事展设计方案/佛教展位平面与3D效果图.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教展位平面与3D效果图.jpg
+  sha256: 11c3719134f851a7306bbc54410b77b94743faad882c1d1d5b4151cad3e9405a
+  bytes: 2401221
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/11c3719134f851a7.jpg
+    sha256: ce7510401681ce435bba0bcebb9adddf7918386a796fc0f39fe34718ad431d10
+    bytes: 324255
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/11c3719134f851a7.webp
+    sha256: 490e7f6c72782aad3e4aa428d6e0cd49937dcd67315bcf96227dfff19255ea70
+    bytes: 19284
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-02平面位置与3D鸟瞰图
+entity_type: 工程设计图纸
+summary_zh: 本图为施工图册第 2 页——02 平面位置图，由“展馆宏观区位落位图（左）”与“展位微观 3D 垂直鸟瞰效果图（右）”两部分构成，全面阐明了 C5 T026 展位（75m²） 在展馆中的人流朝向与内部功能分区逻辑。
+materials:
+- 木结构
+- 大理石地面
+- 洽谈茶桌椅
+colors:
+- 暖米白
+- 棕粉大理石
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 75m²(10m×7.5m)两面开口展位平面动线规划与3D鸟瞰布局参考
+prompt_zh: 展览工程设计汇报展板“02 平面位置图”，左侧为展馆CAD平面导览图并用红框高亮标注C5 T026展位（75平方米，10m×7.5m，毗邻佛堂供具区），右上角标注中文“整体木结构贴纸饰面 两面开口展台 面积：10m*7.5m
+  展位号：C5 T026”，右下角为高清3D顶视垂直鸟瞰渲染图，展示满铺大理石地面的展厅内部布局：底部为佛龛供桌与绿植，左侧为带9盏洗墙射灯的巨幅石材背景墙，中央摆放两张白色现代圆形洽谈桌（各配4把白椅），右上角为中式实木茶桌椅与迎宾接待台，专业展览设计排版。
+tags:
+- 26年春季佛事展
+- 02平面位置图
+- C5_T026展位
+- 75平米展位布局
+- 两面开口展台
+- 3D鸟瞰平面图
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展02平面位置图与C5 T026展位3D垂直鸟瞰布局图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

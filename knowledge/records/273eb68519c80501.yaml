@@ -1,0 +1,74 @@
+id: 273eb68519c80501
+title_zh: 佛教殿堂石材雕像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教殿堂石材雕像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教殿堂石材雕像展示场景.jpg
+  sha256: 273eb68519c80501d44f7f5872045f8259e15131cd8e7b6eee7afbfaf2cf6114
+  bytes: 2584583
+  width: 1835
+  height: 2567
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/273eb68519c80501.jpg
+    sha256: 4bca4d5eaff8feb7fb84547461ab1a43ed3aff950fae1bb5082d06cc57d7ccd4
+    bytes: 511967
+    width: 1464
+    height: 2048
+  thumb512:
+    path: assets/thumb512/273eb68519c80501.webp
+    sha256: 730dccd0f71936291f5dfb611ef921b7b976f527e84481d19c9cad3ad71435f1
+    bytes: 49772
+    width: 366
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统方形金莲平棊吊顶与白玉千手观音殿场景
+entity_type: 空间场景设计
+summary_zh: 本图为大型寺院观音殿（圆通宝殿）室内竖幅中轴对称场景（与第 06 张同属观音殿设计系列，区别在于本方案外廊及前厅采用大面积方形贴金宝相莲花平棊格栅吊顶，内圈核心区保留千瓣金莲内穹顶）。竖幅构图极好地展现了天地呼应的宗教空间尺度。
+  空间以灿烂赤金（天花平棊与万佛墙灯光）、圣洁纯白（中央汉白玉千手观音与双层莲座）及温润米黄（地面与石柱）构成华贵明亮的视觉层次。前景两根八角/圆柱采用米白大理石，柱头与柱脚下段特别镶嵌橙红色玛瑙玉石（或红珊瑚色浮雕铜箍）与青白石雕花覆莲柱础；地面正中嵌入一幅直径约
+  3 米的圆形多色大理…
+materials:
+- 汉白玉千手观音
+- 贴金平棊天花
+- 红玉柱套
+- 大理石拼花
+colors:
+- 灿烂金色
+- 纯白汉白玉
+- 暖橙万佛墙
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：竖幅构图观音殿/佛殿室内空间设计 / 方形贴金宝相花平棊吊顶参考 / 地面圆形彩色大理石水刀拼花与石柱红玉柱套设计；推荐搭配：汉白玉千手观音立像 + 24K贴金方形宝相莲花平棊天花 + 米白大理石柱配橙红玉石浮雕柱套
+  + 多色奢石圆形水刀拼花地面
+prompt_zh: 庄严华丽的佛教寺庙观音殿室内竖幅对称场景，顶部为大面积整齐排列的方形贴金宝相莲花平棊格栅吊顶，边缘环绕贴金斗拱；画面中央远端多层实木须弥座与双层汉白玉莲花宝座上，矗立一尊高大的汉白玉千手观音立像，观音头顶内圈为发光千瓣金莲穹顶，后方弧形墙面满布橙黄色发光的方格万佛墙，座前陈设三张中式雕花供桌与蒲团；前景两侧对称矗立米白色大理石圆柱，柱脚包嵌橙红色浮雕玉石柱套与青白石莲花柱础；高光米黄大理石地面正中镶嵌一幅精美的圆形彩色宝相莲花水刀拼花图案，8K超高清室内效果图。
+tags:
+- 方形平棊吊顶
+- 千手观音立像
+- 圆形水刀拼花
+- 红玉浮雕柱套
+- 观音殿室内设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1835
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 方形贴金宝相花平棊吊顶与汉白玉千手观音殿竖幅三维效果图，配橙红玉石柱套与圆形水刀拼花地面，右下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

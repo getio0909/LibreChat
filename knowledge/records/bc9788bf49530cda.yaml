@@ -1,0 +1,72 @@
+id: bc9788bf49530cda
+title_zh: 佛教寺院大殿内部空间
+source:
+  original_path: 佛教空间设计案例/佛教寺院大殿内部空间.jpg
+original:
+  path: 佛教空间设计案例/佛教寺院大殿内部空间.jpg
+  sha256: bc9788bf49530cda20b657119689c84b69666da09107ce244970fa78ffeaf546
+  bytes: 3113358
+  width: 3350
+  height: 2511
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bc9788bf49530cda.jpg
+    sha256: 959ad411a6a91277ffe0353942186928814ea1fbd8016541ba7b6db8c1e02b74
+    bytes: 379314
+    width: 2048
+    height: 1535
+  thumb512:
+    path: assets/thumb512/bc9788bf49530cda.webp
+    sha256: f0ad3b446c06615e09b7319c11dc942bbfa3009af3ea6191b27f88176f52b43e
+    bytes: 31404
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代大跨度极简禅修讲堂与莲花背光佛殿空间
+entity_type: 空间场景设计
+summary_zh: 本图为一座容纳数百人同时共修的现代大跨度佛教禅修大殿/大讲堂室内正视全景（与第 33 张为同一空间的正面与斜侧面视角组合）。空间将现代大跨度公共建筑的简洁序列感与佛教“一花一世界”的莲花意象完美融合，呈现出开阔、澄明、极具现代宗教仪式感的禅修场域。
+  整体采用“浅灰云纹石地 + 暖白发光天幕 + 明黄禅修蒲团 + 鎏金柱套”的明快庄重色调。地面满铺大规格浅灰色云纹大理石（如帕斯高灰/云多拉灰），保留细腻柔和的镜面反射；远端佛龛与主尊坐佛采用纯白汉白玉材质；两侧四根承重圆柱采用浅褐石材/木饰面，柱身下段包镶一圈高约…
+materials:
+- 汉白玉
+- 云纹大理石
+- 鎏金铜柱套
+colors:
+- 暖白光幕
+- 明黄蒲团
+- 浅灰云纹石
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：现代大型禅修大殿/佛教大讲堂空间设计 / 层叠莲花瓣内发光背景佛龛参考 / 大跨度发光格栅吊顶与蒲团矩阵生成；推荐搭配：浅灰云纹大理石地面 + 白色GRG/汉白玉层叠莲花发光佛龛 + 24K鎏金铜浮雕柱套
+  + 明黄色圆形禅修蒲团 + 4000K自然暖白线性发光天幕
+prompt_zh: 现代大跨度佛教寺院禅修大殿与讲堂内部全景，单点透视严格中轴对称构图，正前方远端为一座巨大的多层盛开白玉莲花瓣形内发光佛龛，内部供奉纯白汉白玉释迦牟尼坐佛与实木供台；浅灰色云纹大理石地面中央留出宽阔通道，左右两侧整齐排列成百上千个明黄色圆形印莲花纹禅修蒲团；大殿两侧对称矗立四根粗壮圆柱，柱底包嵌华丽的鎏金浮雕铜柱套与青石莲花柱础；顶部为现代感极强的斜向折板式白色发光条形天幕吊顶，空间开阔澄明，神圣庄严，8K建筑渲染图。
+tags:
+- 现代禅修大殿
+- 莲花背光佛龛
+- 黄色蒲团矩阵
+- 发光格栅天幕
+- 鎏金浮雕柱套
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2511
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代大跨度极简禅修讲堂与莲花背光佛龛正面全景三维效果图，画面中央地面处带半透明莲花图形水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

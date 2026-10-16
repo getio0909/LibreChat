@@ -1,0 +1,74 @@
+id: 001177e9d8000c42
+title_zh: 佛教主题展览空间设计-03
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-03.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-03.jpg
+  sha256: 001177e9d8000c42b834063b3602d22724ca666fcec1d407da6e3ec172eed48c
+  bytes: 2461631
+  width: 3618
+  height: 2574
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/001177e9d8000c42.jpg
+    sha256: 86cc711fd56abeba07cf88edaf2c5a9b43dc61c61e5023a15efa37b193961303
+    bytes: 251628
+    width: 2048
+    height: 1457
+  thumb512:
+    path: assets/thumb512/001177e9d8000c42.webp
+    sha256: 2600ede7a5702f4004f33393bf628ac6b5a32fd9157bd3070b30cc0ff1942627
+    bytes: 17760
+    width: 512
+    height: 364
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 幽蓝琉璃药师佛对称佛龛殿
+entity_type: 空间场景设计
+summary_zh: 宝蓝幽光与暗黑木石 / 蓝色琉璃佛坐像、双护法立像、雕花供桌、莲花灯
+materials:
+- 宝蓝色古法透光琉璃
+- 青灰石雕莲花座
+- 深色红木雕花供案
+- 暖光琉璃莲花灯
+- 蓝色霓虹灯带
+colors:
+- 高饱和宝蓝
+- 暖金烛光
+- 深木褐
+- 深空灰
+style: 当代药师琉璃光对称主殿风
+ai_design_usage: 宝蓝古法琉璃佛像主龛灯光设计 / 对称式暗调佛殿立面构图 / 冷蓝佛龛与暖光供灯色彩平衡参考
+prompt_zh: 正向严格对称的药师佛主题展览大殿室内设计，视觉中心是一座由蓝色发光灯带勾勒的巨型佛龛，内供奉一尊晶莹剔透的宝蓝色古法琉璃药师佛坐像，下方为石雕莲花宝座，佛龛前设有深色木雕护栏与供桌，桌上摆放五盏散发温暖黄光的莲花供灯，左右两侧对称分布着护法天王立像龛与密布的幽蓝色发光万佛格，深灰石材地面，神秘庄严，8k渲染图。
+tags:
+- 宝蓝琉璃佛
+- 药师佛殿
+- 对称佛龛
+- 幽蓝光环境
+- 莲花供灯
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2574
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a dark-toned Medicine Buddha hall enshrining a glowing blue liuli seated Buddha with an arched
+    backlit mandala halo and two flanking guardian statues.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

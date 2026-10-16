@@ -1,0 +1,77 @@
+id: b6db9a61fa38852d
+title_zh: 中式佛教寺院建筑场景
+source:
+  original_path: 佛教空间设计案例/中式佛教寺院建筑场景.jpg
+original:
+  path: 佛教空间设计案例/中式佛教寺院建筑场景.jpg
+  sha256: b6db9a61fa38852d36704a201a01d644b6178bcf0e367b8914c47d0a00171fb6
+  bytes: 216595
+  width: 688
+  height: 382
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b6db9a61fa38852d.jpg
+    sha256: 3fd1a5e510835c00485cfae08b28efd886e9910027d2eb7a363c64a3a96f8bcf
+    bytes: 59695
+    width: 688
+    height: 382
+  thumb512:
+    path: assets/thumb512/b6db9a61fa38852d.webp
+    sha256: 70594e8980949549c5a3d86c0bdfcbee1e2aa153e00e1f83650d8dfacdee9431
+    bytes: 24330
+    width: 512
+    height: 284
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 传统宫殿式重檐歇山顶寺院主殿（天后宫）正立面全景效果图，建于高耸汉白玉须弥座台基之上，正中嵌巨幅“福”字浮雕照壁，两侧设对称折线形雕花石栏杆踏道。
+materials:
+- 青灰筒瓦
+- 赭红木构梁柱
+- 汉白玉须弥座台基
+- 汉白玉浮雕照壁
+colors:
+- 青灰色
+- 赭红色
+- 米白色
+- 鎏金色
+style: 传统汉传宫殿式
+ai_design_usage: 传统重檐歇山顶寺院主殿正立面、双侧折线御路踏道与汉白玉浮雕台基方案生成
+prompt_zh: 中国传统重檐歇山顶寺院大殿建筑正立面全景效果图，严格的对称构图，青瓦飞檐翘角配鸱吻瑞兽，赭红色木构梁柱与繁复斗拱，檐下悬挂黑底金字“天后宫”牌匾，殿内金光闪烁可见大型金身造像，大殿坐落于高耸的米白色汉白玉石雕台基之上，台基正中镶嵌巨幅“福”字圆形浮雕照壁，左右两侧设对称折线形雕花石栏杆踏道，晴朗蓝天，8K建筑表现图。
+tags:
+- 佛教空间案例
+- 传统寺院建筑
+- 重檐歇山顶
+- 汉白玉台基
+- 浮雕照壁
+- 天后宫
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 382
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D architectural rendering (688x382) of a double-eaved palace-style temple hall with a plaque reading 天后宫
+    (Mazu temple, folk religion rather than purely Buddhist, though interior shows a golden seated statue) and a 福 screen
+    wall.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - subject_mismatch

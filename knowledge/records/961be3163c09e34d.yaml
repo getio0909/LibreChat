@@ -1,0 +1,75 @@
+id: 961be3163c09e34d
+title_zh: 佛教主题石材展览大厅
+source:
+  original_path: 佛堂空间设计参考/佛教主题石材展览大厅.jpg
+original:
+  path: 佛堂空间设计参考/佛教主题石材展览大厅.jpg
+  sha256: 961be3163c09e34d7101e010f12f5af8d1fa68d4a1be2e4198d099964bd4928e
+  bytes: 574444
+  width: 1280
+  height: 642
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/961be3163c09e34d.jpg
+    sha256: 36d5fe5eaddd035ae3a4f7df4b4dc9d819f4e083bc77500c66535840a91e6767
+    bytes: 181269
+    width: 1280
+    height: 642
+  thumb512:
+    path: assets/thumb512/961be3163c09e34d.webp
+    sha256: 83b14235190b87f47627a4a9271d03e8a79c70a88b08251b61fd74f053a9b237
+    bytes: 27650
+    width: 512
+    height: 257
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 现代东方禅意奢石展览大厅，采用严格中轴对称构图，两侧高墙干挂竖向黄洞石大板并内嵌洗墙灯带，四坡木格栅天井垂落飞鸟水晶吊灯，正对青玉宝瓶水景与千佛龛背景墙。
+materials:
+- 暖黄洞石/砂岩大板
+- 胡桃木条形格栅
+- 青玉大宝瓶
+- 黑色大理石水景台
+- 水晶飞鸟吊饰
+colors:
+- 暖金黄
+- 深胡桃木色
+- 翠玉绿
+- 玄黑
+style: 现代奢石展陈
+ai_design_usage: 奢石展览大厅/佛事展大型展位中轴对称构图参考、竖向石材大板嵌灯带墙面设计、千佛龛背景墙与天井水景布局
+prompt_zh: 现代东方禅意石材展览大厅室内设计，严格的一点透视中轴对称构图，两侧高墙采用暖黄色天然洞石大板竖向拼接并内嵌竖条暖光灯带，顶部为四坡面木质格栅吊顶，中央矩形天井垂落大型长方体飞鸟水晶吊灯装置，下方黑色石材水景台座上陈设一尊发光的青玉大宝瓶，正后方为金色弧形前台与整面发光矩阵千佛龛背景墙，左右对称布置新中式沙发休息区，辉煌温暖的灯光氛围，8K建筑效果图
+tags:
+- 石材展览大厅
+- 洞石背景墙
+- 千佛龛墙
+- 中轴对称构图
+- 木格栅坡顶
+- 现代禅意大堂
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 642
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代东方禅意大堂对称空间效果图，两侧洞石墙面配木格栅坡顶与后方多宝格背景墙，纵向分辨率偏低（1280×642）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

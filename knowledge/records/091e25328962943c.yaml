@@ -1,0 +1,70 @@
+id: 091e25328962943c
+title_zh: 佛教金饰舍利塔室内展示
+source:
+  original_path: 佛教空间设计案例/佛教金饰舍利塔室内展示.jpg
+original:
+  path: 佛教空间设计案例/佛教金饰舍利塔室内展示.jpg
+  sha256: 091e25328962943ca7dfb97d5bd5f14d791d6f5ad5d0ae3aef751a74373a76f0
+  bytes: 1518854
+  width: 1440
+  height: 2567
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/091e25328962943c.jpg
+    sha256: 44c41771c2b989f92ffd55617151626c52fd38bd8f2cb9b96bd70bc208602f1d
+    bytes: 305287
+    width: 1149
+    height: 2048
+  thumb512:
+    path: assets/thumb512/091e25328962943c.webp
+    sha256: 2b9cb4a978728e8d32f717241c818ed2bc531165750feff37a4d1f699bd9144f
+    bytes: 29068
+    width: 287
+    height: 512
+library_type: 法器供器
+studio_roles:
+- 物件
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 室内红木底座与多层莲花须弥座上供奉的藏汉融合铜鎏金覆钵式舍利宝塔，塔腹开火焰壶门内供坐佛，前伴橙色琉璃莲花供灯。
+materials:
+- 铜鎏金覆钵式舍利宝塔
+- 十三天相轮与流苏华盖
+- 红木须弥底座
+- 橙光琉璃莲花灯
+colors:
+- 辉煌金
+- 胡桃木棕
+style: 藏汉融合金铜佛塔工艺
+ai_design_usage: 舍利殿/博物馆核心宝塔展品设计、藏汉融合鎏金佛塔造型与细节雕刻参考
+prompt_zh: 室内展示的大型铜鎏金藏式覆钵舍利宝塔特写，竖构图，宝塔立于深色红木底座与多层鎏金莲花须弥座上，圆形覆钵塔身正面开火焰纹壶门佛龛，内供奉一尊金身坐佛，塔身上方为十三天相轮塔刹，顶端装饰华丽的镂空鎏金华盖并垂挂密集金色流苏，最上方为日月宝珠刹顶，右下角前景有一盏发光的橙色琉璃莲花供灯，金碧辉煌，工艺精湛，8K写实摄影
+tags:
+- 舍利塔
+- 铜鎏金佛塔
+- 藏式覆钵塔
+- 法器供具
+- 莲花供灯
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1440
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 长方形双龙戏珠浮雕四足铜鼎式香炉局部放大图，无水印，因从全景图裁切放大画质略软。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

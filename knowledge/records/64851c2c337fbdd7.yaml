@@ -1,0 +1,70 @@
+id: 64851c2c337fbdd7
+title_zh: 佛教寺庙大殿内部场景-02
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-02.jpg
+  sha256: 64851c2c337fbdd77392fc5a2002c45d180049e233adbf8f06c22b590dab247e
+  bytes: 3643267
+  width: 3824
+  height: 2639
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/64851c2c337fbdd7.jpg
+    sha256: 8b504ed1de543347f57e01aff8273ea3902bf37df7e71d927712a3c73afb625b
+    bytes: 420220
+    width: 2048
+    height: 1413
+  thumb512:
+    path: assets/thumb512/64851c2c337fbdd7.webp
+    sha256: bee2a2d8ce0ca3a1d5e7c49762619848ac81580b8d6aaf35efd87ebff68a188f
+    bytes: 34716
+    width: 512
+    height: 353
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为五开间重檐木雕天宫佛龛大殿左侧礼佛通道纵深透视场景（空间场景设计）。
+materials:
+- 五开间重檐红木精雕大佛龛
+- 红木雕花供桌阵列
+- 带鎏金莲瓣柱箍与青石柱础红木圆柱
+- 木雕佛教故事高浮雕墙
+colors:
+- 深红木色
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 五开间重檐木雕天宫楼阁佛龛大殿左侧纵深透视参考、高浮雕木作墙面与通长供桌礼佛流线组织设计
+prompt_zh: 传统佛教寺庙全木作大殿内部左侧通道纵深透视场景，深红棕色实木宽板地面，画面右侧为气势恢宏的五开间重檐红木透雕大佛龛与镶嵌鎏金荷花浮雕的木护栏，龛前整齐一字排开五张红木雕花供桌（摆放红烛与供果）及五对米色方形拜垫，画面中央一列粗壮的红木大圆柱，柱脚包镶精美的鎏金莲瓣束腰铜箍并立于青石双层莲花柱础上，左侧墙面下层为万字纹木格栅隔扇，上层为精湛的深浮雕木雕佛教故事壁画，远端山墙内嵌发光千佛龛，顶部为密集的传统方格木藻井，古朴庄严，8K建筑渲染
+tags:
+- 五开间木佛龛
+- 全木作大殿
+- 木雕高浮雕壁画
+- 鎏金莲瓣柱箍
+- 青石莲花柱础
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2639
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 五开间重檐红木天宫佛龛大殿左侧通道纵深三维效果图，左侧为木雕高浮雕墙，右侧为五供桌阵列。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

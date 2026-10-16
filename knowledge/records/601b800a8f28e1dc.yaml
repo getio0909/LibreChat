@@ -1,0 +1,75 @@
+id: 601b800a8f28e1dc
+title_zh: 庄严宝刹佛教展示场景
+source:
+  original_path: 25年秋季佛事展设计方案/庄严宝刹佛教展示场景.jpg
+original:
+  path: 25年秋季佛事展设计方案/庄严宝刹佛教展示场景.jpg
+  sha256: 601b800a8f28e1dcf82ea33966881a85e1fa0b570da1aa1e12e096d4699b79a3
+  bytes: 978999
+  width: 1996
+  height: 1417
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/601b800a8f28e1dc.jpg
+    sha256: 66c65a3daea3e83a02b303fb2ce738fe29e6cc50e18d63ffee9b9d512e5db6e3
+    bytes: 321231
+    width: 1996
+    height: 1417
+  thumb512:
+    path: assets/thumb512/601b800a8f28e1dc.webp
+    sha256: c567aa6e483e54a83a70ebe3060d17fcde31bd7f2a5be08e6b5bf5a369d3ae12
+    bytes: 20336
+    width: 512
+    height: 363
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-展位正面3D效果图
+entity_type: 工程设计图纸
+summary_zh: 本图为2025年秋季佛事展“庄严宝刹”展位的官方正面中轴对称3D渲染方案效果图（灰色纯色摄影棚背景）。通过与前文第01、02、03张现场实景照片对比可见，现场施工几乎1:1完美还原了本设计图的木构挑檐、透光藻井、U型须弥座围栏、黑白金拼花地面与中央莲花供坛，仅将效果图中两侧千佛墙的“蓝光琉璃佛像”在现场优化为更温暖庄严的“琥珀金光琉璃佛像”，并在背景墙增加了西方三圣立像。
+materials:
+- 透光云石
+- 古建木构轩顶
+- 须弥座
+colors:
+- 暖米金
+- 深木棕
+- 明黄
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 佛事展展位正面中轴对称立面3D渲染与ControlNet线稿/深度底图
+prompt_zh: “莊嚴寶刹”新中式佛教石材展位正面中轴对称3D渲染效果图，纯灰渐变背景，建筑采用传统大殿三段式飞檐挑顶结构：中央为三层阶梯抬升的深木色井字梁嵌金色莲花透光石藻井，顶部冠以“莊嚴寶刹”书法立体字与红印；左右两翼对称延伸弧形白色格栅卷棚轩顶，两端立柱悬挂仿古六角宫灯；内部后墙为暖黄色透光玉石方格拼花墙，两侧内墙为三层蓝色背光千佛陈列灯箱；外围由U型敦煌金石雕须弥座与汉白玉栏杆半围合，正中设置大型石雕莲花供坛与贴金彩绘伽蓝菩萨坐像，地面铺设黑白金几何棋盘格大理石，一点透视构图，3D
+  Max V-Ray超写实渲染，8K分辨率。
+tags:
+- 25年秋季佛事展
+- 庄严宝刹3D效果图
+- 一点透视构图
+- 展位方案设计图
+- ControlNet底图
+- 殿堂式展台
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1417
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展庄严宝刹展位正面一点透视3D方案渲染效果图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh跨图引用''前文第01、02、03张现场实景照片''及本图未出现的西方三圣立像'

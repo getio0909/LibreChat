@@ -1,0 +1,68 @@
+id: 3fb487aab5efe2b2
+title_zh: 展厅内悬挂的石材样品展示图
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/展厅内悬挂的石材样品展示图.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/展厅内悬挂的石材样品展示图.jpg
+  sha256: 3fb487aab5efe2b2587f9a52bf3e12df2ac13c65c2ddc89d7e5f89de84b570cc
+  bytes: 939694
+  width: 1440
+  height: 1080
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3fb487aab5efe2b2.jpg
+    sha256: 26185a743f9474f08c96fefd6f1f5332335e517272eb731e02567806005caf8d
+    bytes: 308378
+    width: 1440
+    height: 1080
+  thumb512:
+    path: assets/thumb512/3fb487aab5efe2b2.webp
+    sha256: 38ba4cb94c56ad99d5689e2ce66d50ed165e7571bf3df189b004a022189e3cc5
+    bytes: 31750
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 本图呈现了阿利坦石材（Alitan Stone）水头旗舰展厅内，通过天车白色吊装带将整块「梦幻庄园/金镶玉」巨幅大板凌空悬挂于白色鹅卵石展床上方的实景展示场景。
+materials:
+- 梦幻庄园大板
+- 白色鹅卵石展床
+colors:
+- 暖橙金棕与灰绿底
+style: 现代奢石展陈
+ai_design_usage: 石材展厅/佛事展大板展陈方式参考 / 整块奢石大板在自然光下的真实反射质感参考 / 品牌展厅宣传图生成
+prompt_zh: 现代高端石材展厅实景，一块巨大的梦幻庄园天然奢石大板由两条白色吊装带悬空吊起，展示在铺满白色鹅卵石的展床上方，大板表面呈现暖橙金、珊瑚粉与浅灰绿交织的华丽流云纹理，高光镜面反射顶部条形天窗，右侧可见橙白色“alitan阿利坦”品牌展厅门头，专业商业空间摄影。
+tags:
+- 阿利坦石材展厅
+- 梦幻庄园
+- 大板吊装展示
+- 奢石展陈场景
+- 暖橙金大理石
+- 品牌展厅实景
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1080
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Large Gold-Jade (梦幻庄园) slab suspended by white straps over a white pebble display bed in the Alitan Stone showroom.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

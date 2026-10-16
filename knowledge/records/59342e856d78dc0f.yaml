@@ -1,0 +1,71 @@
+id: 59342e856d78dc0f
+title_zh: 藏式佛教主题雕花柜
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教主题雕花柜.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教主题雕花柜.jpg
+  sha256: 59342e856d78dc0fdb673791a36a67e1266273f2e94346bc29d3487d6e9c8a7f
+  bytes: 347125
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/59342e856d78dc0f.jpg
+    sha256: b4845c6b4244d1595662eba5dfe45651b0a39180d8d11e7fb496be94b10b469f
+    bytes: 374210
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/59342e856d78dc0f.webp
+    sha256: c9086704157c0638c029b8588c34eb08090cb6678cda7383d3f26ad22118721a
+    bytes: 39408
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 纯白背景下的藏传佛教经典双层阶梯顶双门储物供柜（Tibetan Buddhist Altar Sideboard / Offering Cabinet）标准单品图。该器型采用“外罩倒U形立体叠涩门套框 + 内嵌双抽屉双开门柜体
+  + 顶部双层阶梯供台”的复合结构，浓缩了藏传佛教最核心的四大吉祥图像学体系。
+materials:
+- 硬木
+- 赤金箔
+- 矿物彩绘（白底单品）
+colors:
+- 酱紫红配真金彩绘
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 纯白底藏式供柜软装单品直接合成（Alpha贴图/Inpainting） / 藏传四大吉祥纹样（八吉祥、五妙欲、和气四瑞、六长寿）标准图谱参考
+prompt_zh: 纯白背景家具正面立面图，一座华美庄严的藏式双层阶梯顶双门木雕彩绘供柜，深酱紫红色实木柜体配璀璨真金贴金边框，顶部双层阶梯束腰高浮雕金色八吉祥与五欲妙供图案，柜体外框饰金色回纹与立体莲珠纹，上方双抽屉，下方左门海棠开光内精雕彩色和气四瑞图（白象、猕猴、兔子、飞鸟），右门开光内精雕六长寿图（寿星老人、仙鹿、仙鹤、松树），8K超清产品图。
+tags:
+- 白底家具单品
+- 和气四瑞图
+- 六长寿图
+- 八吉祥供柜
+- 藏式双门雕花柜
+- 五欲妙供
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real product cutout photograph on white background of a Tibetan 2-tier stepped top double-door offering cabinet painted
+    with the Four Harmonious Friends and Six Longevity Symbols.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

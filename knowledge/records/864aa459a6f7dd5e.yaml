@@ -1,0 +1,76 @@
+id: 864aa459a6f7dd5e
+title_zh: 佛教室内展览空间
+source:
+  original_path: 佛教空间设计案例/佛教室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教室内展览空间.jpg
+  sha256: 864aa459a6f7dd5ef0bbe38404aeb62be3d541b34fa0d2e15ef8c2247874281a
+  bytes: 2775956
+  width: 3391
+  height: 2530
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/864aa459a6f7dd5e.jpg
+    sha256: 08c8c6079359d540a29157abe07a27b93285b4c123b229798de20ce7bc6fe1c9
+    bytes: 423865
+    width: 2048
+    height: 1528
+  thumb512:
+    path: assets/thumb512/864aa459a6f7dd5e.webp
+    sha256: bbabd57ef1581df9e5c8b9df96cf1830c707e5ff339aef9e577e11077ddf5906
+    bytes: 34152
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 立带鎏金莲瓣柱脚包箍与青石柱础的实木巨柱、覆金色方格藻井、远端长龛供奉十八罗汉金像的传统木构大殿侧视空间。
+materials:
+- 实木大圆柱
+- 鎏金莲瓣柱脚铜箍
+- 青石鼓形柱础
+- 深棕石材方砖
+- 金色方格藻井
+- 鎏金十八罗汉像
+colors:
+- 栗木棕
+- 辉煌金
+- 深黑棕色
+- 青灰色
+- 明黄配朱红
+style: 传统汉传大木作殿堂风
+ai_design_usage: 传统寺院大雄宝殿侧廊与十八罗汉壁龛空间参考、木柱底部鎏金莲瓣包箍与青石柱础节点设计
+prompt_zh: 传统中式木构寺院大殿室内侧向透视空间，高大的栗棕色实木圆柱挺拔耸立，柱脚包裹一圈精美的鎏金立体莲花瓣铜箍，下承青石莲瓣鼓形柱础，柱间上方连接雕花额枋与雀替，右侧深黑棕色方格石砖地面上排列一列黄底红边方形蒲团，远景木墙长条发光壁龛内整齐供奉金身十八罗汉像，左侧为中式木格栅隔扇门，顶部是金碧辉煌的方格贴金藻井天花，古朴庄严，8K建筑渲染
+tags:
+- 鎏金莲瓣柱箍
+- 青石柱础
+- 十八罗汉龛
+- 平棋藻井
+- 木构大殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2530
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D side-aisle render of the traditional timber Mahavira Hall (#155) showcasing massive wooden columns with gilded
+    lotus cuffs on carved bluestone drum bases and 18 Arhat wall niches.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

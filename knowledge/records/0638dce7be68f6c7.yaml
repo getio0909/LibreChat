@@ -1,0 +1,70 @@
+id: 0638dce7be68f6c7
+title_zh: 藏传佛教龙纹供器
+source:
+  original_path: 佛教家具与陈设素材/藏传佛教龙纹供器.jpg
+original:
+  path: 佛教家具与陈设素材/藏传佛教龙纹供器.jpg
+  sha256: 0638dce7be68f6c729b1456a696c9f3f3bb9fa734bfc2dd06bf211550585554a
+  bytes: 360488
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0638dce7be68f6c7.jpg
+    sha256: b68b383633b29536ed8b7d1a3b64f87ee3b3b469aed08fba08e16a866c80d8ab
+    bytes: 390712
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/0638dce7be68f6c7.webp
+    sha256: 96df6690ebd91704383ad76fd914f97a31bf6dce5ffdd34bb828e227da4068a5
+    bytes: 51042
+    width: 512
+    height: 384
+library_type: 法器供器
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 与第 23、24 项同款展品的正面标准对称视角全景照——藏传佛教大型双龙耳斗式木雕彩绘供器。通过正视图可以最准确地把握该法器的宽窄比例、斗腹斜度（约 60° 外倾角）、双耳S形曲率以及底座兽面与斗腹法轮的垂直中轴对齐关系。
+materials:
+- 红木圆雕
+- 双狮捧法轮浮雕
+- 饕餮底座
+colors:
+- 枣红木配金彩
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 藏式斗式供器正面标准立面图参考 / 法器对称纹样提取 / 结合图23、24完成三视图3D建模
+prompt_zh: 正面水平特写摄影，一座庄严对称的藏传佛教大型双龙耳斗式木雕彩绘供器，深枣红色倒梯形木斗，左右两侧对称盘曲威猛的黑金游龙耳柄手握红珠，顶部中央交叉竖立两支雕花宝瓶杵，斗腹正中深浮雕两尊白身绿鬃雪狮对称拱护金色八辐法轮与双鱼，下方须弥座雕刻红黄彩色莲瓣与金色怒目饕餮兽面，背景为藏式佛堂木饰面展厅，8K超清。
+tags:
+- 藏传龙纹供器
+- 正视图对称构图
+- 双狮拱法轮
+- 孜巴扎兽面
+- 斗式聚宝盆
+- 藏式展厅实拍
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom frontal photograph of the large Tibetan carved and painted wood斗-shaped offering vessel with dragon/phoenix
+    handles.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,75 @@
+id: ba304f1a3dd23bb8
+title_zh: 佛教主题室内展览空间-06
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-06.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-06.jpg
+  sha256: ba304f1a3dd23bb82b7ce74b3681ba3ba7ffd9ab2de5fcb061bae783b6d1079f
+  bytes: 816253
+  width: 1873
+  height: 1249
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ba304f1a3dd23bb8.jpg
+    sha256: 7ec8e7c4f94aca9ea1a99d8ddaa11bacb44d2d12ccef1ae7bd62a36fcd676a03
+    bytes: 222050
+    width: 1873
+    height: 1249
+  thumb512:
+    path: assets/thumb512/ba304f1a3dd23bb8.webp
+    sha256: fda8d2bad0648330ff237346679df9dd68de9f81bf2b5790ef00274312c9cf31
+    bytes: 21036
+    width: 512
+    height: 341
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 新中式禅意书画展厅木构大门内立面对称场景，正中为三开间六扇竖向木格栅大门配方形铜拉手，两侧立鎏金铜箍原木大圆柱与汉白玉覆盆柱础，两翼嵌四幅水墨山水国画灯箱。
+materials:
+- 原木格栅大门与圆柱
+- 鎏金回纹铜柱套
+- 汉白玉覆盆柱础
+- 发光宣纸国画灯箱
+- 仿古青石方砖
+colors:
+- 暖原木色
+- 深青黑色
+- 宣纸素白
+- 鎏金色
+style: 现代禅意
+ai_design_usage: 新中式佛堂与禅修讲堂木构大门内立面设计、水墨国画灯箱与汉白玉柱础细部参考
+prompt_zh: 新中式佛教书画艺术展厅入口大门内立面设计，严谨的中轴对称单点透视构图，正中央为三开间六扇暖色原木大门，上半部为细密竖向木格栅透光窗，腰部镶嵌六个方形黄铜拉手，大门两侧对称矗立粗壮的原木大圆柱，柱脚包镶鎏金回纹铜套并立于浅灰汉白玉覆盆柱础上，左右两翼展墙内嵌四幅发光宣纸灯箱展示传统水墨山水画与高僧人物画，顶部为传统木斗拱与弧形木条格栅吊顶，地面满铺深灰黑色仿古青石方砖，两侧对称摆放新中式实木长凳，古朴典雅，8K渲染。
+tags:
+- 佛教空间案例
+- 新中式木大门
+- 书画展厅
+- 原木圆柱
+- 汉白玉柱础
+- 青石方砖
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1249
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior rendering (reverse angle of 1984205e57a7127d) showing 3-bay 6-leaf wooden lattice doors, wood columns
+    with gilt bronze collars and white marble bases, and 4 backlit ink landscape/calligraphy panels.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

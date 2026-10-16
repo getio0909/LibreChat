@@ -1,0 +1,76 @@
+id: 9275c7843570d954
+title_zh: 佛教寺庙与大佛景观
+source:
+  original_path: 佛教空间设计案例/佛教寺庙与大佛景观.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙与大佛景观.jpg
+  sha256: 9275c7843570d954c0049373dd2efb1cd770ad407391dc248728ed7cd6930db4
+  bytes: 215155
+  width: 638
+  height: 383
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9275c7843570d954.jpg
+    sha256: 449fcf32472d493706829f5b3338a0623fbf067d8eb19cdac6fc862640dd398a
+    bytes: 58761
+    width: 638
+    height: 383
+  thumb512:
+    path: assets/thumb512/9275c7843570d954.webp
+    sha256: efc59f9c0acb11b7486a42ef50204019bd743c5340df44b4c911a176d723b462
+    bytes: 26050
+    width: 512
+    height: 307
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑与园林景观
+entity_type: 空间场景设计
+summary_zh: 前景设圆形荷花池广场与中央大台阶、左右对称立三层重檐歇山顶配殿、后方白石宝座台基上耸立巨型露天金身大佛的寺院景观。
+materials:
+- 花岗岩广场石材
+- 汉白玉宝座台基
+- 露天铜鎏金大佛
+- 重檐歇山顶古建
+- 石雕须弥座栏杆
+colors:
+- 辉煌金
+- 芝麻白
+- 晚霞橙紫
+- 青瓦灰
+- 园林翠绿
+style: 大型山地佛教文化景区与传统寺院园林风
+ai_design_usage: 大型山地佛教文化景区总体规划、中轴对称礼佛广场与露天大佛景观设计、传统寺院建筑群立面参考
+prompt_zh: 宏伟的山地佛教寺庙建筑群与露天大佛景观效果图，严格中轴对称构图，前景是圆形荷花池花岗岩广场，中央是宽阔的石砌礼佛大台阶与五彩花坛，左右两侧石台基上对称耸立三层重檐歇山顶中式传统配殿，底层门廊饰有大型佛教浮雕壁画，远景中央白色金刚宝座石台基前立有一座白塔，台基上方山巅巍然端坐一尊巨型露天金身大佛，背景是青山绿树与绚丽的夕阳晚霞天空，8K景观建筑渲染
+tags:
+- 露天大佛景观
+- 寺院总体规划
+- 重檐歇山顶
+- 中轴礼佛广场
+- 金刚宝座台基
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 383
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res exterior 3D render (638x383) of a grand temple plaza with a circular lotus fountain, central staircase, symmetrical
+    three-story side halls, and a giant outdoor golden seated Buddha.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

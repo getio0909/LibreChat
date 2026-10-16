@@ -1,0 +1,67 @@
+id: 55bc706f449f1f9c
+title_zh: 石材样品展示图
+source:
+  original_path: 天川金大板自家产品/石材样品展示图.jpg
+original:
+  path: 天川金大板自家产品/石材样品展示图.jpg
+  sha256: 55bc706f449f1f9ce2190d0274ef3244b9d89f8eba58f61dfdf867ac2bfaec95
+  bytes: 4936768
+  width: 3072
+  height: 4096
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/55bc706f449f1f9c.jpg
+    sha256: 6985b53b97f20019d32d8216973d73a50453afb6b77d0bff118c06a63aa0768d
+    bytes: 701610
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/55bc706f449f1f9c.webp
+    sha256: 1b5ce62d2b9145e8ee62fb119c2b5cafb26e90b55ed39eeb413271d4a844d8fe
+    bytes: 37408
+    width: 384
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图展示了在石材工厂红毯质检区内，将「天川金」大板裁切为标准长方形地砖后进行的纵向双列地面主砖预铺及右侧黑白根波打线镶边组合检验。
+materials:
+- 天川金规格砖
+colors:
+- 明黄与橄榄灰交织
+- 配黑白根窄波打线
+style: 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 殿堂长廊/过道地面阵列铺贴效果参考 / 金色大理石配黑色波打线收边方案参考 / ControlNet Perspective 地面网格生成
+prompt_zh: 竖幅4K俯视斜角实景摄影，红色质检地毯上整齐预铺着两纵列天川金天然大理石长方形地砖，明快的藤黄色、琥珀金与浅青灰云纹自然过渡，右侧搭配黑色白纹的黑白根大理石窄条波打线镶边模组，高光镜面抛光反射厂房天窗条形光斑，高端石材工程排版检验细节。
+tags:
+- 天川金地砖
+- 地面预铺排版
+- 黑白根波打线
+- 甬道地面设计
+- 黄色大理石拼花
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 自家产品“天川金”（dunhuang-gold）奢石大板展厅竖立实拍，右侧可见“天川金”实体导视立牌，无数字水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

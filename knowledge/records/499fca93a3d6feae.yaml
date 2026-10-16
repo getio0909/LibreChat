@@ -1,0 +1,75 @@
+id: 499fca93a3d6feae
+title_zh: 佛教主题室内立柱与空间设计
+source:
+  original_path: 佛堂空间设计参考/佛教主题室内立柱与空间设计.jpg
+original:
+  path: 佛堂空间设计参考/佛教主题室内立柱与空间设计.jpg
+  sha256: 499fca93a3d6feae4318daf833ec11bbcceb4ac9ec3757f0f342f02036d634ab
+  bytes: 140278
+  width: 683
+  height: 1024
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/499fca93a3d6feae.jpg
+    sha256: 934a65217955fa1c44d2256dd0bdba3a402c1142c3e538a5eba2b05dc017b203
+    bytes: 150754
+    width: 683
+    height: 1024
+  thumb512:
+    path: assets/thumb512/499fca93a3d6feae.webp
+    sha256: 6f2ca67009715a190551a440c3a71b72ba5fce61fde6e1ca620f9b71dba278cf
+    bytes: 33066
+    width: 341
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 东南亚兰纳/泰式禅意奢华酒店大堂空间，巨型乌木圆柱下部包镶古铜色錾刻如意宝相花浮雕护套并承以汉白玉仰覆莲柱础，顶部外露原木桁架悬挂长圆柱阵列吊灯。
+materials:
+- 深黑褐乌木圆柱
+- 古铜錾刻浮雕包柱
+- 汉白玉莲花柱础
+- 黑色抛光花岗岩
+- 朱红丝绒帷幔
+colors:
+- 深黑褐
+- 古铜金
+- 汉白玉白
+- 朱砂红
+style: 东南亚泰式老挝风
+ai_design_usage: 禅意酒店大堂/大型佛堂巨柱装饰设计、汉白玉莲花柱础与金属包柱工艺参考、东南亚佛教风空间氛围迁移
+prompt_zh: 东南亚泰式禅意奢华酒店大堂与佛教艺术空间，前景与中景耸立粗壮的深黑褐色乌木大圆柱，柱身下部包镶精美的古铜色錾刻如意云头与宝相花金属浮雕护套，柱底为白色大理石雕刻的双层莲花瓣柱础，挑高屋顶为外露原木桁架结构，悬挂多组密集排列的长圆柱形暖光阵列吊灯，右侧垂挂朱红色丝绒高窗帘并陈列泰式彩绘佛像雕塑，黑色镜面石材地面倒映暖光，建筑室内实景摄影，8K
+tags:
+- 东南亚禅意
+- 泰式佛教空间
+- 莲花石柱础
+- 金属包柱雕花
+- 阵列长吊灯
+- 酒店大堂设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 683
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 东南亚兰纳风格大堂乌木包铜雕花立柱与汉白玉莲花柱础实景，短边分辨率偏低（683×1024）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

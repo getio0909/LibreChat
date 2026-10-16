@@ -1,0 +1,73 @@
+id: d3599f629caa56bb
+title_zh: 大型灰色大理石板材展示图
+source:
+  original_path: 常用石材大板/大型灰色大理石板材展示图.jpg
+original:
+  path: 常用石材大板/大型灰色大理石板材展示图.jpg
+  sha256: d3599f629caa56bbbc71289217726bface62b78f89d6ad85fa015704ce52f564
+  bytes: 704540
+  width: 1984
+  height: 1488
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d3599f629caa56bb.jpg
+    sha256: 68123b71eb18480baa93d82a6ea7ede2505a14f5d59ebb7ec6b9666eda74252f
+    bytes: 372629
+    width: 1984
+    height: 1488
+  thumb512:
+    path: assets/thumb512/d3599f629caa56bb.webp
+    sha256: 1c0ca80f75d9a3ec525668256139b56704207d5e73e29d84f6806c7cdffac183
+    bytes: 25612
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-中灰网纹系
+entity_type: 实物对象写实
+summary_zh: 本图为高分辨率拍摄的大型中暖灰色调天然大理石大板实物写实（属云朵拉灰、爱马仕灰或土耳其灰品系）。
+materials:
+- 天然大理石
+- 云朵拉灰大理石
+- 爱马仕灰大理石
+colors:
+- 暖中灰色
+- 灰褐色
+- 乳白色
+- 浅银灰
+style: 现代奢石展陈 / 现代高级灰禅意
+ai_design_usage: 现代极简佛堂/艺术展厅地面与墙面贴图 / 高级灰奢石空间风格迁移 / 佛像展台与须弥座基座贴图
+prompt_zh: 超高清大型暖灰色天然大理石大板正面特写，云朵拉灰与爱马仕灰质感，暖中灰色云雾状基底，表面交织着自然的乳白色与浅银色闪电状、树枝状分叉细脉纹路，高光镜面抛光处理，石材加工厂实景展示，现代高级灰禅意空间核心石材，8K超精细纹理。
+tags:
+- 灰色大理石
+- 云朵拉灰
+- 爱马仕灰
+- 白脉闪电纹
+- 高级灰禅意空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1488
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 黑金褐白斜纹天然大理石大板仓库实拍（1984x1488），右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 右下角存在第三方“STM石猫”水印

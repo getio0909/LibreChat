@@ -1,0 +1,69 @@
+id: 87d7bc8ed7cad53c
+title_zh: 室内平面尺寸图
+source:
+  original_path: 26年春季佛事展设计方案/室内平面尺寸图.jpg
+original:
+  path: 26年春季佛事展设计方案/室内平面尺寸图.jpg
+  sha256: 87d7bc8ed7cad53c76e72c4356e53c44fbf0accccad13cb83293261722b514ca
+  bytes: 2218407
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/87d7bc8ed7cad53c.jpg
+    sha256: 27b291092c4b156082b7d24a346c30909e50a394a9b09a8a977586a0c0add99b
+    bytes: 283520
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/87d7bc8ed7cad53c.webp
+    sha256: b2b48e2196b61f494ae0c82d41d06190fe82938473b9b9159dc93192c2f6cd14
+    bytes: 14776
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-03平面尺寸与铺装施工图
+entity_type: 工程设计图纸
+summary_zh: 本图为施工图册第 3 页——03 平面尺寸图。作为全展位地面石材铺装、木结构墙体放线定位及四立面（A/B/C/D）空间索引的核心基准平面图。
+materials:
+- 满铺大理石斜网格
+- 不锈钢收边
+- 四立面索引
+colors:
+- 白底黑线红标
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 10m×7.5m展位地面石材铺装边界、入口开间与家具定位尺寸参考
+prompt_zh: 建筑室内工程CAD平面尺寸施工图，“03 平面尺寸图”，展示10000mm×7500mm新中式佛教石材展厅的平面布局与精确尺寸标注：地面采用45度斜网格线示意满铺大理石并标注“铺大理石 注意：不锈钢条收边”，中央带有A、B、C、D四个立面方向索引符号，底部D立面标注3310mm长佛台与两侧绿植，右侧A立面标注6580mm主入口、2200mm形象柱（内设服务台）及1000mm次入口，中央布置两张圆形洽谈桌（各4把椅）与右上角长方形中式茶桌（4把椅），红色尺寸线清晰完整，白底专业CAD图纸。
+tags:
+- 26年春季佛事展
+- 03平面尺寸图
+- 不锈钢条收边
+- CAD平面图
+- 3310mm佛台
+- 展位尺寸链
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展03平面尺寸图，标注展位平面尺寸链、地面大理石铺装与A/B/C/D四立面索引。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

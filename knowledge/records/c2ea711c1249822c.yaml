@@ -1,0 +1,71 @@
+id: c2ea711c1249822c
+title_zh: 佛教铜制香炉
+source:
+  original_path: 佛教空间设计案例/佛教铜制香炉.jpg
+original:
+  path: 佛教空间设计案例/佛教铜制香炉.jpg
+  sha256: c2ea711c1249822c827ed25f0f6ac06d8b4d06cb23356a60c0e7e804d2486583
+  bytes: 1170555
+  width: 1261
+  height: 2628
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c2ea711c1249822c.jpg
+    sha256: fe437cf51d5a6abd5c6e0ea2324168c8c61806ea424c474dd1b4d70a7cee733c
+    bytes: 228137
+    width: 983
+    height: 2048
+  thumb512:
+    path: assets/thumb512/c2ea711c1249822c.webp
+    sha256: 6e100d5c49a01184ef6fbf588ba2b8ef3643f2496c6d6bf16f507101044cd586
+    bytes: 14810
+    width: 246
+    height: 512
+library_type: 法器供器
+studio_roles:
+- 物件
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 下承洁白汉白玉圆鼓石墩、中设六角镂空暖光灯笼、上冠六角攒尖重檐翘角挂铃亭顶的铜鎏金落地长明供灯特写。
+materials:
+- 铜鎏金六角重檐亭阁式落地供灯
+- 镂空花窗灯室
+- 汉白玉圆鼓底座
+colors:
+- 辉煌金
+- 汉白玉白
+style: 传统中式重檐亭阁金属灯饰风
+ai_design_usage: 佛殿佛坛两侧对称落地长明供灯单品植入（与图10同型、见于图32观音殿）
+prompt_zh: 中式佛教铜鎏金六角重檐亭阁式落地供灯特写，竖构图，上部为精美的六角攒尖重檐翘角宝塔亭顶，翼角悬挂风铃，中部六角形镂空雕花灯笼内透出温暖的橘黄色灯光，下方为修长的鎏金莲花浮雕立柱与束腰莲座，最底部安放在洁白的汉白玉圆形石鼓底座上，背景为中式佛堂木作环境，金碧辉煌，工艺考究，8K高清写实
+tags:
+- 六角落地宫灯
+- 铜鎏金供灯
+- 宝塔长明灯
+- 汉白玉底座
+- 佛堂灯饰
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1261
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 铜鎏金六角单檐亭阁式高足落地供灯局部图（源自#290前景供灯裁切）。原始文件名/md_title误标为“佛教铜制香炉”，且灯身实为单檐六角攒尖顶而非“重檐”。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 原始标题/md_title将铜制亭阁式落地供灯误标为香炉
+  - summary_zh误称重檐六角攒尖顶，实际为单檐

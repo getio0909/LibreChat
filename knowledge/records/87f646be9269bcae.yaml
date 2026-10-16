@@ -1,0 +1,72 @@
+id: 87f646be9269bcae
+title_zh: 佛教建筑木构装饰细节
+source:
+  original_path: 佛教空间设计案例/佛教建筑木构装饰细节.jpg
+original:
+  path: 佛教空间设计案例/佛教建筑木构装饰细节.jpg
+  sha256: 87f646be9269bcae8368ef599729dd3f7520a367696bc0900c26eedf8fc66a64
+  bytes: 852556
+  width: 1740
+  height: 1396
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/87f646be9269bcae.jpg
+    sha256: 776920ac92ec72c628275f178425cc31277f2d1473e10712626d94e46eedb742
+    bytes: 229390
+    width: 1740
+    height: 1396
+  thumb512:
+    path: assets/thumb512/87f646be9269bcae.webp
+    sha256: e56f3737b7d5b0e13648ab3a1f9394aea5e1269564928f9fda422a0ce886953a
+    bytes: 23646
+    width: 512
+    height: 411
+library_type: 家具木作
+studio_roles:
+- 造型
+- 纹样
+- 参考
+category_l1: 佛教空间案例
+category_l2: 传统佛教建筑木雕贴金垂花罩与藻井局部构件
+entity_type: 实物对象写实
+summary_zh: 本图为传统汉传佛教殿堂内部梁架与天花交界处的木雕贴金垂花落挂及平棊藻井局部构件写实特写。该构件通常悬设于主佛龛上方或大殿明间、次间梁枋之下，起到限定神圣空间边界、丰富顶部视觉层次的作用。 构件主体采用纹理细腻温润的深胡桃木/老楠木制作，保留半哑光清漆木质肌理；在平棊井芯、套角雕花、镂空卷草花牙子内缘及垂莲柱头圆珠部位施以24K赤金贴箔工艺，并在叠涩木框内侧暗藏2700K暖黄LED灯带，使木作暖棕与璀璨金箔相互辉映。
+materials:
+- 楠木
+- 红木雕刻
+- 贴金箔
+- 暗藏灯带
+colors:
+- 暖棕原木
+- 亮金箔色
+- 暖黄背光
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统佛殿/中式佛堂顶部木作垂花罩与挂落细部设计 / 贴金平棊天花材质与构件参考 / 古建木雕构件局部特写生成；推荐搭配：金丝楠木/缅甸柚木本色木作 + 局部24K真金箔贴金 + 2700K超薄暗藏线性灯带
+prompt_zh: 中国传统佛教寺庙大殿顶部木构雕刻装饰细节特写，仰视视角，最上方为井字梁分隔的方形贴金盘龙团花平棊藻井天花，四角饰贴金如意角花；中部横贯一道镂空雕刻卷草如意云纹的木质花牙子挂落；下部为三层阶梯式向下悬挑的矩形木框垂花罩，每个竖向节点底部垂挂精致的贴金莲花宝珠垂柱头，深胡桃木色与璀璨金箔结合，内置温暖黄色暗藏灯带，传统苏作木雕工艺，高清细节写实。
+tags:
+- 木雕垂花罩
+- 贴金平棊藻井
+- 镂空花牙子挂落
+- 垂莲柱头构件
+- 传统古建木作
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1396
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统佛殿木雕贴金平棊藻井与垂莲柱花罩局部三维渲染图，原标注误定为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'subject_mismatch: 图像实为三维CG渲染局部图，而非entity_type所标的“实物对象写实”'

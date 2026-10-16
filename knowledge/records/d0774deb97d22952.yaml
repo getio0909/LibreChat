@@ -1,0 +1,74 @@
+id: d0774deb97d22952
+title_zh: 佛教寺庙内部供奉区域
+source:
+  original_path: 佛堂空间设计参考/佛教寺庙内部供奉区域.jpg
+original:
+  path: 佛堂空间设计参考/佛教寺庙内部供奉区域.jpg
+  sha256: d0774deb97d229523c507cd8e218e9d35c2eb41232dec6484ebdc1172885b577
+  bytes: 72301
+  width: 600
+  height: 432
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d0774deb97d22952.jpg
+    sha256: d6a40bae6e0ef6bd58799b33665efa2e3359653f90df7fb35c9f123e6c8e9662
+    bytes: 78115
+    width: 600
+    height: 432
+  thumb512:
+    path: assets/thumb512/d0774deb97d22952.webp
+    sha256: 31c8f7a0b6f59030a519ec863886f23c1b8782e272270facf1f7b33427aee355
+    bytes: 46452
+    width: 512
+    height: 369
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 日本净土真宗寺院本堂从外阵望向内阵的框景实景，温润桧木门框正中悬“歸命山”竖匾与高浮雕金漆栏间，敞开的黑金折门内展现纯金箔宫殿佛龛与阿弥陀佛立像。
+materials:
+- 日本桧木原木
+- 纯金箔宫殿佛龛
+- 黑漆描金须弥坛
+- 高浮雕贴金栏间木雕
+- 蔺草榻榻米
+colors:
+- 桧木暖黄
+- 璀璨金
+- 玄黑
+- 草席浅黄
+style: 传统与跨文化风格
+ai_design_usage: 日式寺院本堂/高端日式佛堂空间设计参考、原木门框与金箔内殿冷暖材质对比构图、栏间高浮雕金漆木雕提取
+prompt_zh: 日本净土真宗寺院本堂内阵供奉区实景，一点透视框景构图，前景为温润的浅黄色日本桧木梁柱框架与榻榻米地面，门楣正中悬挂“歸命山”竖向牌匾，两侧栏间镶嵌极其繁复的纯金高浮雕云纹透雕木花板，黑漆镶金折叠门向内敞开，露出内部金碧辉煌的内阵空间，中央为纯金箔打造的宫殿式重檐佛龛，供奉阿弥陀佛立像，下方为黑漆描金须弥坛、华丽供具与松枝插花，前景正中摆放一只黑色铜钵磬，庄严辉煌，日本建筑摄影，8K
+tags:
+- 日式佛堂
+- 净土真宗本堂
+- 歸命山
+- 金箔佛龛
+- 桧木建筑
+- 栏间木雕
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 432
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 日本净土真宗寺院本堂'歸命山'木作框景与内阵金箔佛龛实景照片，分辨率偏低（600×432）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

@@ -1,0 +1,71 @@
+id: 4f85024a9f15424f
+title_zh: 佛教寺庙内部佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内部佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内部佛像展示场景.jpg
+  sha256: 4f85024a9f15424f161c93d027679025c21ee8a0c145937233c411bbccb4fbbe
+  bytes: 851693
+  width: 1789
+  height: 1398
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4f85024a9f15424f.jpg
+    sha256: 150b8c812f7700db04f5f12ebc344a268c4bf4c9c3882c163c71cdeae6b2d544
+    bytes: 242861
+    width: 1789
+    height: 1398
+  thumb512:
+    path: assets/thumb512/4f85024a9f15424f.webp
+    sha256: 1eb600ab10b94d5ff6807f9dcbb6bf3dcb609a1751a691f08570cfaa2eacdb41
+    bytes: 27180
+    width: 512
+    height: 400
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为传统汉传大雄宝殿“三世佛与二弟子”斜向广角展示场景（深色木壁背景比选版）（空间场景设计）。
+materials:
+- 铜鎏金三世佛与二弟子像
+- 深棕木雕须弥座
+- 深灰黑高光石砖
+- 九宫格木藻井配蓝底星空圆藻井
+- 重彩壁画
+colors:
+- 辉煌金
+- 深红木色
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 传统大雄宝殿斜向广角透视参考、无背板式三世佛与二弟子陈设方案、木构方格与圆藻井组合天花设计
+prompt_zh: 传统佛教寺庙大雄宝殿室内斜向广角场景，前景为宽阔的深灰黑色高光石材地砖地面，右侧高大的深棕色木雕须弥座佛坛上并列供奉三尊巨型铜鎏金三世佛坐像（带镂空火焰纹大背光）及两尊胁侍弟子金像，佛坛前设红木供桌与黄色拜垫，四周矗立包镶鎏金云纹铜箍的深色实木大圆柱，远端墙面镶嵌彩色佛教壁画，顶部为壮观的木构九宫格藻井天花，正中央设一座圆形蓝底金星贴金斗拱大藻井，庄严肃穆，建筑渲染效果图
+tags:
+- 大雄宝殿斜视图
+- 三世佛二弟子
+- 圆形星空藻井
+- 九宫格木天花
+- 背景比选方案
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1398
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统大雄宝殿三世佛与二弟子左前斜视三维效果图（深色木壁背景比选版），右下角带浅淡莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

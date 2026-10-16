@@ -1,0 +1,75 @@
+id: cd84cfce9427de81
+title_zh: 佛教主题展览空间
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间.jpg
+  sha256: cd84cfce9427de81909dc5633b96479cc2640959c1e80aed5028b73459f1cb1a
+  bytes: 3351431
+  width: 2981
+  height: 2525
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/cd84cfce9427de81.jpg
+    sha256: 53f78164de48bcad36ba76d9019043030bff0d0702674d5bc1e792d5593ffdd2
+    bytes: 530209
+    width: 2048
+    height: 1735
+  thumb512:
+    path: assets/thumb512/cd84cfce9427de81.webp
+    sha256: bc809c0f2f29c837067b67841737d2f0d692ee9e2d891f2da4844f6491785703
+    bytes: 49302
+    width: 512
+    height: 434
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 星空顶琉璃千佛柱石窟展厅
+entity_type: 空间场景设计
+summary_zh: 星空蓝与暖黄橙玉 / 星空天幕、七彩千佛方柱、石窟山体群雕、黄玉地面
+materials:
+- 米白砂岩/汉白玉群雕
+- 七彩渐变琉璃千佛柱
+- 敦煌彩绘包柱
+- 高光橙黄玉石
+- 光纤星空顶
+colors:
+- 深邃星空蓝
+- 橙黄玉石色
+- 洁白
+- 青紫红渐变
+style: 大型沉浸式数字石窟佛教大殿风
+ai_design_usage: 沉浸式数字佛教展厅概念设计 / 橙黄玉石地面曼荼罗水刀拼花参考 / 石窟群雕与千佛柱组合构图
+prompt_zh: 大型沉浸式佛教石窟艺术展览大厅，正向对称构图，顶部是深蓝色璀璨星空天幕，前景左右矗立两根七彩渐变发光的琉璃千佛方柱配石雕须弥座，中央两根敦煌彩绘壁画柱之间是一座白色石窟山体佛像群雕，下方簇拥着绚丽的巨型彩色莲花雕塑，地面铺设高光橙黄色玉石网格地砖并镶嵌圆形曼荼罗图案，倒影斑斓，8k效果图。
+tags:
+- 星空顶展厅
+- 琉璃千佛柱
+- 石窟群雕
+- 黄玉地面拼花
+- 曼荼罗地拼
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2525
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering of a starry-sky digital grotto hall with rainbow backlit thousand-Buddha square pillars,
+    central rockery grotto sculpture with white marble Buddhas and colorful lotus flowers, painted pink pillars, and orange-yellow
+    jade floor with mandala medallions.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

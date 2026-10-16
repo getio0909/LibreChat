@@ -1,0 +1,73 @@
+id: a08bd3450f3e7b86
+title_zh: 工厂环境大理石板材展示
+source:
+  original_path: 常用石材大板/工厂环境大理石板材展示.jpg
+original:
+  path: 常用石材大板/工厂环境大理石板材展示.jpg
+  sha256: a08bd3450f3e7b86f851431208f117dd318b4cff86f4fe99836b16bd24b343b1
+  bytes: 180939
+  width: 828
+  height: 622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a08bd3450f3e7b86.jpg
+    sha256: 4dabb811534861a470fd454d98fa7d1cee92c0a09f8eeaea96f4465516fc629c
+    bytes: 84241
+    width: 828
+    height: 622
+  thumb512:
+    path: assets/thumb512/a08bd3450f3e7b86.webp
+    sha256: 6d5ee0cfcd840b2a9a1d688b59f64ab2812bd0dccbd2f44b31be781a80f240f5
+    bytes: 22352
+    width: 512
+    height: 385
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-白底双斜带纹系
+entity_type: 实物对象写实
+summary_zh: 本图为刚刚下线或陈列于“奥特晶”高光度磨抛车间前的大型白底银灰斜纹天然大理石大板实物写实。
+materials:
+- 天然白色大理石
+- 奥特晶高光抛光大板
+colors:
+- 纯白色
+- 银灰色
+- 浅褐灰色
+style: 现代奢石展陈 / 现代极简禅意
+ai_design_usage: 极简现代佛堂明亮墙地面贴图 / 净土宗佛堂纯白主背景墙 / 石材家具（供桌、茶几）面板贴图
+prompt_zh: 超高光泽度天然白色大理石大板正面展示，纯净洁白的石材基底，从左下向右上平行贯穿两道优雅的银灰色斜向条带纹路，中间有大面积无瑕纯白留白，表面经过奥特晶高光度镜面抛光处理，放置在石材加工车间机械设备前，8K超高清材质。
+tags:
+- 高光白大理石
+- 平行斜纹大板
+- 奥特晶抛光
+- 极简白石材
+- 高洁净度背景墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 622
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 黑底金黄放射状碎金奢石大板实拍，原图828x622分辨率偏低，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 828x622 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（828x622，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印

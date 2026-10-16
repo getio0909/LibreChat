@@ -1,0 +1,75 @@
+id: 8efd41e53874c0f4
+title_zh: 佛教主题石材展览空间设计
+source:
+  original_path: 佛教空间设计案例/佛教主题石材展览空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教主题石材展览空间设计.jpg
+  sha256: 8efd41e53874c0f453c88e6e86d89584293df10a046cfc6e8392d42445d179b8
+  bytes: 3847419
+  width: 3411
+  height: 2560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8efd41e53874c0f4.jpg
+    sha256: fd8d4beab94472c18ef9798f4036d0722579675ab9f6afd50bb5573d5f47af07
+    bytes: 525765
+    width: 2048
+    height: 1537
+  thumb512:
+    path: assets/thumb512/8efd41e53874c0f4.webp
+    sha256: 4ae8e9da16643e98586f98d2de30f81b9d8da8d67baba64cfc3f499e8566affa
+    bytes: 45974
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 金碧背光佛陀座像与汉白玉莲池殿
+entity_type: 空间场景设计
+summary_zh: 赤金、黑金大理石与汉白玉 / 放射状火焰金背光坐佛、汉白玉石桥与莲花池
+materials:
+- 房山汉白玉精雕拱桥与栏杆
+- 青黑石深浮雕须弥座
+- 24K贴金坐佛与放射状火焰背光
+- 鎏金盘龙柱础
+- 黑金花镜面大理石
+colors:
+- 璀璨鎏金
+- 汉白玉纯白
+- 青黑石色
+- 黑金花乌黑
+- 荷花粉绿
+style: 奢华古建石雕莲池与金佛大殿风
+ai_design_usage: 室内七宝莲池与汉白玉拱桥栏杆设计 / 放射状太阳火焰金色佛像背光设计 / 青黑石深浮雕须弥座与汉白玉盘龙柱参考
+prompt_zh: 极尽奢华庄严的佛教石材展览大殿室内设计，左侧核心区供奉一尊金光闪耀的释迦牟尼佛坐像，下方为精雕细琢的青黑石多层深浮雕须弥座，佛像背后是一轮光芒四射的圆形放射状火焰金背光，两侧矗立带鎏金盘龙柱础的汉白玉八角柱，右侧前景是一座室内七宝莲花池，盛开着荷花并横跨洁白的汉白玉精雕卷云纹拱桥与石栏杆，背景高墙布满暖金发光万佛小龛与中式木构门楼，黑金花镜面大理石地面，8k超高清效果图。
+tags:
+- 汉白玉拱桥
+- 室内七宝莲池
+- 放射状金背光
+- 青石须弥座
+- 盘龙柱础
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2560
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a golden seated Buddha with a sculpted flame-and-cloud mandorla on a dark stone Sumeru pedestal
+    beside an indoor lotus pond with white marble balustrades.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

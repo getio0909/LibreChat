@@ -1,0 +1,71 @@
+id: 09fc6054931d97e2
+title_zh: 佛教金色香炉陈设
+source:
+  original_path: 佛教空间设计案例/佛教金色香炉陈设.jpg
+original:
+  path: 佛教空间设计案例/佛教金色香炉陈设.jpg
+  sha256: 09fc6054931d97e2052401a8a75df6f075f1dbf4d9c3e371def05f3cd89a6778
+  bytes: 1310800
+  width: 1534
+  height: 2620
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/09fc6054931d97e2.jpg
+    sha256: 3f2ed1f082ddc9840c48d2dfe7b200335ccd134dcabb3cd397c433f6616714dc
+    bytes: 356814
+    width: 1199
+    height: 2048
+  thumb512:
+    path: assets/thumb512/09fc6054931d97e2.webp
+    sha256: 672f9b8ecf99aa16985407b529469585c0bb267920cdc5a10f733bec4b6e6253
+    bytes: 21238
+    width: 300
+    height: 512
+library_type: 法器供器
+studio_roles:
+- 物件
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 安放于深色雕花红木供桌上、炉腹饰仰莲宝相花浮雕、两侧立雕双龙耳且炉盖顶立鎏金瑞狮钮的铜鎏金三足熏香炉特写。
+materials:
+- 铜鎏金双龙耳三足熏炉
+- 镂空金狮钮炉盖
+- 深色雕花红木供桌
+colors:
+- 辉煌金
+- 深红木色
+style: 传统汉传皇家寺院金铜工艺
+ai_design_usage: 佛堂供桌核心香炉法器单品植入、铜鎏金雕花金属材质贴图与微距陈设参考
+prompt_zh: 佛教铜鎏金双龙耳三足香炉法器微距特写，安放在深色雕花红木供桌上，炉身浑圆饱满，表面精雕高浮雕仰莲瓣纹与缠枝宝相花纹，左右两侧对称装饰立体盘龙双耳，顶部为镂空祥云纹炉盖并立有一尊威严的鎏金瑞狮钮，下承三只兽首吞足，纯正黄金光泽，雕工极致繁复，暗调虚化背景，博物馆级器物摄影，8K超高清细节
+tags:
+- 金色香炉
+- 铜鎏金法器
+- 双龙耳三足炉
+- 狮钮熏炉
+- 佛堂供具
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1534
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 黄铜三足双耳香炉插三支线香的局部放大裁切图。元数据存在明显幻觉：画面实为敞口插香的香炉，根本没有“镂空金狮钮炉盖/瑞狮顶钮”及“双龙耳”（实为素面曲柄朝冠耳），且小图强行放大至1534x2620导致严重马赛克像素化。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - summary_zh、materials、tags存在严重幻觉（虚构镂空金狮钮炉盖与双龙耳，实际为无盖敞口插三支线香的素耳三足炉）
+  - 局部小图强行放大导致严重像素化模糊

@@ -1,0 +1,69 @@
+id: 345b575176570641
+title_zh: 佛教传统佛龛展示场景
+source:
+  original_path: 佛教家具与陈设素材/佛教传统佛龛展示场景.jpg
+original:
+  path: 佛教家具与陈设素材/佛教传统佛龛展示场景.jpg
+  sha256: 345b5751765706411ee77a84ec8056a912a7cdf8e551a11513d95a69db208ad7
+  bytes: 472651
+  width: 1440
+  height: 1080
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/345b575176570641.jpg
+    sha256: 76b81c603ae32831e72531d34b7322d4c7e399522c6642b874a45f64e0bc7413
+    bytes: 510080
+    width: 1440
+    height: 1080
+  thumb512:
+    path: assets/thumb512/345b575176570641.webp
+    sha256: 146839eaf7900636f87bf7d1d32c872b13b34786e59b8c15e6797d3452372fc4
+    bytes: 62340
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 物件
+- 风格
+category_l1: 佛教家具与陈设
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 一座殿堂级藏传佛教“五开间双层满堂供奉”大型实木雕花佛龛与前置独立供台室内实景场景。该场景完整呈现了藏传寺院或顶级居士佛堂中“上供诸佛菩萨、中设八宝曼扎七支供、下设雕花储物坛城柜、前设独立献供方台”的标准宗教空间陈设体系。
+materials:
+- 巨型红木佛龛
+- 黑铜佛像
+- 鎏金供具
+colors:
+- 深紫棕配金铜蓝光
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 大型藏传佛堂整墙佛龛空间布局参考（ControlNet Depth） / 密宗满堂供品（八吉祥牌、朵玛、曼扎、七水碗）标准陈设示范 / 佛龛内冷光背光与暖金木雕照明设计
+prompt_zh: 室内广角实景摄影，一座气势恢宏的藏传佛教五开间双层红木贴金大佛龛满堂供奉场景，深紫红色实木柜体满雕璀璨真金斗拱飞檐与火焰拱门，上下两层十个佛龛内供奉黑铜与鎏金佛像，龛内散发出神秘的柔和冰蓝背光，供台台面整齐陈列十六座圆形木雕彩绘八吉祥供牌、金色朵玛塔、绿松石曼扎盘与一排净水供碗，两侧配鲜花与金曼扎，下方十二扇柜门高浮雕金色瑞兽，正前方中轴线设一座独立雕花小供柜与蓝色回纹礼拜毯，8K超高清佛堂实景。
+tags:
+- 藏式佛龛场景
+- 满堂供奉布局
+- 八吉祥供牌陈列
+- 五开间大佛柜
+- 佛堂空间设计
+- 密宗供品摆放
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1080
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 展厅实拍藏式五开间双层大型雕花佛龛与前置独立供台满堂供奉陈设场景。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

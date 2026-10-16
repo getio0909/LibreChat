@@ -1,0 +1,74 @@
+id: 189d9e6088209f8c
+title_zh: 佛教寺院石材装饰展示
+source:
+  original_path: 26年春季佛事展设计方案/佛教寺院石材装饰展示.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教寺院石材装饰展示.jpg
+  sha256: 189d9e6088209f8ca54f1b243bcce3da55a0689376e6c9ef3fe85b12d7b3e40a
+  bytes: 4659691
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/189d9e6088209f8c.jpg
+    sha256: 1de69661e738b3eb3ffb8a48a4777ffe73665004ca0b7d24558939f438dc4657
+    bytes: 790160
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/189d9e6088209f8c.webp
+    sha256: 962da57991ee6136346ac4f8be91c948e8c882cc84a3ad3692a116eec01977ae
+    bytes: 39480
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 材质
+- 物件
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-叠级藏光佛龛与佛台
+entity_type: 空间场景设计
+summary_zh: 本图完整展示了 2026年春季佛事展（C5 T026）南侧 D立面庄严佛龛核心陈列区与东侧 A立面入口品牌形象柱内侧的空间组合。设计将传统寺院大殿的“背光佛龛+须弥座佛台+礼佛拜垫”进行现代极简新中式转译，打造出既可作为高端家宅佛堂样板间、又可展现寺院大型石雕工艺的沉浸式场景。
+materials:
+- 禅境灰蓝大理石
+- 敦煌金玉石供桌
+colors:
+- 米白
+- 烟灰蓝
+- 琥珀金
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 双层亚字形藏光佛龛、禅境灰蓝背景与敦煌金供桌组合空间参考
+prompt_zh: 现代新中式佛教寺院石材展厅实景，中央为双层内凹亚字形折角圆弧（R200/R100）传统佛龛背景墙，凹槽内隐藏暖黄色LED灯带散发两圈神圣金色光晕，佛龛内部镶嵌“禅境灰蓝”金镶玉天然大理石（烟灰蓝色底配金色斜纹），龛前摆放敦煌金天然黄玉石五层高浮雕须弥座大供桌，桌上供奉精美的鎏金伽蓝菩萨坐像与鲜花水果，前方同款灰蓝金纹大理石高光地面上摆放一张明黄色团莲坐垫的实木拜凳，左侧米白色墙面镶嵌黑色立体字“莊嚴寶刹
+  寺院装饰石材”及绿植盆栽，庄严静谧，8K商业空间摄影。
+tags:
+- 26年春季佛事展
+- 禅境灰蓝
+- 金镶玉大理石系列
+- 叠级藏光佛龛
+- 敦煌金须弥座供桌
+- 伽蓝菩萨
+- 现代佛堂设计
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展D立面叠级藏光佛龛（禅境灰蓝大理石背景与地面）、敦煌金须弥座供桌与伽蓝菩萨坐像实景。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

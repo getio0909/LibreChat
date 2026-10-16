@@ -1,0 +1,77 @@
+id: 7a444acc4786a739
+title_zh: 佛教室内雕像展览场景
+source:
+  original_path: 佛教空间设计案例/佛教室内雕像展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教室内雕像展览场景.jpg
+  sha256: 7a444acc4786a7392b1dfc727b2f8e545a7f56b565aa04a6d2bf64fdeab822a2
+  bytes: 1789014
+  width: 2692
+  height: 2575
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7a444acc4786a739.jpg
+    sha256: b384919a7761c76d949f81868019b8a4ee3c7353a4c3acc9d4b37db524a8ae8f
+    bytes: 372677
+    width: 2048
+    height: 1959
+  thumb512:
+    path: assets/thumb512/7a444acc4786a739.webp
+    sha256: ec540c09d91163186e0f9b0841b0c655a441da5dd422c374fa9c3f6ad4189b88
+    bytes: 29356
+    width: 512
+    height: 490
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 前景右侧米黄石雕须弥座与发光莲花墙前安奉汉白玉普贤骑象像、左后方白光拱龛供奉汉白玉观音坐像的双区雅致展陈空间。
+materials:
+- 汉白玉普贤骑象像
+- 汉白玉观音坐像
+- 米黄石雕须弥座
+- 发光莲花轮廓墙
+- 浅灰浮雕石板配金圆饰
+- 深灰石材地面
+colors:
+- 汉白玉白
+- 米黄色
+- 深木棕
+- 深灰色
+- 暖金色
+style: 现代美术馆级佛教石雕造像展陈风
+ai_design_usage: 佛教造像艺术馆/寺院菩萨专殿分龛展陈设计、汉白玉菩萨雕像与现代发光莲花背景墙搭配参考
+prompt_zh: 现代雅致佛教室内汉白玉雕像展览空间，前后双焦点构图，前景右侧是一尊精美的汉白玉普贤菩萨骑六牙白象雕像侧面像，安奉在精雕细琢的米黄色石材束腰仰莲须弥座上，背后深色木墙镶嵌巨大的暖光莲花轮廓灯带，左后方木作框景内设柔白发光拱形佛龛，供奉一尊汉白玉观音菩萨坐像，两侧装饰带金色圆形浮雕的浅灰石雕护墙板，前方设实木供案，深灰色哑光石材地面，8K展厅效果图
+tags:
+- 汉白玉普贤菩萨
+- 汉白玉观音
+- 石雕须弥座
+- 发光莲花背景墙
+- 造像展览馆
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2575
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of an indoor Buddhist stone sculpture gallery featuring a white marble Samantabhadra on a six-tusked elephant
+    before a glowing lotus outline wall and a Guanyin niche, misclassified under category_l2 as '现代禅修茶室'.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - subject_mismatch

@@ -1,0 +1,76 @@
+id: 54a004203d1f26be
+title_zh: 佛教寺庙钟鼓陈设场景
+source:
+  original_path: 佛堂空间设计参考/佛教寺庙钟鼓陈设场景.jpg
+original:
+  path: 佛堂空间设计参考/佛教寺庙钟鼓陈设场景.jpg
+  sha256: 54a004203d1f26be6ea3c83ee39cd242d907a200d1a281359e989d1b64a2fb7c
+  bytes: 487923
+  width: 793
+  height: 800
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/54a004203d1f26be.jpg
+    sha256: d89dd6dace3def40b022f9cf96804674065cf35a7fdf0a1845082f65d98e39a4
+    bytes: 172759
+    width: 793
+    height: 800
+  thumb512:
+    path: assets/thumb512/54a004203d1f26be.webp
+    sha256: b4f86a625049f5f3b9404bbe7dcf946ea0436bebd8c677e697b28bf42c3b2d2c
+    bytes: 49686
+    width: 508
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 宋明古典青绿朱红撞色风格的寺院礼乐法器壁龛正立面场景，青绿彩绘筒瓦门罩下悬挂巨型同心圆青铜绿锈大圆锣，下方设朱红黑金彩绘供桌与两尊青铜护法瑞兽。
+materials:
+- 青铜绿锈大圆锣
+- 青绿朱红彩绘木门罩
+- 朱红黑金供桌
+- 铸铜瑞兽麒麟
+- 米黄肌理墙面
+colors:
+- 松石铜绿
+- 朱砂红
+- 暖米黄
+- 玄黑
+style: 传统汉传宫殿式
+ai_design_usage: 佛堂/禅意会所侧墙法器端景壁龛设计、青绿与朱红传统建筑撞色参考、对称式中式艺术陈设构图
+prompt_zh: 中国传统佛教寺院礼乐法器壁龛陈设正立面设计，绝对对称构图，外框为青绿与朱红彩绘的传统木构雕花门罩，顶部带有筒瓦屋檐与斗拱雀替，温暖米色背景墙正中央垂直悬挂一面巨大的同心圆青铜绿锈浮雕大铜锣，下方摆放朱红框镶黑金彩绘的中式供桌，桌上陈列对称的古典铜炉法器，供桌前方左右两侧各蹲坐一尊威严的青铜绿锈瑞兽麒麟，宋明古典青绿朱红配色，柔和立体的光影质感，8K超高清
+tags:
+- 法器陈设壁龛
+- 青铜大锣
+- 青绿朱红配色
+- 中式端景设计
+- 护法瑞兽
+- 对称正立面
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 793
+  low_res: true
+  ai_generated: true
+  third_party_watermark: false
+  text_overlay: false
+  notes: AI生成的青绿朱红中式彩绘门罩悬挂青铜大锣与供桌瑞兽立面图，分辨率偏低（793×800），构件与纹样细节呈AI伪影。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - ai_generated

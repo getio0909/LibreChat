@@ -1,0 +1,73 @@
+id: e376af74b44063cd
+title_zh: 大雄宝殿佛教建筑场景
+source:
+  original_path: 佛教空间设计案例/大雄宝殿佛教建筑场景.jpg
+original:
+  path: 佛教空间设计案例/大雄宝殿佛教建筑场景.jpg
+  sha256: e376af74b44063cdda21c6c627175f82fd8a22343277d05af595869116fa4137
+  bytes: 242515
+  width: 735
+  height: 381
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e376af74b44063cd.jpg
+    sha256: fcdf1575074b164e27a11ca2543dbad6d581b22d4fdd04e1281d34bfa81ee41c
+    bytes: 69980
+    width: 735
+    height: 381
+  thumb512:
+    path: assets/thumb512/e376af74b44063cd.webp
+    sha256: ee17fdbf998bbe7d481939d5d4cf7176ec4bf5a786ed14488dea5be161a11c68
+    bytes: 24160
+    width: 512
+    height: 265
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 高大汉白玉月台之上矗立重檐歇山顶大殿、重檐间高悬“大雄寶殿”黑底金字匾、八柱敞厅内显三世大金佛及前广场石灯笼参道的寺院建筑场景。
+materials:
+- 重檐歇山顶大雄宝殿
+- 朱红廊柱
+- “大雄寶殿”黑底金字匾
+- 汉白玉栏杆月台
+- 石灯笼广场
+colors:
+- 朱红色
+- 青灰色
+style: 传统汉传宫殿式与新唐风建筑
+ai_design_usage: 传统与新唐风结合的大雄宝殿建筑外观及礼佛前广场规划、轴线松树石灯笼景观参考
+prompt_zh: 中国传统与新唐风结合的寺院大雄宝殿建筑外观及前广场全景效果图，严格中轴对称构图，高大的白色汉白玉须弥座月台之上矗立恢弘的重檐歇山顶佛殿，青灰瓦屋面配金色鸱尾，重檐正中悬挂“大雄寶殿”黑底金字牌匾，八根朱红色廊柱敞开，殿内清晰可见三尊巨大的金身坐佛；前方为宽阔的花岗岩礼佛大道与雕龙御道台阶，两侧对称排列唐式石灯笼、石雕护法与苍松繁花，右后方远景耸立一座多层木塔，庄严神圣，8K建筑表现图
+tags:
+- 大雄宝殿
+- 寺院建筑外观
+- 重檐歇山顶
+- 礼佛广场
+- 新唐风古建
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 381
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代仿古佛殿木格栅大门及两侧白石四大天王高龛外立面效果图，原图尺寸735x381分辨率偏低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 735x381 (<800px short side)'
+  - 分辨率过低（735x381，最短边<768px）

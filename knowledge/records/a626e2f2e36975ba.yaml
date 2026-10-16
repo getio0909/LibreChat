@@ -1,0 +1,72 @@
+id: a626e2f2e36975ba
+title_zh: 灰色纹理石材展示图
+source:
+  original_path: 常用石材大板/灰色纹理石材展示图.jpg
+original:
+  path: 常用石材大板/灰色纹理石材展示图.jpg
+  sha256: a626e2f2e36975baef6783c9c7ecc3487680dbbdef67151fdb5213383e99580b
+  bytes: 185961
+  width: 853
+  height: 640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a626e2f2e36975ba.jpg
+    sha256: 1109d55150ccf479a6c5360c16394577b32a2a35462219b26895a92e994cebc5
+    bytes: 107378
+    width: 853
+    height: 640
+  thumb512:
+    path: assets/thumb512/a626e2f2e36975ba.webp
+    sha256: 5c112c026439995b46f4d3ba09e3990481271d2f48f716b84e14522bcc3f1f84
+    bytes: 36328
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-中灰分叉白脉系
+entity_type: 实物对象写实
+summary_zh: 本图为石材车间内采用微侧角度拍摄的天然中灰色分叉白脉大理石大板实物写实。
+materials:
+- 天然中灰大理石
+- 云朵拉灰切板
+colors:
+- 中性暖灰色
+- 乳白色
+- 浅银灰
+style: 现代奢石展陈 / 现代禅意空间
+ai_design_usage: 现代佛堂接待前台/香案立面石材包覆 / 室内外过渡空间灰石墙面 / 现代极简风地面拼铺
+prompt_zh: 天然中暖灰色大理石大板微侧视特写，沉稳均匀的暖灰色云斑基底，左右两侧分布着清晰的乳白色闪电折线状与树枝分叉状方解石脉纹，中部保留大面积沉稳灰底，高光镜面抛光表面，侧面带有蓝绿色防护胶，石材车间实景，8K高清。
+tags:
+- 中灰大理石
+- 树枝分叉白纹
+- 云朵拉灰切板
+- 现代禅风灰石
+- 接待台石材
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 640
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Slightly angled shot of a medium grey marble slab with branching white veins in a workshop, bearing an STM石猫 watermark
+    in bottom right.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - third_party_watermark
+  - text_overlay

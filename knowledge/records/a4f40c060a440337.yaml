@@ -1,0 +1,75 @@
+id: a4f40c060a440337
+title_zh: 佛教主题室内展览空间-08
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-08.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-08.jpg
+  sha256: a4f40c060a4403377c203d350a064d72ac46111ff57382aa46679c76bce54d3a
+  bytes: 1024825
+  width: 1851
+  height: 1220
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a4f40c060a440337.jpg
+    sha256: 2a5b2de0fa10600ec859044b62d41ecc082b0dadf915b1b67d5b83337e021430
+    bytes: 279020
+    width: 1851
+    height: 1220
+  thumb512:
+    path: assets/thumb512/a4f40c060a440337.webp
+    sha256: 1b049f139c7d5481447259ee594f65fa1e1a455167c300c8a76c20e56eceaccf
+    bytes: 30116
+    width: 512
+    height: 337
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 物件
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 新中式雕花木柱功德牌位堂与玉璧陈设场景，中央立镶嵌鎏金雕花板的方形胡桃木大柱与汉白玉方形须弥座柱础，左侧卷书造型供案陈设汉白玉平安扣玉璧，后方为黑金须弥座大佛龛。
+materials:
+- 嵌鎏金雕花板胡桃木方柱
+- 汉白玉方形须弥座柱础
+- 汉白玉平安扣玉璧
+- 卷书造型实木供案
+- 黑金彩绘须弥座木佛龛
+colors:
+- 红棕胡桃木色
+- 鎏金色
+- 汉白玉白
+- 明黄色
+style: 现代禅意
+ai_design_usage: 高端寺院功德堂与祖师堂室内设计、雕花嵌板方木柱与汉白玉方形须弥柱础及玉璧供案植入参考
+prompt_zh: 新中式高端寺院功德堂与佛堂室内场景设计，斜向广角透视构图，空间中央矗立两根粗壮的红棕胡桃木方形大柱，柱身四面镶嵌深浮雕金色卷草龙纹花板，柱头饰有镂空鎏金雀替，柱脚承接洁白的汉白玉高浮雕莲花方形须弥座柱础，左侧竖向木格栅窗前摆放一张两端呈漩涡卷轴造型的创意实木供案，案上立放一枚温润的汉白玉雕花平安扣玉璧，后方为黑金彩绘须弥座托起的金漆万字格雕花大佛龛与红木供桌，桌前排列三个黄蓝刺绣圆形拜垫，右侧立有一座金色八角经幢，红棕色拼花地板，华贵庄严，8K超高清渲染。
+tags:
+- 佛教空间案例
+- 功德牌位堂
+- 雕花方木柱
+- 汉白玉须弥柱础
+- 玉璧雕塑
+- 卷书供案
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1220
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior rendering of the merit tablet hall featuring square walnut columns with gilt dragon relief panels on
+    white marble sumeru bases, a scroll-shaped display table with a white jade bi-disc, and a black-gold shrine.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

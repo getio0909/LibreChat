@@ -1,0 +1,76 @@
+id: 7b0f1ff4c1e9590c
+title_zh: 现代佛教雕像展览空间设计
+source:
+  original_path: 佛堂空间设计参考/现代佛教雕像展览空间设计.jpg
+original:
+  path: 佛堂空间设计参考/现代佛教雕像展览空间设计.jpg
+  sha256: 7b0f1ff4c1e9590c343ae66bb3cead3fa19f66cb6b2305b36d090bdeed8ab69a
+  bytes: 861068
+  width: 1600
+  height: 960
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7b0f1ff4c1e9590c.jpg
+    sha256: a795fa7491325deafdffbe0e2059f753e91982b48013966467e1565d851d4936
+    bytes: 242006
+    width: 1600
+    height: 960
+  thumb512:
+    path: assets/thumb512/7b0f1ff4c1e9590c.webp
+    sha256: 09ab7868badc363afb1d7b76f3e65c1972c142e3feea2772007408dc2deae80b
+    bytes: 14104
+    width: 512
+    height: 307
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 现代奢石博物馆风暗调佛像展厅效果图，前景与两侧门洞采用斜向纹理灰褐天然木纹奢石包柱，深炭灰背景墙嵌圆形竖条金属格栅，聚光灯精准打亮中央黑石底座上的汉白玉水月观音坐像。
+materials:
+- 斜纹天然木纹奢石大板
+- 汉白玉水月观音雕像
+- 黑色大理石方底座
+- 圆形内凹原木条吊顶
+- 深炭灰波浪肌理墙
+colors:
+- 炭黑/深灰
+- 汉白玉纯白
+- 灰褐石纹
+- 原木暖棕
+style: 现代奢石展陈
+ai_design_usage: 庄严宝刹奢石展厅/佛事展核心造像展区设计、斜纹奢石门套与暗调背景墙搭配、汉白玉水月观音博物馆级重点照明构图
+prompt_zh: 现代博物馆风格暗调奢石佛教雕像展厅室内设计，一点透视中轴对称构图，前景与两侧门洞采用灰褐色斜向流动纹理的天然木纹奢石大板包柱，柱底内嵌向上洗墙射灯，深炭灰色肌理背景墙正中央嵌入一个圆形中式竖条金属格栅月洞造型，前方黑色大理石方底座上供奉一尊洁白细腻的汉白玉水月观音（自在观音）坐像，顶部纯黑吊顶正中设计一个大型圆形内凹原木宽板条吊顶，窄角聚光灯精准打亮白玉观音，墙角暗藏纤细暖光灯带，静谧高雅的东方现代展陈美学，8K室内效果图
+tags:
+- 水月观音
+- 自在观音
+- 奢石门套应用
+- 博物馆风展厅
+- 暗调重点照明
+- 圆月格栅背景
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 960
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代奢石博物馆风暗调佛像展厅与水月观音坐像3D效果图，中下部遍布'知末'平台水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

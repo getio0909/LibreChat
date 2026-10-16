@@ -1,0 +1,74 @@
+id: f27bcc6a252a2e2b
+title_zh: 厦门南普陀寺｜石柱与朱金木作
+source:
+  original_path: 设计风格精选20261010/xiamen-nanputuo-stone-wood.jpg
+original:
+  path: 设计风格精选20261010/xiamen-nanputuo-stone-wood.jpg
+  sha256: f27bcc6a252a2e2b1b75b5c15db52d21ce304583f4e75e07d7fb7db68dc6f375
+  bytes: 1489871
+  width: 1500
+  height: 1125
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f27bcc6a252a2e2b.jpg
+    sha256: a6d9caaa5e86152ca284f21924e5665c595b84b392c83474f8423c5062f8a986
+    bytes: 381667
+    width: 1500
+    height: 1125
+  thumb512:
+    path: assets/thumb512/f27bcc6a252a2e2b.webp
+    sha256: c90bb343f3ee581abf7ea737de66361109c13e0ac0cff0d4fcee08d2847e683d
+    bytes: 50398
+    width: 512
+    height: 384
+library_type: 建筑景观
+studio_roles:
+- 风格
+- 纹样
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 闽南寺院青绿斗拱与大悲殿匾额门廊场景
+entity_type: 空间场景设计
+summary_zh: 这是闽南名刹福建厦门南普陀寺核心殿堂“大悲殿”（八角三重檐亭阁式观音宝殿）外檐门头、牌匾与青绿斗拱木石交接空间场景。
+materials:
+- 青绿彩绘木构斗拱
+- 紫红底金字实木牌匾
+- 金漆透雕凤凰雀替
+- 花岗岩浮雕八角石柱
+colors:
+- 松石翠绿
+- 朱红色
+- 赤金色
+- 紫红色
+- 花岗岩灰白
+style: 闽南潮州传统工艺 / 闽南佛教寺院门头
+ai_design_usage: 闽南/台湾风格佛寺门头与牌匾设计 / 青绿朱红斗拱色彩搭配参考 / 佛事展传统寺院门楼展位立面生成
+prompt_zh: 福建厦门南普陀寺“大悲殿”门头外檐正视仰拍场景，正中央高悬一块紫红底色镶嵌金色镂空卷草边框的巨型牌匾，上书苍劲饱满的“大悲殿”三个金色大字；牌匾上方为层层出跳的翠绿色与朱红色相间的闽南传统木构斗拱与琉璃瓦滴水檐，牌匾下方两侧花岗岩石柱柱头处对称安装两件精美的金漆镂空凤凰雀替，左右前景有翠绿树叶自然掩映，色彩明快庄严，高清古建摄影。
+tags:
+- 厦门南普陀寺
+- 大悲殿金匾
+- 闽南青绿斗拱
+- 金漆凤凰雀替
+- 木石交接门头
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Dabeidian.jpg
+  credit: Gisling
+  license: cc-by-3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1125
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Close-up architectural view of the '大悲殿' plaque, gilded openwork phoenix brackets, green painted dougong, and carved
+    granite columns at Xiamen Nanputuo Temple.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

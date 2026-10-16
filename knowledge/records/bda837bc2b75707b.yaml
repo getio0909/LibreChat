@@ -1,0 +1,76 @@
+id: bda837bc2b75707b
+title_zh: 传统佛教寺庙建筑场景
+source:
+  original_path: 佛教空间设计案例/传统佛教寺庙建筑场景.jpg
+original:
+  path: 佛教空间设计案例/传统佛教寺庙建筑场景.jpg
+  sha256: bda837bc2b75707b6141258aaeafb3bb3f3f123f71e2b595380414628afd0b34
+  bytes: 259758
+  width: 688
+  height: 381
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bda837bc2b75707b.jpg
+    sha256: 1600716014dba2228293c48437a07637e16fdb12041001194966f358caf6ca46
+    bytes: 69612
+    width: 688
+    height: 381
+  thumb512:
+    path: assets/thumb512/bda837bc2b75707b.webp
+    sha256: 86b05150bb4c7c86dd1be4066c13dbfa2bab90945b01c76574260162c415a0aa
+    bytes: 30028
+    width: 512
+    height: 284
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 秋日山林中的传统汉式寺院建筑群（妈祖庙）正面全景，中央重檐歇山顶主殿与两侧钟鼓楼对称布局，殿前青石月台踏道入口蹲坐一对汉白玉石狮并配石灯笼。
+materials:
+- 青灰筒瓦
+- 栗褐色木构
+- 汉白玉石狮
+- 青石月台踏道
+colors:
+- 青灰色
+- 栗褐色
+- 秋叶金黄
+- 汉白玉白
+style: 传统汉传宫殿式
+ai_design_usage: 传统寺庙山门主殿与钟鼓楼建筑群规划、殿前月台石狮布局与秋景古建环境渲染
+prompt_zh: 中国传统汉式寺庙建筑群正面全景效果图，中轴对称布局，中央为重檐歇山顶主殿，檐下挂“妈祖庙”金字牌匾，左右两侧对称耸立重檐钟楼与鼓楼，青灰筒瓦飞檐翘角，殿前设宽阔的青石月台与中轴大台阶，台阶入口设石灯笼，月台前对称蹲坐一对大型汉白玉石雕雄狮，周围环绕金黄色的秋日银杏树与翠绿草坡，蓝天阳光明媚，写实建筑景观渲染，8K。
+tags:
+- 佛教空间案例
+- 传统寺庙建筑群
+- 钟鼓楼
+- 汉白玉石狮
+- 寺院园林景观
+- 秋景古建
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 381
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D architectural rendering (688x381) of a traditional temple complex with a main gate plaque reading 妈祖庙
+    (Mazu temple, folk religion rather than Buddhist temple), flanked by bell/drum towers and white stone lions.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - subject_mismatch

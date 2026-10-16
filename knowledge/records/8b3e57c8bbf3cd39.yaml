@@ -1,0 +1,72 @@
+id: 8b3e57c8bbf3cd39
+title_zh: 佛教寺庙室内展览空间-02
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内展览空间-02.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内展览空间-02.jpg
+  sha256: 8b3e57c8bbf3cd393bfbf901b1695be8c19ec94a78a031b6f294a6c8f854c380
+  bytes: 132450
+  width: 546
+  height: 350
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8b3e57c8bbf3cd39.jpg
+    sha256: 262a390710c291ce5a85cad3c26f27876ec5ca6cea61c93c0f21fc18c46923a6
+    bytes: 36215
+    width: 546
+    height: 350
+  thumb512:
+    path: assets/thumb512/8b3e57c8bbf3cd39.webp
+    sha256: 0f74f985dea64730023cbbb0a9581f43703669e88eb2ae151cf9bef4e7ec3ca1
+    bytes: 18132
+    width: 512
+    height: 328
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 新中式素雅白石万佛壁与佛龛展陈空间
+entity_type: 空间场景设计
+summary_zh: 本图为现代新中式佛教文化展厅/纪念堂的核心室内局部场景（与第 09、25 张同属一套空间方案的不同视角）。空间摒弃了传统寺庙浓烈的红黄重彩，转而采用高雅纯净的暖白石材与水墨山水意境，打造出兼具现代美术馆气质与宗教神圣感的礼佛展陈空间。
+  全室墙面及建筑构件均以暖白色/米白色细粒汉白玉（或白砂岩）为主材，呈现温润细腻的哑光石材肌理。正中主龛内供奉古法泥金彩绘释迦牟尼佛（或药师佛）结跏趺坐像，背后为精雕细琢的火焰纹贴金大背光，背光后衬以灰白双色大理石浅浮雕云水山峦背景墙；右侧高台供奉古铜/泥金质感阿难尊者合十立像；踢…
+materials:
+- 汉白玉
+- 浮雕石板
+- 彩绘泥金造像
+colors:
+- 暖白石色
+- 泥金彩绘
+- 水墨灰
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：现代新中式素雅佛堂立面设计 / 白色大理石万佛墙与壶门主佛龛比例参考 / 佛教艺术馆山水浮雕背景墙生成；推荐搭配：米白汉白玉/白砂岩浮雕墙面 + 灰白水墨云纹大理石背景板 + 泥金彩绘佛像 + 3000K-3500K暖白暗藏洗墙灯带
+prompt_zh: 现代新中式素雅白石佛教展厅室内设计，三面围合构图，正中为三曲壶门形内凹大佛龛，龛内供奉泥金彩绘释迦牟尼坐佛与金色火焰背光，背景为水墨意境的灰白石雕云海山峦，龛前设汉白玉小护栏；左侧整面墙为暖白色大理石雕刻的矩阵式背光千佛小龛与几何花格浮雕；右侧石雕台基上伫立合十礼拜的阿难尊者雕像，背后为发光经文镂空光幕与远山浮雕；顶部环绕白色中式直棂格栅与垂莲柱，光影圣洁柔和，现代禅意建筑效果图。
+tags:
+- 新中式佛教展厅
+- 汉白玉万佛墙
+- 壶门佛龛设计
+- 山水浮雕背景墙
+- 发光经文光幕
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 350
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代新中式素白石材壶门佛龛与万佛壁展陈空间局部三维效果图，原图分辨率偏低（546x350）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 546x350 (<800px short side)'

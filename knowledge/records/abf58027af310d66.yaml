@@ -1,0 +1,69 @@
+id: abf58027af310d66
+title_zh: 大型浅黄石材展示板
+source:
+  original_path: 天川金大板自家产品/大型浅黄石材展示板.jpg
+original:
+  path: 天川金大板自家产品/大型浅黄石材展示板.jpg
+  sha256: abf58027af310d66f9725737bfff6122628c5c6bac2da840507484e2a1974828
+  bytes: 3402294
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/abf58027af310d66.jpg
+    sha256: 3dc6d1945c8945483d5afb0946546e97a34dda0fb00983a3e4261b9a9bbe9ec2
+    bytes: 576353
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/abf58027af310d66.webp
+    sha256: 3f6cb0c96263f58b56ef3a6fdabf4188ce1719c61b3c56416ab20094dbb9e892
+    bytes: 24382
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为一块竖立于现代化石材大板市场黑色展架上的近正方形大幅面浅暖黄色系「天川金」（柔光香槟金批次）展示大板。
+materials:
+- 天川金大板
+colors:
+- 浅香槟黄
+- 暖杏粉云团
+- 金棕细脉
+style: 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 现代居家佛堂/禅修室柔和暖调背景墙贴图 / 观音殿/药师殿温润玉感墙地面材质 / ControlNet Tile 无缝高清纹理扩图
+prompt_zh: 正面4K超清写实摄影，一块方正巨大的浅黄色天川金天然大理石大板，温润如黄玉的奶油香槟黄与浅杏黄基底，中央晕染着柔和的暖杏粉与桃花云雾色块，表面交织着细腻的琥珀金与茶褐色丝状细脉，镜面高光抛光质感，大型石材展厅背景，色调温馨雅致，8k细节。
+tags:
+- 天川金
+- 浅黄大理石
+- 香槟金奢石
+- 黄玉质感
+- 柔和禅意墙面
+- 方形大板样本
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 自家产品“天川金”（dunhuang-gold）奢石大板仓库实拍，左下角为实体库存标签贴纸而非数字文字叠加。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

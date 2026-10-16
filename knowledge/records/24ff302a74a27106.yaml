@@ -1,0 +1,77 @@
+id: 24ff302a74a27106
+title_zh: 佛教寺庙入口及石狮景观
+source:
+  original_path: 佛教空间设计案例/佛教寺庙入口及石狮景观.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙入口及石狮景观.jpg
+  sha256: 24ff302a74a2710614cb4ff5aee9b3812cb6bec20efe765b4bb870b4c4eedb3a
+  bytes: 244795
+  width: 708
+  height: 383
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/24ff302a74a27106.jpg
+    sha256: b62e62e1b8b3cb30eda80671dd6694876f71148d98e9a9af9a7e4f698b513c90
+    bytes: 68703
+    width: 708
+    height: 383
+  thumb512:
+    path: assets/thumb512/24ff302a74a27106.webp
+    sha256: 684417a100b4d2422753e02f6ebd665a864f9564af1bcde17ff9c5b190f982aa
+    bytes: 26544
+    width: 512
+    height: 277
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑与园林景观
+entity_type: 空间场景设计
+summary_zh: 前景花岗岩广场嵌圆形浮雕地景圆盘、中景立青瓦歇山顶“天王殿”（内供金身弥勒佛）与一对汉白玉守门石狮、两翼展弧形木格栅连廊的寺院入口景观。
+materials:
+- 汉白玉守门石狮
+- 圆形浮雕地景石材
+- 花岗岩广场砖
+- 青瓦歇山顶天王殿
+- 弧形木格栅连廊
+- 造型迎客松
+colors:
+- 芝麻白
+- 汉白玉白
+- 青瓦深灰
+- 原木棕
+- 辉煌金
+style: 传统汉传寺院山门天王殿与新中式禅意景观融合风
+ai_design_usage: 寺院入口山门广场与天王殿建筑景观设计、大型门口汉白玉守门石狮与地面圆形浮雕地景石材应用参考
+prompt_zh: 中式佛教寺庙入口广场与天王殿建筑景观效果图，中轴对称构图，前景宽阔的花岗岩铺装广场中央镶嵌巨大的圆形吉祥几何浮雕地景石雕圆盘，两侧栽种造型迎客松并设石凳，中景正中是一座青瓦重檐歇山顶传统大殿，匾额书写“天王殿”，敞开的大门内可见金身弥勒佛坐像，殿门前左右对称伫立一对威武的大型汉白玉石狮子与雕花须弥座，大殿两侧对称延伸出现代新中式弧形木格栅游廊，右后方耸立一座多层佛塔，晴朗蓝天，8K建筑景观渲染
+tags:
+- 天王殿
+- 汉白玉石狮
+- 寺院入口广场
+- 地景石雕拼花
+- 弧形木连廊
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 383
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res exterior 3D render (708x383) of a temple entrance plaza with a circular carved stone pavement medallion,
+    '天王殿' main hall enshrining golden Maitreya, white marble guardian lions, and curved timber corridors.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

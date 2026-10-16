@@ -1,0 +1,72 @@
+id: a7dd6969090691ae
+title_zh: 佛教石刻佛像展示空间
+source:
+  original_path: 佛教空间设计案例/佛教石刻佛像展示空间.jpg
+original:
+  path: 佛教空间设计案例/佛教石刻佛像展示空间.jpg
+  sha256: a7dd6969090691ae37b4d2e4b7fda57aa02db434c43e3a0175a8db90ae1d3ca7
+  bytes: 2818249
+  width: 3421
+  height: 2573
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a7dd6969090691ae.jpg
+    sha256: 0eacbdf97f9deb9abf4dc10fd5a9afdffeb0e5acee2a72f7ca306d39d0137b0d
+    bytes: 322492
+    width: 2048
+    height: 1540
+  thumb512:
+    path: assets/thumb512/a7dd6969090691ae.webp
+    sha256: 3e1ffda8ce5c6f8b3075c8046e31d162f799f95d17ee461528721623cedab7d4
+    bytes: 25746
+    width: 512
+    height: 385
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 暗调禅意药师佛石刻佛龛与十二大愿发光经幡展陈空间
+entity_type: 空间场景设计
+summary_zh: 本图为一座极具戏剧光影张力与深邃禅意的现代药师佛殿（东方净琉璃世界主题展厅）核心供奉场景。空间采用博物馆级“暗场剧场式照明”，在幽暗静谧的空间背景中，以温暖醇厚的金光精准点亮中央药师佛大龛、两侧千佛矩阵、五盏白玉莲花酥油灯及左右垂挂的《药师佛十二大愿》发光金字经幡，营造出直抵人心的宗教神秘感与庄严感。
+  全室以深邃的玄黑、深胡桃木褐与璀璨的暖金灯光形成极致明暗对比。主尊药师佛及两侧大龛内的日光遍照菩萨、月光遍照菩萨均采用古朴的褐黄色砂岩/青铜仿石材质雕刻；主尊下方的悬空须弥座下半部雕刻成金色钟乳石/灵鹫山奇峰倒挂…
+materials:
+- 褐石药师佛像
+- 黑底金字经幡
+- 深色胡桃木供桌
+colors:
+- 深邃黑灰
+- 暖金灯光
+- 古铜石色
+style: 当代博物馆暗调戏剧光影佛像展陈风格
+ai_design_usage: 适用场景：暗调戏剧光影药师佛殿/禅修空间设计 / 垂挂式发光佛教经文幡装置参考 / 倒挂山石须弥座与双层壶门发光佛龛设计；推荐搭配：黄褐砂岩雕刻药师三尊造像 + 黑胡桃木千佛格龛配2400K琥珀金背光 + 黑色亚克力/金属蚀刻背光金字经幡
+  + 白玉莲花琉璃供灯 + 深灰青石哑光地面
+prompt_zh: 暗调禅意佛教药师佛殿堂展示空间，正面中轴对称构图，深邃幽暗的空间中，正中央为双层如意壶门形暖金内发光大壁龛，龛内供奉褐石雕刻的药师琉璃光如来坐像（左手持药钵），底座为覆莲与金色倒挂山石造型；主龛两侧为矩阵式排列的圆拱形暖黄发光千佛小龛；左右两侧自天花垂挂两条黑底发光金字的《药师佛十二大愿》经幡（左为第一大愿，右为第十二大愿），最外侧壁龛供奉日光与月光菩萨；前方深色实木供桌上并列摆放五盏发光的白玉莲花玻璃罩供灯，顶部为方格点状射灯藻井，深灰黑色石材地面，光影神秘庄严，8K超高清效果图。
+tags:
+- 药师佛殿空间
+- 药师十二大愿
+- 暗调禅意光影
+- 发光金字经幡
+- 石刻佛像展陈
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2573
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 暗调戏剧光影药师佛殿正面三维效果图，中央供褐石药师佛与五盏莲花灯，两侧垂挂《药师佛十二大愿》黑底金字经幡。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

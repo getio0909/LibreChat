@@ -1,0 +1,77 @@
+id: a5279cb31e3e2587
+title_zh: 佛教主题展览空间-03
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间-03.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间-03.jpg
+  sha256: a5279cb31e3e258746fe3611304c782d98efae41d96be5a1e52e5755c5ca0836
+  bytes: 588571
+  width: 1713
+  height: 1278
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a5279cb31e3e2587.jpg
+    sha256: 66ea6d1ac33c7ecbf32542bae4110360b22fb9dbf5144d74064fa4056f216363
+    bytes: 226144
+    width: 1713
+    height: 1278
+  thumb512:
+    path: assets/thumb512/a5279cb31e3e2587.webp
+    sha256: 2a4c763edd744039e6cdc75f0d45f23efd63966b30661fbb956432c42686aab5
+    bytes: 26108
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 新中式室内禅意庭院展厅
+entity_type: 空间场景设计
+summary_zh: 暖白米棕与苍翠绿意 / 抛光棕灰大理石、罗汉松盆景、青石宫灯、宫灯吊顶
+materials:
+- 纯白石英砂砾
+- 芝麻黑火烧面花岗岩
+- 超白玻璃激光内雕
+- 太湖石与罗汉松
+- 原木格栅
+colors:
+- 石英纯白
+- 玄武深灰
+- 原木暖色
+- 苔藓翠绿
+style: 现代新中式室内枯山水禅院风
+ai_design_usage: 室内禅意庭院造景参考 / 新中式几何宫灯吊顶设计 / 石灯笼与罗汉松盆景室内植入
+prompt_zh: 新中式佛教文化展厅室内禅意中庭设计，前景是高光镜面浅棕灰色大理石地面，中景是室内景观池，设有底部发光的深色汀步石、太湖石假山与苍翠的造型罗汉松盆景，左侧白墙挂有佛画并摆放青石雕刻石灯笼，右侧木墙镶嵌两块发光透明玻璃佛像线雕屏风，顶部黑色天花悬挂错落有致的金色几何中式发光吊灯，禅意盎然，8k效果图。
+tags:
+- 室内禅意庭院
+- 罗汉松造景
+- 石灯笼
+- 汀步水景
+- 新中式展厅
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1278
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 3D interior rendering of an indoor Zen courtyard exhibition hall with glossy brown-grey marble floor, sunken stepping-stone
+    water pond with Podocarpus pines, stone lantern, and two backlit etched glass Buddha panels on right wood wall. Semi-transparent
+    lotus watermark in bottom-right. Metadata materials/colors fields claim 纯白石英砂砾 dry landscape which is absent.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - 'hallucination: materials and colors fields claim 纯白石英砂砾 dry landscape which is absent'

@@ -1,0 +1,73 @@
+id: 9cee32939bd6166c
+title_zh: 深绿纹理石材展示板
+source:
+  original_path: 常用石材大板/深绿纹理石材展示板.jpg
+original:
+  path: 常用石材大板/深绿纹理石材展示板.jpg
+  sha256: 9cee32939bd6166c43972ab90ec9d16ba85a46b39d1daeebe6b5402b8e0c2cd5
+  bytes: 1520659
+  width: 2048
+  height: 1536
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9cee32939bd6166c.jpg
+    sha256: 4f776901cf86ade537de8e9f1a19137634101c49d43a1934363b7f3731aac62f
+    bytes: 996426
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/9cee32939bd6166c.webp
+    sha256: c8582cc9a628290b9aa0387333c53ad84a4a31514f02b0feb75997cbeb800aec
+    bytes: 57046
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-深绿云雾角砾系
+entity_type: 实物对象写实
+summary_zh: 本图为陈列于澳盛大板市场“弘尚石业（HONG SHANG STONE）”展位前的超高清天然深绿色云雾角砾大理石大板实物写实。
+materials:
+- 天然深绿大理石
+- 森林绿角砾大理岩
+- 丹东绿石材
+colors:
+- 松林深绿
+- 墨绿色
+- 灰绿色
+- 纯白色
+style: 现代奢石展陈 / 新中式山林禅意
+ai_design_usage: 新中式禅堂/书房山水意境背景墙 / 传统红木家具（罗汉床、太师椅、供桌）攒框镶嵌石芯 / 奢石展厅场景构建
+prompt_zh: 超高清深森林绿天然大理石大板正面特写，澳盛大板市场弘尚石业展厅实拍，深邃的墨绿与松林绿基底，环绕交织着灰绿色与纯白色的云雾状、藤蔓状网纹，中部有深色椭圆形天然岩核，宛如幽谷深潭与云海松涛，镜面高光抛光，8K精细石材纹理。
+tags:
+- 深绿云雾大理石
+- 弘尚石业
+- 山水画意绿石
+- 家具嵌石材料
+- 丹东绿大板
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1536
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: High-res dark forest green clouded marble slab displayed in front of Hong Shang Stone booth with STM石猫 watermark
+    in bottom right.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

@@ -1,0 +1,76 @@
+id: eafbc5e4007eb112
+title_zh: 东阳卢宅｜肃雍堂梁枋木作
+source:
+  original_path: 设计风格精选20261010/dongyang-luzhai-beams.jpg
+original:
+  path: 设计风格精选20261010/dongyang-luzhai-beams.jpg
+  sha256: eafbc5e4007eb112b55a44f37f4b8bab8eba1ba640951b06b40ee36af1b093a6
+  bytes: 1978640
+  width: 1800
+  height: 1200
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/eafbc5e4007eb112.jpg
+    sha256: c241eae3f0015e8806dbf3c915a97986f0d2f62da25de39c68080047090ad18a
+    bytes: 655993
+    width: 1800
+    height: 1200
+  thumb512:
+    path: assets/thumb512/eafbc5e4007eb112.webp
+    sha256: 763eb275dc179efc3fde4d754a31808ecbc8e7bb97e3c3c7377b2774916b1448
+    bytes: 52402
+    width: 512
+    height: 341
+library_type: 空间展陈
+studio_roles:
+- 风格
+- 物件
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 东阳传统厅堂梁架与九狮球花灯场景
+entity_type: 空间场景设计
+summary_zh: 这是素有“民间故宫”之称的浙江东阳卢宅核心建筑“肃雍堂”（明代巨型厅堂）内部中轴梁架、堂匾与巨型九狮球大堂灯空间场景。
+materials:
+- 东阳木雕冬瓜梁
+- 黑漆合抱木柱
+- 青石柱础与雕花石香案
+- 刺绣串珠大堂花灯
+- 古木牌匾
+colors:
+- 古铜深褐
+- 漆黑色
+- 青石灰色
+- 米金与朱红彩绘
+style: 江南东阳传统木雕工艺 / 明清礼仪厅堂
+ai_design_usage: 传统中式讲堂/祖师堂/宗祠大殿空间设计 / 殿堂多牌匾陈设布局参考 / 巨型传统华盖宝灯与石雕供案植入
+prompt_zh: 浙江东阳卢宅肃雍堂宏伟的明代传统厅堂室内空间，严格中轴对称广角构图，前景正中阶沿上摆放一张古朴的雕花翘头三弯腿石质香案，中景两根粗壮的黑色圆柱高耸入顶，上方彩绘冬瓜大梁之间错落悬挂着“风纪世家”、“科第世家”、“翰林”等多块历代古木金字牌匾与六角红纱宫灯；大堂正中央悬挂一盏高达数米的巨型非遗刺绣串珠九狮球华盖大堂灯，庄重威严，历史古建摄影。
+tags:
+- 东阳卢宅肃雍堂
+- 传统厅堂梁架
+- 九狮球大堂珠灯
+- 功名牌匾陈设
+- 翘头雕花香案
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20260731_Residence_of_the_Lu_Family_in_Dongyang_09.jpg
+  credit: Windmemories
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1200
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Interior photograph of Suyong Hall at Dongyang Luzhai showing timber beams, plaques, a large beaded lantern, and
+    a carved wooden altar table in the foreground.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials misidentify the dark weathered carved wooden altar table in the foreground as a carved stone
+    table (雕花石香案)'

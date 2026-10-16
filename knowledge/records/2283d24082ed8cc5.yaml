@@ -1,0 +1,71 @@
+id: 2283d24082ed8cc5
+title_zh: 现代佛教主题展厅
+source:
+  original_path: 佛教空间设计案例/现代佛教主题展厅.jpg
+original:
+  path: 佛教空间设计案例/现代佛教主题展厅.jpg
+  sha256: 2283d24082ed8cc5e36b27a1c9462267c43e60900b7679d65cb0dfd7c22be71b
+  bytes: 1017104
+  width: 2192
+  height: 1239
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2283d24082ed8cc5.jpg
+    sha256: 0f33b0249a1a2e0d18a906a4be65d52184d4cf45a644a4914a28eb37b98c0e75
+    bytes: 284149
+    width: 2048
+    height: 1158
+  thumb512:
+    path: assets/thumb512/2283d24082ed8cc5.webp
+    sha256: 1e11e77b4dfe8b5b53cee4c2241457a56c95c017e690e4ebf03afdd928acaca6
+    bytes: 25890
+    width: 512
+    height: 289
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 中央雕花木佛龛内供奉通透宝蓝色琉璃药师佛坐像与胁侍菩萨、背衬金色云海山水壁画、四周环绕发光万佛墙与深色镜面拼花石地面的现代展厅。
+materials:
+- 蓝琉璃药师佛与胁侍像
+- 鎏金雕花大佛龛
+- 金色山水壁画
+- 万佛格墙
+- 深色镜面拼花石地面
+colors:
+- 宝蓝色
+- 深胡桃木色
+style: 现代新中式琉璃净土展陈风
+ai_design_usage: 现代寺院药师佛殿/万佛宝殿室内设计、蓝色琉璃主尊配金色山水背景与九宫发光顶参考
+prompt_zh: 现代新中式佛教药师殿与万佛主题展厅室内设计，广角中轴对称构图，正中央大型雕花木制佛龛内供奉一尊璀璨通透的宝蓝色琉璃药师佛坐像，两侧分立胁侍菩萨，佛像背后为金碧辉煌的金色云海山水壁画；大殿四周墙面为通顶的发光万佛墙小佛龛，四根深色胡桃木方形立柱挺立，顶部为规整的木梁九宫格发光天棚，地面铺设高光深黑褐色大理石并在正中镶嵌圆形石材莲花水刀拼花，倒影清晰，神圣庄严，8K建筑空间渲染
+tags:
+- 现代佛教展厅
+- 药师佛殿
+- 蓝琉璃佛像
+- 万佛墙设计
+- 石材水刀拼花
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1239
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代极简佛堂渲染图，正中阿弥陀佛立像配弧形发光万佛墙与顶部垂挂莲花灯阵，两侧百宝阁陈列陶瓷瓶与佛像，画面干净无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

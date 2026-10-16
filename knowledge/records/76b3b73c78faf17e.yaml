@@ -1,0 +1,75 @@
+id: 76b3b73c78faf17e
+title_zh: 佛教大殿礼佛空间场景
+source:
+  original_path: 佛教空间设计案例/佛教大殿礼佛空间场景.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿礼佛空间场景.jpg
+  sha256: 76b3b73c78faf17eec64aff31df1e838ac2dfee47497546f8218ab81b5d640b5
+  bytes: 2866390
+  width: 3361
+  height: 2528
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/76b3b73c78faf17e.jpg
+    sha256: db60d2a3e94956b588fda8c4cca95a2a546eb003a65f641456c9db0ca3e8b8eb
+    bytes: 363534
+    width: 2048
+    height: 1540
+  thumb512:
+    path: assets/thumb512/76b3b73c78faf17e.webp
+    sha256: eb735710a441a9f37a1c5bd481215e5a07714c3430189aa8d196e43eadd900a8
+    bytes: 28146
+    width: 512
+    height: 385
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 设多层发光莲瓣大龛供奉汉白玉三世佛、立米白竖槽圆柱、深木地板上排列逾百个黄圆蒲团的大型现代共修礼佛大殿。
+materials:
+- 汉白玉三世佛
+- 发光莲瓣佛龛
+- 竖槽米白石柱
+- 深胡桃木地板
+- 黄色圆形蒲团
+colors:
+- 深胡桃木色
+- 象牙白
+- 暖黄色
+- 明黄色
+style: 现代禅意与新中式共修空间风
+ai_design_usage: 大型现代寺院禅堂/居士共修礼佛大厅设计、多层发光莲瓣形背景龛造型、凹槽石柱与木作结合参考
+prompt_zh: 大型现代禅意佛教大殿礼佛共修空间，大纵深中轴对称透视，深棕色胡桃木地板中央留出宽阔通道，两侧整齐排列上百个明黄色圆形禅修蒲团，两排浅米白色竖向凹槽石柱配深木色莲花瓣柱头与柱础，远端正中是巨大的多层发光莲花瓣形尖拱佛龛，内部供奉三尊洁白的汉白玉三世佛坐像，前方设木雕长供桌与落地木宫灯，顶部深木色方格暗藏灯带藻井天花，庄严静谧，8K建筑渲染
+tags:
+- 多层莲瓣龛
+- 汉白玉三世佛
+- 蒲团阵列
+- 凹槽石柱
+- 共修礼佛堂
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2528
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a large co-practice Buddha hall with fluted white stone columns, over 100 yellow kneeling cushions,
+    and white marble Three-Ages Buddhas in layered lotus arches, misclassified under category_l2 as '现代禅修茶室'.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - subject_mismatch

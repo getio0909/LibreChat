@@ -1,0 +1,74 @@
+id: 580f616dfdc38236
+title_zh: 佛教主题室内展览场景
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览场景.jpg
+  sha256: 580f616dfdc382367dbbead046dd2d8f62fe196c0fefa50b47620454a6b05417
+  bytes: 2591330
+  width: 3686
+  height: 2574
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/580f616dfdc38236.jpg
+    sha256: 659dd2af6a6b6742663dd5232e24c9c8fb911f2beaa8bb55ff5f0e0a263d2921
+    bytes: 253458
+    width: 2048
+    height: 1430
+  thumb512:
+    path: assets/thumb512/580f616dfdc38236.webp
+    sha256: fa73e5899e1efb3900ec25568173cbd6b2f9daea4f61b88165422c4bde8ab429
+    bytes: 19340
+    width: 512
+    height: 358
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 药师佛十二大愿主题暗调沉浸式祈福佛堂场景，两侧高墙密布琥珀暖光圆拱形祈福小龛，远端莲花尖拱主龛供奉立佛，倾斜巨柱上镌刻发光《药师经》第四、六、九、十大愿经文。
+materials:
+- 深胡桃木龛架与护墙板
+- 发光经文倾斜方柱
+- 深褐色哑光石材地面
+- 内藏暖光LED灯带
+colors:
+- 深胡桃木褐
+- 琥珀暖金光
+- 深炭灰
+style: 现代禅意
+ai_design_usage: 暗调沉浸式药师佛祈福空间设计、药师经十二大愿发光经文斜柱创意与千佛光明灯墙参考
+prompt_zh: 现代暗调沉浸式药师佛主题祈福佛堂室内设计，深邃的一点透视构图，全空间采用深胡桃木打造，左右两侧高墙满布成百上千个散发琥珀色暖光的圆拱形祈福小佛龛，远端正中设双层莲花尖拱发光大佛龛，内供奉一尊庄严立佛，空间内设有向内倾斜的深色巨型斜柱，柱面上竖向镌刻并发出金色光芒的《药师经》十二大愿汉字经文，顶部为深色井字格栅吊顶配金色回形暗藏灯带，深褐色哑光石材地面映出温暖金光倒影，神秘庄严禅意氛围，8K超高清渲染。
+tags:
+- 佛教空间案例
+- 药师佛殿
+- 药师十二大愿
+- 暗调沉浸式佛堂
+- 发光经文墙
+- 千佛光明灯
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2574
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 3D interior rendering of a dark-toned Medicine Buddha hall with glowing amber wall niches and inclined pillars inscribed
+    with glowing Medicine Buddha Sutra vows. Semi-transparent lotus watermark in bottom-right corner.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark

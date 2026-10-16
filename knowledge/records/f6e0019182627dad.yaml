@@ -1,0 +1,74 @@
+id: f6e0019182627dad
+title_zh: 佛教寺庙大殿佛像场景
+source:
+  original_path: 佛堂空间设计参考/佛教寺庙大殿佛像场景.jpg
+original:
+  path: 佛堂空间设计参考/佛教寺庙大殿佛像场景.jpg
+  sha256: f6e0019182627dad86c8f1de64a2de1941b479b89f90f95a05674c9f9d506825
+  bytes: 147391
+  width: 1200
+  height: 554
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f6e0019182627dad.jpg
+    sha256: f34371ab5a11b4a010ee44bd29f4b5013b27b625e577aeba77b0edbd21e07670
+    bytes: 128655
+    width: 1200
+    height: 554
+  thumb512:
+    path: assets/thumb512/f6e0019182627dad.webp
+    sha256: c167f037b32d98d8fe470a9c53dc03f87433d09ba9986af37f87bfcd11dbcfa4
+    bytes: 20734
+    width: 512
+    height: 236
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 东亚/日式传统古刹大雄宝殿宽画幅场景，幽暗大殿中耸立高光黑漆巨柱，聚光灯照亮中央丈六纯金坐佛、舟形金色大光背、唐破风天盖、金色幢幡及两侧大理石石灯笼。
+materials:
+- 纯金箔大佛与舟形光背
+- 高光黑漆大木柱
+- 灰白大理石石灯笼
+- 鎏金镂空金属幢幡
+- 榻榻米与红地毯
+colors:
+- 璀璨金
+- 玄黑
+- 暗酒红
+- 灰白石色
+style: 传统与跨文化风格
+ai_design_usage: 大型寺院大殿/数字佛堂电影感明暗光影参考、巨型金佛舟形背光与唐破风天盖造型、室内石灯笼陈设搭配
+prompt_zh: 传统东亚日式佛教寺院大雄宝殿室内场景，超宽画幅电影感中轴对称构图，幽暗深邃的大殿内耸立四根高光黑漆巨型木柱，正中央高台鎏金须弥座上供奉一尊巨大的纯金坐佛，背后为繁复精美的舟形金色雕花大背光，佛像上方悬挑日式唐破风弧形木质天盖，两侧垂挂华丽的金色镂空金属幢幡，佛坛前方左右对称矗立两座灰白色大理石雕刻的传统石灯笼，地面铺设榻榻米与中央暗红地毯并反射璀璨金光，戏剧性聚光照明，8K史诗级建筑摄影
+tags:
+- 大雄宝殿
+- 巨型金佛
+- 舟形背光
+- 唐破风华盖
+- 石灯笼
+- 戏剧光影
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 554
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 日式传统大殿金佛、唐破风天盖与黑漆巨柱宽画幅概念效果图，纵向分辨率偏低（1200×554）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

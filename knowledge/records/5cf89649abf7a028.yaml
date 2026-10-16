@@ -1,0 +1,71 @@
+id: 5cf89649abf7a028
+title_zh: 地藏王菩萨坐像及供台场景
+source:
+  original_path: 佛教空间设计案例/地藏王菩萨坐像及供台场景.jpg
+original:
+  path: 佛教空间设计案例/地藏王菩萨坐像及供台场景.jpg
+  sha256: 5cf89649abf7a0284d77103222e57f6f94bd271df3965fbede2e17845b675d81
+  bytes: 2060224
+  width: 1789
+  height: 2630
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5cf89649abf7a028.jpg
+    sha256: bdaad9ef6a4842b7c67d4fcb414b9284abe0be9422363d589cde74e1fe419f41
+    bytes: 392497
+    width: 1393
+    height: 2048
+  thumb512:
+    path: assets/thumb512/5cf89649abf7a028.webp
+    sha256: 8c9fc75a4e100c2b1473f5626da5fef9f690b071515bbb4647ca085dc6d39cf5
+    bytes: 28836
+    width: 348
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 物件
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 正中供奉头戴五佛冠、持锡杖与摩尼珠的铜鎏金地藏王菩萨坐像，背后为多层叠级暗藏暖光灯带的巨型盛开莲花瓣造型背景墙。
+materials:
+- 铜鎏金五佛冠地藏王菩萨坐像
+- 多层叠级发光大莲瓣背景墙
+- 红木雕花供桌
+- 万佛墙
+colors:
+- 辉煌金
+- 暖米黄色
+style: 现代新中式佛殿光影风
+ai_design_usage: 现代寺院地藏殿/功德堂核心佛龛设计、叠级暗藏灯带莲瓣形背景墙造型参考
+prompt_zh: 现代中式地藏殿室内供奉空间设计，竖幅中轴对称构图，正中央供奉一尊庄严的铜鎏金地藏王菩萨结跏趺坐像，头戴五佛宝冠，右手持九环锡杖，左手托摩尼宝珠，下承多层鎏金莲花座；背后是极具设计感的多层重叠绽放的巨型发光莲花瓣造型背景墙，层间暗藏柔和暖金色灯带；前方设深色红木雕花供桌，摆放铜香炉、烛台与水果供品，两侧墙面内嵌发光万佛小龛，神圣慈悲，8K室内设计渲染图
+tags:
+- 地藏王菩萨
+- 发光莲花背景墙
+- 地藏殿设计
+- 佛堂供台场景
+- 现代佛教展厅
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1789
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代极简禅堂白玉释迦牟尼坐像与多层发光莲瓣背光墙竖向局部（源自#270中景裁切）。materials字段误列入画面中不存在的“万佛墙”。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - materials字段包含画面中未出现的“万佛墙”

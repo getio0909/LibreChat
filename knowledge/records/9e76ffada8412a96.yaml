@@ -1,0 +1,70 @@
+id: 9e76ffada8412a96
+title_zh: 莊嚴寶刹立面设计图
+source:
+  original_path: 26年春季佛事展设计方案/莊嚴寶刹立面设计图.jpg
+original:
+  path: 26年春季佛事展设计方案/莊嚴寶刹立面设计图.jpg
+  sha256: 9e76ffada8412a960a6bef40edc0c45b09d525fb29ec18241a79d0ade6e69b4a
+  bytes: 1631991
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/9e76ffada8412a96.jpg
+    sha256: e9f2e467a5381035fe25cca029ba5c1cd6cf4011f15747e076ed7b07c1bd183d
+    bytes: 127000
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/9e76ffada8412a96.webp
+    sha256: a67a613695ea4bcd3aae0f569456d4d0eb364b69db94ef53a615ca11760d5057
+    bytes: 4520
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-B立面副入口施工图
+entity_type: 工程设计图纸
+summary_zh: 本图为 2026年春季佛事展（C5 T026）北侧副迎宾面——B立面图 施工深化图。完整定义了展位 7.5 米宽北向敞开门头的造型比例，并提供了从北侧副入口向南平视展厅内部（正对 D立面叠级佛龛与石雕供桌）的标准正立面透视关系。
+materials:
+- 7150mm敞开门洞
+- PVC字
+colors:
+- 暖米白(C13M9Y19K0)
+- 青绿示意
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 7.5米跨度北侧敞开副入口门头CAD立面与内部佛龛正视轴线参考
+prompt_zh: 展览工程CAD彩色立面施工图，“B立面图”，展示7500mm宽、5000mm高的新中式佛教石材展位北侧副入口敞开门头正立面：暖米白色木结构门架（CMYK色值C13 M9 Y19 K0）配传统中式几何折角装饰框，顶部横梁居中安装“莊嚴寶刹”PVC雕刻书法字与红印章，下方为7150mm宽无柱大跨度敞开入口（左柱宽150mm，右墙厚200mm），透过门洞正面平视展厅内部的双层折角藏黄光佛龛背景墙、石雕须弥座佛台、左侧迎宾接待台与右侧白色圆形洽谈桌椅，带有精确的红色工程尺寸标注线，白底专业CAD图纸。
+tags:
+- 26年春季佛事展
+- B立面图
+- 莊嚴寶刹立面
+- 7150mm大跨度门头
+- 工程设计图纸
+- PVC雕刻字
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展北侧副入口B立面门头框线CAD施工尺寸标注图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay
+  - 'hallucination: summary_zh声称图内展示''正对D立面叠级佛龛与石雕供桌的内部透视''，实际门洞内部为空白'

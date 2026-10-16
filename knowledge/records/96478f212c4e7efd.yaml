@@ -1,0 +1,74 @@
+id: 96478f212c4e7efd
+title_zh: 佛教寺庙内石材供桌与雕像展览场景
+source:
+  original_path: 25年秋季佛事展设计方案/佛教寺庙内石材供桌与雕像展览场景.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教寺庙内石材供桌与雕像展览场景.jpg
+  sha256: 96478f212c4e7efdb024f711d0435ad75171fc6359ac066e6af3045dbf1d6738
+  bytes: 3121750
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/96478f212c4e7efd.jpg
+    sha256: 30a42873e43b3eb2b2a1b3a115cf21f6413423bc669acacdd25edb94d094b87e
+    bytes: 652920
+    width: 2048
+    height: 1153
+  thumb512:
+    path: assets/thumb512/96478f212c4e7efd.webp
+    sha256: ec05b43c476dad18d6033c3e013bb168455e7a3a135db4e0c46a948681eb101a
+    bytes: 35610
+    width: 512
+    height: 288
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 物件
+- 材质
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-中轴供坛与千佛墙
+entity_type: 空间场景设计
+summary_zh: 本图聚焦展位中轴线核心展品——巨型全石雕双层仰覆莲瓣须弥供坛（佛台）与贴金彩绘伽蓝菩萨（关公）坐像，同时右后方完整呈现右翼3×12格透光千佛墙与门廊宫灯。该场景直观展示了寺院大殿主供坛、石雕须弥座护栏、地面石材拼花与背景千佛龛的成套工程交付效果。
+materials:
+- 敦煌金玉石
+- 金镶玉
+- 贴金彩绘
+- 琉璃
+colors:
+- 暖金
+- 明黄
+- 橙珀色
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 佛堂核心供坛陈设、须弥座围合布局与千佛发光墙搭配参考
+prompt_zh: 佛教展厅中央核心供奉区实景，前景为一座宏伟的天然五彩敦煌金玉石雕刻双层莲花瓣大型供坛，石材表面高光抛光，带有天然青绿、暖黄与紫红玉石纹理，上层雕刻饱满肥厚的仰莲瓣，下层为覆莲瓣底座；供坛正中供奉一尊贴金彩绘伽蓝菩萨坐像，头戴金冠、身披明黄龙纹锦袍、端坐金龙宝座，台面摆放鎏金高脚果盘与鲜花；左后方为金镶玉大理石高墙、彩绘佛像与带有“天然玉石敦煌金须弥座”红牌的浮雕基座，右后方为内嵌36尊橙黄琉璃佛像的发光背光墙，地面为镜面金镶玉与黑色大理石棋盘格拼花，光影庄重华丽，8K实景摄影。
+tags:
+- 石雕莲花供坛
+- 敦煌金须弥座
+- 3980元每米
+- 金镶玉地面
+- 伽蓝菩萨坐像
+- 阿利坦吴智勇
+material_ids:
+- dunhuang-gold
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展中轴敦煌金莲花供坛、伽蓝菩萨坐像与右翼透明亚克力千佛墙实景，含现场实体标价红牌与名片立牌。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,69 @@
+id: a3d21f7833768a21
+title_zh: 佛教石材纹理样本
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/佛教石材纹理样本.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/佛教石材纹理样本.jpg
+  sha256: a3d21f7833768a21f4709179d5755972d9f72696ae00dd1627fdf8a34063cef2
+  bytes: 3879292
+  width: 1591
+  height: 3181
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a3d21f7833768a21.jpg
+    sha256: ffacdd206b7dd5bc71596a4625821775db23412a28e144d2a82b33e2f993e964
+    bytes: 427681
+    width: 1024
+    height: 2048
+  thumb512:
+    path: assets/thumb512/a3d21f7833768a21.webp
+    sha256: 8ba44ecf85ec9a763dc7e5b72911d8c9d2bc9520205006e059ea02af5313a915
+    bytes: 29988
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为「梵高皇 / 敦煌壁」系列中以炽烈朱砂红与赤金黄为主导色调的 3K 正射微距纹理标准样本。
+materials:
+- 敦煌壁
+colors:
+- 浓郁朱砂红
+- 琥珀黄
+- 半透明白玉晶斑
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: 佛龛内壁/佛像背光火焰纹材质替换 / 中式奢华红木家具嵌石贴图 / 喜庆庄严佛教空间主题墙面材质
+prompt_zh: 天然“梵高皇/敦煌壁”奢石3K竖向正射微距材质贴图，浓郁醇正的朱砂红、南红玛瑙色与温暖的琥珀金、姜黄色大面积交融，红金交界处镶嵌着半透明的羊脂白玉方解石晶斑，全板密布亮金色丝状网脉，宛如佛像背光火焰与极乐云霞，高清无缝PBR贴图。
+tags:
+- 敦煌壁
+- 梵高皇
+- 朱砂红玛瑙质感
+- 红金佛光肌理
+- 3K正射贴图
+- 红木家具嵌石
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1591
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3K vertical 1:2 orthographic texture scan of Dunhuang Wall / Van Gogh Imperial dominated by rich cinnabar red, amber
+    gold, and white quartz patches.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

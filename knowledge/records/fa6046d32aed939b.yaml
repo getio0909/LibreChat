@@ -1,0 +1,74 @@
+id: fa6046d32aed939b
+title_zh: 佛教主题展览空间设计-08
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-08.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-08.jpg
+  sha256: fa6046d32aed939b198807a3aac7202a076e99e3e35770fc474c0476d84c2aee
+  bytes: 3552117
+  width: 3531
+  height: 2634
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fa6046d32aed939b.jpg
+    sha256: d53633dfc29b2e14214c2f41ca762c988b1c409019fb9258da923f618f386787
+    bytes: 477683
+    width: 2048
+    height: 1528
+  thumb512:
+    path: assets/thumb512/fa6046d32aed939b.webp
+    sha256: dc5066d12f3605f67bbf30f3ef3bc452b502d247f4e537162ed01540fe99ec25
+    bytes: 38844
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统木构唐卡屏风与壁画展厅
+entity_type: 空间场景设计
+summary_zh: 温润红木与翠绿奢石 / 实木雕花唐卡座屏、千手观音唐卡、墨绿大理石地面
+materials:
+- 高光墨绿纹理奢石
+- 老红木精雕座屏
+- 红底描金唐卡
+- 重彩佛教壁画
+- 中式落地宫灯
+colors:
+- 深墨绿
+- 红木紫褐
+- 唐卡朱红描金
+- 暖黄宫灯光
+style: 古典中式书院型唐卡壁画美术馆风
+ai_design_usage: 佛教唐卡与重彩壁画专题展厅设计 / 传统红木雕花座屏独立展架参考 / 墨绿奢石镜面地面与中式木构搭配
+prompt_zh: 古典雅致的佛教唐卡与壁画艺术展厅室内设计，展厅中央错落摆放多座精美的深色红木雕花座屏展架，正中屏风内展示一幅色彩绚丽的红底描金千手千眼观音唐卡，左侧整面长墙绘制巨幅传统重彩佛陀说法图壁画，地面铺设镜面高光墨绿色天然纹理奢石大理石，清晰倒映出屏风与画作，顶部为深色中式井字木格吊顶，背景点缀木雕花窗与暖黄落地宫灯，8k效果图。
+tags:
+- 唐卡展厅
+- 红木座屏
+- 重彩佛教壁画
+- 墨绿奢石地面
+- 中式美术馆
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2634
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a Buddhist art gallery displaying wood-framed thangka screens, gold-on-black mural panels,
+    and a small white marble Buddha on a polished dark-green luxury marble floor.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

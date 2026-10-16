@@ -1,0 +1,71 @@
+id: 0f82f504a0487ca0
+title_zh: 佛教禅意室内展览空间
+source:
+  original_path: 佛教空间设计案例/佛教禅意室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教禅意室内展览空间.jpg
+  sha256: 0f82f504a0487ca05a0651e08c49cae7ff3706b5d5fb54d9c06603504f7ef1f9
+  bytes: 3057916
+  width: 4582
+  height: 2564
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0f82f504a0487ca0.jpg
+    sha256: 359485c74b7af6032491f41659e58c768b1c4d8c34b660e40abdad082e4c9929
+    bytes: 250917
+    width: 2048
+    height: 1146
+  thumb512:
+    path: assets/thumb512/0f82f504a0487ca0.webp
+    sha256: a9fe33fb2aa2c846b1324911bf5b5e57941a7b9defd56c170ed61503c64e1658
+    bytes: 17124
+    width: 512
+    height: 287
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代极简禅修抄经室与发光山水屏风满月墙场景
+entity_type: 空间场景设计
+summary_zh: 本图为一座极致简约、充满宋氏美学与现代东方禅意的“抄经室 / 茶修冥想室 / 禅意雅集空间”正面全景。空间完全隐去了具象的宗教神像，转而以“留白、远山、飞鸟、满月、寒梅、原木矮几”等禅宗自然意象，传达出“万法归宗、明心见性、圆满无碍”的深远禅境。
+  全室以温暖质朴的浅胡桃木/橡木本色、素雅的米白硅藻泥/宣纸肌理墙面、以及明亮温暖的2700K-3000K琥珀黄背光为主色调。地面满铺自然结疤肌理的浅棕实木地板；正面背景墙采用米白艺术肌理漆留白，嵌入两扇夹丝透光山水画玻璃灯箱；右侧护墙板与天花木肋均采用同色系哑光原木饰面。
+materials:
+- 原木护墙与地板
+- 透光山水玻璃
+- 矮几软垫
+colors:
+- 温润原木
+- 素雅米白
+- 暖黄山水光幕
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：现代极简禅修抄经室/茶室/冥想空间设计 / 圆形满月发光背景墙与插花造景参考 / 内发光水墨山水玻璃灯箱屏风生成；推荐搭配：天然白橡木/胡桃木护墙板与地板 + 米白肌理艺术涂料留白墙 + 夹绢透光水墨山水玻璃灯箱
+  + 圆形满月暗藏灯带背景龛 + 原木抄经矮几
+prompt_zh: 现代极简东方禅意抄经室与冥想空间正面全景，温润的原木色与米白留白格调，正中背景墙大片米白留白，左右对称嵌入两扇竖长条暖黄色内发光水墨群山与飞鸟玻璃屏风；右侧原木护墙板中心设有一个巨大的正圆形内凹发光“满月”背景龛，圆周散发柔和暖光，右下角点缀一枝斜出的黄色腊梅花枝；左侧为中式木格栅移门与深棕窗帘；实木地板上整齐摆放两排共七张极简原木矮几，桌上放置白色禅修软垫；顶部为木肋条跌级暗藏暖光吊顶，宁静空灵，8K超高清室内设计效果图。
+tags:
+- 现代禅意空间
+- 抄经室设计
+- 圆形满月背景墙
+- 发光山水屏风
+- 极简冥想茶室
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2564
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代禅堂长桌抄经讲堂与发光宣纸背景墙渲染图（#285的横幅裁切版，裁去了左下角水印），画面干净。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

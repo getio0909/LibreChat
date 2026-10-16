@@ -1,0 +1,74 @@
+id: cb9670bd3879a048
+title_zh: 佛教主题石材宝座
+source:
+  original_path: 佛教家具与陈设素材/佛教主题石材宝座.jpg
+original:
+  path: 佛教家具与陈设素材/佛教主题石材宝座.jpg
+  sha256: cb9670bd3879a0487b2a791cab17d63a7078e8c14113322fc873a19180596371
+  bytes: 429427
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/cb9670bd3879a048.jpg
+    sha256: 8876c160878dc3e7ce0f81055d8d8de6872cd7c9adbe9645154adf2af1bb25cd
+    bytes: 464915
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/cb9670bd3879a048.webp
+    sha256: e516de5ab579b446634f63ab0c20128811363d3dfb116e9cb9cd012ac1777710
+    bytes: 55790
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 法座宝座
+entity_type: 实物对象写实
+summary_zh: 陈设于传统中式红木雕花展厅中的一座汉白玉与小叶紫檀复合镶嵌须弥座法座（佛像宝座或高僧法座）。该器型严格遵循佛教须弥座（Sumeru Pedestal）与身光、头光背屏规制：上部为葫芦形双圆弧头光与身光背板，中部为宽平仰覆莲座面，下部为束腰须弥座，既可作为中型佛像的专用供奉宝座，亦可作为佛教仪轨中的尊贵法座。
+materials:
+- 汉白玉
+- 小叶紫檀
+- 青金石
+- 鎏金
+colors:
+- 羊脂白配深紫檀
+style: 藏汉融合须弥宝座风
+ai_design_usage: 汉白玉与紫檀木复合佛座设计 / 须弥座力士金刚杵细节生成 / 佛像底座材质替换（ControlNet）
+prompt_zh: 正面近景特写，一座精美绝伦的佛教汉白玉与小叶紫檀镶嵌须弥宝座，靠背由圆形汉白玉身光和顶部日轮头光组成，外缘雕刻白玉祥云并镶嵌深蓝色青金石宝珠，紫檀木回纹框架，宽平的汉白玉仰覆莲花座面，须弥座束腰雕刻两尊汉白玉护法力士托举座台，正中饰鎏金十字金刚杵，背景为传统红木金龙浮雕护墙板与玫瑰花艺，8K超清写实。
+tags:
+- 汉白玉宝座
+- 须弥座法座
+- 青金石镶嵌
+- 小叶紫檀
+- 十字金刚杵
+- 力士托举浮雕
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: 豆包AI生成的汉白玉与紫檀嵌青金石须弥座法座，右下角带'豆包AI生成'水印，被误标为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

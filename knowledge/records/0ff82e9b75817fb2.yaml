@@ -1,0 +1,69 @@
+id: 0ff82e9b75817fb2
+title_zh: 橙棕大理石佛教石材展板
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/橙棕大理石佛教石材展板.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/橙棕大理石佛教石材展板.jpg
+  sha256: 0ff82e9b75817fb2e9575b01c9e3d54b0c4cadd1d0a4e6661501a642b195bc8f
+  bytes: 704469
+  width: 2273
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0ff82e9b75817fb2.jpg
+    sha256: db1827d622811320ec0e8a34f23cf83d0e96fec2f86f810022cde5b196b60959
+    bytes: 500536
+    width: 2048
+    height: 1152
+  thumb512:
+    path: assets/thumb512/0ff82e9b75817fb2.webp
+    sha256: ec29e5fdaf4ce5d9eb612088c9ea65fe7545c7fd2bb57abea163c00f38ec4045
+    bytes: 27938
+    width: 512
+    height: 288
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图展示了位于水头鹏翔石材城 A1 区阿利坦展位内的一块近正方形幅面「梦幻庄园」精选展示大板，左右两侧均围绕着涂刷蓝色防护背胶并贴有防裂背网的同系列大板扎堆，展现了充足的现货储备与方正饱满的板型。
+materials:
+- 梦幻庄园大板
+colors:
+- 暖桃橙
+- 浅灰绿角砾
+- 铁锈红细网纹
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 方形佛堂/禅修室整板背景墙材质贴图 / 桌面/茶盘圆桌整板裁切母本 / 均匀碎花暖调大理石纹理参考
+prompt_zh: 正面平视摄影，一块方正宽大的梦幻庄园天然大理石展板竖立在白色鹅卵石展床上，板面呈现极其均匀细腻的浅灰绿与米杏色角砾肌理，全板密布温暖的橙棕色与铁锈红蛛网状细脉，色调温和醇厚，两侧排列着蓝色封边的同款石材大板，高光抛光质感，高清实景拍摄。
+tags:
+- 梦幻庄园
+- 方形大板样本
+- 蛛网纹大理石
+- 均匀角砾肌理
+- 佛龛方形背板
+- 水头A1区展厅
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Near-square Gold-Jade (梦幻庄园) slab displayed in the Shuitou A1 showroom flanked by blue-edged slab bundles.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

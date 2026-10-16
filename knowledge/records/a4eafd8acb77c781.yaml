@@ -1,0 +1,74 @@
+id: a4eafd8acb77c781
+title_zh: 藏式佛教多层装饰柜
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教多层装饰柜.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教多层装饰柜.jpg
+  sha256: a4eafd8acb77c7813a4ca8ec3be9fccaeb8e1842627477655b58942238b492e2
+  bytes: 413504
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a4eafd8acb77c781.jpg
+    sha256: d64840040a094d05e35e2a76382c695a8c953403b80667e9d69f466d6499435b
+    bytes: 445481
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/a4eafd8acb77c781.webp
+    sha256: ee8466128c7b1b9e6a6324fa36eb3bf38ae1fe81739765cecccf987e57539185
+    bytes: 44172
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 三层阶梯式坛城装饰柜的“三层整板青玉台面 + 正面重工嵌宝 + 侧面素面红木”现代改良版方案。在实际佛堂使用中，水平承重台面经常需要摆放酥油灯、香炉、净水碗等法器，将三层水平盖板全部升级为耐热易清洁且视觉通透的天然青玉/奢石大板，兼具极高的实用价值与现代奢石美学。
+materials:
+- 红酸枝
+- 冰种青玉大板
+- 绿松石
+colors:
+- 紫红木配青白玉绿
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 实木柜体+奢石台面盖板（Stone Top Cabinet）复合家具设计 / 繁简对比现代藏式家具改造
+prompt_zh: 室内家具实景图，一座结合天然冰种青玉台面与红木雕花的藏式三层阶梯装饰柜，顶层、中层与底层三块水平承重台面均采用厚实的抛光晴水绿青白玉整板，前脸束腰与双开门镶嵌青玉底板、红木镂空海棠花浮雕及绿松石红珊瑚圆珠，柜体侧面采用极简素面红木攒框护板，繁简对比高级，8K超清质感。
+tags:
+- 青玉台面柜
+- 木石跨界家具
+- 繁简对比设计
+- 三层阶梯供台
+- 晴水绿奢石
+- 藏式装饰柜
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a 3-tier stepped Tibetan cabinet with celadon jade horizontal
+    slab tops and plain wood sides. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

@@ -1,0 +1,70 @@
+id: 9b5e36d2dbd4ae27
+title_zh: 佛教寺庙大殿内部陈设
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部陈设.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部陈设.jpg
+  sha256: 9b5e36d2dbd4ae27db0c97c9a8786e80c13ed59244c7f29c666dc7f9cdaf3aa3
+  bytes: 1047934
+  width: 1966
+  height: 1263
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9b5e36d2dbd4ae27.jpg
+    sha256: 948a111af77784a915225c5e45dfad2db288a3f823d3bc9c7a430b49b82be76f
+    bytes: 287769
+    width: 1966
+    height: 1263
+  thumb512:
+    path: assets/thumb512/9b5e36d2dbd4ae27.webp
+    sha256: 44c6c143440c24689070ea62d371f240b3385051851ff134fde365025f41ec45
+    bytes: 30296
+    width: 512
+    height: 329
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为五开间重檐红木透雕天宫楼阁大佛龛右前斜视内部陈设场景（空间场景设计，与本卷第28号左前斜视图互为镜像补充）。
+materials:
+- 五开间重檐红木大佛龛右前斜视图
+- 前景红木巨柱鎏金莲瓣柱箍与青石多层莲花柱础特写
+- 五张雕花供桌
+- 千佛墙
+colors:
+- 深红木色
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 五开间重檐木雕佛龛大殿右前对角透视参考、前景立柱鎏金铜箍与青石莲花柱础高清节点展示
+prompt_zh: 传统佛教寺庙大殿内部陈设右前斜向透视场景，深红棕色高光实木地板，前景右侧矗立一根粗壮的红木大圆柱，清晰展示柱脚包镶的精美鎏金仰覆莲瓣束腰铜箍与下方的青石八角双层莲花柱础，中景横亘着宏伟的五开间重檐红木透雕天宫楼阁式大佛龛，飞檐斗拱贴金雕花，龛前设镶嵌鎏金荷花浮雕的木雕护栏，整齐排列五张红木雕花供桌（陈列香炉、红烛与供果）及五对米黄色方形拜垫，左右两侧远端墙面内嵌暗红色发光千佛墙，顶部为传统方格木藻井，8K建筑效果图
+tags:
+- 大殿内部陈设
+- 鎏金莲瓣铜箍
+- 青石八角柱础
+- 五供桌陈设
+- 重檐木雕帐龛
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1263
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 五开间重檐红木透雕天宫楼阁佛龛大殿右前斜视三维效果图，左下角带半透明莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

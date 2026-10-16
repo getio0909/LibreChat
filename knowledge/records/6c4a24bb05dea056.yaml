@@ -1,0 +1,72 @@
+id: 6c4a24bb05dea056
+title_zh: 金色坐佛造像与经文背景
+source:
+  original_path: 佛教空间设计案例/金色坐佛造像与经文背景.jpg
+original:
+  path: 佛教空间设计案例/金色坐佛造像与经文背景.jpg
+  sha256: 6c4a24bb05dea05650cb4f0701e7ace6f7c131fa37abeede35e053727afc0f0b
+  bytes: 1788008
+  width: 1664
+  height: 2644
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6c4a24bb05dea056.jpg
+    sha256: 0e111dfd7c319b91318a40cee1709460ad566e068cd6a0474b1a096e65d577f2
+    bytes: 351310
+    width: 1289
+    height: 2048
+  thumb512:
+    path: assets/thumb512/6c4a24bb05dea056.webp
+    sha256: d8aab25c0774ac8c7f54072e6106182b5ad2b4a1b6d9ae9ff65764619dd22343
+    bytes: 21712
+    width: 322
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 佛像造像
+entity_type: 实物对象写实
+summary_zh: 铜鎏金释迦牟尼禅定坐像配双层镂空火焰纹大背光，背衬竖排繁体金色高浮雕汉译《吉祥经》全文赭红背景墙，前景陈设铜鎏金香炉与盛开粉白荷花。
+materials:
+- 铜鎏金释迦牟尼禅定坐像
+- 双层镂空火焰纹大背光
+- 莲花台座
+- 暖红底金色《吉祥经》浮雕背景墙
+colors:
+- 辉煌金
+- 暖赭红
+style: 传统汉传金铜佛像与经文浮雕融合风
+ai_design_usage: 佛像主尊与汉译南传《吉祥经》书法浮雕背景墙一体化设计、铜鎏金造像法相与背光雕刻参考
+prompt_zh: 铜鎏金释迦牟尼佛禅定坐像与《吉祥经》浮雕背景墙正面特写，高分竖幅中轴对称构图，主尊释迦牟尼佛螺发肉髻，面容慈悲安详，身披通肩袈裟，双手结禅定印，端坐于多层鎏金莲花宝座上，身后矗立精美的舟形双层镂空火焰卷草纹黄金大背光；后方暖赭红色背景墙上整齐排列竖向繁体金色高浮雕《吉祥经》汉字经文（清晰可见“住适宜处、往昔有德行、置身于正道、是为最吉祥”等金字）；前景正中摆放铜鎏金香炉，两侧点缀盛开的粉白荷花与翠绿荷叶，金碧辉煌，庄严吉祥，8K超清写实摄影
+tags:
+- 金色坐佛
+- 释迦牟尼佛像
+- 吉祥经背景墙
+- 经文浮雕墙
+- 火焰纹背光
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1664
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 木雕贴金三宝佛坐像与背光龛局部放大竖图（源自#289中央主佛区裁切）。小图强行放大导致严重像素化马赛克；且summary_zh称“前景陈设铜鎏金香炉与盛开粉白荷花”，实际该裁切画面底部仅有模糊铜香炉，并无粉白荷花。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 局部小图强行放大导致严重像素化失真
+  - summary_zh存在幻觉（提到盛开粉白荷花，但该裁切画幅内仅有香炉而无荷花）

@@ -1,0 +1,73 @@
+id: 1d917034a3b7e9ba
+title_zh: 佛教石材展览墙与雕像陈列场景
+source:
+  original_path: 25年秋季佛事展设计方案/佛教石材展览墙与雕像陈列场景.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教石材展览墙与雕像陈列场景.jpg
+  sha256: 1d917034a3b7e9ba5533c1c7213b80590738d336701f5afce33d817aa0a5f597
+  bytes: 3239180
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1d917034a3b7e9ba.jpg
+    sha256: d91c06c844a84f82eeb11ed3f527e3aa27a5235d3c4e0b737e4b2abfd6b5b811
+    bytes: 747094
+    width: 2048
+    height: 1153
+  thumb512:
+    path: assets/thumb512/1d917034a3b7e9ba.webp
+    sha256: 0abe8ef77511742315dfaec75c68551c21d8f80a1c53654772891a03deae1bdd
+    bytes: 40238
+    width: 512
+    height: 288
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 材质
+- 物件
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-西方三圣石材背景墙
+entity_type: 空间场景设计
+summary_zh: 本图完整展示了展位后方“金镶玉奢石高大背景墙 + 西方三圣（阿弥陀佛、观世音菩萨、大势至菩萨）彩绘立像 + 敦煌金须弥座汉白玉护栏”的标准寺院佛殿后壁展陈系统。
+materials:
+- 金镶玉大板
+- 汉白玉栏杆
+- 敦煌金基座
+colors:
+- 暖金棕
+- 石绿
+- 象牙白
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 竖向黑钛分缝奢石背景墙与三圣佛像陈设比例设计参考
+prompt_zh: 庄严的佛教展厅西方三圣石材背景墙全景，高挑墙面采用十二块天然金镶玉大理石大板竖向拼接，中间嵌入黑色金属竖条分缝，石材呈现暖金琥珀与灰褐色天然闪电纹；墙前通长布置敦煌金高浮雕石雕须弥座，台沿安装一排纯白汉白玉微缩雕花栏杆；须弥座上等距供奉西方三圣（阿弥陀佛、观音菩萨、大势至菩萨）三尊贴金彩绘立像，每尊佛像背后均有石绿色全镂空卷草莲花大背光，佛像之间点缀盛开的鲜花；顶部衔接金镶玉透光石莲花藻井天花与白色轩顶格栅，空间气势恢宏，8K建筑室内摄影。
+tags:
+- 西方三圣背景墙
+- 金镶玉透光石
+- 498元每平米
+- 598元每平米
+- 3980元每米
+- 竖向分缝石材墙
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展金镶玉背景墙、西方三圣立像与敦煌金须弥座汉白玉护栏实景，含现场实体价格红牌。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

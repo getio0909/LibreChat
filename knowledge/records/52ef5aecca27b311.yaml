@@ -1,0 +1,76 @@
+id: 52ef5aecca27b311
+title_zh: 佛教传统室内展览空间
+source:
+  original_path: 佛教空间设计案例/佛教传统室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教传统室内展览空间.jpg
+  sha256: 52ef5aecca27b311aa2c52212cde18181467082a9167bceae52d1f109dc63547
+  bytes: 1638732
+  width: 1869
+  height: 2584
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/52ef5aecca27b311.jpg
+    sha256: 994def5840fd8a63bf83b89e84881761c1e107b9d252884dacde2df918b7ba36
+    bytes: 303443
+    width: 1481
+    height: 2048
+  thumb512:
+    path: assets/thumb512/52ef5aecca27b311.webp
+    sha256: 96e9d204ec15f461bb81c965c0161266812662d490daa4012cd267df1613939a
+    bytes: 25066
+    width: 370
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 设双列红木抄经长案、方蒲团、汉白玉柱础巨柱、发光藏经书架与巨幅水墨山水画轴的传统佛教抄经阅览展览空间。
+materials:
+- 红木长案
+- 青石板地面
+- 汉白玉柱础
+- 实木圆柱
+- 水墨宣纸挂画
+- 棉麻蒲团
+colors:
+- 深木棕
+- 墨灰色
+- 米白色
+- 暖金色
+style: 传统汉传禅堂与书院风
+ai_design_usage: 寺院藏经阅览室、抄经堂、传统佛教书画文献展厅空间设计参考
+prompt_zh: 中式传统寺院抄经堂与佛教文化展览室内空间，纵深竖构图，两列红木弧形格栅腿长条抄经桌，两侧整齐排列米白色方形禅修蒲团，深灰色青石板地面，右侧粗壮实木圆柱配鎏金柱箍与汉白玉鼓形柱础，后方内嵌暖光灯带的通顶藏经阁书架陈列古籍经书，正面深色木墙镶嵌两幅巨型水墨山水书法画轴，弧形木格栅吊顶，静谧禅意光影，3D建筑效果图，8K超清质感
+tags:
+- 抄经堂
+- 藏经阁书架
+- 禅修长案
+- 汉白玉柱础
+- 佛教文化展厅
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1869
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a traditional wooden sutra-copying and library hall with two long rows of desks, brushes, and
+    backlit bookshelves, misclassified under category_l2 as '现代禅修茶室'.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - subject_mismatch

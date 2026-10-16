@@ -1,0 +1,75 @@
+id: 9ce7f8617c698949
+title_zh: 佛教石灯笼与现代景观设计场景
+source:
+  original_path: 佛教空间设计案例/佛教石灯笼与现代景观设计场景.jpg
+original:
+  path: 佛教空间设计案例/佛教石灯笼与现代景观设计场景.jpg
+  sha256: 9ce7f8617c698949f7c5921647203d161cef1118bdd03b4aaa95029acf55690f
+  bytes: 143233
+  width: 332
+  height: 383
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9ce7f8617c698949.jpg
+    sha256: 276cf28a30b90f15e6a717e5f7deef46261448cf78e2127ad792157c35caa18c
+    bytes: 40504
+    width: 332
+    height: 383
+  thumb512:
+    path: assets/thumb512/9ce7f8617c698949.webp
+    sha256: f61dfe0d4ccfb255411a5c007a8607d7dad0b289c0a55c033329001787d40bd6
+    bytes: 27514
+    width: 332
+    height: 383
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代新中式禅意庭院水景与日式/唐式石灯笼景观场景
+entity_type: 空间场景设计
+summary_zh: 本图为现代新中式禅意寺院、佛学院或高端禅修会所的户外内庭院水景小品场景。设计以“静水、白石、古松、石灯笼、木格栅”五大东方禅宗园林核心要素，构建出空灵澄澈、新旧交融的当代禅意景观空间。 色调清新明快、自然雅致：前景石灯笼与池岸护栏采用洁净的芝麻白/白麻花岗岩；水池底面铺设浅蓝色马赛克或反光石材，映射出清澈蔚蓝的水色；中景植物呈现深浅不一的松翠绿与嫩绿草坪色；背景建筑外立面则采用高挑挺拔的暖棕原木色（铝代木/防腐木）竖向格栅与深灰Low-E玻璃幕墙。
+materials:
+- 白麻石灯笼
+- 罗汉松
+- 浅灰石材水池
+- 木格栅幕墙
+colors:
+- 浅灰白石
+- 静谧水蓝
+- 苍翠松绿
+- 原木格栅
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：现代新中式寺院/禅修会所庭院水景设计 / 唐式白石灯笼与造型罗汉松景观节点参考 / 现代木格栅建筑立面与古典园林融合生成；推荐搭配：芝麻白花岗岩精雕唐式石灯笼 + 多层云片造型罗汉松 + 黑山石景石
+  + 极简浅灰石材镜面水池 + 竖向木纹铝格栅建筑幕墙
+prompt_zh: 现代新中式佛教禅意庭院景观设计局部场景，前景右侧为清澈蔚蓝的现代极简几何静水池，左侧伫立一座传统白麻花岗岩雕刻的四角攒尖宝珠顶唐式石灯笼，一道现代灰白色石材矮横栏分隔前中景；中景翠绿草坪上点缀天然黑山石与修剪平整的灌木，一株造型苍劲优美的多层云片状罗汉松舒展枝叶；背景为高大现代的竖向原木色格栅与玻璃幕墙建筑立面，阳光明媚，清新宁静的东方禅意园林效果图。
+tags:
+- 禅意庭院景观
+- 唐式石灯笼
+- 造型罗汉松
+- 现代镜面水景
+- 新中式木格栅立面
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 332
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代仿古重檐佛殿群与白石汉白玉高台须弥座栏杆夜景，原图尺寸332x383分辨率偏低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 332x383 (<800px short side)'
+  - 分辨率过低（332x383，最短边<768px）

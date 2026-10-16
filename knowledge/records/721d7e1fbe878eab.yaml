@@ -1,0 +1,73 @@
+id: 721d7e1fbe878eab
+title_zh: 佛教石材佛像室内展示场景
+source:
+  original_path: 佛堂空间设计参考/佛教石材佛像室内展示场景.jpg
+original:
+  path: 佛堂空间设计参考/佛教石材佛像室内展示场景.jpg
+  sha256: 721d7e1fbe878eabf050983da1a4d66997ab51a89b23e90b26928cd08cdc1b31
+  bytes: 32510
+  width: 750
+  height: 397
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/721d7e1fbe878eab.jpg
+    sha256: 965dcd436a1dde85e4b0ddc04e97e1d49b6776741f5db449d12a37df5f12188a
+    bytes: 34851
+    width: 750
+    height: 397
+  thumb512:
+    path: assets/thumb512/721d7e1fbe878eab.webp
+    sha256: c653435e00d90379aba7d7a457d14f2346de9ef61de32145b0bef3fd7c17eda3
+    bytes: 9804
+    width: 512
+    height: 271
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 安藤忠雄“头大佛殿”低视角框景实景，从幽暗的折板清水混凝土拱形隧道望向圆形大厅，拱门裁切遮挡佛首仅露出沐浴在顶部自然天光中的浅灰花岗岩大佛胸腹、禅定手印与石莲座。
+materials:
+- 素面清水混凝土
+- 浅灰白花岗岩巨佛
+- 石雕仰莲宝座
+- 深灰花岗岩台阶
+colors:
+- 混凝土冷灰
+- 月白
+- 深炭灰
+style: 现代禅意
+ai_design_usage: 安藤忠雄风现代极简大佛堂/美术馆空间设计、折板混凝土拱门框景构图(ControlNet Depth)、巨型花岗岩/汉白玉石雕佛像自然顶光照明参考
+prompt_zh: 安藤忠雄风格现代极简清水混凝土大佛殿室内场景，低角度中轴对称框景构图，前景为幽暗深邃的多边形折板清水混凝土拱形隧道，透过拱门框景望向内部明亮的圆形大厅，一尊巨大的浅灰白色花岗岩石雕坐佛端坐于石雕莲花宝座之上，拱门恰好遮挡佛像头部仅露出宽厚胸膛、流畅衣纹与禅定手印，顶部露天圆洞倾泻神圣的自然天光，下方为八级石材台阶与圆形石质礼拜台，极致纯粹的光影与几何建筑美学，8K建筑摄影
+tags:
+- 安藤忠雄风格
+- 头大佛殿
+- 清水混凝土佛堂
+- 花岗岩大佛
+- 折板拱廊框景
+- 自然天光设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 397
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 安藤忠雄头大佛殿清水混凝土拱廊框景石雕大佛实景，分辨率偏低（750×397）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

@@ -1,0 +1,75 @@
+id: ec2c1caed9f4286b
+title_zh: 泰国建筑浮雕｜Kala 双头像残件
+source:
+  original_path: 设计风格精选20260930/thai-kala-panel.jpg
+original:
+  path: 设计风格精选20260930/thai-kala-panel.jpg
+  sha256: ec2c1caed9f4286b4972e2772e7052056df8d420af8b1629f91ee7bd31d27edd
+  bytes: 84936
+  width: 500
+  height: 706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ec2c1caed9f4286b.jpg
+    sha256: 50c48a80ea8f8d6c9c9f014a9f27a11eb1724e533204b019a92b49e0c994997b
+    bytes: 86721
+    width: 500
+    height: 706
+  thumb512:
+    path: assets/thumb512/ec2c1caed9f4286b.webp
+    sha256: f4f7f0029b29a25ee1ca07de25765835373e5775fd97089934c9d5c1531a8a8c
+    bytes: 33894
+    width: 363
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 东南亚古代灰塑/石雕神兽建筑构件
+entity_type: 实物对象写实
+summary_zh: 这是一件博物馆展陈的东南亚（泰国陀罗钵地/素可泰或高棉风格）古建筑门楣/柱头神兽卡拉（Kala / Kirtimukha，对应中国传统建筑中的椒图/吞口兽）高浮雕残件实物写实。
+materials:
+- 古建灰泥灰塑
+- 风化米白石灰岩
+- 黑色金属博物馆展架
+colors:
+- 浅米褐色
+- 古朴灰白
+- 深褐包浆
+style: 东南亚泰式高棉风 / 博物馆古董展陈
+ai_design_usage: 东南亚风格寺院建筑构件设计 / 博物馆式古董石雕单品展陈参考 / 辟邪瑞兽浮雕造型生成
+prompt_zh: 博物馆展出的古代泰国素可泰风格建筑灰塑石雕神兽卡拉（Kala）浮雕残件，安装在黑色现代金属底座上，浅米色麻布背景；雕件呈现并列的正面与侧面两个神兽头像，圆目凸出，阔鼻大口，口中吐出对称向下延展的火焰状卷草纹叶片，古朴的米灰色石灰岩与灰塑风化多孔肌理，顶部投射柔和博物馆聚光灯，立体阴影分明。
+tags:
+- 泰式卡拉神兽
+- 东南亚石雕残件
+- 吞口兽浮雕
+- 博物馆展陈参考
+- 古建灰塑构件
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/38309
+  credit: The Metropolitan Museum of Art, 1986.506.14
+  license: cc0
+  license_status: confirmed
+quality:
+  min_side_px: 500
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Museum display of an ancient Thai stucco architectural relief fragment depicting a Kala monster mask on a black metal
+    stand.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - subject_mismatch
+  - 'hallucination: materials and tags misidentify this stucco (灰泥灰塑) fragment as weathered white limestone/stone carving
+    (风化米白石灰岩/东南亚石雕残件)'

@@ -1,0 +1,76 @@
+id: d83d8e96eced4fb4
+title_zh: 佛教主题展览空间-02
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间-02.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间-02.jpg
+  sha256: d83d8e96eced4fb46e55e13af4431f496dea7916c145c376a29ad6681ae93b3a
+  bytes: 5318038
+  width: 4464
+  height: 2431
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d83d8e96eced4fb4.jpg
+    sha256: 2699e98edba799bc456b60d730b3508822a6c844db5ba70f8042a245a86e9120
+    bytes: 464253
+    width: 2048
+    height: 1115
+  thumb512:
+    path: assets/thumb512/d83d8e96eced4fb4.webp
+    sha256: d24625963d0e98037d989e76605ca000fb363faf9959943dc358146e7965d792
+    bytes: 37210
+    width: 512
+    height: 279
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 金色万佛墙与鎏金圆柱大殿
+entity_type: 空间场景设计
+summary_zh: 辉煌暖金与米白玉石 / 鎏金雕花石柱、万佛龛墙、汉白玉雕花供台
+materials:
+- 黑钛不锈钢框
+- 高透光软膜灯箱
+- 浅色枫木包柱
+- 深灰工业风吊顶
+- 浅灰柔抛砖
+colors:
+- 暖金黄
+- 朱砂红
+- 浅木色
+- 深炭灰
+style: 现代文博级佛教艺术美术馆风
+ai_design_usage: 4K金碧辉煌万佛殿空间生成 / 大理石圆柱嵌鎏金铜箍节点参考 / 汉白玉须弥供台与万佛墙搭配
+prompt_zh: 4K超高清金碧辉煌的现代万佛大殿室内设计，一排高大的米黄色大理石圆柱，柱底为汉白玉莲花柱础，柱身包裹三道精美的鎏金雕花金属箍，四周墙面满布暖金色发光万佛小龛并镶嵌五块竖向汉白玉石碑，右侧陈列多尊金身护法立像与汉白玉浮雕供台，顶部为多层发光密肋木椽吊顶，庄严华贵，8k建筑效果图。
+tags:
+- 万佛大殿
+- 大理石圆柱
+- 鎏金铜箍
+- 汉白玉供台
+- 金碧辉煌
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2431
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K 3D interior rendering of a golden Ten-Thousand-Buddha hall with beige stone columns wrapped in gilt bronze bands,
+    5 white marble vertical stele panels inset into the thousand-Buddha wall, golden guardian statues, and carved white marble
+    altar table. Metadata materials/colors/style fields are misaligned (claiming 黑钛不锈钢框/深灰工业风吊顶/浅色枫木包柱).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials/colors/style fields claim 黑钛不锈钢框/深灰工业风吊顶/浅色枫木包柱 which are completely absent'

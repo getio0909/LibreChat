@@ -1,0 +1,70 @@
+id: 40f3282b9c3d5887
+title_zh: 国际木作参考｜木与骨镶嵌面板
+source:
+  original_path: 设计风格精选20260930/wood-inlay-panel.jpg
+original:
+  path: 设计风格精选20260930/wood-inlay-panel.jpg
+  sha256: 40f3282b9c3d58870c1e17822a21ce54c96b6f87238422142f8192eaad30500a
+  bytes: 2051625
+  width: 4000
+  height: 1205
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/40f3282b9c3d5887.jpg
+    sha256: 6c2847570acadbe54a97f50aec6b4e0ff67c0b531596ca53a381125d4c5c8f74
+    bytes: 445691
+    width: 2048
+    height: 617
+  thumb512:
+    path: assets/thumb512/40f3282b9c3d5887.webp
+    sha256: 4d832d656de01e9e502e698986b7e03b2ee15e738e92dc61845e779d8dbad3af
+    bytes: 22276
+    width: 512
+    height: 154
+library_type: 家具木作
+studio_roles:
+- 纹样
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 中东/伊斯兰骨木微缩镶嵌装饰横板
+entity_type: 实物对象写实
+summary_zh: 这是一件中东/埃及（科普特或早期伊斯兰法蒂玛/马穆鲁克时期）博物馆级古木嵌骨/象牙几何建筑横楣板（Frieze Panel with Bone/Ivory and Ebony Inlay）实物写实。
+materials:
+- 风化深褐古木
+- 象牙白骨片镶嵌
+- 乌木微缩镶嵌
+colors:
+- 深褐木色
+- 象牙白
+- 乌木黑
+style: 跨文化中东微缩镶嵌 / 几何曼陀罗装饰
+ai_design_usage: 高端佛龛/供桌微缩镶嵌腰线设计 / 大理石水刀拼花（石材马赛克鑲嵌）图案参考 / 曼陀罗与连拱廊装饰母题提取
+prompt_zh: 超高清横幅文物摄影，一件古老的中东伊斯兰风格木质嵌骨与乌木微缩镶嵌装饰横板（Marquetry Frieze），粗糙风化的深褐色古木板上，正中央镶嵌一个精密的同心圆曼陀罗放射圆盘，四周环绕四个菱形与对角网格方框；左右两侧对称排列各五个由白色骨雕小立柱支撑的圆拱形盲券，拱券内部填满极致微小的象牙白与深褐色菱形马赛克点阵纹样，工艺精湛绝伦，历史包浆浓郁。
+tags:
+- 骨木微缩镶嵌
+- 连拱券装饰板
+- 同心圆曼陀罗
+- 水刀拼花参考
+- 古典家具镶嵌纹样
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/449211
+  credit: The Metropolitan Museum of Art, 37.103
+  license: cc0
+  license_status: confirmed
+quality:
+  min_side_px: 1205
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Museum photograph of an Islamic/Middle Eastern wooden frieze panel inlaid with bone/ivory and ebony in an arcade
+    and central rosette pattern.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,77 @@
+id: fce43532a8910b3e
+title_zh: 佛教主题室内展览空间
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间.jpg
+  sha256: fce43532a8910b3e45720618b5e661e821bb6ec79ddb4133d5cd82eb18c0ada7
+  bytes: 2894680
+  width: 3352
+  height: 2508
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fce43532a8910b3e.jpg
+    sha256: 45eba637e44e7162b1c145c390a4f72fbfe2a47673d7369361a8f9db825a54b8
+    bytes: 368414
+    width: 2048
+    height: 1532
+  thumb512:
+    path: assets/thumb512/fce43532a8910b3e.webp
+    sha256: 0086a1fa33e5efa6ce6e8b0ac7d1b6f67f23c706831e199fc57a084b5f21ff56
+    bytes: 30308
+    width: 512
+    height: 383
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅堂与讲经礼佛大厅
+entity_type: 空间场景设计
+summary_zh: 暖黄原木色 / 实木地板、浅米黄石柱、汉白玉三圣像、黄布蒲团
+materials:
+- 汉白玉
+- 老红木
+- 24K鎏金浮雕
+- 重彩壁画
+- 灰木纹大理石
+colors:
+- 汉白玉白
+- 深红木褐
+- 鎏金黄
+- 朱砂红
+- 浅云灰
+style: 新中式皇家寺院与当代禅修厅风
+ai_design_usage: 大型禅堂空间构图参考(ControlNet Depth/Lineart) / 蒲团阵列透视生成 / 汉白玉佛像莲花背光设计
+prompt_zh: 现代新中式大型佛教禅堂室内设计，低角度广角透视，深色实木地板上整齐排列成百上千个明黄色莲花纹圆形蒲团，竖向凹槽米黄石柱配深木色雕刻莲花柱础，远端佛坛供奉三尊汉白玉坐佛，背后是巨型多层发光白莲花瓣造型背景墙，顶部井字格栅藻井暗藏暖光灯带，庄严温暖，8k超高清效果图。
+tags:
+- 禅堂设计
+- 讲经堂
+- 汉白玉三圣
+- 莲花背光
+- 蒲团阵列
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2508
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior rendering of a warm wood and beige stone meditation hall with white marble Three Saints statues against
+    a layered lotus halo and rows of yellow round cushions. Metadata fields materials/colors are misaligned (claiming 24K鎏金浮雕/重彩壁画/朱砂红).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials and colors fields list 24K鎏金浮雕/重彩壁画/朱砂红/灰木纹大理石 which are absent from this warm wood and white
+    marble meditation hall'

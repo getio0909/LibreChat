@@ -1,0 +1,74 @@
+id: 5ab95b659ec91207
+title_zh: 佛教主题展览石柱陈列场景
+source:
+  original_path: 佛教空间设计案例/佛教主题展览石柱陈列场景.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览石柱陈列场景.jpg
+  sha256: 5ab95b659ec912070696cf40ee594e081cef5a6f6dca44fc93e50c78a0437742
+  bytes: 1313544
+  width: 972
+  height: 2540
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5ab95b659ec91207.jpg
+    sha256: 9ca6ad21f47469ebd9869a753b2b05740b1107caa5d9206fed0e7e933eac730b
+    bytes: 256973
+    width: 784
+    height: 2048
+  thumb512:
+    path: assets/thumb512/5ab95b659ec91207.webp
+    sha256: ab48f5dc36e64a08dadb0cd2b911e5a598e9a8065c734446363491bba30fcf0b
+    bytes: 25880
+    width: 196
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 纹样
+category_l1: 佛教空间案例
+category_l2: 琉璃千佛发光柱陈列空间
+entity_type: 空间场景设计
+summary_zh: 霓虹渐变与米白石材 / 彩色背光琉璃千佛柱、米白石雕仰莲须弥柱础
+materials:
+- 米白汉白玉石雕
+- 七彩渐变透光琉璃
+- 敦煌重彩壁画
+- 松香黄玉石
+- 光纤星空顶
+colors:
+- 星空深蓝
+- 松香橙黄
+- 汉白玉白
+- 霓虹青紫渐变
+style: 当代超现实星空数字石窟展厅风
+ai_design_usage: 千佛发光柱立面与结构设计 / 石雕团花须弥柱础细部参考 / 传统石雕与现代光电结合方案
+prompt_zh: 现代佛教艺术展厅内的巨型琉璃千佛发光方柱陈列场景，竖幅构图，高耸的方形立柱由成百上千个小方格组成，每格内有一尊浮雕坐佛，内部背光自下而上呈现青色、白色、紫红与橙红色的绚丽渐变，柱底是三层叠涩米白色天然石材雕刻的团莲纹须弥座柱础，顶部为蓝色星空顶，地面为暖黄色抛光大理石，8k渲染。
+tags:
+- 千佛发光柱
+- 石雕须弥柱础
+- 团莲浮雕
+- 琉璃佛龛柱
+- 现代佛教展陈
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 972
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Vertical close-up 3D rendering of tall square thousand-Buddha pillars with rainbow gradient backlit compartments
+    on 3-tier carved beige stone sumeru bases under a starry ceiling and yellow jade floor.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

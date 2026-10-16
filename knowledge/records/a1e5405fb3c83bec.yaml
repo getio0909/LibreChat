@@ -1,0 +1,72 @@
+id: a1e5405fb3c83bec
+title_zh: 佛教寺庙内部佛像场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内部佛像场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内部佛像场景.jpg
+  sha256: a1e5405fb3c83bec53338c525e475bb420932775aeda9b9074189987385a924b
+  bytes: 141934
+  width: 494
+  height: 349
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a1e5405fb3c83bec.jpg
+    sha256: 844fd54a1d28f8c2cba20b08ef12d76ba0212f9b7abe269504ba8c00f92af119
+    bytes: 40473
+    width: 494
+    height: 349
+  thumb512:
+    path: assets/thumb512/a1e5405fb3c83bec.webp
+    sha256: ead53c4bc79ec5cdee0c2fd1d7fef09a8e62212a4a823a96a2081ee2098da0d2
+    bytes: 24738
+    width: 494
+    height: 349
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为大型双层挑空传统大佛殿室内侧面仰视场景（空间场景设计，与本卷第14号同属一个大型双层大佛殿项目）。
+materials:
+- 跨两层巨型古铜鎏金坐佛
+- 彩绘石雕多层莲花须弥座
+- 二层挑空木回廊
+- 巨幅重彩壁画
+- 人字形露明木屋架
+colors:
+- 古铜金
+- 深木棕
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 双层挑空巨型大佛殿侧面仰视构图参考、多层彩绘石雕莲花须弥座与二层观礼回廊空间关系设计
+prompt_zh: 大型双层挑空佛教寺庙大殿内部仰视场景，低角度斜向透视，右侧高大的多层青绿彩绘石雕莲花须弥座上端坐一尊跨两层通高的巨型古铜鎏金释迦牟尼佛坐像，地面为深灰黑色高光镜面大理石，左侧与上方为二层挑空木结构观礼回廊与木雕栏杆，高耸的实木圆柱直达人字形露明木椽坡屋顶，远端墙面悬挂巨幅传统佛教壁画，空间尺度宏伟震撼，建筑效果图
+tags:
+- 双层挑空大殿
+- 巨型坐佛
+- 彩绘石雕须弥座
+- 二层木构回廊
+- 仰视崇高感构图
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 349
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 双层挑空传统大佛殿室内右前侧仰视三维效果图，原图分辨率偏低（494x349），为#198剖透视母图的局部视角预览。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 494x349 (<800px short side)'

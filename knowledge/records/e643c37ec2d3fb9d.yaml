@@ -1,0 +1,72 @@
+id: e643c37ec2d3fb9d
+title_zh: 佛教风格室内走廊与装饰门
+source:
+  original_path: 佛教家具与陈设素材/佛教风格室内走廊与装饰门.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格室内走廊与装饰门.jpg
+  sha256: e643c37ec2d3fb9d65f05c5ee23f71231c2eabfcd990dc20a7f8b5028128dd3c
+  bytes: 786679
+  width: 1054
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e643c37ec2d3fb9d.jpg
+    sha256: 98ce4b7826704bb5ae0c220a9e4f16420f6bc2c0ea5a8430cb990f3f3ff72cbc
+    bytes: 243781
+    width: 1054
+    height: 1706
+  thumb512:
+    path: assets/thumb512/e643c37ec2d3fb9d.webp
+    sha256: a3ccdb21a02957454fcdb344252e0c795463bea4181f8a6fb858bd75112b262f
+    bytes: 19340
+    width: 316
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教家具与陈设
+category_l2: 现代禅意空间
+entity_type: 空间场景设计
+summary_zh: 一座将现代极简酒店式照明设计与传统藏传佛教建筑门饰完美融合的“佛堂入户玄关走廊与朱红装饰门”空间场景（Modern Tibetan-Zen Corridor & Ornate Entrance Door）。该场景展示了从日常现代居住空间步入神圣佛堂空间的“心理转换过渡甬道（Threshold
+  Space）”，兼具极高的当代东方室内设计水准。
+materials:
+- 浅木护墙板
+- 朱红漆雕花门
+- 黄铜壁灯
+colors:
+- 暖木色配朱红描金
+style: 现代藏式禅意风
+ai_design_usage: 现代禅意佛堂入户门与玄关走廊设计 / 传统海水江崖木雕与现代极简门扇结合参考 / 线性灯带与藏式元素融合示范
+prompt_zh: 室内建筑竖幅一点透视摄影，一条极具现代禅意与藏传美学融合的室内走廊，尽头是一扇华丽的藏式朱红色装饰木门，门扇上方正中镶嵌圆形金色宝瓶八吉祥浮雕徽章，门扇下方三分之一处高浮雕五彩祥云、金色须弥山峰与翠绿海水江崖纹，门头上方挑出藏式彩绘方椽斗拱檐口，走廊两侧为浅暖色实木护墙板，竖向镶嵌隐藏式暖光线性灯带，并对称悬挂两盏精致的紫铜藏式壁灯，深色木地板铺设棕色地毯，光影静谧神圣，8K超高清。
+tags:
+- 藏式装饰门
+- 佛堂玄关走廊
+- 海水江崖浮雕
+- 朱红描金木门
+- 现代藏式室内
+- 线性灯带走廊
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1054
+  low_res: false
+  ai_generated: true
+  third_party_watermark: false
+  text_overlay: false
+  notes: AI-generated interior scene of a modern wood-paneled hallway leading to an ornate red Tibetan double door with polychrome
+    eaves and Eight Auspicious Symbols medallions.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated

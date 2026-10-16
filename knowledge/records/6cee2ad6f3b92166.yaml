@@ -1,0 +1,76 @@
+id: 6cee2ad6f3b92166
+title_zh: 佛教室内神像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教室内神像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教室内神像展示场景.jpg
+  sha256: 6cee2ad6f3b921660ca17fe15c65c836bc607b1b0e8c6285b0de166f036d5ea6
+  bytes: 4360502
+  width: 3535
+  height: 2643
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6cee2ad6f3b92166.jpg
+    sha256: 5548fd7cf1702325f1a3f60b39d3f6d78c4108450c643122698dcaf267489556
+    bytes: 542921
+    width: 2048
+    height: 1531
+  thumb512:
+    path: assets/thumb512/6cee2ad6f3b92166.webp
+    sha256: a1b476e1e88c3366084455d2fb3efc381322dfe40931ca4c8292a10e3aeb2106
+    bytes: 49582
+    width: 512
+    height: 383
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 顶部嵌第03号同款八角金色放射状法轮莲花藻井、正中配三轮金光供奉五尊彩绘神像、两侧饰金底云龙壁画的传统殿堂空间。
+materials:
+- 八角放射状金色藻井
+- 彩绘神像坐像
+- 金底云龙壁画板
+- 实木雕花供桌
+- 浅米黄石材地面
+- 明黄方蒲团
+colors:
+- 原木棕
+- 辉煌金
+- 浅米黄色
+- 朱砂红
+- 彩绘多色
+style: 传统中式祠庙与护法殿堂风
+ai_design_usage: 传统木构神殿/道教三清五老殿/佛教护法诸天殿室内空间设计、第03号圆形放射状浮雕构件作为八角藻井天池应用参考
+prompt_zh: 传统中式木构神殿室内神像展示场景，中轴对称构图，正中央木雕门罩内红色须弥座长坛上并列供奉五尊彩绘传统天尊神像坐像，背后镶嵌三轮巨大的金色发光圆光背板，前方并列摆放三张实木雕花供桌与六个明黄色方形蒲团，左右两侧墙面装饰金色云龙纹浮雕壁画，顶部深木色方格天花中央嵌有一座金碧辉煌的八角形二十四辐放射状莲花浮雕藻井，浅米黄色石材地面，庄严威仪，8K建筑渲染
+tags:
+- 八角放射藻井
+- 五尊神像
+- 云龙纹壁画
+- 三轮圆光
+- 传统神殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2643
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 'High-res 3D render of the same Taoist Five Wealth Gods / Tianzun shrine hall as #136 showing the full octagonal
+    24-spoke lotus caisson ceiling and cloud-dragon wall reliefs, misclassified as a Buddhist temple hall.'
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - subject_mismatch

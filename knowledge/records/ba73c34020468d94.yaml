@@ -1,0 +1,76 @@
+id: ba73c34020468d94
+title_zh: 佛教宫殿式主殿室内场景
+source:
+  original_path: 佛堂空间设计参考/佛教宫殿式主殿室内场景.jpg
+original:
+  path: 佛堂空间设计参考/佛教宫殿式主殿室内场景.jpg
+  sha256: ba73c34020468d9429fd7f1c7325b270bb6ad6df15e36ea6c881c2b26bd84afb
+  bytes: 39110
+  width: 533
+  height: 300
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ba73c34020468d94.jpg
+    sha256: 4c858042e956f76090997e4fa58cec4c7535dbe98680e587db6c8ca62d80e71e
+    bytes: 42237
+    width: 533
+    height: 300
+  thumb512:
+    path: assets/thumb512/ba73c34020468d94.webp
+    sha256: 98825c0ae730fc8f13a6a3cbe7e3273ac450f7d59e33716e11bfd6e5e1c9b9d1
+    bytes: 29926
+    width: 512
+    height: 288
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 传统唐宋宫殿式重彩佛教主殿室内概念场景，四根朱红金箍大柱撑起青绿斗拱与垂花门罩，中央五级丹墀金栏高台上设雕花金宝座与巨幅青绿重彩荷花壁画屏风。
+materials:
+- 朱漆金箍木柱
+- 鎏金须弥座与宝座
+- 青绿彩绘斗拱
+- 重彩荷花壁画屏风
+- 深色实木地板
+colors:
+- 朱砂红
+- 黄金色
+- 石青石绿
+- 深木褐
+style: 传统汉传宫殿式
+ai_design_usage: 影视/游戏/文旅项目唐宋宫殿式佛殿概念设计、传统金漆宝座与青绿荷花屏风背景搭配参考
+prompt_zh: 中国传统唐宋宫殿式佛教主殿室内场景概念设计，严格中轴对称构图，四根粗壮的朱红色大圆柱中部装饰金色莲花束腰，顶部为繁复的石青石绿彩绘斗拱藻井与朱红雕花垂花门罩，正中央高台设五级台阶与金色雕花栏杆，台上安置金碧辉煌的雕花宝座，宝座背后为巨幅青绿重彩荷花壁画屏风，左右两侧对称陈列六座高脚金色宫灯烛台，深色木地板反射温暖辉煌的烛光，史诗级古风场景插画，8K
+tags:
+- 宫殿式佛殿
+- 唐宋古建室内
+- 青绿重彩
+- 黄金须弥座
+- 荷花壁画屏风
+- 中轴对称大殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 300
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 超低分辨率（533×300）世俗古装宫殿朝堂宝座CG概念图，无佛教元素，与传统寺院大殿主题不符。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - subject_mismatch
+  - 'hallucination: summary_zh与tags将世俗宫殿朝堂宝座CG图臆造为''佛教宫殿式主殿''及''黄金须弥座'''

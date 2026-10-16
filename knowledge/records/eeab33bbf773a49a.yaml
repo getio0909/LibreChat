@@ -1,0 +1,70 @@
+id: eeab33bbf773a49a
+title_zh: 佛教寺庙室内佛塔展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内佛塔展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内佛塔展示场景.jpg
+  sha256: eeab33bbf773a49abe1cf383d7c716e5dc988d69ed4a2a0e3fd439cab9c3bf86
+  bytes: 2650772
+  width: 3414
+  height: 2559
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/eeab33bbf773a49a.jpg
+    sha256: f15828d4a4045022da2564c8fa48501374a4d42fc64b6bf9af17c2185780cd62
+    bytes: 371052
+    width: 2048
+    height: 1535
+  thumb512:
+    path: assets/thumb512/eeab33bbf773a49a.webp
+    sha256: afeb3bed9ae05cde75131c6e9d096ec7ce9989354766fda0b5a8617890c5a297
+    bytes: 30256
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 藏汉融合佛塔圣殿
+entity_type: 空间场景设计
+summary_zh: 本图为大型寺院室内金色舍利宝塔大殿（现代中式平顶九宫格天花比选方案）（空间场景设计，与本卷第02号坡屋顶露明木椽版构成天花与外廊立面比选）。
+materials:
+- 汉白玉麒麟浮雕御道与三路石阶
+- 藏式铜鎏金尊胜宝塔
+- 现代中式白底木格九宫格天花配中心星空藻井
+- 发光经文木柱與白色拱门
+colors:
+- 辉煌金
+- 汉白玉白
+style: 藏汉融合皇家塔殿风
+ai_design_usage: 室内金色佛塔大殿现代中式平顶天花比选方案（对比第02号坡屋顶版）、汉白玉麒麟御道与现代格栅吊顶结合参考
+prompt_zh: 佛教寺庙室内金色佛塔展示大殿（现代中式平顶天花方案），正面中轴对称仰视构图，前景为洁白的汉白玉三路石材台阶与卷云栏杆，中央汉白玉丹陛御道雕刻圆形麒麟瑞兽浮雕，顶端盛开一朵橙红色发光琉璃莲花灯，前景左右立有两根镶嵌竖向发光经文灯箱的深色木柱，中景八角形红棕色石雕须弥座高台上矗立巨大的藏式铜鎏金尊胜舍利宝塔（塔身开龛供奉金佛），塔刹直通顶部八角发光藻井中心的蓝色星空天池与月牙吊灯，两侧天花采用现代中式深色木框白底九宫格发光平顶吊顶，后方环绕发光千佛经架与两座白色发光拱门，8K超清渲染
+tags:
+- 室内佛塔展示
+- 天花比选方案
+- 九宫格发光天花
+- 汉白玉麒麟御道
+- 藏式铜鎏金佛塔
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2559
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大型室内藏式铜鎏金佛塔圣殿正面三维效果图（平顶九宫格发光天花比选版），前景设汉白玉三路丹陛与琉璃莲花灯。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

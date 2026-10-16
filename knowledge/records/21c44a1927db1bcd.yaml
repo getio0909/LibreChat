@@ -1,0 +1,72 @@
+id: 21c44a1927db1bcd
+title_zh: 层叠木质框架佛像展示装置
+source:
+  original_path: 佛堂空间设计参考/层叠木质框架佛像展示装置.jpg
+original:
+  path: 佛堂空间设计参考/层叠木质框架佛像展示装置.jpg
+  sha256: 21c44a1927db1bcdb7e1aea5824d09cc8e5914aea36835e9a24bae85aaa1264c
+  bytes: 39726
+  width: 472
+  height: 708
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/21c44a1927db1bcd.jpg
+    sha256: 6e76c53cf0b66effb862e3412779c8d04ce091802e9840253e8555aa1fdff194
+    bytes: 42392
+    width: 472
+    height: 708
+  thumb512:
+    path: assets/thumb512/21c44a1927db1bcd.webp
+    sha256: a4760a773035494922135b5b0cab4a5bfda3731c148a840279b1d87739f0598c
+    bytes: 10116
+    width: 341
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 参考
+category_l1: 佛堂空间参考
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: 纯黑背景下的现代极简层叠木框佛龛单品特写，由九层浅色原木矩形框呈非对称阶梯状向内递进叠套并暗藏顶部暖光，营造深邃石窟透视感，内部供奉羊脂白玉极简无相禅定坐佛。
+materials:
+- 浅色天然硬木(枫木/白蜡木)
+- 羊脂白玉/汉白玉坐佛
+- 隐藏式LED暖光源
+colors:
+- 原木暖黄棕
+- 羊脂白
+- 纯黑背景
+style: 现代禅意
+ai_design_usage: 现代极简佛龛/单尊玉佛展柜工业设计参考、层叠错位几何框景造型提取、汉白玉极简小佛像展陈灯光设计
+prompt_zh: 现代极简主义层叠木质框架佛龛展示装置单品特写，纯黑色背景，佛龛由九层温暖的浅色原木矩形画框由外向内逐层缩小叠套而成，顶部与底部呈非对称几何阶梯状斜向内收，形成深邃的石窟透视感，顶部阶梯内暗藏温暖柔和的隐藏灯光，龛内正中供奉一尊极简留白风格的羊脂白玉禅定坐佛与方形玉底座，龛背左侧留有一道黑色竖缝，下方连接同材质原木方柱底座，现代东方禅意工业设计，工作室产品摄影，8K
+tags:
+- 实物对象写实
+- 现代极简佛龛
+- 层叠木框装置
+- 白玉禅定佛
+- 几何叠级工艺
+- 佛像展柜设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 472
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 纯黑背景下的现代极简非对称层叠原木框佛龛与白玉坐佛单品图，分辨率偏低（472×708）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

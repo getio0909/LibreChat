@@ -1,0 +1,75 @@
+id: 63f7a6c77dd49ec7
+title_zh: 佛教寺院僧侣仪式场景
+source:
+  original_path: 佛堂空间设计参考/佛教寺院僧侣仪式场景.jpg
+original:
+  path: 佛堂空间设计参考/佛教寺院僧侣仪式场景.jpg
+  sha256: 63f7a6c77dd49ec7554871378b70e6cf356a17e9eb261dd66898cd5d816d2e74
+  bytes: 560560
+  width: 834
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/63f7a6c77dd49ec7.jpg
+    sha256: 65b4ae4ad6891601ac84d89d9420d40da34bcb40f0969e73e99dbab66275462d
+    bytes: 172967
+    width: 834
+    height: 1280
+  thumb512:
+    path: assets/thumb512/63f7a6c77dd49ec7.webp
+    sha256: 3bb2b8b4bb7149e4b43cb11ddb0d47595144d6d95d477e67cca66420c6d4226c
+    bytes: 29684
+    width: 334
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 现代极简人间佛教禅宗寺院大法堂早晚课共修实景，浅米色莱姆石高台等距供奉三尊带舟形鎏金背光的三世坐佛，右侧嵌竖向玻璃砖透光墙，数十名僧侣整齐列队合十礼赞。
+materials:
+- 米白莱姆石干挂墙板
+- 古铜金三世坐佛
+- 舟形鎏金浮雕大背光
+- 透光玻璃砖阵列
+- 白色高光磨石地面
+colors:
+- 暖米灰
+- 古铜金
+- 僧袍深褐
+- 纯白
+style: 现代禅意
+ai_design_usage: 现代大型禅堂/讲堂建筑室内设计、莱姆石干挂背景墙与三世佛金色舟形背光搭配、玻璃砖透光墙面采光设计
+prompt_zh: 现代极简禅宗寺院大雄宝殿室内共修仪式场景，高角度俯拍透视构图，高耸的浅米灰色莱姆石干挂背景墙与抬高石材佛台上，等距供奉三尊古铜金色坐佛，每尊佛像背后均有巨大的舟形鎏金浮雕大背光，顶部轨道射灯投射温暖光束，右侧高墙镶嵌竖向透光玻璃砖阵列，光洁的白色石材地面上，数十名身穿灰衣棕褐袈裟的僧侣整齐列队合十礼佛，神圣庄严的现代宗教建筑摄影，8K
+tags:
+- 现代禅堂
+- 人间佛教建筑
+- 三世佛供奉
+- 莱姆石墙面
+- 僧侣共修场景
+- 玻璃砖采光墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 834
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代极简寺院大殿三世佛与僧侣列队共修实景照片，全图带Alamy图库水印及底部版权黑边。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

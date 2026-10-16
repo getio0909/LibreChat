@@ -1,0 +1,76 @@
+id: 5dbc60db81d97145
+title_zh: 大型大理石板材展示图
+source:
+  original_path: 常用石材大板/大型大理石板材展示图.jpg
+original:
+  path: 常用石材大板/大型大理石板材展示图.jpg
+  sha256: 5dbc60db81d97145151c9ee29bc5e50c3d540c4670998743585da1d80b333cb0
+  bytes: 178419
+  width: 828
+  height: 622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5dbc60db81d97145.jpg
+    sha256: 81eb400cf68b83070d5ba928533fd8ad8f4f83cc867100149863ed7b87e041a7
+    bytes: 80684
+    width: 828
+    height: 622
+  thumb512:
+    path: assets/thumb512/5dbc60db81d97145.webp
+    sha256: 872ffdb965bc509af5252d3ed4b698f5f5a67b90af406ece958a7cbf1135e171
+    bytes: 20224
+    width: 512
+    height: 385
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-白底灰斜纹系
+entity_type: 实物对象写实
+summary_zh: 本图为单块大体量白色系天然大理石精抛光大板的正面写实展示（属雅士白/雪花白或爵士白斜纹品类）。
+materials:
+- 天然大理石
+- 雅士白大理石
+- 高光抛光石材
+colors:
+- 乳白色
+- 象牙白
+- 浅紫灰色
+- 银灰色
+style: 现代奢石展陈 / 现代禅意
+ai_design_usage: 佛堂主背景墙材质贴图 / 双板对称连纹（Book-match）生成 / ControlNet材质纹理迁移 / 现代禅意空间白石墙面替换
+prompt_zh: 高清天然白色大理石大板正面特写，雅士白大理石材质，纯净乳白色基底，左上角大面积留白，右下角斜向贯穿优雅的浅紫灰色与银灰色水墨流云纹理，镜面高光抛光质感，表面有柔和的条形灯带倒影，石材展厅蓝色地面木托架陈列，极简东方禅意美学，8K超高清材质细节。
+tags:
+- 白色大理石
+- 斜纹大板
+- 雅士白
+- 水墨留白纹理
+- 佛堂背景墙选材
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 622
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 黑底金纹奢石大板工厂实拍，原图828x622分辨率偏低，板面中央偏下有红色“6-5”编号涂写/叠加，右下角有“STM石猫”平台水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 828x622 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（828x622，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印
+  - 画面中央偏下存在红色“6-5”文字叠加

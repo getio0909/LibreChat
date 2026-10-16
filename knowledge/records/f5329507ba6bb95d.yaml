@@ -1,0 +1,75 @@
+id: f5329507ba6bb95d
+title_zh: 佛教室内展览空间-02
+source:
+  original_path: 佛教空间设计案例/佛教室内展览空间-02.jpg
+original:
+  path: 佛教空间设计案例/佛教室内展览空间-02.jpg
+  sha256: f5329507ba6bb95d9d4cae0c54782b7b9a69742279ecab288eaaf7cd4a69a8f6
+  bytes: 634344
+  width: 1370
+  height: 984
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f5329507ba6bb95d.jpg
+    sha256: 9f8da7c48e073b11310a11457f9285daeabc7b8921073ff7971aba5804f4c5a1
+    bytes: 171763
+    width: 1370
+    height: 984
+  thumb512:
+    path: assets/thumb512/f5329507ba6bb95d.webp
+    sha256: 39435cecfffa511cc0ff87629b00be36689df49f19a6f07cbefea906b4c4b17b
+    bytes: 28344
+    width: 512
+    height: 368
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 材质
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 地面满铺高光翠绿褐纹奢石、左设带鎏金莲瓣基座的红木护墙、右设黄蓝红三色千佛墙与蓝底格栅藻井的展厅空间。
+materials:
+- 翠绿褐纹奢石大理石
+- 鎏金莲瓣木基座
+- 红木雕花护墙
+- 三色彩绘千佛龛
+- 蓝底木格栅藻井
+colors:
+- 翠绿色
+- 金褐色
+- 深红木色
+- 辉煌金
+- 群青蓝与明黄
+style: 石窟重彩千佛与现代奢石融合风
+ai_design_usage: 万佛堂转角过道空间设计、翠绿奢石地面与深色红木鎏金莲瓣踢脚线节点、多彩琉璃千佛墙配色参考
+prompt_zh: 佛教寺院室内千佛展览空间转角视角，地面满铺高光镜面翠绿色与金褐色纹理交织的奢石大理石大板，倒影清晰，左侧为深色红木雕花转角护墙板，底部镶嵌一排精美的鎏金立体莲花瓣束腰基座，右侧与正前方墙面是满布黄、蓝、红三色交替排布的彩绘琉璃千佛小龛阵列，顶部为木格栅方格藻井并内嵌天蓝色与暖白色发光面板，色彩绚丽庄严，8K室内渲染
+tags:
+- 翠绿奢石地面
+- 鎏金莲瓣基座
+- 彩绘千佛墙
+- 蓝底藻井
+- 佛教展厅
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 984
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a Buddhist exhibition hall featuring a mirror-polished green-and-brown luxury marble floor, carved redwood
+    wainscot panels on a gilded lotus base, and colorful 1000-Buddha niche walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

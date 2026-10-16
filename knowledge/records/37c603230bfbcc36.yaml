@@ -1,0 +1,70 @@
+id: 37c603230bfbcc36
+title_zh: 佛教雕刻供桌展示
+source:
+  original_path: 佛教家具与陈设素材/佛教雕刻供桌展示.jpg
+original:
+  path: 佛教家具与陈设素材/佛教雕刻供桌展示.jpg
+  sha256: 37c603230bfbcc36d8e5e5ec8dde3fe02535962d050e3d397a99707be2a65c28
+  bytes: 397242
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/37c603230bfbcc36.jpg
+    sha256: dd650dde85f64343bdd0b55f1d7c1a7e688a9fe48a310243da820bf457865048
+    bytes: 430553
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/37c603230bfbcc36.webp
+    sha256: 60fde6bbe17a6096ed9d58c151c03f64be256e354c9aaf8816ba731ba0cd96c7
+    bytes: 51536
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 展厅实景拍摄的一套标准藏传佛教高僧/活佛讲经说法全套木雕彩绘法座、经桌与须弥座踏跺组合（Tibetan Buddhist Dharma Throne & Sutra Reading Desk Set）。整套装置由后方高耸的六拏具背光宝座、中部双龙护莲长方经桌（供桌）、下部力士金刚杵须弥座基台以及左侧弧形斜坡卷草雕花护栏（踏步扶手）四部分组成。
+materials:
+- 实木深浮雕
+- 矿物彩绘
+- 金刚杵踏跺
+colors:
+- 暖红棕配五彩描金
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 高僧说法法座与经桌成套家具设计 / 藏传六拏具（大鹏、龙女、摩羯鱼）标准图像学参考 / 双龙护莲供桌纹样提取
+prompt_zh: 展厅实景摄影，一套庄严精美的藏传佛教木雕彩绘高僧讲经法座与供桌组合，温暖红棕色核桃实木打造，后方高耸弧形背光精雕六拏具（顶部摩尼宝、中央金翅大鹏鸟咬蛇、两侧龙女与摩羯鱼），前方长方形经桌正面高浮雕双青龙拱护粉色盛开莲花，上沿饰彩色莲瓣与金色金刚杵，下方须弥座束腰雕刻两尊护法力士托举座台与中央十字金刚杵，左侧配弧形满雕卷草花鸟扶手屏，8K超高清细节。
+tags:
+- 藏式雕刻供桌
+- 六拏具背光
+- 金翅大鹏鸟
+- 双龙护莲浮雕
+- 讲经说法台
+- 力士金刚杵须弥座
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a Tibetan carved and painted wood monastic dharma throne with Six-Ornaments halo, sutra
+    desk, sumeru base, and side staircase balustrade.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

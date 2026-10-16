@@ -1,0 +1,75 @@
+id: f462f55696238fbd
+title_zh: 佛教主题展览空间设计-13
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-13.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-13.jpg
+  sha256: f462f55696238fbdefc93d2f2a837078bac3b8fd0b475f0fa7a4ac27935443e8
+  bytes: 3621379
+  width: 3708
+  height: 2417
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f462f55696238fbd.jpg
+    sha256: 4f051fe0ba3ecf77c7fea1da23149be1ae84d1c97c54bf1d3816a1d89218f468
+    bytes: 463364
+    width: 2048
+    height: 1335
+  thumb512:
+    path: assets/thumb512/f462f55696238fbd.webp
+    sha256: ba2d08ad56cab309726f081f63e32d34074514bfc62d188532c7a5ba29c6de0b
+    bytes: 37440
+    width: 512
+    height: 334
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 说法图巨幅发光壁画与须弥座厅
+entity_type: 空间场景设计
+summary_zh: 暖金米黄与墨黑青石 / 巨幅佛陀说法壁画、汉白玉束腰须弥座、雕花隔扇门
+materials:
+- 高显色内透光重彩壁画软膜
+- 汉白玉束腰须弥座
+- 老红木万字纹隔扇门
+- 鎏金团龙圆雕
+- 深灰板岩
+colors:
+- 重彩石青朱红
+- 汉白玉白
+- 深红木色
+- 鎏金黄
+- 青灰
+style: 传统宫殿式说法图壁画陈列厅风
+ai_design_usage: 巨幅佛教重彩壁画内透光展陈设计 / 汉白玉束腰须弥座长台细部参考 / 中式红木隔扇门嵌鎏金圆雕立面设计
+prompt_zh: 庄严对称的新中式佛教壁画展览大厅，正中央巨型壁龛内是一幅通体柔和发光的巨幅工笔重彩《佛陀说法图》壁画，壁画下方是一座通长的纯白汉白玉精雕束腰莲花须弥座台基，左右两侧墙面下部为精致的深红木万字纹雕花隔扇门并镶嵌圆形鎏金浮雕，门扇上方各内嵌四幅发光的传统佛教绘画，顶部是镶嵌金色圆形浮雕的井字木格吊顶，深灰色哑光石板地面，8k效果图。
+tags:
+- 佛陀说法图
+- 发光软膜壁画
+- 汉白玉须弥座
+- 中式隔扇门
+- 鎏金浮雕吊顶
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2417
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a Buddhist lecture/exhibition hall featuring a backlit Sutra-preaching mural above a long white
+    marble Sumeru base and framed by illuminated 1000-Buddha side walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

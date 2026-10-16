@@ -1,0 +1,77 @@
+id: daa491ceee9abb25
+title_zh: 佛教主题展厅设计效果图
+source:
+  original_path: 佛教空间设计案例/佛教主题展厅设计效果图.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展厅设计效果图.jpg
+  sha256: daa491ceee9abb2573af188206bcafc9d295718b4ae9b7496d47915d0145c355
+  bytes: 2037576
+  width: 3442
+  height: 2568
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/daa491ceee9abb25.jpg
+    sha256: 1b8a9e387184f3992be845fb830bcfce697917f7f4c063fc4ad24fe617e4138d
+    bytes: 318902
+    width: 2048
+    height: 1528
+  thumb512:
+    path: assets/thumb512/daa491ceee9abb25.webp
+    sha256: 88ade919aeb063e42fde5b0421c520aab3ce409f94387ab0926a58ddf594bb9d
+    bytes: 21186
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代日式/新中式禅修书院
+entity_type: 空间场景设计
+summary_zh: 浅原木与深灰青石 / 原木书架格栅、深灰哑光石材水景、榻榻米坐垫
+materials:
+- 七彩古法烧制琉璃
+- 深色红木龛框
+- 青白石雕栏杆
+- 高光深绿大理石
+- 星空软膜
+colors:
+- 宝蓝
+- 琥珀橙
+- 翡翠绿
+- 紫罗兰
+- 鎏金黄
+style: 当代沉浸式琉璃光影佛殿风
+ai_design_usage: 现代极简禅堂/精舍设计(ControlNet Depth) / 室内石材水景台与原木格栅搭配 / 月洞佛龛光影参考
+prompt_zh: 现代极简禅意佛堂与书院室内设计，单点中心透视，前景是深灰色哑光石材砌筑的错层浅水景池，池中点缀天然黄蜡石与禅舟小品，中景木地板上整齐排列灰白色方形禅修坐垫，左侧为整墙浅原木色藏经书架，右侧为半透明竖向木格栅隔断，尽头正中是圆形月洞佛龛配柔和射灯照亮白石小佛像，静谧空灵，8k室内效果图。
+tags:
+- 现代禅堂
+- 极简佛堂
+- 月洞佛龛
+- 室内水景石
+- 藏经书院
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2568
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering of a modern Zen library and meditation room with light wood bookcases holding boxed
+    sutras, dark grey stone water feature with yellow stone and bronze boat sculpture in foreground, and circular moon-gate
+    Buddha niche at rear. Metadata materials/colors/style fields are misaligned (claiming 七彩古法烧制琉璃/高光深绿大理石/星空软膜).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials/colors/style fields claim 七彩古法烧制琉璃/高光深绿大理石/星空软膜/紫罗兰 which are completely absent'

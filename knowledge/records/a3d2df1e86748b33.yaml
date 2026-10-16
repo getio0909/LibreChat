@@ -1,0 +1,73 @@
+id: a3d2df1e86748b33
+title_zh: 佛教室内观音像及装饰
+source:
+  original_path: 佛教空间设计案例/佛教室内观音像及装饰.jpg
+original:
+  path: 佛教空间设计案例/佛教室内观音像及装饰.jpg
+  sha256: a3d2df1e86748b33ac61a1531ed48dd6a6870ec3c4d5e3566cd6dc9c666ad2da
+  bytes: 4585410
+  width: 3415
+  height: 2564
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a3d2df1e86748b33.jpg
+    sha256: ed424b6f960368f5b37300699948f944c8fbd390d39bf8fc13bb5a7c93221db0
+    bytes: 607294
+    width: 2048
+    height: 1538
+  thumb512:
+    path: assets/thumb512/a3d2df1e86748b33.webp
+    sha256: d472292efc903755a160ced91700df01b755ca739478ab419806ce54812ff819
+    bytes: 60808
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 低角度仰视巨型八角千瓣金莲穹顶藻井与发光万佛墙下，伫立于米黄石雕仰莲座上的高大汉白玉合十持珠观音菩萨立像空间。
+materials:
+- 汉白玉观音立像
+- 米黄石雕仰莲座
+- 八角千瓣金莲穹顶藻井
+- 发光金色万佛墙
+colors:
+- 汉白玉白
+- 辉煌金
+- 米黄色
+- 暖黄光色
+style: 现代宏大圆通宝殿与穹顶藻井风
+ai_design_usage: 大型观音殿/圆通宝殿核心立像与巨型穹顶藻井设计、低角度仰视崇高感空间构图、汉白玉立像与金顶对比方案
+prompt_zh: 极具震撼力的佛教圆通宝殿室内低角度仰视场景，正中央矗立一尊高大圣洁的汉白玉观音菩萨立像，双手胸前合十持念珠，神态慈悲安详，脚踏米黄色石材雕刻仰莲花瓣底座，观音像正上方是覆盖整个天际的巨型八角形千瓣金莲穹顶藻井，密布数百个金色莲花浮雕方格并围绕中心圆形团花天池，后方两侧为璀璨的金色发光万佛墙，白玉与赤金交相辉映，神圣崇高，8K超清建筑渲染
+tags:
+- 汉白玉观音立像
+- 千瓣金莲穹顶
+- 八角藻井
+- 仰视构图
+- 圆通宝殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2564
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-angle 3D render looking up at a tall white marble standing Guanyin on a stone lotus pedestal beneath a golden
+    thousand-petal lotus octagonal caisson dome and glowing 10,000-Buddha walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

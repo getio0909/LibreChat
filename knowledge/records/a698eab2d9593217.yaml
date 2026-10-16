@@ -1,0 +1,77 @@
+id: a698eab2d9593217
+title_zh: 佛教室内展览空间-03
+source:
+  original_path: 佛教空间设计案例/佛教室内展览空间-03.jpg
+original:
+  path: 佛教空间设计案例/佛教室内展览空间-03.jpg
+  sha256: a698eab2d95932175e68defaa8604eca25caf9bb33ccd7d7c913db6ed9e89786
+  bytes: 2405833
+  width: 2061
+  height: 2520
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a698eab2d9593217.jpg
+    sha256: f68ed8830f0974e97e39489c89b6267673c1342b675534fef87d8af08f6345d8
+    bytes: 510125
+    width: 1675
+    height: 2048
+  thumb512:
+    path: assets/thumb512/a698eab2d9593217.webp
+    sha256: 0fda891454cc9d2262ce6e280f33557b51c78a5edb097b67e9abc4187c91f4f8
+    bytes: 46902
+    width: 419
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 灰褐高光大理石地面排列明黄圆蒲团、立汉白玉柱础木柱、大型背光木格栅花窗前陈列成排中式实木禅椅的现代禅堂空间。
+materials:
+- 灰褐纹理大理石
+- 背光木格栅花窗
+- 实木太师禅椅
+- 汉白玉柱础
+- 黄色圆形蒲团
+- 深木格栅吊顶
+colors:
+- 灰褐色
+- 深胡桃木色
+- 暖黄光色
+- 明黄色
+- 汉白玉白
+style: 现代中式禅堂与人文共修风
+ai_design_usage: 现代寺院禅堂/共修讲堂后区与侧廊设计、背光木格栅大花窗与禅椅陈设参考、大理石地面蒲团排布方案
+prompt_zh: 现代中式佛教禅堂与室内展览空间竖幅视角，高光灰褐色纹理大理石地面上整齐排列数十个明黄色圆形禅修蒲团，中景立两根深胡桃木大圆柱配洁白的汉白玉柱础，后方左侧是一整面通高大型背光中式几何木格栅花窗，透出温暖柔和的黄光，花窗前整齐一字排开一列中式实木太师禅椅，顶部为深色木格栅嵌线性灯条吊顶，静谧禅意，8K建筑室内效果图
+tags:
+- 现代禅堂
+- 背光木格栅
+- 太师禅椅
+- 蒲团阵列
+- 汉白玉柱础
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2061
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D rear-diagonal render of the modern meditation hall (#152) showing rows of yellow round meditation cushions on
+    a grey stone floor and perimeter Chinese armchairs before a backlit wooden screen, misclassified under category_l2 as
+    '现代禅修茶室'.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - subject_mismatch

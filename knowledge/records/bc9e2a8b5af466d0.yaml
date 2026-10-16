@@ -1,0 +1,76 @@
+id: bc9e2a8b5af466d0
+title_zh: 展厅展示的蓝白纹理石材样品
+source:
+  original_path: 常用石材大板/展厅展示的蓝白纹理石材样品.jpg
+original:
+  path: 常用石材大板/展厅展示的蓝白纹理石材样品.jpg
+  sha256: bc9e2a8b5af466d0f7987691220381d62682a0e8be2b95374efb14d35ec89e5c
+  bytes: 259199
+  width: 828
+  height: 622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bc9e2a8b5af466d0.jpg
+    sha256: f923d4e23d75b18e0bfab1ac4f522690cfd27bd90dc01eb87e2c04e10d23fb69
+    bytes: 127462
+    width: 828
+    height: 622
+  thumb512:
+    path: assets/thumb512/bc9e2a8b5af466d0.webp
+    sha256: 78a24948e6e9a3e0de54fb80b43a63f911d2c194830de3e5bec475af662e3d91
+    bytes: 36160
+    width: 512
+    height: 385
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用奢石大板-蓝白分明斜纹系
+entity_type: 实物对象写实
+summary_zh: 本图为带有明确规格参数（298×201cm）的天然蓝白双色斜纹大理石大板（蓝天白云/冰川蓝奢石）展厅实拍图。
+materials:
+- 天然蓝白大理石
+- 蓝天白云奢石
+- 结晶大理石
+colors:
+- 天青蓝
+- 星云蓝
+- 冰雪白
+- 银白色
+style: 现代奢石展陈 / 现代禅意艺术
+ai_design_usage: 对称拼接（Book-match）形成“V型碧海雪山”主背景墙 / 禅意水景空间背板 / 现代艺术佛堂点睛背景材质
+prompt_zh: 天然蓝白双色斜纹大理石奢石大板正面特写，尺寸298x201厘米，左上大部分区域为浓郁的天青蓝与银白冰晶交织的斜向流云纹理，右下角自然过渡为纯净的冰雪白色留白基底，色彩分界鲜明自然，如碧海雪山交融，镜面高光抛光，高端石材展厅陈列，8K超高清细节。
+tags:
+- 蓝白大理石
+- 5504号大板
+- 碧海雪山纹理
+- 对角双色奢石
+- 298x201大板
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 622
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 蓝灰金黄流体纹大理石大板实拍，原图828x622分辨率偏低，顶部居中叠加黑字“5504# 25 298*201”规格文本，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 828x622 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（828x622，最短边<768px）
+  - 顶部存在“5504# 25 298*201”规格文字叠加
+  - 右下角存在第三方“STM石猫”水印

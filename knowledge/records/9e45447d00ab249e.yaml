@@ -1,0 +1,73 @@
+id: 9e45447d00ab249e
+title_zh: 佛教石材墙面装饰案例
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材墙面装饰案例.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材墙面装饰案例.jpg
+  sha256: 9e45447d00ab249e4695a563a0a6d6b7dca1d6d38fbd64cdd634e0d23a1b85a9
+  bytes: 4865980
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9e45447d00ab249e.jpg
+    sha256: 5c18c276d8f50e29cc1984f0e2ce58e4534e624ca888e8c403a278bc35bcabc6
+    bytes: 895027
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/9e45447d00ab249e.webp
+    sha256: 6bcbdb9b39261f9bad5265e0e1f9cb370bb84bccb4634510477594372f743453
+    bytes: 44874
+    width: 384
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 材质
+- 参考
+- 纹样
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-天然美石背景墙左段
+entity_type: 空间场景设计
+summary_zh: 本图为 C立面 9米奢石长卷展墙的左端起始段局部特写，与第 01 图（中段“· 佛國畫卷”）左右无缝衔接。重点展示了巨幅对纹奢石画框在墙角处的木作收边工艺，以及高抛光奢石与展厅环境光影的交互效果。
+materials:
+- 佛国画卷奢石
+- 莲瓣木线
+- 回型条
+colors:
+- 琥珀金
+- 紫黑
+- 深胡桃木
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 奢石背景墙左端收口节点、标题书法字与镜面灯带反射质感参考
+prompt_zh: 新中式石材展厅奢石背景墙左侧局部特写，米白色墙面上方安装黑色立体书法字“天然美石 ·”及黑色轨道射灯与长臂洗墙灯，核心区域镶嵌镜像对称拼接的“佛国画卷”敦煌金天然奢石大板，浓烈的金黄色、琥珀色与深紫黑色天然纹理交织成对称佛塔图案，高光镜面石材表面清晰反射出远处暖黄色的阶梯折角灯带光影，四周采用100mm宽雕花莲瓣实木线条包边，底部为深胡桃木中式回纹护墙板，8K室内实景摄影。
+tags:
+- 26年春季佛事展
+- 天然美石
+- 佛国画卷
+- 奢石墙收口节点
+- 镜面大理石反射
+- 中式护墙板
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展C立面佛国画卷（敦煌金系列）对纹奢石背景墙左段'天然美石·'正视实景特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh跨图引用''第 01 图（中段·佛國畫卷）'''

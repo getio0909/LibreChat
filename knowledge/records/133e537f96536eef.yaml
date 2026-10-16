@@ -1,0 +1,75 @@
+id: 133e537f96536eef
+title_zh: 佛教风格多层装饰柜-02
+source:
+  original_path: 佛教家具与陈设素材/佛教风格多层装饰柜-02.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格多层装饰柜-02.jpg
+  sha256: 133e537f96536eefbf675650c708b470a3716f723bfd00bc5501fbd331f3ff8f
+  bytes: 421521
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/133e537f96536eef.jpg
+    sha256: b58a948734817a488a7da1105efc733907fbe0cd5adc99d3de5954f080af1e3e
+    bytes: 454054
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/133e537f96536eef.webp
+    sha256: 8bcb7ad0669c8687982e1d64a1cbd22482a1daa14cdd99a408692723d7f47523
+    bytes: 45576
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 基于第 12 项三层阶梯展台母本，通过 AI 材质重构生成的“紫檀红木攒框 + 豆青玉底板 + 满嵌绿松石红珊瑚”宫廷级三层坛城装饰柜。该设计将原本纯木雕的飞天与八吉祥转化为极具乾隆宫廷“百宝嵌（玉石镶嵌）”风格的木玉复合工艺品。
+materials:
+- 紫檀红木
+- 青玉底板
+- 绿松石
+- 红珊瑚
+colors:
+- 深紫红配青豆绿
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 纯木雕家具向“红木嵌玉百宝嵌”工艺转换示例 / 藏式供台奢石玉器化定制设计
+prompt_zh: 室内实景渲染，一座奢华的紫檀红木嵌青玉三层阶梯式佛教坛城装饰柜，深紫红色红木框架配古铜包角，三层台面与柜门背板全部镶嵌温润的豆青色和田青玉，青玉底板上叠加红木镂空雕花，顶层与中层镶嵌成排的绿松石、红珊瑚与青金石圆珠，底层柜门为青玉套雕海棠形宝相花开光，置于藏式地毯上，极致百宝嵌工艺质感，8K超清。
+tags:
+- 红木嵌青玉
+- 百宝嵌工艺
+- 三层装饰柜
+- 绿松石红珊瑚
+- 坛城供台
+- 木玉复合家具
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a 3-tier stepped Tibetan cabinet with celadon jade panels
+    and turquoise/coral inlays. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

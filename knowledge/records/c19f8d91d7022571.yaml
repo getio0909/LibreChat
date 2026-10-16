@@ -1,0 +1,76 @@
+id: c19f8d91d7022571
+title_zh: 佛教室内供奉空间设计案例
+source:
+  original_path: 佛教空间设计案例/佛教室内供奉空间设计案例.jpg
+original:
+  path: 佛教空间设计案例/佛教室内供奉空间设计案例.jpg
+  sha256: c19f8d91d702257147a52c36c051eb16c74fd0948a4aae641cccb736e9521178
+  bytes: 3361609
+  width: 3944
+  height: 2615
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c19f8d91d7022571.jpg
+    sha256: fe89d5ab171f118c9c04684b4bc8acb06790c03378f190c3d21a0a6ac4f73efd
+    bytes: 406785
+    width: 2048
+    height: 1358
+  thumb512:
+    path: assets/thumb512/c19f8d91d7022571.webp
+    sha256: d0ee05a43f9f4c8bfc1665c57eaef60e398e5b82812fdfed38672271f5fd13cc
+    bytes: 31460
+    width: 512
+    height: 339
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 中式居家与会所佛堂
+entity_type: 空间场景设计
+summary_zh: 正中设金色雕花华盖佛龛（供奉三世佛与文殊普贤五尊金像）并连体博古架、两侧白墙挂六幅重彩菩萨画的新中式佛堂案例。
+materials:
+- 金色雕花华盖佛龛
+- 实木博古架
+- 胡桃木地板
+- 五尊鎏金佛菩萨像
+- 框装重彩菩萨画
+- 六角落地宫灯
+colors:
+- 胡桃木棕
+- 辉煌金
+- 纯白色
+- 明黄色
+- 丹青彩绘色
+style: 新中式博古精舍佛堂风
+ai_design_usage: 中型居士林/会所佛堂设计案例、五尊佛菩萨（三世佛+文殊普贤）同龛供奉布局、佛龛融合博古藏经架设计
+prompt_zh: 新中式佛教室内供奉空间设计案例，正中央一体式实木佛坛柜，中央佛龛顶部冠以精美的金色镂空雕花天宫华盖，龛内金色心经背景板前并列供奉三尊带火焰背光的三世佛与左右文殊普贤菩萨共五尊金像，佛龛两侧连接开放式木作博古架陈列经函与小佛塔，前方设红木雕花供桌、浅色地垫与三个黄色圆蒲团，两侧立六角落地宫灯，左右白墙各对称悬挂三幅框装工笔重彩菩萨挂画，胡桃木地板，木格栅加矩形透光灯膜天花，8K效果图
+tags:
+- 五尊佛龛
+- 天宫华盖
+- 博古架佛柜
+- 重彩菩萨挂画
+- 会所佛堂
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2615
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a neo-Chinese shrine hall with five gilded Buddha and Bodhisattva statues under a golden openwork canopy,
+    flanked by wooden curio shelves and six framed polychrome bodhisattva paintings.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

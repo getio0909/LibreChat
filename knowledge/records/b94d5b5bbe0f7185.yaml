@@ -1,0 +1,75 @@
+id: b94d5b5bbe0f7185
+title_zh: 佛教大殿内部展示空间
+source:
+  original_path: 佛教空间设计案例/佛教大殿内部展示空间.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿内部展示空间.jpg
+  sha256: b94d5b5bbe0f7185b46bcb5b61819ef59a02e286f536c3e3166785e0d072ede6
+  bytes: 2601088
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b94d5b5bbe0f7185.jpg
+    sha256: 692789eb6594a53d6131ac0e1e2317dd7fc90fda6d9bf35fc21ca107354b1288
+    bytes: 489460
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/b94d5b5bbe0f7185.webp
+    sha256: ca7b63dab31de907128dd7c6a9b163a8d613ba4ad778779222f3cac13073d26c
+    bytes: 29702
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 顶部覆巨型米白石材八角叠涩斗拱藻井、正面设心经山水中央主龛与青绿云水海棠形侧龛的现代白色石材万佛大殿。
+materials:
+- 米白石材斗拱藻井
+- 白石万佛墙
+- 镂空心经屏风
+- 青绿浮雕背板
+- 灰棕大理石水刀拼花
+colors:
+- 象牙白
+- 辉煌金
+- 青绿色
+- 灰褐色
+- 明黄色
+style: 现代素雅石雕与新中式禅意风
+ai_design_usage: 现代石材装配式大雄宝殿设计、八角叠涩斗拱发光藻井建造参考、海棠形佛龛与山水背板深化
+prompt_zh: 现代素雅石材佛教大殿内部展示空间，顶部是巨型米白色石材八角叠涩斗拱发光莲花藻井穹顶，正面墙设三座大佛龛，中央矩形主龛供奉一佛二弟子金像，背景为金色山水浮雕与圆形镂空心经透光屏风，左右两侧为海棠形石材拱门佛龛，内供金佛并配青绿山水祥云浮雕背景板，两侧墙面是白色石材发光万佛墙，汉白玉雕花护栏，灰棕色高光大理石地面带大型圆形几何水刀拼花，两排黄色方蒲团，8K建筑渲染
+tags:
+- 八角斗拱藻井
+- 海棠形佛龛
+- 心经山水背板
+- 白色万佛墙
+- 石材大殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K 3D render of a contemporary off-white stone 10,000-Buddha hall with a monumental octagonal bracketed
+    stone caisson, central Heart Sutra relief niche, and begonia-shaped side niches.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

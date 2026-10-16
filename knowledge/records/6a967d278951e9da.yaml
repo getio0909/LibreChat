@@ -1,0 +1,69 @@
+id: 6a967d278951e9da
+title_zh: 佛教风格石材装饰柱展示
+source:
+  original_path: 佛教空间设计案例/佛教风格石材装饰柱展示.jpg
+original:
+  path: 佛教空间设计案例/佛教风格石材装饰柱展示.jpg
+  sha256: 6a967d278951e9da848c184515b243a216213c3ed722192ddb37a5b7e6a43348
+  bytes: 1426235
+  width: 1298
+  height: 2640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6a967d278951e9da.jpg
+    sha256: 08c9012586d4122a2d34bc6cfbf261c22bff540e8f547a78588d7bb77b790167
+    bytes: 265751
+    width: 1007
+    height: 2048
+  thumb512:
+    path: assets/thumb512/6a967d278951e9da.webp
+    sha256: 43358dd22ea8f7c4fecd49f9199a66b57e25e84244738e933c7261bba3d8d515
+    bytes: 24566
+    width: 252
+    height: 512
+library_type: 建筑景观
+studio_roles:
+- 造型
+- 纹样
+- 参考
+category_l1: 佛教空间案例
+category_l2: 建筑木石构件
+entity_type: 实物对象写实
+summary_zh: 底部为高大方形汉白玉仰覆莲瓣须弥座柱础、中部深红木柱身四面镶嵌铜鎏金卷草与佛龛高浮雕板的佛殿室内复合装饰方柱特写。
+materials:
+- 多层汉白玉仰覆莲瓣柱础
+- 深色红木柱体
+- 镶嵌铜鎏金卷草佛龛浮雕饰板
+colors:
+- 汉白玉白
+- 辉煌金
+style: 现代奢华佛殿石木金复合工艺
+ai_design_usage: 高端佛殿室内复合装饰方柱节点深化、汉白玉柱础与木包金柱身收口工艺参考
+prompt_zh: 佛教大殿室内豪华复合材质装饰方柱特写，竖构图，底部为高大的多层方形汉白玉石雕须弥座柱础，精细雕刻仰覆莲花瓣与回纹卷草线脚，上方柱身为深色红木方柱框架，四面镶嵌通体铜鎏金高浮雕缠枝宝相花与佛像壁龛装饰板，柱头饰鎏金莲花斗拱，背景为白色石材万佛墙与棕色大理石地面，石雕木作与鎏金工艺完美结合，8K建筑节点写实渲染
+tags:
+- 汉白玉柱础
+- 石材装饰柱
+- 铜鎏金包柱
+- 建筑木石构件
+- 佛殿立柱节点
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1298
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大型拱形火焰背光石雕门券，浮雕卷草八吉祥纹与双狮戏球柱头，局部裁切图，无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,72 @@
+id: 649d84db0268f568
+title_zh: 佛教寺庙观音殿室内场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙观音殿室内场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙观音殿室内场景.jpg
+  sha256: 649d84db0268f5689a641a3761d6ce13bda3053749c699a55976c8b7c407e880
+  bytes: 4044970
+  width: 3433
+  height: 2562
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/649d84db0268f568.jpg
+    sha256: ebc738cba0774480591b44d964ed5f5f5b041548fa487e21c87fbf25e6befb75
+    bytes: 529209
+    width: 2048
+    height: 1528
+  thumb512:
+    path: assets/thumb512/649d84db0268f568.webp
+    sha256: a6c6115de324fe37200bdff351ce2370ae570270f7179e8cf86c3552a0c793e6
+    bytes: 48224
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 大型寺院千瓣金莲穹顶观音殿室内场景
+entity_type: 空间场景设计
+summary_zh: 本图为大型现代寺院观音殿（圆通宝殿）内部核心礼佛空间场景（与第 20 张同属一殿的不同吊顶方案）。空间以中心坛城式布局烘托高大圣洁的汉白玉千手观音（多臂观音）立像，头顶笼罩巨大的千瓣金莲苍穹，营造出“千处祈求千处应、佛光普照”的震撼宗教空间体验。
+  空间以纯白、璀璨暖金与温润米黄为主色调。主尊千手观音及下方双层仰覆莲瓣须弥座均采用极品一级汉白玉精雕，肤质与衣纹温润如玉；顶部穹顶为层层向心收拢的立体贴金莲花瓣构件；环殿巨柱采用米白直纹大理石，柱脚包嵌一圈红棕色宝相花高浮雕铜箍（或红玉套）及汉白玉双层莲瓣柱础；地面采…
+materials:
+- 汉白玉造像
+- 贴金莲花穹顶
+- 大理石水刀拼花
+colors:
+- 璀璨暖金
+- 纯白汉白玉
+- 米黄大理石
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：大型寺院圆通宝殿/观音殿空间设计 / 千瓣金莲穹顶藻井与汉白玉立像构图参考 / 佛殿大理石水刀拼花地面设计；推荐搭配：四川宝兴汉白玉大型观音造像 + 贴金千瓣莲花GRG/木雕穹顶 + 莎安娜米黄配多色玉石水刀拼花地面
+  + 暖橙色背光万佛墙
+prompt_zh: 宏伟的中国佛教寺庙观音殿室内场景，低角度仰视对称构图，大殿中央多层木质台基与汉白玉莲花宝座上矗立一尊高大的汉白玉多臂千手观音立像；正上方为震撼的圆形千瓣贴金莲花层叠穹顶藻井，每片莲瓣散发温暖金光；后方弧形墙面满布橙黄色发光的方格万佛墙；前景两侧矗立粗壮的米白大理石圆柱，柱底包嵌红棕色浮雕铜套与汉白玉莲瓣柱础；高光米黄大理石地面镶嵌精美的八角莲花曼荼罗水刀拼花与彩色莲花波打线，金碧辉煌，圣洁庄严，8K超高清渲染。
+tags:
+- 观音殿空间设计
+- 千瓣金莲穹顶
+- 汉白玉千手观音
+- 大理石水刀拼花
+- 发光万佛墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2562
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大型千瓣金莲穹顶观音殿三维效果图，中央供汉白玉千手观音立像，地面铺设彩色莲花水刀拼花大理石。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

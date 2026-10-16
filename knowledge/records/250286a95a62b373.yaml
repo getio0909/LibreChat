@@ -1,0 +1,71 @@
+id: 250286a95a62b373
+title_zh: 佛教寺庙大殿内部场景-03
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-03.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-03.jpg
+  sha256: 250286a95a62b37322b7cd1977c0664581cb50495ef77c0d50db615ecc5bf717
+  bytes: 977793
+  width: 1983
+  height: 1219
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/250286a95a62b373.jpg
+    sha256: f565b5abd224a4413b4dfb5440c49d85f73695faa318340ae929b006da4badf3
+    bytes: 274912
+    width: 1983
+    height: 1219
+  thumb512:
+    path: assets/thumb512/250286a95a62b373.webp
+    sha256: 1cd289976abce614762a153c077a6b86f2eeb4bd3a15dbedf76dd25fd9624a48
+    bytes: 26518
+    width: 512
+    height: 315
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为五开间重檐歇山顶红木透雕天宫楼阁大佛龛（帐龛）正面中轴全景场景（空间场景设计）。
+materials:
+- 五开间重檐歇山顶红木透雕大佛龛
+- 嵌鎏金荷花裙板木护栏
+- 五张红木供桌配十方拜垫
+- 青石莲花柱础木巨柱
+- 千佛墙
+colors:
+- 深红木色
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 五开间重檐木作大佛龛正面中轴标准全景参考、传统大型帐龛飞檐斗拱与五供桌对称陈设范式
+prompt_zh: 传统佛教寺庙大殿正面中轴对称全景，深红棕色高光实木地板，前景左右耸立两根带鎏金莲瓣束腰铜箍与青石多层莲花柱础的红木大圆柱，正中央为一座极其宏伟的五开间重檐歇山顶红木透雕天宫楼阁式大佛龛，飞檐斗拱层层挑出，贴金龙凤卷草雕花繁复华丽，五个佛龛内均饰有贴金毗卢帽花罩并供奉佛像，佛龛前设镶嵌鎏金荷花浮雕的通长木护栏，前方一字排开五张红木雕花供桌与五对十个米黄色方形拜垫，左右两侧墙面内嵌暗红色发光千佛墙，8K超清建筑效果图
+tags:
+- 天宫楼阁佛龛
+- 五开间重檐佛龛
+- 金漆木雕
+- 五供桌阵列
+- 中轴对称全景
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1219
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 五开间重檐歇山顶红木透雕天宫楼阁佛龛大殿正面中轴三维效果图，左下角带半透明莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

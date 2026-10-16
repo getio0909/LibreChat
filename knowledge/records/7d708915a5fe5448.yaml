@@ -1,0 +1,72 @@
+id: 7d708915a5fe5448
+title_zh: 藏传佛教供桌与装饰细节
+source:
+  original_path: 佛教空间设计案例/藏传佛教供桌与装饰细节.jpg
+original:
+  path: 佛教空间设计案例/藏传佛教供桌与装饰细节.jpg
+  sha256: 7d708915a5fe544810d7cd3d0019e21d2de016629144504d6fc3558ee916d917
+  bytes: 1532043
+  width: 990
+  height: 2622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7d708915a5fe5448.jpg
+    sha256: 3e93c663741a5d9e53bbc1841739decf262b3df57b6be69dc190475066b10fe2
+    bytes: 280406
+    width: 773
+    height: 2048
+  thumb512:
+    path: assets/thumb512/7d708915a5fe5448.webp
+    sha256: e0e5cfd47446f9a03e98d9f74d7cd76a4dbe82ec67a2335fa3dafaedcb602c4c
+    bytes: 23630
+    width: 193
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 造型
+- 纹样
+- 参考
+category_l1: 佛教空间案例
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 采用繁复24K真金贴金与红蓝藏式重彩木雕工艺打造的重檐转角佛龛与三层阶梯供台，密集供奉铜鎏金密宗佛像、酥油灯、曼扎盘与八吉祥法器。
+materials:
+- 藏式/汉藏融合重檐贴金彩绘转角佛龛与供台
+- 八吉祥浮雕
+- 铜鎏金佛像与七政宝供器
+colors:
+- 辉煌金
+- 朱红宝蓝
+style: 藏传佛教金漆重彩坛城风
+ai_design_usage: 藏传佛教密坛/精舍华丽转角佛龛定制参考、贴金重彩木雕纹样与藏式供器陈设细节
+prompt_zh: 藏传佛教华丽重檐贴金彩绘转角佛龛与多层供桌陈设细节特写，竖幅构图，佛龛采用繁复精湛的金漆木雕工艺，色彩以辉煌金、朱砂红与宝蓝色为主，上部为重檐金顶与雕花盘龙柱佛龛，内供奉多尊铜鎏金密宗佛像；中部三层阶梯供台上铺黄色织锦，密集陈列纯金酥油灯、曼扎盘、八吉祥法器与七政宝供具；下部为精雕瑞兽莲花纹彩绘须弥座底柜，极尽庄严华贵，8K宗教艺术写实摄影
+tags:
+- 藏传佛教供桌
+- 藏式雕花佛龛
+- 贴金彩绘木雕
+- 八吉祥供器
+- 密宗坛城陈设
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 990
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 藏式彩绘描金多层阶梯式须弥座供坛局部竖图。左下角地面处带有半透明白色莲花图形水印；且summary_zh与materials称层台陈设“金铜佛像、酥油灯与曼扎盘等法器供品”，实际画面中阶梯供座表面完全空置，仅右侧边缘露出半尊立像衣角与一盏高足灯。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 左下角存在第三方半透明莲花图形水印
+  - summary_zh与materials存在幻觉（虚构层台陈设金铜佛像、酥油灯与曼扎盘，实际阶梯台面为空置状态）

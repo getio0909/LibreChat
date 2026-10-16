@@ -1,0 +1,77 @@
+id: 1b0626c35b822487
+title_zh: 佛教主题展厅设计
+source:
+  original_path: 佛教空间设计案例/佛教主题展厅设计.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展厅设计.jpg
+  sha256: 1b0626c35b822487dca3d785ce55f471dcfaa4e41264d2836776ac19ec0d0579
+  bytes: 984420
+  width: 2192
+  height: 1254
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1b0626c35b822487.jpg
+    sha256: 0a0f6ce4eb94ad95e99a27910ab6533405bdd03be365abeccf54df551a3eaa86
+    bytes: 278873
+    width: 2048
+    height: 1172
+  thumb512:
+    path: assets/thumb512/1b0626c35b822487.webp
+    sha256: 1cb34cb188d5c5eafcee1f329b6feb9a1b3eca263ae5f12faafd88d781d0bd9a
+    bytes: 25836
+    width: 512
+    height: 293
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 药师琉璃佛殿与万佛展厅
+entity_type: 空间场景设计
+summary_zh: 深木色与宝蓝金黄 / 蓝色琉璃药师佛、透光云石背景、墨绿大理石地面
+materials:
+- 灰白花岗岩条石
+- 深褐色防腐木
+- 白色抹灰墙
+- 青石板
+- 翠竹绿植
+colors:
+- 素白
+- 深木褐
+- 浅麻灰
+- 竹叶青
+style: 现代新中式禅意庭院园林风
+ai_design_usage: 药师琉璃佛殿空间生成 / 山水纹透光奢石背景墙应用 / 蓝橙互补色宗教光影参考
+prompt_zh: 大型现代药师琉璃佛殿室内空间，正中供奉通体宝蓝色半透明琉璃药师佛坐像，两侧为橙黄色琉璃日光月光菩萨，佛像背后是整面发光的水墨云山纹透光奢石大板背景墙，四周墙面嵌满蓝黄双色发光万佛小龛，粗壮深木色方柱配青石浮雕柱础，地面为高光镜面墨绿色大理石，倒影绚丽，8k渲染图。
+tags:
+- 药师琉璃佛
+- 东方净琉璃世界
+- 透光奢石背景墙
+- 绿石材地面
+- 万佛墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1254
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior rendering of the Medicine Buddha hall with blue liuli Medicine Buddha, orange-yellow Bodhisattva and
+    Yaksha guardian statues between columns, thousand-Buddha walls, and green marble floor. Metadata materials/colors/style
+    fields are misaligned (describing an outdoor courtyard with 防腐木/白色抹灰墙/翠竹绿植).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials/colors/style fields describe an outdoor courtyard with 防腐木/白色抹灰墙/翠竹绿植 instead of the indoor
+    Medicine Buddha hall'

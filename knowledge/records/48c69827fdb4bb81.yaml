@@ -1,0 +1,71 @@
+id: 48c69827fdb4bb81
+title_zh: 潮州木雕｜金漆层叠透雕花板
+source:
+  original_path: 设计风格精选20261010/chaozhou-gilded-openwork.jpg
+original:
+  path: 设计风格精选20261010/chaozhou-gilded-openwork.jpg
+  sha256: 48c69827fdb4bb811b7a6da531c8a45b26a86437d7607134b7afc9ff70d01f91
+  bytes: 6823782
+  width: 5456
+  height: 2949
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/48c69827fdb4bb81.jpg
+    sha256: 5fd2d35912d0a224c0ee2ef2da0aedefbd6d41e87599d1d5d2d2796dc89c3c09
+    bytes: 407574
+    width: 2048
+    height: 1107
+  thumb512:
+    path: assets/thumb512/48c69827fdb4bb81.webp
+    sha256: eeac795d128808beadc32ac3eb419dfcddb54595dcfc6b0c70f5cc2cf8f91a2d
+    bytes: 29702
+    width: 512
+    height: 277
+library_type: 家具木作
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 潮州金漆木雕多层镂空花板构件
+entity_type: 实物对象写实
+summary_zh: 这是一件中国国家级非遗“潮州金漆木雕”极具代表性的“虾蟹篓/鱼蟹水草”题材多层镂空通雕横幅花板（建筑梁托或神龛眉板构件）实物写实。
+materials:
+- 樟木多层镂空圆雕
+- 纯赤金箔贴金
+- 黑漆木底座
+colors:
+- 赤金色
+- 古铜暗金
+- 漆黑色
+style: 闽南潮州传统工艺 / 潮州金漆木雕
+ai_design_usage: 高定佛龛/供桌金漆木雕构件设计 / 传统非遗木雕细节风格迁移 / 石材或金属仿潮州多层透雕工艺研发
+prompt_zh: 博物馆展陈的中国潮州金漆木雕多层镂空通雕花板特写，安装在黑色木底座上；整块樟木采用极致繁复的三层立体透雕技法，雕刻出生动的螃蟹、弯曲交错的芦苇水草、垂挂饱满的颗粒谷穗、翻滚的螺旋海浪以及隐藏在深层水草后的游鱼，表面满贴纯正赤金箔，在顶光照射下呈现丰富的明暗金色金属层次与深邃立体镂空感，超高清非遗文物微距摄影。
+tags:
+- 潮州金漆木雕
+- 多层镂空通雕
+- 鱼蟹水草木雕
+- 佛龛贴金构件
+- 非遗木雕写实
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:金漆木雕通雕鱼藻蓼花纹花板.jpg
+  credit: 三猎
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2949
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res museum photograph of a Chaozhou gilded multi-layer openwork wood carving depicting fish, crabs, reeds, and
+    grain ears.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

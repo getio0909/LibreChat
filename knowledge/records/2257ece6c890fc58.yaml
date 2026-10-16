@@ -1,0 +1,70 @@
+id: 2257ece6c890fc58
+title_zh: 藏式佛教木质雕刻展柜
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教木质雕刻展柜.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教木质雕刻展柜.jpg
+  sha256: 2257ece6c890fc5898d024372c3ebc416546a76081cf3051c10b6039efdbeec9
+  bytes: 379196
+  width: 1440
+  height: 1080
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2257ece6c890fc58.jpg
+    sha256: d20300566d2fc3be5f32d5aabdd33fd5043b7eb9850cc215a21ad3e3e757b9f1
+    bytes: 408764
+    width: 1440
+    height: 1080
+  thumb512:
+    path: assets/thumb512/2257ece6c890fc58.webp
+    sha256: 0d3eb0970a062ebe0f0211c6ca99554950fe350d5d1deb296c3f7f56e5b323e8
+    bytes: 51862
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: 陈设于现代展厅轨道射灯下的一座殿堂级藏传佛教“十一佛冠顶”三联多宝格大佛龛展柜。整座佛柜以藏传寺院大经堂建筑立面为蓝本，将飞檐斗拱、转经筒排、双鹿法轮、火焰拱门（巴卡拱）与下层储物供柜融为一体，体量宏伟，雕工极尽繁复。
+materials:
+- 实木
+- 矿彩沥粉贴金
+- 绿松石镶嵌
+colors:
+- 深棕红配石青翠绿
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 大型藏传佛堂整墙主佛龛定制设计 / 双鹿法轮与十一佛冠建筑化家具参考 / 多尊佛像阵列陈设母本
+prompt_zh: 展厅正面实景摄影，一座宏伟的藏传佛教十一佛冠顶三联木雕彩绘大佛龛展柜，顶部一字排开十一尊浮雕佛像，正中门楣饰鎏金八辐法轮与双鹿卧像，下方为多层藏式彩绘斗拱飞檐，中部由中央大型火焰拱门主龛与两侧十四个小型火焰拱形博古龛组成，腰线与底部九门九抽储物柜满雕绿松石青绿与朱红描金卷草瑞兽图案，顶部轨道射灯照明，8K高清。
+tags:
+- 十一佛冠顶
+- 双鹿法轮
+- 火焰拱门佛龛
+- 藏式大佛柜
+- 九门三联柜
+- 矿彩描金木雕
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1080
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a large Tibetan 11-Buddha-crown 3-bay altar cabinet with flame-arch niches and polychrome
+    carved lower doors.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

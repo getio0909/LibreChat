@@ -1,0 +1,70 @@
+id: dba0e5b4fae091f9
+title_zh: 藏式佛教家具展示空间
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教家具展示空间.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教家具展示空间.jpg
+  sha256: dba0e5b4fae091f9a0033f462a6cc75c1f06cca4a65c67cb44a499748bd4af43
+  bytes: 369192
+  width: 1440
+  height: 1080
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/dba0e5b4fae091f9.jpg
+    sha256: 58c41666b3074596bc21815e7d885ee01ece16535e0e3c152323e6f1e78852b9
+    bytes: 397559
+    width: 1440
+    height: 1080
+  thumb512:
+    path: assets/thumb512/dba0e5b4fae091f9.webp
+    sha256: 61192ef6d97d2541441d89de5bc08e6c3b02d176707b55b8fb946288415d40bf
+    bytes: 48564
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 物件
+- 风格
+category_l1: 佛教家具与陈设
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 一座真实落地的藏汉融合佛教实木雕花家具品牌展厅（或高端禅茶会客厅）完整空间场景。作为本批次最具文献与算法对照价值的“源头实景母本图（Ground-Truth Source Image）”，它不仅展示了成套藏式雕花实木沙发、茶几、角几在真实商业展厅中的围合尺度与软装搭配，还同时呈现了后方背景墙的木雕唐卡挂画阵列与左后方的四角亭阁式木佛龛。
+materials:
+- 雕花实木沙发组
+- 木雕唐卡挂画
+- 木地板
+colors:
+- 暖金棕配天青软包
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: ControlNet材质替换与背景重绘的标准实景母本（对比图01-06及图28） / 佛教艺术家具展厅与禅茶会客厅整体软装设计参考
+prompt_zh: 室内展厅实景摄影，一个温馨典雅的藏汉融合佛教实木雕花家具会客展示空间，浅色人字拼木地板，暖驼色肌理背景墙，中央围合摆放一套琥珀金棕色核桃木深浮雕莲花靠背沙发与大型方形实木茶几，搭配天青色织锦坐垫、青花瓷茶具与鲜花花瓶，背景墙上悬挂布达拉宫全景木雕画与两幅度母木雕唐卡挂屏，左后方矗立一座高大的四角飞檐亭阁式木雕佛龛，自然柔和的展厅照明，8K实景照片。
+tags:
+- 藏式家具展厅
+- 实景母本图
+- 布达拉宫木雕画
+- 会客沙发空间
+- 人字拼木地板
+- ControlNet源图像
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1080
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of Tibetan carved wood sofa, coffee table, wall wood-carved thangkas, and corner pavilion
+    shrine (original physical furniture reference for the AI variants).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

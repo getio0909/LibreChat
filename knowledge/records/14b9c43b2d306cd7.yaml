@@ -1,0 +1,72 @@
+id: 14b9c43b2d306cd7
+title_zh: 浅米色石材纹理样本
+source:
+  original_path: 常用石材大板/浅米色石材纹理样本.jpg
+original:
+  path: 常用石材大板/浅米色石材纹理样本.jpg
+  sha256: 14b9c43b2d306cd7a6907134493e01fa4b25303574217f4c5e1591ce050bd219
+  bytes: 204635
+  width: 908
+  height: 575
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/14b9c43b2d306cd7.jpg
+    sha256: 1236d627770a752123e2e43d309a15b0e92ca47a574e7dfefedb3bf2675dda4e
+    bytes: 95845
+    width: 908
+    height: 575
+  thumb512:
+    path: assets/thumb512/14b9c43b2d306cd7.webp
+    sha256: 65d49a1b694a5ccd1deff9110fff6960435444cc14b540d896682e4c02e46de9
+    bytes: 12104
+    width: 512
+    height: 324
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石样本-带标尺浅米色系
+entity_type: 实物对象写实
+summary_zh: 本图为同批次荒料或同矿口产出的另一片浅米黄色天然大理石大板工业扫描数字样本。
+materials:
+- 天然浅米色大理石
+- 生物沉积大理岩
+colors:
+- 浅暖米色
+- 淡杏仁色
+- 乳白色
+style: 现代奢石展陈 / 传统与现代通用
+ai_design_usage: 多板组合无重复感墙地面铺贴（Multi-tile Texture） / 传统寺院大殿内墙石材贴图 / 石雕须弥座与栏板底材纹理
+prompt_zh: 天然浅米色大理石大板正交工业扫描样本图，左侧和底部带有厘米与英寸标尺，温和的浅杏色与奶油米黄底色，细腻均匀的云团状生物碎屑斑点肌理，带有几丝若隐若现的断续白色方解石细丝，无反光均匀照明，高端室内外建筑装饰石材贴图。
+tags:
+- 浅米色大理石
+- 大板扫描样本
+- 奶油米黄纹理
+- 建筑石材贴图
+- 工程排版母板
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 575
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Industrial scan of a light beige marble slab with CM/IN ruler borders on left and bottom and an STM石猫 watermark in
+    the lower right.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - third_party_watermark
+  - text_overlay

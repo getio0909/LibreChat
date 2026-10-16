@@ -1,0 +1,72 @@
+id: 6be499d1481889b9
+title_zh: 佛教建筑雕刻装饰细节
+source:
+  original_path: 佛教空间设计案例/佛教建筑雕刻装饰细节.jpg
+original:
+  path: 佛教空间设计案例/佛教建筑雕刻装饰细节.jpg
+  sha256: 6be499d1481889b9687a471006a8fd294c3cd55510da0b2267859d71a3a97863
+  bytes: 3492254
+  width: 2415
+  height: 2640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6be499d1481889b9.jpg
+    sha256: 6ac5870bac92733a11e1c8d222b2fd4e19f83a8f0526a766eff045b5614588cf
+    bytes: 670103
+    width: 1873
+    height: 2048
+  thumb512:
+    path: assets/thumb512/6be499d1481889b9.webp
+    sha256: 91f2a4bde7444a818732256847ebe375e4dd749e3f36ab87ef280de28b18bee5
+    bytes: 52460
+    width: 468
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 造型
+- 纹样
+- 参考
+category_l1: 佛教空间案例
+category_l2: 传统佛教建筑重檐贴金斗拱与透光祥云天幕构件
+entity_type: 实物对象写实
+summary_zh: 本图为传统佛殿内部大型佛龛上方或抱厦前檐的唐宋/明清复合式重檐木雕贴金构件仰视正视特写。集深浮雕大梁、透光云石祥云天幕、唐式弧形轩顶、垂莲柱与密集贴金斗拱于一体，代表了传统宗教木作雕刻的最高华丽等级。 构件以深沉的紫檀/酸枝木色为底托，在斗拱、拱眼壁透雕花板、莲花垂柱及平板枋高浮雕上大面积覆贴高纯度亮金箔；顶部正中嵌入一块方形透光云石/艺术琉璃灯箱板，满绘金黄与象牙白交织的吉庆流云纹，自上而下投射出柔和神圣的天光。
+materials:
+- 贴金斗拱
+- 透雕木花板
+- 透光云石
+colors:
+- 辉煌赤金
+- 深棕木色
+- 暖黄云纹
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统大雄宝殿主佛龛顶部重檐贴金斗拱设计 / 弧形唐式卷棚轩顶与镂空金花板细部参考 / 透光云石祥云发光天窗植入；推荐搭配：深红酸枝木/菠萝格实木构件 + 24K亮金箔透雕拱眼壁与斗拱 + 透光云石彩绘祥云灯箱板
+  + 重点射灯打亮
+prompt_zh: 中国传统佛教建筑室内重檐木雕贴金装饰构件正面仰视特写，严格对称构图，顶部横梁深浮雕卷草番莲纹，正中嵌入一块方形金色流云纹透光云石发光天窗；下方为人字形博风板与弧形卷棚轩顶，两侧垂挂一对硕大的贴金莲花垂珠柱头；轩顶下方的拱眼壁满雕精湛的贴金镂空缠枝牡丹花纹，其下整齐排列一排金碧辉煌的传统贴金斗拱与高浮雕莲花额枋，木质温润，金箔璀璨，极致的中国传统古建木雕工艺细节，8K超高清。
+tags:
+- 贴金斗拱构件
+- 唐式弧形轩顶
+- 镂空缠枝牡丹
+- 透光祥云天窗
+- 佛教木雕细节
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2415
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统佛殿唐破风重檐贴金斗拱、垂莲柱与透光祥云天窗局部三维渲染图（右下角带莲花角标），原标注误定为实物写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'subject_mismatch: 图像实为三维CG渲染局部图（带相同莲花角标），而非entity_type所标的“实物对象写实”'

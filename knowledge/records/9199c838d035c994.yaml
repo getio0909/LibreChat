@@ -1,0 +1,70 @@
+id: 9199c838d035c994
+title_zh: 灰色纹理大理石展示图
+source:
+  original_path: 蓝金灰大板自家产品/灰色纹理大理石展示图.jpg
+original:
+  path: 蓝金灰大板自家产品/灰色纹理大理石展示图.jpg
+  sha256: 9199c838d035c994b3e5fcd81da594f3989e48021f716e30604b00e320d64718
+  bytes: 4691153
+  width: 3378
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9199c838d035c994.jpg
+    sha256: 0673dda1203f7c4dcc5aafbe91d47c90f812764d833c9198c19a7d8632c56044
+    bytes: 660401
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/9199c838d035c994.webp
+    sha256: 187bb9e1881e8ea0dd81a76b47a77ea0a7ce72bcad4feb12d0d0840c6a98d3a4
+    bytes: 35638
+    width: 512
+    height: 341
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为竖立在展厅黑色重型底座上的一整块极具艺术感染力的「蓝金灰（深蓝灰斜带配绯霞角）」大板正视标准照（编号07微距特写即取自此板右半部）。
+materials:
+- 蓝金灰大板
+colors:
+- 深鸽羽蓝灰
+- 暖驼金斜带
+- 左下暖粉霞光
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 佛堂/禅茶室艺术主题背景墙整板贴图 / 四拼或双拼对开连纹（Bookmatch）设计母本 / 戏剧性冷暖撞色奢石参考
+prompt_zh: 正面超清写实摄影，一块极具艺术画意的蓝金灰天然奢石大板竖立在展厅黑色钢架上，深邃的鸽羽蓝、黛青灰与暖沙金色宽幅条带从左上向右下浩荡奔流，左下角晕染出一片温暖绚丽的桃花粉与珊瑚橘晚霞色块，数条鲜明的赤铜红长脉与纯白细丝纵向贯穿板面，镜面抛光质感，8k超高清。
+tags:
+- 蓝金灰大板
+- 左下绯霞色块
+- 四拼连纹母本
+- 山水晚霞意境
+- 赤铜长脉奢石
+- A5区展厅
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res front-on showroom photograph of a Blue-Gold-Grey slab featuring deep blue-grey diagonal bands, pinkish lower-left
+    blush, and copper-red veins.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,74 @@
+id: e92c97dc527e622d
+title_zh: 佛教主题展览空间设计-10
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-10.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-10.jpg
+  sha256: e92c97dc527e622dfed169cd1eae1c77ce6bdc9c16ec3cdc98f8a5c72103452a
+  bytes: 977873
+  width: 1713
+  height: 1284
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e92c97dc527e622d.jpg
+    sha256: 94f52128cc7d31bd73d41c07c7a8e12926c6aada71a124574e2b73b4b965ef83
+    bytes: 293191
+    width: 1713
+    height: 1284
+  thumb512:
+    path: assets/thumb512/e92c97dc527e622d.webp
+    sha256: d90bec54733a8a4e2294159cd5be322d57a297822106cf01665f3317691ec6d3
+    bytes: 35840
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 室内禅意枯山水汀步景观廊
+entity_type: 空间场景设计
+summary_zh: 浅灰砾石、深灰石板与翠绿 / 发光汀步石、太湖石罗汉松、发光透明屏风
+materials:
+- 芝麻黑火烧面花岗岩汀步
+- 白砂砾石
+- 太湖石与罗汉松盆景
+- 边缘发光玻璃线雕屏
+- 原木竖格栅
+colors:
+- 纯白砂色
+- 深麻灰
+- 原木色
+- 松叶翠绿
+style: 现代新中式室内枯山水汀步景观风
+ai_design_usage: 室内枯山水白砂汀步悬浮灯带节点设计 / 太湖石与罗汉松室内造景参考 / 玻璃激光内雕佛像发光屏风设计
+prompt_zh: 现代新中式室内禅意枯山水庭院近景效果图，前景地面铺满洁白的枯山水砂砾，其上错落排列两排深灰色花岗岩汀步石板，石板底部暗藏温暖的悬浮灯带，庭院中央是一座长方形石砌花池，池内精心布置白色太湖石假山、翠绿苔藓与苍劲的造型罗汉松盆景，左侧为原木色竖向格栅与两扇边缘发光的透明玻璃佛像线雕屏风，右侧为木框留白挂画墙，暗调天花垂下暖光几何吊灯，宁静雅致，8k。
+tags:
+- 枯山水汀步
+- 悬浮灯带汀步
+- 太湖石罗汉松
+- 玻璃线雕屏风
+- 室内禅院
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1284
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of an indoor Zen dry-landscape passage with circular stepping stones, white gravel, Taihu rocks,
+    Podocarpus pines, and backlit mountain-silhouette glass screens.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

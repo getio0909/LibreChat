@@ -1,0 +1,72 @@
+id: 1bf9dc5b9b230ac3
+title_zh: 佛教寺庙内景-金色佛塔与石材台阶
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内景-金色佛塔与石材台阶.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内景-金色佛塔与石材台阶.jpg
+  sha256: 1bf9dc5b9b230ac30087d2732a7479ddd7041f8c5d0206e6e1b9b65d48a3bb8c
+  bytes: 2454248
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1bf9dc5b9b230ac3.jpg
+    sha256: c25858362a67207d0b60ce55a904ae550f4aed05cea75627151a6d5aa252c199
+    bytes: 501021
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/1bf9dc5b9b230ac3.webp
+    sha256: d67443fbcd817c6238f361064bba4acab9e8e7d12fb8cafc0c266c5240d10f97
+    bytes: 33722
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 藏汉融合佛塔圣殿
+entity_type: 空间场景设计
+summary_zh: 本图为大型寺院室内金色舍利宝塔大殿（藏汉融合尊胜塔殿）坡屋顶方案全景（空间场景设计，与本卷第37号构成坡屋顶 vs 平顶藻井的比选方案）。
+materials:
+- 汉白玉麒麟浮雕御道与三路石阶
+- 橙红琉璃莲花灯
+- 八角红棕石雕须弥座
+- 藏式铜鎏金尊胜宝塔
+- 露明斜坡木椽屋顶
+colors:
+- 辉煌金
+- 汉白玉白
+style: 藏汉融合皇家塔殿风
+ai_design_usage: 大型室内舍利宝塔大殿空间规划、汉白玉麒麟丹陛御道节点、坡屋顶木椽与八角藻井结合参考
+prompt_zh: 大型佛教寺庙室内金色佛塔大殿，中轴对称广角仰视构图，前景为洁白的汉白玉三路九级石材台阶与卷云雕花栏杆，中央汉白玉丹陛御道雕刻圆形回纹框麒麟瑞兽浮雕，御道顶端盛开一朵橙红色发光琉璃莲花灯，中景八角形红棕色石雕须弥座高台上矗立一座巨大的藏式铜鎏金尊胜舍利宝塔，塔座雕刻雪山狮子与八吉祥浮雕，覆钵塔身悬挂金色璎珞，塔刹直通顶部八角发光藻井中心的蓝色星空天池，藻井悬挂月牙形白玉吊灯，大殿采用传统斜坡露明深色木椽屋顶，四周环绕发光千佛回廊，庄严神圣，8K超高清渲染
+tags:
+- 室内佛塔大殿
+- 汉白玉麒麟御道
+- 藏式尊胜宝塔
+- 三路汉白玉石阶
+- 露明木椽坡屋顶
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K 3D render of a sloped-rafter hall housing a monumental Tibetan-style gilded victorious stupa ('尊胜宝塔')
+    on an octagonal carved stone Sumeru base approached by a three-lane white marble staircase with a central royal ramp.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

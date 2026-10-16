@@ -1,0 +1,69 @@
+id: 3311484f73d6569f
+title_zh: 暖调金纹天然石材纹理
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/暖调金纹天然石材纹理.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/暖调金纹天然石材纹理.jpg
+  sha256: 3311484f73d6569f5326c79698f58d7ab5afe695e750ffd4e14bd71ad25d1ef5
+  bytes: 708180
+  width: 652
+  height: 1306
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3311484f73d6569f.jpg
+    sha256: 95afb14d4bfeb6eee8add935334611fb0c083a7fc01e6e49e3ea9091071b9f01
+    bytes: 197556
+    width: 652
+    height: 1306
+  thumb512:
+    path: assets/thumb512/3311484f73d6569f.webp
+    sha256: caafea017b4ece7e9b98a86bd8f531ac506c1404869c67d20a06809d30f43479
+    bytes: 33176
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为「金镶玉」大理石的高纯度竖向标准材质样本（Material Swatch），聚焦于一条自右上蜿蜒至中下方的白玉方解石主脉及其周边伴生的赤金网纹，可直接作为3D建模与AI图像生成的无缝纹理输入源。
+materials:
+- 金镶玉大理石
+colors:
+- 琥珀金网纹
+- 暖粉褐底
+- 贯穿白玉方解石脉
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: ComfyUI IP-Adapter 材质迁移输入源 / 3D Max & Blender 佛龛竖向边框与立柱贴图 / 竖幅条屏石材画设计
+prompt_zh: 金镶玉天然大理石高清竖向微距纹理贴图，温暖的琥珀金、珊瑚橘粉与烟粉灰基底，中心有一道洁白温润如羊脂玉的方解石主脉自右上向左下蜿蜒贯穿，与左上至右下的赤金色细脉交织，天然矿物结晶质感细腻，无反光正射PBR材质样本。
+tags:
+- 金镶玉纹理
+- PBR竖向贴图
+- 白玉脉特写
+- 佛龛立柱材质
+- 暖金大理石样本
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 652
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Vertical orthographic texture swatch cropped from the center of the Gold-Jade slab (#330), highlighting the white
+    calcite vein and golden webbing.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

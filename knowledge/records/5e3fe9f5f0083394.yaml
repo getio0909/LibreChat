@@ -1,0 +1,71 @@
+id: 5e3fe9f5f0083394
+title_zh: 佛教寺庙室内展览空间
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内展览空间.jpg
+  sha256: 5e3fe9f5f008339443097476d6577975d9066116639a0de3f0e8b30792e72fc4
+  bytes: 3445854
+  width: 3421
+  height: 2557
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5e3fe9f5f0083394.jpg
+    sha256: a94c4fcb5646df0e5f90689b02bf57ff82e559a5c624a6cf0819841c188c69bf
+    bytes: 486363
+    width: 2048
+    height: 1531
+  thumb512:
+    path: assets/thumb512/5e3fe9f5f0083394.webp
+    sha256: 3b53ee0bed01b842052c9d4f7ce66a5e441e62d4365a0772e773ce85131cefcb
+    bytes: 44386
+    width: 512
+    height: 383
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统汉藏融合金碧彩绘佛殿与禅修礼拜空间
+entity_type: 空间场景设计
+summary_zh: 本图展示了一座极具皇家寺院与汉藏融合色彩的豪华佛殿内部礼拜与共修空间。空间将壁画艺术、悬塑艺术、万佛格龛与传统藻井天花融为一体，色彩浓烈绚烂、法相庄严，专为大型法会礼拜、诵经禅修而设计。 空间采用深红棕酸枝木色、璀璨赤金色与重彩壁画色（朱红、石青、石绿、泥金）搭配，地面则以沉稳的深灰青石板平衡视觉重心。环殿护墙底座为深红木高浮雕须弥座，满雕金色仰覆莲瓣与卷草纹；墙面核心区镶嵌巨幅传统工笔重彩描金菩萨说法图壁画；吊顶采用贴金木雕构件与黑底描金彩绘结合，地面铺陈数十个米黄色表面、朱红滚边的硬质方形拜垫（蒲团）。
+materials:
+- 贴金木作
+- 重彩壁画
+- 青石地砖
+colors:
+- 金碧辉煌
+- 深棕红木
+- 米黄蒲团
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统金碧辉煌佛殿室内全景设计 / 重彩佛教壁画与背光万佛龛墙面组合参考 / 八角贴金藻井与拜垫阵列空间生成；推荐搭配：深色红木雕花护墙须弥座 + 工笔重彩描金壁画 + 贴金方形莲花平棊天花 + 深灰哑光青石地砖
+  + 米黄红边礼拜方垫
+prompt_zh: 金碧辉煌的中国传统佛教寺院大殿内部礼拜空间，广角透视，地面铺设深灰色青石砖，整齐排列多排米黄色带红边的方形拜垫蒲团；四周墙面下部为深红木雕花贴金莲瓣须弥座，中部镶嵌大幅重彩描金观音与诸菩萨群像壁画，壁画两侧为暖黄发光的方格千佛龛（内供白玉坐佛）及火焰宝珠形黄色透光圆窗；墙顶一圈立体彩塑飞天瑞兽与贴金斗拱，天花中央为八角形贴金盘龙藻井，两侧为金色方形莲花平棊发光格栅吊顶，庄严华丽，超高清建筑效果图。
+tags:
+- 传统金碧佛殿
+- 重彩佛教壁画
+- 八角贴金藻井
+- 背光万佛格龛
+- 礼拜蒲团阵列
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2557
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统金碧佛殿侧壁重彩壁画、发光白玉佛格、高处彩绘悬塑与八角藻井三维效果图，地面陈列红边方蒲团。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

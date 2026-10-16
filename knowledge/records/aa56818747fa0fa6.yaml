@@ -1,0 +1,75 @@
+id: aa56818747fa0fa6
+title_zh: 佛教室内供桌与佛像场景-02
+source:
+  original_path: 佛教空间设计案例/佛教室内供桌与佛像场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教室内供桌与佛像场景-02.jpg
+  sha256: aa56818747fa0fa6f7e3f72a42a35a71526a54d4335476610efcbf4d51345a61
+  bytes: 3265976
+  width: 3339
+  height: 2645
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/aa56818747fa0fa6.jpg
+    sha256: a90b7aec5c0447384fbc9ce85d6c73d3748369d4f3e6e497054e19180879c023
+    bytes: 511822
+    width: 2048
+    height: 1622
+  thumb512:
+    path: assets/thumb512/aa56818747fa0fa6.webp
+    sha256: b380a7c256d8d770ead237d46cce3f013e1bd053ec770a5e88be42bc44ed5ca8
+    bytes: 43338
+    width: 512
+    height: 406
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 正中设金色镂空华盖与木雕《心经》背板供奉汉白玉观音坐像、左侧临窗辟木地台禅茶席的佛堂茶室一体化空间。
+materials:
+- 汉白玉观音坐像
+- 金色镂空华盖
+- 木雕心经背板
+- 浅灰大理石地面
+- 原木茶桌与护墙
+colors:
+- 原木暖黄
+- 汉白玉白
+- 辉煌金
+- 浅灰色
+- 明黄色
+style: 现代原木禅意佛堂兼茶室风
+ai_design_usage: 现代佛堂兼禅茶室一体化空间设计、汉白玉观音像配木雕心经背板与金色华盖方案、居家禅意空间参考
+prompt_zh: 现代禅意原木风佛堂兼茶室一体化室内空间，主区正中供奉一尊洁白的汉白玉观音菩萨坐像，背后是海棠框发光木雕《般若波罗蜜多心经》背景墙，观音像上方悬挂华丽的金色镂空雕花华盖与垂幢，前方摆放浅木色雕花供桌、草编地席与两个莲花纹黄色圆蒲团，两侧立木质落地灯，左侧临窗设抬高木地台茶室区域，摆放实木长茶桌、木凳与迎客松盆景，浅灰色大理石地面，原木格栅天花，温暖阳光洒入，8K效果图
+tags:
+- 佛堂茶室一体
+- 汉白玉观音
+- 金色镂空华盖
+- 心经背景墙
+- 禅茶空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2645
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of an integrated domestic Buddhist shrine and Zen tea room with a white marble seated Guanyin before a
+    wooden Heart Sutra screen and a raised window tea platform on the left.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

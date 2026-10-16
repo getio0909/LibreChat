@@ -1,0 +1,76 @@
+id: a9000177e089e292
+title_zh: 佛教大殿佛像陈列场景
+source:
+  original_path: 佛教空间设计案例/佛教大殿佛像陈列场景.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿佛像陈列场景.jpg
+  sha256: a9000177e089e292d81e4c37eed38e9024411fa4e4f6148a9f04fec5b5976830
+  bytes: 3985534
+  width: 3526
+  height: 2639
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a9000177e089e292.jpg
+    sha256: 59c8c09f2b866d7580df95871c642af2a339369f384b1e47577b1e90dd4261b1
+    bytes: 517654
+    width: 2048
+    height: 1533
+  thumb512:
+    path: assets/thumb512/a9000177e089e292.webp
+    sha256: 1e5f98c6b99aa79ce4a9faaaae2613d52d007456f032ea8942792b84a274fd5c
+    bytes: 42942
+    width: 512
+    height: 383
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 低角度仰视展现巨型八角星空莲瓣藻井、正中同坛并列三世佛二弟子与文殊普贤五尊金像、地面铺几何拼花木地板的恢弘大殿。
+materials:
+- 香槟金铜佛像
+- 白色浮雕透光石板
+- 几何拼花木地板
+- 汉白玉方形莲花柱础
+- 深色凹槽方形木柱
+colors:
+- 香槟金
+- 原木棕
+- 汉白玉白
+- 星空蓝
+style: 传统与现代结合恢弘穹顶大殿风
+ai_design_usage: 五尊主佛菩萨（三世佛+文殊普贤）一字并列大殿布局、大型八角星空莲花藻井仰视构图参考
+prompt_zh: 大雄宝殿室内低角度广角对称仰视效果图，正前方通长主佛坛上并列供奉五尊金色巨像（中央三尊三世佛坐像配二弟子立像，左侧金身文殊菩萨骑狮像，右侧金身普贤菩萨骑象像），背后为白色浮雕发光海棠形石材背景板，两端角落陈列金色罗汉群像，前景两根粗壮的方形深木色大柱立于白色汉白玉莲瓣方形柱础上，地面为几何图案拼花木地板并排列一排十个米色方蒲团，屋顶中央是巨大的八角形发光莲花瓣藻井，藻井中心为深蓝色星空圆顶，庄严震撼，8K渲染
+tags:
+- 五尊同坛
+- 八角星空藻井
+- 拼花木地板
+- 文殊普贤
+- 方形莲花柱础
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2639
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a golden Mahavira Hall enshrining five seated statues (Three-Ages Buddhas flanked by Manjusri and Samantabhadra)
+    on a carved wooden altar with 10,000-Buddha walls and an octagonal dragon caisson.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh mentions ''二弟子'' (two standing disciples), whereas the altar only has five seated statues (Three-Ages
+    Buddhas plus Manjusri and Samantabhadra)'

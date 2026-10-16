@@ -1,0 +1,73 @@
+id: bb7175acd364d4d9
+title_zh: 佛教石质佛像墙展览设计
+source:
+  original_path: 佛教空间设计案例/佛教石质佛像墙展览设计.jpg
+original:
+  path: 佛教空间设计案例/佛教石质佛像墙展览设计.jpg
+  sha256: bb7175acd364d4d981aab3a3c9b852dacd35b337524dae283d99979c3660445f
+  bytes: 1532779
+  width: 1294
+  height: 2646
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bb7175acd364d4d9.jpg
+    sha256: 43e761989c3daa1bcc8985c3cf102c169a6f02b26b8c73911e3eab723e49629f
+    bytes: 278240
+    width: 1002
+    height: 2048
+  thumb512:
+    path: assets/thumb512/bb7175acd364d4d9.webp
+    sha256: 390c05bd6d715aca9dda5054a10691d1b8999cbe91a9dd0d34d900f4e720e52d
+    bytes: 26868
+    width: 250
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代白玉兰大理石浮雕框与深木格千佛墙展览场景
+entity_type: 空间场景设计
+summary_zh: 本图为现代寺院大殿、功德堂或佛教文化中心内部“大理石护墙与红木万佛格龛结合”的高端千佛墙展览立面场景。设计以典雅的白色天然云纹大理石作为建筑结构基底与外框，将温润深沉的木质千佛格龛如同巨幅立体画卷般镶嵌于石墙之中，兼具现代石材装饰的整洁大气与传统木龛供佛的庄重温度。
+  立面呈现鲜明的三重材质色彩对比：①外围护墙与台基：采用灰白底色带柔美斜向山水云纹的高档白色大理石（如爵士白、白玉兰或鱼肚白），下部墙裙做现代欧式/新中式矩形线框造型，外框则满雕细腻的浅浮雕卷草番莲纹；②内嵌格龛：采用深胡桃木/酸枝木制作矩阵式壶门小…
+materials:
+- 白玉兰
+- 爵士白大理石
+- 深色木格龛
+- 金身小佛
+colors:
+- 雅白云纹石
+- 深胡桃木
+- 赤金红莲佛像
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：现代寺院功德堂/万佛堂立面护墙设计 / 爵士白大理石浮雕画框与深木格千佛龛结合参考 / 大小嵌套式万佛墙模块生成；推荐搭配：爵士白/鱼肚白大理石矩形线框护墙裙 + 汉白玉浮雕卷草外框 + 深胡桃木矩阵佛龛
+  + 金身红莲座坐佛 + 深色木纹砖/木地板
+prompt_zh: 现代佛教寺院石质与木质结合的千佛墙展览设计场景，竖幅斜视构图，墙面下部为一米高的爵士白天然云纹大理石护墙裙，带有精致的矩形凹凸线框；上部外围以雕刻连续卷草浮雕纹的白色大理石宽边框包边，内部镶嵌整面深胡桃木色方格矩阵千佛龛，每个小木龛内供奉一尊坐在红橙渐变莲花座上的金身小坐佛并带暖光照明；左侧中部跨四格嵌设一个中型镂空雕花木框主佛龛，内供一尊较大尺寸的通体鎏金坐佛，深褐色木地板，现代典雅与传统庄严完美结合，高清室内效果图。
+tags:
+- 石质佛像墙
+- 爵士白大理石护墙
+- 木格千佛龛
+- 功德堂立面设计
+- 金身红莲坐佛
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1294
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 当代极简白色弧形叠级天幕与环形水景禅堂渲染图（与#269、#270同系列），局部竖向构图干净无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

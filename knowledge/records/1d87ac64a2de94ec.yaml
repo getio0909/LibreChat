@@ -1,0 +1,71 @@
+id: 1d87ac64a2de94ec
+title_zh: 彩绘佛教坐像
+source:
+  original_path: 佛教空间设计案例/彩绘佛教坐像.jpg
+original:
+  path: 佛教空间设计案例/彩绘佛教坐像.jpg
+  sha256: 1d87ac64a2de94ec1da762a17ff2319cfa47fa5ab8e23af2bb9e2478aad30424
+  bytes: 78004
+  width: 281
+  height: 378
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1d87ac64a2de94ec.jpg
+    sha256: 8c4d9cf2d39acb1ceca88d86f5ca55bd5362c2dc192e5ccbb3266c1c3b4ca4e6
+    bytes: 21191
+    width: 281
+    height: 378
+  thumb512:
+    path: assets/thumb512/1d87ac64a2de94ec.webp
+    sha256: 9dff61118033a7be08be597a04184faa2079ca308036f06a9b7656a470e84014
+    bytes: 12350
+    width: 281
+    height: 378
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 风格
+- 参考
+category_l1: 佛教空间案例
+category_l2: 佛像造像
+entity_type: 实物对象写实
+summary_zh: 纯黑博物馆背景下经顶部聚光灯照亮的宋辽风格木雕敷彩贴金观音菩萨坐像，头戴高花冠、胸饰璎珞，保留斑驳朱砂石绿矿物彩绘包浆。
+materials:
+- 宋辽风格木雕彩绘贴金水月/自在观音坐像
+- 斑驳矿物彩绘肌理
+- 博物馆暗黑背景
+colors:
+- 朱砂红
+- 石绿古金
+style: 宋辽古典写实木雕彩绘风
+ai_design_usage: 博物馆级古代彩绘木雕菩萨造像展陈照明、宋代写实衣纹与传世彩绘做旧质感参考
+prompt_zh: 宋辽风格木雕彩绘贴金观音菩萨坐像特写，竖幅构图，纯黑博物馆背景，菩萨头戴精美高宝冠，面容丰润慈悲，双目微垂，身披朱砂红与石青石绿交织的飘逸天衣帔帛，胸前佩戴精致的贴金璎珞珠串，结跏趺坐姿，表面保留历史岁月沉淀的斑驳矿物彩绘与古金包浆肌理，戏剧性顶部聚光灯照亮，东方古典雕塑艺术杰作，8K文物摄影质感
+tags:
+- 彩绘佛像
+- 宋辽木雕观音
+- 木雕彩绘菩萨
+- 博物馆佛像展陈
+- 古典佛教造像
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 281
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 博物馆藏唐代风格石雕菩萨立像残件（黑底文物照），原图尺寸281x378分辨率过低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 281x378 (<800px short side)'
+  - 分辨率过低（281x378，最短边<768px）

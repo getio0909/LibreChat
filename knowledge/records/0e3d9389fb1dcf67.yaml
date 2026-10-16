@@ -1,0 +1,71 @@
+id: 0e3d9389fb1dcf67
+title_zh: 佛教寺庙内部供桌与佛像场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内部供桌与佛像场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内部供桌与佛像场景.jpg
+  sha256: 0e3d9389fb1dcf671d3d53a53e19d1ecf0ba718adf4072d0cc3eab871af2a80f
+  bytes: 4253942
+  width: 3544
+  height: 2647
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0e3d9389fb1dcf67.jpg
+    sha256: 2f17f7ddda9a5c4a20b246bc685ca56c4b5704fc8e050b1a277a460e5e04729e
+    bytes: 534443
+    width: 2048
+    height: 1530
+  thumb512:
+    path: assets/thumb512/0e3d9389fb1dcf67.webp
+    sha256: de45bd41c5f3366a2314bc9198ffbf649434251c176c253c5404ed473c4df39f
+    bytes: 46426
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为寺院孔雀明王殿（密教护法专殿）核心佛龛与供桌陈设近景空间（空间场景设计，本卷第22号为其拉远全景图）。
+materials:
+- 四臂孔雀明王骑孔雀彩绘金像
+- 唐破风贴金斗拱佛龛
+- 嵌鎏金盘龙雕花板方木柱
+- 汉白玉须弥座柱础
+- 红木雕花供桌
+colors:
+- 深木棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 寺院孔雀明王殿/密宗护法殿主龛近景设计、方木柱嵌古铜鎏金雕花板与汉白玉柱础节点、供桌花果陈设参考
+prompt_zh: 传统佛教寺庙孔雀明王殿内部供桌与佛龛近景，正面中轴对称构图，暖红棕色几何拼花实木地板上并列摆放三个蓝黄红彩绘莲花圆形蒲团，中间两根粗壮的深色方形木柱正面镶嵌古铜鎏金盘龙浮雕长板，下承精雕汉白玉方形莲花须弥座柱础，柱间设中式红木雕花大供桌，摆放鲜果、白瓷插花与香炉，后方为金碧辉煌的唐破风弧形顶多层贴金斗拱佛龛，龛内供奉骑乘开屏孔雀的四臂孔雀明王彩绘金身坐像，两侧竖条木格栅前对称摆放汉白玉圆璧摆件，华丽庄严，8K建筑渲染
+tags:
+- 孔雀明王殿
+- 汉白玉方形柱础
+- 唐破风贴金佛龛
+- 红木雕花供桌
+- 白玉圆璧陈设
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2647
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 孔雀明王殿核心主龛与供桌陈设正面近景三维效果图，含唐破风贴金佛龛、嵌金龙方木柱及汉白玉须弥柱础。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

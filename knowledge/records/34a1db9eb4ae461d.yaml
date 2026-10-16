@@ -1,0 +1,70 @@
+id: 34a1db9eb4ae461d
+title_zh: 佛教寺院立面设计图
+source:
+  original_path: 26年春季佛事展设计方案/佛教寺院立面设计图.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教寺院立面设计图.jpg
+  sha256: 34a1db9eb4ae461d47e8099081460d6b0904ca0eb65c4ee4e3f83550b427b161
+  bytes: 1693758
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/34a1db9eb4ae461d.jpg
+    sha256: 941310f971ec477cb3ef0fa37e60df4d27c806c8c75f54e7e0ad15023960f9c5
+    bytes: 155664
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/34a1db9eb4ae461d.webp
+    sha256: 6d64129e7141d22263c15d9f711a35f0159394bc798ff75d4b4313f3c3753a2f
+    bytes: 5974
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-A立面主入口施工图
+entity_type: 工程设计图纸
+summary_zh: 本图为 2026年春季佛事展（C5 T026展位）东侧主迎宾面——A立面图 施工深化图。完整定义了 10 米跨度主入口的门头造型比例、叠级中式回纹框线尺寸、品牌形象柱发光字工艺以及从入口向内看去的内部空间透视关系。
+materials:
+- 木结构贴纸
+- 背发光字
+colors:
+- 暖米白(C13M9Y19K0)
+- 青绿示意
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 10米跨度新中式展位主入口门头CAD立面尺寸链与ControlNet底图
+prompt_zh: 展览展示工程CAD彩色立面施工图，“A立面图”，新中式佛教石材展位东侧主入口正立面设计，暖米白色木结构门头（CMYK色值C13 M9 Y19 K0），传统中式几何折角叠级线条装饰，右侧设1200mm宽品牌形象柱带“莊嚴寶刹
+  寺院装饰石材”背发光书法字与红印章，左侧为6580mm宽大跨度无柱敞开入口，内部透视可见“天然美石·佛國畫卷”奢石背景墙、佛龛供桌与中式茶室洽谈区，四周带有精确的红色尺寸标注线（总高5000mm，总宽10000mm），白底专业工程图纸风格。
+tags:
+- 26年春季佛事展
+- A立面图
+- 工程设计图纸
+- 展位门头设计
+- 背发光字
+- 尺寸标注图
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展东侧主入口A立面CAD施工深化与尺寸标注图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

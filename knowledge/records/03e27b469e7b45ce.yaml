@@ -1,0 +1,71 @@
+id: 03e27b469e7b45ce
+title_zh: 佛教寺庙大殿内部场景-05
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-05.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-05.jpg
+  sha256: 03e27b469e7b45cea92fed3bda6a89b1f99d08fcd6e85d66263fe57f34427773
+  bytes: 3162729
+  width: 3401
+  height: 2528
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/03e27b469e7b45ce.jpg
+    sha256: cdfac743ea7888c49a547015cd4ed6b43fa1e8d78d6632ca5ad6d65f4b25e846
+    bytes: 421482
+    width: 2048
+    height: 1522
+  thumb512:
+    path: assets/thumb512/03e27b469e7b45ce.webp
+    sha256: 608d4e53b01eb9e6a9463fe45b73d6b942b39d207fd975ff24b46fcaa94f4ace
+    bytes: 34204
+    width: 512
+    height: 381
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为大雄宝殿侧壁“通长木雕十八罗汉壁龛长廊”与主佛坛侧翼空间展示场景（空间场景设计）。
+materials:
+- 通长木雕十八罗汉壁龛长廊
+- 铜鎏金罗汉坐像群
+- 深灰黑高光石砖
+- 汉白玉柱础木圆柱
+- 主坛金佛与雕花木供桌
+colors:
+- 原木棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 大雄宝殿侧壁十八罗汉木雕壁龛长廊专项设计参考、罗汉龛挂落隔柱比例与主佛坛空间呼应关系
+prompt_zh: 传统佛教寺庙大雄宝殿内部十八罗汉壁龛长廊与主坛侧视场景，低角度广角透视，深灰黑色高光石材地砖地面，画面左侧墙面为通长的中式深色木雕须弥座壁龛长廊，每个雕花木龛内供奉一尊神态各异、带金色火焰背光的铜鎏金十八罗汉坐像，上方为竖条木格栅护墙，中间立有带鎏金莲瓣柱箍与汉白玉多层柱础的实木大圆柱，画面右侧为高大的木雕供桌、方形拜垫以及主坛上的巨型金佛与白色发光石材背板，顶部为九宫格发光木藻井，8K超清建筑效果图
+tags:
+- 十八罗汉长廊
+- 木雕罗汉壁龛
+- 大殿侧壁设计
+- 鎏金罗汉造像
+- 汉白玉多层柱础
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2528
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大雄宝殿侧壁通长木雕十八罗汉壁龛长廊与主佛坛侧翼三维效果图，右下角带半透明莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []
