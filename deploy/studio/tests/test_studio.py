@@ -633,9 +633,14 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
 
     async def _run() -> None:
         transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=transport, base_url="http://studio:8000"
+            ) as client,
+        ):
+            assert app.state.session_manager is not None
+            assert getattr(app.state.session_manager, "_task_group", None) is not None
             # 1. 验证tools/list返回恰好4个工具且Schema完全扁平
             list_res = await client.post(
                 "/mcp",
@@ -1546,3 +1551,169 @@ def test_shared_token_64_hex_validation() -> None:
                 gemini_api_key="test-gemini-key",
                 ark_api_key="test-ark-key",
             )
+
+
+# 校验进入应用lifespan共享StreamableHTTPSessionManager时，User A与User B并发MCP请求上下文与资产隔离不串号
+def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_b_lc = studio_env.librechat_images_dir / USER_B
+    user_a_lc.mkdir(parents=True, mode=0o700)
+    user_b_lc.mkdir(parents=True, mode=0o700)
+
+    upload_a = "aaaaaaaa-1111-2222-3333-444444444444"
+    upload_b = "bbbbbbbb-1111-2222-3333-444444444444"
+    (user_a_lc / f"{upload_a}__a.jpg").write_bytes(
+        _make_image_bytes(80, 60, fmt="JPEG")
+    )
+    (user_b_lc / f"{upload_b}__b.jpg").write_bytes(
+        _make_image_bytes(100, 100, fmt="JPEG")
+    )
+
+    both_in_flight = asyncio.Event()
+    in_flight_count = 0
+    small_jpg = _make_image_bytes(64, 64, fmt="JPEG")
+
+    async def _barrier_ark_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal in_flight_count
+        in_flight_count += 1
+        if in_flight_count >= 2:
+            both_in_flight.set()
+        await asyncio.wait_for(both_in_flight.wait(), timeout=5.0)
+        return httpx.Response(
+            200,
+            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        ark_transport=httpx.MockTransport(_barrier_ark_handler),
+    )
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=transport, base_url="http://studio:8000"
+            ) as client,
+        ):
+            shared_mgr = app.state.session_manager
+            assert shared_mgr is not None
+            assert getattr(shared_mgr, "_task_group", None) is not None
+
+            # 并发执行User A与User B的generate_image，且各自只允许解析自身名下的参考图
+            req_a = client.post(
+                "/mcp",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_A,
+                    "X-LibreChat-Conversation-ID": "conv-user-a-001",
+                },
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 101,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "generate_image",
+                        "arguments": {
+                            "prompt": "用户A专属供案",
+                            "references": [{"id": upload_a, "use": "造型"}],
+                        },
+                    },
+                },
+            )
+            req_b = client.post(
+                "/mcp",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_B,
+                    "X-LibreChat-Conversation-ID": "conv-user-b-002",
+                },
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 102,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "generate_image",
+                        "arguments": {
+                            "prompt": "用户B专属香炉",
+                            "references": [{"id": upload_b, "use": "造型"}],
+                        },
+                    },
+                },
+            )
+
+            res_a, res_b = await asyncio.gather(req_a, req_b)
+            assert res_a.status_code == 200
+            assert res_b.status_code == 200
+            body_a = res_a.json()["result"]
+            body_b = res_b.json()["result"]
+            assert body_a["isError"] is False
+            assert body_b["isError"] is False
+
+            img_id_a = json.loads(body_a["content"][0]["text"])["id"]
+            img_id_b = json.loads(body_b["content"][0]["text"])["id"]
+            assert img_id_a != img_id_b
+
+            # 验证生成结果分别落盘在各自用户的目录且互不可见
+            assert (
+                studio_env.data_dir / "users" / USER_A / "jobs" / img_id_a
+            ).is_dir()
+            assert not (
+                studio_env.data_dir / "users" / USER_A / "jobs" / img_id_b
+            ).exists()
+            assert (
+                studio_env.data_dir / "users" / USER_B / "jobs" / img_id_b
+            ).is_dir()
+            assert not (
+                studio_env.data_dir / "users" / USER_B / "jobs" / img_id_a
+            ).exists()
+
+            # 并发调用list_images验证各自只返回自己的上传图与生成图
+            list_a, list_b = await asyncio.gather(
+                client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 103,
+                        "method": "tools/call",
+                        "params": {"name": "list_images", "arguments": {"limit": 10}},
+                    },
+                ),
+                client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_B,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 104,
+                        "method": "tools/call",
+                        "params": {"name": "list_images", "arguments": {"limit": 10}},
+                    },
+                ),
+            )
+            ids_a = {
+                item["id"]
+                for item in json.loads(
+                    list_a.json()["result"]["content"][0]["text"]
+                )["images"]
+            }
+            ids_b = {
+                item["id"]
+                for item in json.loads(
+                    list_b.json()["result"]["content"][0]["text"]
+                )["images"]
+            }
+            assert ids_a == {upload_a, img_id_a}
+            assert ids_b == {upload_b, img_id_b}
+
+    asyncio.run(_run())
