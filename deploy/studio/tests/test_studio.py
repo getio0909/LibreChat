@@ -913,3 +913,89 @@ def test_concurrency_cap_and_mcp_error_states(
             assert max_observed_in_flight == 2
 
     asyncio.run(_run_concurrency())
+
+
+# 校验POST派发后取消请求会落盘uncertain，且启动时自动将遗留pending对账为uncertain并在list_images警告展示
+def test_cancellation_marks_uncertain_and_startup_reconciles_pending(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    dispatched = asyncio.Event()
+
+    async def _hanging_ark_handler(request: httpx.Request) -> httpx.Response:
+        dispatched.set()
+        await asyncio.sleep(60)
+        return httpx.Response(200, json={"data": []})
+
+    async def _run() -> None:
+        cancel_job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / "img_cancelled01"
+        task = asyncio.create_task(
+            generate_seedream(
+                studio_env,
+                "cancelled prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=cancel_job_dir,
+                transport=httpx.MockTransport(_hanging_ark_handler),
+            )
+        )
+        await dispatched.wait()
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+
+        cancel_receipt = json.loads(
+            (cancel_job_dir / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert cancel_receipt["state"] == "uncertain"
+        assert "finished" in cancel_receipt
+
+        # 构造一个因进程崩溃遗留的pending状态任务，验证应用启动时自动对账为uncertain
+        abandoned_job_dir = (
+            studio_env.data_dir / "users" / USER_A / "jobs" / "img_abandoned02"
+        )
+        abandoned_job_dir.mkdir(parents=True, mode=0o700)
+        (abandoned_job_dir / "receipt.json").write_text(
+            json.dumps(
+                {
+                    "state": "pending",
+                    "started": 1700000000.0,
+                    "requested_size": "2048x2048",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        app = create_app(settings=studio_env, rules=load_rules())
+        reconciled_receipt = json.loads(
+            (abandoned_job_dir / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert reconciled_receipt["state"] == "uncertain"
+
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 20,
+                    "method": "tools/call",
+                    "params": {"name": "list_images", "arguments": {"limit": 10}},
+                },
+            )
+            assert res.status_code == 200
+            payload = json.loads(res.json()["result"]["content"][0]["text"])
+            by_id = {item["id"]: item for item in payload["images"]}
+            assert "img_cancelled01" in by_id
+            assert by_id["img_cancelled01"]["state"] == "uncertain"
+            assert by_id["img_cancelled01"]["warning"] is True
+            assert "img_abandoned02" in by_id
+            assert by_id["img_abandoned02"]["state"] == "uncertain"
+            assert by_id["img_abandoned02"]["warning"] is True
+            assert len(payload["warnings"]) >= 2
+
+    asyncio.run(_run())
+

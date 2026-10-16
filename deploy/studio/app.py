@@ -44,6 +44,7 @@ from .store import (
     allocate_studio_job,
     list_user_images,
     normalize_conversation_id,
+    reconcile_pending_receipts,
     resolve_image,
     user_librechat_images_dir,
     user_studio_dir,
@@ -265,7 +266,16 @@ def build_mcp_server(
             if name == "list_images":
                 limit = int(args.get("limit", 20))
                 images = list_user_images(settings, user_id, limit=limit)
-                payload = {"images": images, "count": len(images), "warnings": []}
+                warnings = [
+                    f"Image job {item['id']} is in uncertain state (the request may have been billed)."
+                    for item in images
+                    if item.get("warning")
+                ]
+                payload = {
+                    "images": images,
+                    "count": len(images),
+                    "warnings": warnings,
+                }
                 return types.CallToolResult(
                     content=[
                         types.TextContent(
@@ -603,6 +613,7 @@ def create_app(
 ) -> Starlette:
     active_settings = settings or load_settings()
     active_rules = rules or load_rules()
+    reconcile_pending_receipts(active_settings)
     limiter = ConcurrencyLimiter(
         max_per_user=active_settings.max_parallel_per_user,
         global_max=active_settings.global_max_parallel,
@@ -629,6 +640,7 @@ def create_app(
     # 管理应用生命周期内的无状态MCP会话管理器
     @contextlib.asynccontextmanager
     async def lifespan(app_instance: Starlette) -> AsyncIterator[None]:
+        reconcile_pending_receipts(active_settings)
         manager = _new_session_manager()
         app_instance.state.session_manager = manager
         async with manager.run():

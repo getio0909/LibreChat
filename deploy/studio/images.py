@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import binascii
 import hashlib
@@ -421,6 +422,13 @@ async def generate_seedream(
         ) as client:
             response = await client.post(url, json=body, headers=headers)
             raw_content = response.content
+    except asyncio.CancelledError:
+        record.update(state="uncertain", finished=time.time())
+        try:
+            write_receipt(destination, record)
+        except OSError:
+            pass
+        raise
     except (httpx.TimeoutException, TimeoutError, httpx.HTTPError, OSError):
         record.update(state="uncertain", finished=time.time())
         write_receipt(destination, record)

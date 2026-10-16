@@ -2,6 +2,7 @@ import io
 import json
 import os
 import re
+import time
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -39,10 +40,12 @@ class ResolvedImage:
     mtime_ns: int
     width: int
     height: int
+    state: str = "saved"
+    warning: bool = False
 
     # 转换为对外的无敏感信息字典结构
     def to_public_dict(self) -> dict[str, Any]:
-        return {
+        payload: dict[str, Any] = {
             "id": self.id,
             "kind": self.kind,
             "created": self.created,
@@ -50,6 +53,10 @@ class ResolvedImage:
             "height": self.height,
             "size": f"{self.width}x{self.height}",
         }
+        if self.state != "saved" or self.warning:
+            payload["state"] = self.state
+            payload["warning"] = True
+        return payload
 
 
 # 校验并返回合法的24位十六进制LibreChat用户编号
@@ -207,8 +214,71 @@ def _parse_librechat_filename(filename: str) -> tuple[str, str] | None:
     return None
 
 
-# 扫描用户目录中的全部可用图像记录
-def _collect_user_images(settings: StudioSettings, user_id: str) -> list[ResolvedImage]:
+# 以0600权限原子写入receipt.json文件
+def _write_receipt_atomic(directory: Path, values: dict[str, Any]) -> None:
+    target = directory / "receipt.json"
+    temporary = directory / "receipt.tmp"
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+        json.dump(values, stream, ensure_ascii=False)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, target)
+
+
+# 启动时扫描所有用户的任务目录，将残留的pending状态凭据标记为uncertain
+def reconcile_pending_receipts(settings: StudioSettings) -> int:
+    base = Path(settings.data_dir)
+    if not base.exists() or base.is_symlink() or not base.is_dir():
+        return 0
+    users_dir = base / "users"
+    if not users_dir.exists() or users_dir.is_symlink() or not users_dir.is_dir():
+        return 0
+    reconciled_count = 0
+    now = time.time()
+    for user_dir in users_dir.iterdir():
+        if (
+            user_dir.is_symlink()
+            or not user_dir.is_dir()
+            or not USER_ID_RE.fullmatch(user_dir.name)
+        ):
+            continue
+        jobs_dir = user_dir / "jobs"
+        if not jobs_dir.exists() or jobs_dir.is_symlink() or not jobs_dir.is_dir():
+            continue
+        for job_dir in jobs_dir.iterdir():
+            if (
+                job_dir.is_symlink()
+                or not job_dir.is_dir()
+                or not job_dir.name.startswith("img_")
+            ):
+                continue
+            receipt_file = job_dir / "receipt.json"
+            if receipt_file.is_symlink() or not receipt_file.is_file():
+                continue
+            try:
+                ensure_safe_subpath(receipt_file, user_dir)
+                receipt_data = json.loads(
+                    read_bytes_no_follow(receipt_file, user_dir).decode("utf-8")
+                )
+                if (
+                    not isinstance(receipt_data, dict)
+                    or receipt_data.get("state") != "pending"
+                ):
+                    continue
+                receipt_data["state"] = "uncertain"
+                receipt_data["finished"] = now
+                _write_receipt_atomic(job_dir, receipt_data)
+                reconciled_count += 1
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                continue
+    return reconciled_count
+
+
+# 扫描用户目录中的全部可用图像记录（可选包含uncertain状态任务）
+def _collect_user_images(
+    settings: StudioSettings, user_id: str, *, include_uncertain: bool = False
+) -> list[ResolvedImage]:
     uid = validate_user_id(user_id)
     results: list[ResolvedImage] = []
 
@@ -239,7 +309,7 @@ def _collect_user_images(settings: StudioSettings, user_id: str) -> list[Resolve
                 )
             )
 
-    # 扫描工作台数据目录中的已保存原图
+    # 扫描工作台数据目录中的已保存原图与可选uncertain任务
     studio_dir = user_studio_dir(settings, uid, create=False)
     jobs_dir = studio_dir / "jobs"
     if jobs_dir.is_dir() and not jobs_dir.is_symlink():
@@ -257,39 +327,62 @@ def _collect_user_images(settings: StudioSettings, user_id: str) -> list[Resolve
                 receipt_data = json.loads(
                     read_bytes_no_follow(receipt_file, studio_dir).decode("utf-8")
                 )
-                if (
-                    not isinstance(receipt_data, dict)
-                    or receipt_data.get("state") != "saved"
-                ):
+                if not isinstance(receipt_data, dict):
                     continue
-                original_name = receipt_data.get("file")
-                if original_name not in (
-                    "original.jpg",
-                    "original.png",
-                    "original.webp",
-                ):
-                    continue
-                original_path = job_dir / original_name
-                if original_path.is_symlink() or not original_path.is_file():
-                    continue
-                stat_info = original_path.stat(follow_symlinks=False)
-                width = int(receipt_data.get("width") or 0)
-                height = int(receipt_data.get("height") or 0)
-                if width <= 0 or height <= 0:
-                    width, height = _read_image_dimensions(original_path, studio_dir)
+                state = receipt_data.get("state")
+                if state == "saved":
+                    original_name = receipt_data.get("file")
+                    if original_name not in (
+                        "original.jpg",
+                        "original.png",
+                        "original.webp",
+                    ):
+                        continue
+                    original_path = job_dir / original_name
+                    if original_path.is_symlink() or not original_path.is_file():
+                        continue
+                    stat_info = original_path.stat(follow_symlinks=False)
+                    width = int(receipt_data.get("width") or 0)
+                    height = int(receipt_data.get("height") or 0)
+                    if width <= 0 or height <= 0:
+                        width, height = _read_image_dimensions(
+                            original_path, studio_dir
+                        )
+                    results.append(
+                        ResolvedImage(
+                            id=job_dir.name,
+                            kind="studio",
+                            path=original_path.resolve(strict=True),
+                            created=_format_mtime_ns(stat_info.st_mtime_ns),
+                            mtime_ns=stat_info.st_mtime_ns,
+                            width=width,
+                            height=height,
+                        )
+                    )
+                elif include_uncertain and state == "uncertain":
+                    stat_info = receipt_file.stat(follow_symlinks=False)
+                    width = int(receipt_data.get("width") or 0)
+                    height = int(receipt_data.get("height") or 0)
+                    req_size = receipt_data.get("requested_size")
+                    if (width <= 0 or height <= 0) and isinstance(req_size, str):
+                        parts = req_size.split("x")
+                        if len(parts) == 2 and all(p.isdigit() for p in parts):
+                            width, height = int(parts[0]), int(parts[1])
+                    results.append(
+                        ResolvedImage(
+                            id=job_dir.name,
+                            kind="studio",
+                            path=receipt_file.resolve(strict=True),
+                            created=_format_mtime_ns(stat_info.st_mtime_ns),
+                            mtime_ns=stat_info.st_mtime_ns,
+                            width=width,
+                            height=height,
+                            state="uncertain",
+                            warning=True,
+                        )
+                    )
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 continue
-            results.append(
-                ResolvedImage(
-                    id=job_dir.name,
-                    kind="studio",
-                    path=original_path.resolve(strict=True),
-                    created=_format_mtime_ns(stat_info.st_mtime_ns),
-                    mtime_ns=stat_info.st_mtime_ns,
-                    width=width,
-                    height=height,
-                )
-            )
 
     results.sort(key=lambda item: (item.mtime_ns, item.id), reverse=True)
     return results
@@ -393,11 +486,11 @@ def resolve_image(
     raise ValueError(f"Image not found for current user: {cleaned_id}")
 
 
-# 按时间倒序返回当前用户的最近图片列表
+# 按时间倒序返回当前用户的最近图片列表（含uncertain状态警告项）
 def list_user_images(
     settings: StudioSettings, user_id: str, limit: int = 20
 ) -> list[dict[str, Any]]:
     if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 50:
         raise ValueError("limit must be an integer between 1 and 50")
-    images = _collect_user_images(settings, user_id)
+    images = _collect_user_images(settings, user_id, include_uncertain=True)
     return [item.to_public_dict() for item in images[:limit]]
