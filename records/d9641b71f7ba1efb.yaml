@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d9641b71f7ba1efb.jpg
     sha256: 2c629515c937443d444a8f726478d1c995628123fe2df6d372b480ee842b89e8
-    size: 235911
     bytes: 235911
     width: 1979
     height: 1325
   thumb512:
     path: assets/thumb512/d9641b71f7ba1efb.webp
     sha256: 15fad39bb73dfcb4485555323b5bdd7b91989e0408737b9080114b7bcaae42e1
-    size: 19912
     bytes: 19912
     width: 512
     height: 343
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代新中式佛教壁画与石雕造像博物馆展厅场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式佛教文物与石材雕塑博物馆长廊空间的反向视角全景（与第 14 张互为对向镜头）。该视角重点展示了左侧整面长墙的“双层嵌入式经变壁画与浮雕展陈系统”及下部斜面石材护墙基座，远端以中式圆形月洞门收束视线，展现出曲径通幽、步移景异的东方展陈美学。
+  左侧巨幅展墙下方采用温润的米黄色大理石（如莎安娜米黄/莱姆石）打造出向上内倾的折面护墙台基，并在折角处内藏洗墙暖光灯带，其下衔接约 30cm 高的纯黑哑光花岗岩内退踢脚；中轴及右侧展柜采用浅胡桃木柜体配超白无框玻璃罩；地面铺设深灰黑色仿古青石方砖，质感冷峻沉稳。
 materials:
 - 米黄大理石展台
 - 原木玻璃展柜
@@ -54,7 +53,7 @@ tags:
 - 博物馆空间设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

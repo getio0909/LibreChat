@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8bb48803428b6f2b.jpg
     sha256: e8caa583362187f470260828f8f676e396e13cdf3f879e4c8380f6fa7e2a4a07
-    size: 389181
     bytes: 389181
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/8bb48803428b6f2b.webp
     sha256: 77c9322eca7e68c2ada55232599e56d174b3c122de65ae736b85ed60f941ab69
-    size: 38876
     bytes: 38876
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为阿利坦石材 B7 区旗舰展厅核心通道上，一块带白色复合边框的「梵高皇 / 敦煌壁」主推样板大板的微侧角立体展示照（与编号06为同一块核心样板的不同拍摄角度，本图重点展示了整扎板材的侧面层叠厚度与展厅空间关系）。
 materials:
 - 梵高皇
 colors:

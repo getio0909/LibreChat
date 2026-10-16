@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4e9824d0d0db1f07.jpg
     sha256: afb9fba6bdfa6f0cf8517db483d6e948f1d6a7c3502f2d412e4b5ebb434b26da
-    size: 477783
     bytes: 477783
     width: 2048
     height: 1433
   thumb512:
     path: assets/thumb512/4e9824d0d0db1f07.webp
     sha256: 2d9aec6f989b818d4a06cf3fd4be3fc51a5deaf342029cf9e6f3030bea74a4f0
-    size: 37460
     bytes: 37460
     width: 512
     height: 358
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统大雄宝殿“五尊主像（三世佛+文殊普贤）+ 两侧十八罗汉廊”暖红棕拼花木地板版正面中轴全景场景（空间场景设计）。
 materials:
 - 暖红棕席纹拼花木地板
 - 五尊铜鎏金大佛菩萨配白色发光海棠石背板
@@ -53,7 +51,7 @@ tags:
 - 八角重檐金藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

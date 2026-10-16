@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/dccf671fae000a63.jpg
     sha256: cef3511e9ae5ca85d7e024507c4a5e9c0bda83cf8b9d6a171bb4a9b281cf6bcd
-    size: 133740
     bytes: 133740
     width: 564
     height: 1129
   thumb512:
     path: assets/thumb512/dccf671fae000a63.webp
     sha256: 987aa442412607185a75c628da727a80333a76ae92ef0e71836a3cf15d00f901
-    size: 23990
     bytes: 23990
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「梦幻庄园」大理石的高纯度正射局部纹理特写样本，专门截取了该品种最具代表性的「冷暖角砾共生 + 墨线铁脉穿插」局部区域，用于近距离展示石材内部的矿物结晶构造与色彩过渡细节。
 materials:
 - 梦幻庄园大理石
 colors:

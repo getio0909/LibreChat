@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/40f3282b9c3d5887.jpg
     sha256: 6c2847570acadbe54a97f50aec6b4e0ff67c0b531596ca53a381125d4c5c8f74
-    size: 445691
     bytes: 445691
     width: 2048
     height: 617
   thumb512:
     path: assets/thumb512/40f3282b9c3d5887.webp
     sha256: 4d832d656de01e9e502e698986b7e03b2ee15e738e92dc61845e779d8dbad3af
-    size: 22276
     bytes: 22276
     width: 512
     height: 154
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 中东/伊斯兰骨木微缩镶嵌装饰横板
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 这是一件中东/埃及（科普特或早期伊斯兰法蒂玛/马穆鲁克时期）博物馆级古木嵌骨/象牙几何建筑横楣板（Frieze Panel with Bone/Ivory and Ebony Inlay）实物写实。
 materials:
 - 风化深褐古木
 - 象牙白骨片镶嵌

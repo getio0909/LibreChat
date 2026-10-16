@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ef437670268492a2.jpg
     sha256: e678d96b781a8014cad61edabce54ea66cacbb5ad1f0aa3c3bd9a667f5034ab0
-    size: 293925
     bytes: 293925
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/ef437670268492a2.webp
     sha256: e0e39cea12a8ffd9bc6a77486de220dc8d94bd3685589d0c3510648d5e075fb3
-    size: 19812
     bytes: 19812
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-透明格栅万佛陈列墙
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图从人眼正常观赏的斜侧45度视角，展示了展位两翼“三层三十六格透明亚克力背光千佛陈列墙”的整体面貌。该设计摒弃了传统寺院木质万佛龛的厚重压抑感，以高透亚克力与背光灯箱创造出轻盈、纯净、现代感十足的供奉与认捐展示系统。
 materials:
 - 琉璃/树脂禅定佛像
 - 亚克力格栅
@@ -57,9 +55,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

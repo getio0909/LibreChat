@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2283d24082ed8cc5.jpg
     sha256: 0f33b0249a1a2e0d18a906a4be65d52184d4cf45a644a4914a28eb37b98c0e75
-    size: 284149
     bytes: 284149
     width: 2048
     height: 1158
   thumb512:
     path: assets/thumb512/2283d24082ed8cc5.webp
     sha256: 1e11e77b4dfe8b5b53cee4c2241457a56c95c017e690e4ebf03afdd928acaca6
-    size: 25890
     bytes: 25890
     width: 512
     height: 289
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中央雕花木佛龛内供奉通透宝蓝色琉璃药师佛坐像与胁侍菩萨、背衬金色云海山水壁画、四周环绕发光万佛墙与深色镜面拼花石地面的现代展厅。
 materials:
 - 蓝琉璃药师佛与胁侍像
 - 鎏金雕花大佛龛
@@ -54,7 +52,7 @@ tags:
 - 石材水刀拼花
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

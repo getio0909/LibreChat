@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ec2c1caed9f4286b.jpg
     sha256: 50c48a80ea8f8d6c9c9f014a9f27a11eb1724e533204b019a92b49e0c994997b
-    size: 86721
     bytes: 86721
     width: 500
     height: 706
   thumb512:
     path: assets/thumb512/ec2c1caed9f4286b.webp
     sha256: f4f7f0029b29a25ee1ca07de25765835373e5775fd97089934c9d5c1531a8a8c
-    size: 33894
     bytes: 33894
     width: 363
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 东南亚古代灰塑/石雕神兽建筑构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 这是一件博物馆展陈的东南亚（泰国陀罗钵地/素可泰或高棉风格）古建筑门楣/柱头神兽卡拉（Kala / Kirtimukha，对应中国传统建筑中的椒图/吞口兽）高浮雕残件实物写实。
 materials:
 - 古建灰泥灰塑
 - 风化米白石灰岩

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/52ef5aecca27b311.jpg
     sha256: 994def5840fd8a63bf83b89e84881761c1e107b9d252884dacde2df918b7ba36
-    size: 303443
     bytes: 303443
     width: 1481
     height: 2048
   thumb512:
     path: assets/thumb512/52ef5aecca27b311.webp
     sha256: 96e9d204ec15f461bb81c965c0161266812662d490daa4012cd267df1613939a
-    size: 25066
     bytes: 25066
     width: 370
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 设双列红木抄经长案、方蒲团、汉白玉柱础巨柱、发光藏经书架与巨幅水墨山水画轴的传统佛教抄经阅览展览空间。
 materials:
 - 红木长案
 - 青石板地面
@@ -57,7 +55,7 @@ tags:
 - 佛教文化展厅
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

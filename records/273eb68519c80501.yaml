@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/273eb68519c80501.jpg
     sha256: 4bca4d5eaff8feb7fb84547461ab1a43ed3aff950fae1bb5082d06cc57d7ccd4
-    size: 511967
     bytes: 511967
     width: 1464
     height: 2048
   thumb512:
     path: assets/thumb512/273eb68519c80501.webp
     sha256: 730dccd0f71936291f5dfb611ef921b7b976f527e84481d19c9cad3ad71435f1
-    size: 49772
     bytes: 49772
     width: 366
     height: 512
@@ -33,7 +31,9 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统方形金莲平棊吊顶与白玉千手观音殿场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型寺院观音殿（圆通宝殿）室内竖幅中轴对称场景（与第 06 张同属观音殿设计系列，区别在于本方案外廊及前厅采用大面积方形贴金宝相莲花平棊格栅吊顶，内圈核心区保留千瓣金莲内穹顶）。竖幅构图极好地展现了天地呼应的宗教空间尺度。
+  空间以灿烂赤金（天花平棊与万佛墙灯光）、圣洁纯白（中央汉白玉千手观音与双层莲座）及温润米黄（地面与石柱）构成华贵明亮的视觉层次。前景两根八角/圆柱采用米白大理石，柱头与柱脚下段特别镶嵌橙红色玛瑙玉石（或红珊瑚色浮雕铜箍）与青白石雕花覆莲柱础；地面正中嵌入一幅直径约
+  3 米的圆形多色大理…
 materials:
 - 汉白玉千手观音
 - 贴金平棊天花
@@ -55,7 +55,7 @@ tags:
 - 观音殿室内设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

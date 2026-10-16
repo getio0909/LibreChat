@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/250286a95a62b373.jpg
     sha256: f565b5abd224a4413b4dfb5440c49d85f73695faa318340ae929b006da4badf3
-    size: 274912
     bytes: 274912
     width: 1983
     height: 1219
   thumb512:
     path: assets/thumb512/250286a95a62b373.webp
     sha256: 1cd289976abce614762a153c077a6b86f2eeb4bd3a15dbedf76dd25fd9624a48
-    size: 26518
     bytes: 26518
     width: 512
     height: 315
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为五开间重檐歇山顶红木透雕天宫楼阁大佛龛（帐龛）正面中轴全景场景（空间场景设计）。
 materials:
 - 五开间重檐歇山顶红木透雕大佛龛
 - 嵌鎏金荷花裙板木护栏
@@ -54,7 +52,7 @@ tags:
 - 中轴对称全景
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

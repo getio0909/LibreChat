@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/84172b5ff89881f3.jpg
     sha256: 70a4dcd09010f44996195f8d5bb101d902cee2b5770561cf5628ae5036c76305
-    size: 463649
     bytes: 463649
     width: 1286
     height: 2048
   thumb512:
     path: assets/thumb512/84172b5ff89881f3.webp
     sha256: dedf114e7868050073c4abcc5785824d89cabfb9472e3b4ef9ec704aad7c6a95
-    size: 28854
     bytes: 28854
     width: 321
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 伊斯兰/莫卧儿大理石镂空花窗构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 这是一件16至17世纪印度莫卧儿帝国（Mughal）风格的整石透雕白色大理石镂空花窗屏板（Jali Screen）实物写实。
 materials:
 - 印度马克拉纳白色大理石
 - 整石透雕构件

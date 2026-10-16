@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/14b9c43b2d306cd7.jpg
     sha256: 1236d627770a752123e2e43d309a15b0e92ca47a574e7dfefedb3bf2675dda4e
-    size: 95845
     bytes: 95845
     width: 908
     height: 575
   thumb512:
     path: assets/thumb512/14b9c43b2d306cd7.webp
     sha256: 65d49a1b694a5ccd1deff9110fff6960435444cc14b540d896682e4c02e46de9
-    size: 12104
     bytes: 12104
     width: 512
     height: 324
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石样本-带标尺浅米色系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为同批次荒料或同矿口产出的另一片浅米黄色天然大理石大板工业扫描数字样本。
 materials:
 - 天然浅米色大理石
 - 生物沉积大理岩
@@ -51,7 +49,7 @@ tags:
 - 工程排版母板
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/efc2aefed0884882.jpg
     sha256: 1c9dadb646ea94441c8808d202caea21ec4df1779f7c2cdec3d2d50d3c7a64dc
-    size: 411751
     bytes: 411751
     width: 2048
     height: 1726
   thumb512:
     path: assets/thumb512/efc2aefed0884882.webp
     sha256: 92fea36a92bdc93773487169a63ff0e644bdff10157a867f030911b998300b99
-    size: 35714
     bytes: 35714
     width: 512
     height: 432
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 以巨幅发光云海仙山壁画为背景、正中供奉深蓝琉璃药师佛坐像与琥珀金日光月光菩萨立像、前景立青石柱础木柱的药师殿场景。
 materials:
 - 深蓝琉璃药师佛像
 - 琥珀金菩萨立像
@@ -58,7 +56,7 @@ tags:
 - 青石柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

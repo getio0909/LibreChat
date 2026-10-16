@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/494ef286d4b787b4.jpg
     sha256: 6077273efe1f64ff63f2bfebb47cbd202ddcb0c8e95c7726f73a4b761ea90531
-    size: 263361
     bytes: 263361
     width: 1685
     height: 1261
   thumb512:
     path: assets/thumb512/494ef286d4b787b4.webp
     sha256: 13f6b26fa5c98b10a7cfedc40f309d6663657be716a943b7dbd23066f3c4da09
-    size: 33156
     bytes: 33156
     width: 512
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统金碧八角宝盖藻井与白玉须弥坛城大殿场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为一座极尽奢华的现代宫殿式佛教主殿内部广角中轴对称场景。空间以“深色镜面石材地面如水池、纯白汉白玉须弥座如莲台、贴金八角垂悬宝盖如天冠”的三重空间隐喻，构建出庄严神圣的中心坛城式大殿格局。 空间呈现强烈的“白玉、赤金、深咖黑镜面”三色高反差奢石美学。前景两根巨型方柱与内圈四根廊柱均采用温润洁白的米白大理石/汉白玉干挂，柱底承托深灰黑色高浮雕覆莲须弥柱础（柱脚处点缀金色套箍）；中央大型坛城栏杆与踏步采用纯白汉白玉精雕；地面大面积铺设高光泽度深咖色带闪电白纹的镜面大理石（如黑白根或深啡网纹），反射率极高。
 materials:
 - 汉白玉须弥座
 - 镜面大理石
@@ -54,7 +52,7 @@ tags:
 - 发光万佛墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a5fb2a250b8857f7.jpg
     sha256: 87b68d55451897a0e93eb858825e730ef4332940531c8fe1a95af71b7222ae93
-    size: 333685
     bytes: 333685
     width: 2032
     height: 2048
   thumb512:
     path: assets/thumb512/a5fb2a250b8857f7.webp
     sha256: 29f8915452a052f56846df54c84d08c245202245c5943641b9c428995352992c
-    size: 18166
     bytes: 18166
     width: 508
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式佛堂茶室禅意端景墙软装局部特写，暖褐木饰面墙体左侧嵌入圆形月亮门发光背景龛，右侧黑陶大瓮斜插金黄秋叶枝条伸入光晕之中，下部设实木展台与经卷。
 materials:
 - 胡桃木竖向木饰面
 - 圆形透光宣纸/云石壁龛
@@ -56,7 +54,7 @@ tags:
 - 东方极简美学
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

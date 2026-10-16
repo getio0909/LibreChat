@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a9000177e089e292.jpg
     sha256: 59c8c09f2b866d7580df95871c642af2a339369f384b1e47577b1e90dd4261b1
-    size: 517654
     bytes: 517654
     width: 2048
     height: 1533
   thumb512:
     path: assets/thumb512/a9000177e089e292.webp
     sha256: 1e5f98c6b99aa79ce4a9faaaae2613d52d007456f032ea8942792b84a274fd5c
-    size: 42942
     bytes: 42942
     width: 512
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 低角度仰视展现巨型八角星空莲瓣藻井、正中同坛并列三世佛二弟子与文殊普贤五尊金像、地面铺几何拼花木地板的恢弘大殿。
 materials:
 - 香槟金铜佛像
 - 白色浮雕透光石板
@@ -56,7 +54,7 @@ tags:
 - 方形莲花柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/98bbfd85c8a0891c.jpg
     sha256: 36a81e8f337224bc5d3c49d61be15a66741f118cc0ba79afeedc5a1bd5fcf9db
-    size: 462833
     bytes: 462833
     width: 1706
     height: 1280
   thumb512:
     path: assets/thumb512/98bbfd85c8a0891c.webp
     sha256: 5915b6d1dc9f37afd746eabf7e8c6b123eeebb5b5f0c4a3cffc24d50b144f424
-    size: 39562
     bytes: 39562
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 矿山与车间场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是一幅极具匠心纪实感的大型石材精加工车间「蓝金灰」工程板地面连纹预铺与工程师持图审板空间场景图。
 materials:
 - 加工车间实景
 colors:

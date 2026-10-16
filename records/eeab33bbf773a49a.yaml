@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/eeab33bbf773a49a.jpg
     sha256: f15828d4a4045022da2564c8fa48501374a4d42fc64b6bf9af17c2185780cd62
-    size: 371052
     bytes: 371052
     width: 2048
     height: 1535
   thumb512:
     path: assets/thumb512/eeab33bbf773a49a.webp
     sha256: afeb3bed9ae05cde75131c6e9d096ec7ce9989354766fda0b5a8617890c5a297
-    size: 30256
     bytes: 30256
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 藏汉融合佛塔圣殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型寺院室内金色舍利宝塔大殿（现代中式平顶九宫格天花比选方案）（空间场景设计，与本卷第02号坡屋顶露明木椽版构成天花与外廊立面比选）。
 materials:
 - 汉白玉麒麟浮雕御道与三路石阶
 - 藏式铜鎏金尊胜宝塔
@@ -53,7 +51,7 @@ tags:
 - 藏式铜鎏金佛塔
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

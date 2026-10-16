@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4160a59fa255db3e.jpg
     sha256: 5940643d7dd4a03b7346b239a2a294d82037d39058c9dfe6079dbd32b14cbb0f
-    size: 218769
     bytes: 218769
     width: 707
     height: 1413
   thumb512:
     path: assets/thumb512/4160a59fa255db3e.webp
     sha256: c76d751c39899f6355fa8a0a4985692eaec2874578773b90804c04649601e6fc
-    size: 32276
     bytes: 32276
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「蓝金灰（深黛蓝重色亚类）」的标准竖向正射纹理样本，重点展示了该品种在深色调区间内极具力量感的岩石肌理与金属感红脉。
 materials:
 - 蓝金灰微距特写
 colors:

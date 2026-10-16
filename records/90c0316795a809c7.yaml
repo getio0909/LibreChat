@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/90c0316795a809c7.jpg
     sha256: 074204e5a4dc23c05afb7ec4d7cc509b16f4823560dd7052635a069c103b6d79
-    size: 306789
     bytes: 306789
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/90c0316795a809c7.webp
     sha256: 6968687b187224d9da2e173a0388775b0640366ad039f16d983c0394c2de5ade
-    size: 20326
     bytes: 20326
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-01展位3D轴测材质索引图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为整套施工图册的扉页总纲——01 材质图。采用东北角 45° 斜俯视 3D 等轴测渲染视角，将 75m² 两面开口展位的建筑体块、空间围合、灯光矩阵与八大核心材质工艺直观地整合在一张图面上。
 materials:
 - 木结构
 - 大理石

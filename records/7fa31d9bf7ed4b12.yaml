@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7fa31d9bf7ed4b12.jpg
     sha256: 74f92584cb8855fae1980937292f285fc9c9cae994106ca84a54fc09f6ed8260
-    size: 42041
     bytes: 42041
     width: 519
     height: 349
   thumb512:
     path: assets/thumb512/7fa31d9bf7ed4b12.webp
     sha256: 50861fe0a309732d9e276751e08c5692c07ab64c2f25a127218c0a998dddb4cc
-    size: 24242
     bytes: 24242
     width: 512
     height: 344
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代露明木椽坡屋顶下设玻璃护栏双层挑空中庭、升起大型青铜鎏金坐佛、两侧配嵌星点壁灯的竖向竹木格栅墙与后方黑金山水画的展陈空间。
 materials:
 - 青铜鎏金大佛
 - 多层石雕莲花座
@@ -58,7 +56,7 @@ tags:
 - 佛教美术馆
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

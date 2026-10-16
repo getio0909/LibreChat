@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4c8811a4aa3b9320.jpg
     sha256: fda4ad03fa58a7aac1a0d6f96f74e7578b67d5c55dc736c4fcdd40f5e6c401da
-    size: 861358
     bytes: 861358
     width: 1613
     height: 2048
   thumb512:
     path: assets/thumb512/4c8811a4aa3b9320.webp
     sha256: 152cd01123b491798366f92ed29163fe7b492a986d32816584da7b0e103f2e5d
-    size: 57286
     bytes: 57286
     width: 403
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 东南亚南传佛教寺庙门廊场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是老挝琅勃拉邦（Luang Prabang，典型如香通寺 Wat Xieng Thong）传统南传佛教寺院大殿（Sim）敞开的雕花木门与外廊空间场景。
 materials:
 - 高浮雕贴金柚木门
 - 黑漆描金方柱

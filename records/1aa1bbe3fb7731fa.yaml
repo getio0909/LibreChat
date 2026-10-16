@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1aa1bbe3fb7731fa.jpg
     sha256: 2347fb9ea9008dcec510f615d44fd17e950dd9f619a45d5666d2d3e2aab137c6
-    size: 366174
     bytes: 366174
     width: 1836
     height: 2048
   thumb512:
     path: assets/thumb512/1aa1bbe3fb7731fa.webp
     sha256: 5516045a52a02ad668a0b966b81706f599e4ecedcf6649c8303e55c62597afc2
-    size: 31206
     bytes: 31206
     width: 459
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统重檐木构佛殿斜坡屋顶与白玉丹陛回廊场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型传统寺院佛殿或佛教文化主题展馆内部主殿台基与外侧回廊交界处的空间场景（与第 01 张同属一座大型殿堂，本图视角转向主佛坛前端的汉白玉丹陛台阶）。空间通过高差台基、巨柱阵列与折坡屋顶，营造出拾级而上、步入佛国的庄严空间序曲。
+  空间以深棕红木结构、洁白汉白玉礼制台基、青白石柱础与灰褐青石地砖构成古朴厚重的材质体系。右侧主坛台基采用整料汉白玉砌筑三级踏步，正中斜坡镶嵌浅浮雕卷草宝相团花丹陛御道石，两侧护以云纹抱鼓石与莲花望柱栏板；台基上安放两座橙黄色透光琉璃盛开莲花座灯；主柱采用深红木包柱，底部为青白石多层…
 materials:
 - 红木梁柱
 - 汉白玉丹陛石
@@ -54,7 +53,7 @@ tags:
 - 传统佛殿回廊
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

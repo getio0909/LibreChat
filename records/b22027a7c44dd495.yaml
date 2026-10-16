@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b22027a7c44dd495.jpg
     sha256: 2c3a5f8a511e7d106c24f370ced536ce26f5d82d0a1bf6cab34cdc3c0c6b3f6e
-    size: 428928
     bytes: 428928
     width: 2048
     height: 1393
   thumb512:
     path: assets/thumb512/b22027a7c44dd495.webp
     sha256: 78dd1ce866add96c9392571d793e51ae00ddbefd971c8ea8a7228fd7882affde
-    size: 33508
     bytes: 33508
     width: 512
     height: 348
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 传统木梁架门罩下设米黄石雕通长须弥座供奉四尊金佛、背衬嵌汉白玉圆环的暖红金祥云浮雕墙与两侧折面飞天壁画的主殿场景。
 materials:
 - 米黄石雕须弥座长坛
 - 祥云浮雕背景墙
@@ -58,7 +56,7 @@ tags:
 - 飞天壁画
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

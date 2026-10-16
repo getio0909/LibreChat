@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a1e5405fb3c83bec.jpg
     sha256: 844fd54a1d28f8c2cba20b08ef12d76ba0212f9b7abe269504ba8c00f92af119
-    size: 40473
     bytes: 40473
     width: 494
     height: 349
   thumb512:
     path: assets/thumb512/a1e5405fb3c83bec.webp
     sha256: ead53c4bc79ec5cdee0c2fd1d7fef09a8e62212a4a823a96a2081ee2098da0d2
-    size: 24738
     bytes: 24738
     width: 494
     height: 349
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型双层挑空传统大佛殿室内侧面仰视场景（空间场景设计，与本卷第14号同属一个大型双层大佛殿项目）。
 materials:
 - 跨两层巨型古铜鎏金坐佛
 - 彩绘石雕多层莲花须弥座
@@ -54,7 +52,7 @@ tags:
 - 仰视崇高感构图
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

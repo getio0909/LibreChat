@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/649d84db0268f568.jpg
     sha256: ebc738cba0774480591b44d964ed5f5f5b041548fa487e21c87fbf25e6befb75
-    size: 529209
     bytes: 529209
     width: 2048
     height: 1528
   thumb512:
     path: assets/thumb512/649d84db0268f568.webp
     sha256: a6c6115de324fe37200bdff351ce2370ae570270f7179e8cf86c3552a0c793e6
-    size: 48224
     bytes: 48224
     width: 512
     height: 382
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 大型寺院千瓣金莲穹顶观音殿室内场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型现代寺院观音殿（圆通宝殿）内部核心礼佛空间场景（与第 20 张同属一殿的不同吊顶方案）。空间以中心坛城式布局烘托高大圣洁的汉白玉千手观音（多臂观音）立像，头顶笼罩巨大的千瓣金莲苍穹，营造出“千处祈求千处应、佛光普照”的震撼宗教空间体验。
+  空间以纯白、璀璨暖金与温润米黄为主色调。主尊千手观音及下方双层仰覆莲瓣须弥座均采用极品一级汉白玉精雕，肤质与衣纹温润如玉；顶部穹顶为层层向心收拢的立体贴金莲花瓣构件；环殿巨柱采用米白直纹大理石，柱脚包嵌一圈红棕色宝相花高浮雕铜箍（或红玉套）及汉白玉双层莲瓣柱础；地面采…
 materials:
 - 汉白玉造像
 - 贴金莲花穹顶
@@ -54,7 +53,7 @@ tags:
 - 发光万佛墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

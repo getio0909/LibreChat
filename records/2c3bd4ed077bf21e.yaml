@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2c3bd4ed077bf21e.jpg
     sha256: 18a0778b96662a4715e820c44c3aa4ab7639c0a4d140e81e59803a3c3b81f282
-    size: 420968
     bytes: 420968
     width: 2048
     height: 1144
   thumb512:
     path: assets/thumb512/2c3bd4ed077bf21e.webp
     sha256: 2ac90af6e00b904d444765bdb123af0faa9e17830f88441f5f95bc65d67d2207
-    size: 34468
     bytes: 34468
     width: 512
     height: 286
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 供奉挑高两层鎏金千手观音立像、墙面饰“如意珠手印”四十二手眼浮雕与万佛龛、顶部设星空穹顶与橘黄莲花灯的宏伟观音宝殿。
 materials:
 - 铜鎏金千手观音
 - 浅米黄石柱
@@ -59,7 +57,7 @@ tags:
 - 星空藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

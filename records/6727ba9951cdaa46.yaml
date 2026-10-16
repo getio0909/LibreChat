@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6727ba9951cdaa46.jpg
     sha256: f7925a9fa25c0d6134be94a5f68b19bf47682d36398663b66fec381ab1667767
-    size: 666063
     bytes: 666063
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/6727ba9951cdaa46.webp
     sha256: f8d2a702bdad57749cdb228bc0ff62b8c7b9d4d27244b526745d44d31e54cb38
-    size: 59700
     bytes: 59700
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 藏传与多民族融合佛殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为藏传佛教风格（或藏汉融合）千佛墙与三联度母/长寿三尊主龛大殿内景（空间场景设计）。
 materials:
 - 金色满铺千佛墙与三联镀金雕花主龛
 - 藏式菩萨/度母坐像
@@ -54,7 +52,7 @@ tags:
 - 甘珠尔藏经架
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

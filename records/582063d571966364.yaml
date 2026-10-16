@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/582063d571966364.jpg
     sha256: 33fdea9d1a4998715d5d68baf1586b43939c8c12f1d5b1c336cce1a8faca6d9c
-    size: 860241
     bytes: 860241
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/582063d571966364.webp
     sha256: 38a3e5f4fa94b4c883fc9e536ba7df48583eb431bbe448481e01ae21a8b214f9
-    size: 46708
     bytes: 46708
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-殿堂式核心区
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图展示了2025年秋季佛事展“庄严宝刹（Alitan Stone）”展位核心殿堂区的低角度仰视实景。空间采用现代新中式殿堂化展陈手法，将传统大雄宝殿的“藻井、背光墙、须弥坛、护栏、拜垫/禅椅”转化为模块化全石材装配空间，营造出恢弘崇高、金碧辉煌的礼佛与商业洽谈双重气场。
 materials:
 - 金镶玉奢石
 - 敦煌金玉石
@@ -58,9 +56,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

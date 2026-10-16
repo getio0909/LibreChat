@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7243258cbd656d7c.jpg
     sha256: a2a0c2117a251a986cd5cd4e90f165083d589d53217ffd5768fdffae45c67dcb
-    size: 491040
     bytes: 491040
     width: 2048
     height: 1540
   thumb512:
     path: assets/thumb512/7243258cbd656d7c.webp
     sha256: a64a4c2da89a9dcee441effe8c8aaf3d2453ad250c91cfdb2186c236dedb08d2
-    size: 45356
     bytes: 45356
     width: 512
     height: 385
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 星空顶巨型石雕涅槃卧佛殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 星空蓝、彩绘壁画柱与黄玉 / 巨型白石卧佛、敦煌风彩绘方柱、黄玉地面
 materials:
 - 纯白汉白玉整石卧佛
 - 敦煌重彩壁画包柱
@@ -56,7 +54,7 @@ tags:
 - 琉璃千佛柱
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

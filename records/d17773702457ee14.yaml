@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d17773702457ee14.jpg
     sha256: 9884a75f067423743810c8599a9928eb77c2091635032094b020776cb82d934c
-    size: 302371
     bytes: 302371
     width: 1024
     height: 2048
   thumb512:
     path: assets/thumb512/d17773702457ee14.webp
     sha256: 04a98da6851bdab9012ea9a902326dbf57d7c93383bbd53e526e8af8ef650459
-    size: 15016
     bytes: 15016
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「蓝金灰（浅银米灰素雅亚类）」的超高清工业级数字扫描/正射材质贴图（Ultra-HD Albedo Map），专为大尺寸高清喷绘、超写实 3D 渲染与 AI 细节放大（Tile Upscale）提供极致精度的母本。
 materials:
 - 蓝金灰超清特写
 colors:

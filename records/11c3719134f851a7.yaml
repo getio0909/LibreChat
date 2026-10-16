@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/11c3719134f851a7.jpg
     sha256: ce7510401681ce435bba0bcebb9adddf7918386a796fc0f39fe34718ad431d10
-    size: 324255
     bytes: 324255
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/11c3719134f851a7.webp
     sha256: 490e7f6c72782aad3e4aa428d6e0cd49937dcd67315bcf96227dfff19255ea70
-    size: 19284
     bytes: 19284
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-02平面位置与3D鸟瞰图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为施工图册第 2 页——02 平面位置图，由“展馆宏观区位落位图（左）”与“展位微观 3D 垂直鸟瞰效果图（右）”两部分构成，全面阐明了 C5 T026 展位（75m²） 在展馆中的人流朝向与内部功能分区逻辑。
 materials:
 - 木结构
 - 大理石地面

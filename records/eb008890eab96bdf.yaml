@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/eb008890eab96bdf.jpg
     sha256: a02800baaf8cdccdd907cbdd3a6746d5c4c3ed8f1fef8e87156b0545cb1e31aa
-    size: 135139
     bytes: 135139
     width: 828
     height: 620
   thumb512:
     path: assets/thumb512/eb008890eab96bdf.webp
     sha256: e1a3bd9b653c7a2553ee65e1be2085983518d52df10a1db88ad50bc82d69d23a
-    size: 43764
     bytes: 43764
     width: 512
     height: 383
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-幽深墨绿冰裂系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为放置在石材加工厂车间支架上的天然幽深墨绿色冰裂纹大理石（典型蛇纹石化大理岩/台湾绿/印度深绿品系）大板实物写实。
 materials:
 - 天然墨绿大理石
 - 蛇纹石大理岩
@@ -53,7 +51,7 @@ tags:
 - 香案茶台石材
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

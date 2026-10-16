@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/966029906a9024de.jpg
     sha256: 00954b9e4d319dcbf57ba3e6f6a533c7bbc42c5fd9317542a8fbc7decc694883
-    size: 313385
     bytes: 313385
     width: 2048
     height: 1149
   thumb512:
     path: assets/thumb512/966029906a9024de.webp
     sha256: 0cd72e5afdd965b37add2b727fcff24f873db12ec98f8fd147f2bd9686bb3bf7
-    size: 31430
     bytes: 31430
     width: 512
     height: 287
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代原木风万佛墙祈福千佛殿室内场景，采用温润浅色桧木梁柱与回纹护墙板，四周高墙密布模块化发光小佛龛并嵌设两座大型主佛龛，地面铺设深灰黑带白筋高光大理石。
 materials:
 - 台湾桧木饰面
 - 贴金莲花雕花柱
@@ -56,7 +54,7 @@ tags:
 - 模块化佛龛
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

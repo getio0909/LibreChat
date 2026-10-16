@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8918fbd22a5370e8.jpg
     sha256: bd0e57a5fcf956391cbce96df8b330c730a91f5228860b315200ba29380cf7a4
-    size: 290198
     bytes: 290198
     width: 1954
     height: 1354
   thumb512:
     path: assets/thumb512/8918fbd22a5370e8.webp
     sha256: d1eca4a9cf73d9c49931cd5445e5894df5a9a2c3fbf76e8b804b202b44df167c
-    size: 26248
     bytes: 26248
     width: 512
     height: 355
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为多进式传统佛殿内部回廊、护法壁画墙与分殿隔断空间设计（空间场景设计，本卷第33号为其正视中轴全景）。
 materials:
 - 高光灰褐水墨纹大理石
 - 深棕实木梁柱配青白石柱础
@@ -54,7 +52,7 @@ tags:
 - 框景透视构图
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

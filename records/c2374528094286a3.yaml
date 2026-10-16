@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c2374528094286a3.jpg
     sha256: 3a3feed1635afb936b56bcaf77e3d300d607f093625db7c9423e14b890aa1417
-    size: 328103
     bytes: 328103
     width: 1448
     height: 1086
   thumb512:
     path: assets/thumb512/c2374528094286a3.webp
     sha256: 052e6c9fb355feba8930c90eee43932d53c5d6c9d0b8fb2f91255e3faee62569
-    size: 33122
     bytes: 33122
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 现代禅意奢石会所空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是一幅极具标杆意义的现代东方禅意高定会所/礼佛前厅空间场景设计图。
 materials:
 - 透光黄金云石
 - 深色胡桃木浮雕板

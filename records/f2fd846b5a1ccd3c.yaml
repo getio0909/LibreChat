@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f2fd846b5a1ccd3c.jpg
     sha256: 9d6fb30f2fe7897ec4fa52b1652cc4df36b4c05a6c2fb7fb06a2b5878bd4755d
-    size: 330005
     bytes: 330005
     width: 1018
     height: 2036
   thumb512:
     path: assets/thumb512/f2fd846b5a1ccd3c.webp
     sha256: 03fd2d244de62a16e9e70b6f8074454dc18a6da673846b6f2bd70b9f95ad65bf
-    size: 18638
     bytes: 18638
     width: 256
     height: 512
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「天川金」大理石的高纯度正射微距纹理标准样本（Orthographic PBR Texture Swatch），专门截取了该品种明黄底色最为纯粹、金丝网纹最为典雅的局部区域，供 AI 材质渲染与设计深化直接调用。
 materials:
 - 天川金微距特写
 colors:

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2352822c6b0d2625.jpg
     sha256: 6f09b59daf1d90cd39583b1e812b2048e9b7aa19b626b5bb97f4168a479e5908
-    size: 627043
     bytes: 627043
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/2352822c6b0d2625.webp
     sha256: 41374687c683b39e0ecc2e08309a8c58753ce0c461d272505ec639963f5b858c
-    size: 40168
     bytes: 40168
     width: 512
     height: 362
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代自然劈裂面灰麻石摩崖千佛墙与大悲咒光幕展厅场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为一座极具当代建筑艺术感与自然石窟精神的佛教石材展览空间/现代佛殿过厅主场景。设计师将传统敦煌、云冈、龙门石窟的“摩崖开龛造像”意象引入现代室内，以整面粗犷冷峻的自然劈裂面灰麻花岗岩背景墙，镶嵌数十个澄明温暖的拱形发光金佛龛，创造出“顽石生金莲、幽谷现佛光”的强烈美学震撼。
+  核心视觉冲突源于“粗砺自然面花岗岩”与“高光镜面奢石、璀璨赤金佛像”的极致材质对比。正面巨幅主墙采用深灰色带青苔微瑕肌理的自然劈裂面（蘑菇面）灰麻/青石花岗岩砌筑；墙体开凿的圆拱龛内壁涂覆洁白哑光微水泥/白石，内置4000K暖白暗藏光带…
 materials:
 - 自然面灰麻花岗岩
 - 鎏金佛像
@@ -54,7 +53,7 @@ tags:
 - 粗犷石材与金佛反差
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

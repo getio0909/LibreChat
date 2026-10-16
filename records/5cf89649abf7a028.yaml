@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5cf89649abf7a028.jpg
     sha256: bdaad9ef6a4842b7c67d4fcb414b9284abe0be9422363d589cde74e1fe419f41
-    size: 392497
     bytes: 392497
     width: 1393
     height: 2048
   thumb512:
     path: assets/thumb512/5cf89649abf7a028.webp
     sha256: 8c9fc75a4e100c2b1473f5626da5fef9f690b071515bbb4647ca085dc6d39cf5
-    size: 28836
     bytes: 28836
     width: 348
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正中供奉头戴五佛冠、持锡杖与摩尼珠的铜鎏金地藏王菩萨坐像，背后为多层叠级暗藏暖光灯带的巨型盛开莲花瓣造型背景墙。
 materials:
 - 铜鎏金五佛冠地藏王菩萨坐像
 - 多层叠级发光大莲瓣背景墙
@@ -53,7 +51,7 @@ tags:
 - 现代佛教展厅
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

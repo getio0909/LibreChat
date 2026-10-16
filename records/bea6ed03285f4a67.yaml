@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/bea6ed03285f4a67.jpg
     sha256: 1d958e462d5ca58ed477711b1d10eba0a1aa21a853fdca2d85d31266d1e2a422
-    size: 786540
     bytes: 786540
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/bea6ed03285f4a67.webp
     sha256: 5016ec0bf68478767a8961f8f53601bd732be0be790d350db4fbcd22bbd20762
-    size: 52176
     bytes: 52176
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中央设汉白玉栏杆月台、蓝色天球佛龛与直通八角金顶的锥形千佛塔华盖，左右辟荷花池伫立两尊巨型金色太子像的恢宏圣坛大殿。
 materials:
 - 汉白玉雕花栏杆月台
 - 锥形千佛塔华盖
@@ -58,7 +56,7 @@ tags:
 - 浴佛太子像
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

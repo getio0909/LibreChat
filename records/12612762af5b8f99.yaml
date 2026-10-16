@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/12612762af5b8f99.jpg
     sha256: d6ea8861e1fc32bb020b9b0f42ea4bf58c2e1da166207301d280ac1baa49ba95
-    size: 151610
     bytes: 151610
     width: 534
     height: 2048
   thumb512:
     path: assets/thumb512/12612762af5b8f99.webp
     sha256: a6ef35326e7bdf10dda543012f73fdf8b400ac06a39c4dfe2700d0899ff863b5
-    size: 10116
     bytes: 10116
     width: 133
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯黑背景下展示的传统深色红木高立式透雕观音佛龛，顶冠贴金重檐宝塔顶，中部镂空卷草莲花券门内供奉朱红衣贴金观音坐像，下承高束腰雕花底座。
 materials:
 - 传统深色红木透雕卷草莲花高立式佛龛
 - 金色重檐宝顶
@@ -52,7 +50,7 @@ tags:
 - 透雕木作
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

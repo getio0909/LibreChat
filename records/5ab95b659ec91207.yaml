@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5ab95b659ec91207.jpg
     sha256: 9ca6ad21f47469ebd9869a753b2b05740b1107caa5d9206fed0e7e933eac730b
-    size: 256973
     bytes: 256973
     width: 784
     height: 2048
   thumb512:
     path: assets/thumb512/5ab95b659ec91207.webp
     sha256: ab48f5dc36e64a08dadb0cd2b911e5a598e9a8065c734446363491bba30fcf0b
-    size: 25880
     bytes: 25880
     width: 196
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 琉璃千佛发光柱陈列空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 霓虹渐变与米白石材 / 彩色背光琉璃千佛柱、米白石雕仰莲须弥柱础
 materials:
 - 米白汉白玉石雕
 - 七彩渐变透光琉璃
@@ -56,7 +54,7 @@ tags:
 - 现代佛教展陈
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

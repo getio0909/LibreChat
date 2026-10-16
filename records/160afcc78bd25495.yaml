@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/160afcc78bd25495.jpg
     sha256: 59b361e53ca61acb52084c42656ba1683d6c2da11fd241fdbbebdaf0cbc53f7a
-    size: 228686
     bytes: 228686
     width: 1797
     height: 1169
   thumb512:
     path: assets/thumb512/160afcc78bd25495.webp
     sha256: c1887f25bcb85f2d0df8d48b588a9c13ad426c8afc7e54377d8d220ab0e82a57
-    size: 24390
     bytes: 24390
     width: 512
     height: 333
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 通长深红木雕须弥座上供奉配拱形重彩壁画背板的三世佛二弟子及两侧文殊普贤像、侧墙挂巨幅框装壁画的大雄宝殿场景。
 materials:
 - 深红木雕须弥座
 - 拱形重彩壁画背板
@@ -57,7 +55,7 @@ tags:
 - 方案比选
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

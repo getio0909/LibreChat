@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/dba0e5b4fae091f9.jpg
     sha256: 58c41666b3074596bc21815e7d885ee01ece16535e0e3c152323e6f1e78852b9
-    size: 397559
     bytes: 397559
     width: 1440
     height: 1080
   thumb512:
     path: assets/thumb512/dba0e5b4fae091f9.webp
     sha256: 61192ef6d97d2541441d89de5bc08e6c3b02d176707b55b8fb946288415d40bf
-    size: 48564
     bytes: 48564
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 一座真实落地的藏汉融合佛教实木雕花家具品牌展厅（或高端禅茶会客厅）完整空间场景。作为本批次最具文献与算法对照价值的“源头实景母本图（Ground-Truth Source Image）”，它不仅展示了成套藏式雕花实木沙发、茶几、角几在真实商业展厅中的围合尺度与软装搭配，还同时呈现了后方背景墙的木雕唐卡挂画阵列与左后方的四角亭阁式木佛龛。
 materials:
 - 雕花实木沙发组
 - 木雕唐卡挂画
@@ -52,7 +50,7 @@ tags:
 - ControlNet源图像
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

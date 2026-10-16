@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d3599f629caa56bb.jpg
     sha256: 68123b71eb18480baa93d82a6ea7ede2505a14f5d59ebb7ec6b9666eda74252f
-    size: 372629
     bytes: 372629
     width: 1984
     height: 1488
   thumb512:
     path: assets/thumb512/d3599f629caa56bb.webp
     sha256: 1c0ca80f75d9a3ec525668256139b56704207d5e73e29d84f6806c7cdffac183
-    size: 25612
     bytes: 25612
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-中灰网纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为高分辨率拍摄的大型中暖灰色调天然大理石大板实物写实（属云朵拉灰、爱马仕灰或土耳其灰品系）。
 materials:
 - 天然大理石
 - 云朵拉灰大理石
@@ -53,7 +51,7 @@ tags:
 - 高级灰禅意空间
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

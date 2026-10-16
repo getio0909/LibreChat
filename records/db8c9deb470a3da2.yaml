@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/db8c9deb470a3da2.jpg
     sha256: 2edb5d4b679682c34a5513bcfd8901ebbc06ac06716970e82ed71ce2bd2df365
-    size: 423533
     bytes: 423533
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/db8c9deb470a3da2.webp
     sha256: 0d8a64d1685e1e8b0e976352179cb0806e7c43238f91559e961f95961a34b897
-    size: 34984
     bytes: 34984
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 建筑木石构件-敦煌金石雕须弥座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为天然玉石·敦煌金高浮雕须弥座（展会结缘价3980元/米）的顺延透视特写。须弥座是佛教建筑与佛像供奉台基的最高等级形制，本品严格遵循唐宋至明清官式须弥座的层叠规制，采用整石数控精雕结合手工修光抛光工艺打造。
 materials:
 - 天然玉石敦煌金（五层规制高浮雕）
 colors:
@@ -53,9 +51,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

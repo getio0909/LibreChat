@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/83d14ad9e8e7bc35.jpg
     sha256: 8434387268b71ee4a125632ca3599cb277d4294f320e6210de9aaaa4f7853809
-    size: 477425
     bytes: 477425
     width: 2048
     height: 1875
   thumb512:
     path: assets/thumb512/83d14ad9e8e7bc35.webp
     sha256: 9e720a64ff0caf0c7baffb0100365c9a67196e666dd567b1584d777a6e3449d5
-    size: 43608
     bytes: 43608
     width: 512
     height: 469
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统大雄宝殿三世佛背后增设“鱼肚白大理石背景屏风墙”的陈列比选场景（空间场景设计）。
 materials:
 - 铜鎏金三世佛与二弟子像
 - 高耸鱼肚白大理石背景屏风墙
@@ -54,7 +52,7 @@ tags:
 - 圆形星空藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

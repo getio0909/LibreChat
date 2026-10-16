@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2693587fce9663e6.jpg
     sha256: fbdd6bc74732bcd3ed9a957854b91ef7c03ddf900e2864668429c84a86f0e64a
-    size: 366563
     bytes: 366563
     width: 2048
     height: 1527
   thumb512:
     path: assets/thumb512/2693587fce9663e6.webp
     sha256: 8501fe4ec59c9ce0886c251648bc1e8097b5e38ea1f3b1d963bde0bb3b5bdbf2
-    size: 31200
     bytes: 31200
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 佛经壁画与藏经文化展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 深褐红木与青灰白玉 / 传统木构书柜、汉白玉雕花栏杆、橙玉发光莲花
 materials:
 - 原木实木格栅
 - 素面清水混凝土
@@ -56,7 +54,7 @@ tags:
 - 说法图壁画
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

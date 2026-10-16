@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/be353221b983e7c4.jpg
     sha256: 47ac0b9bf40ef3f49d3df062b010baabac4b416d8c18ebebbadc43fcd4a53981
-    size: 387548
     bytes: 387548
     width: 2048
     height: 1274
   thumb512:
     path: assets/thumb512/be353221b983e7c4.webp
     sha256: 68208d70d9ebc7b8ac02d64595d2977396923c32781ab3f376107f235033d06e
-    size: 32240
     bytes: 32240
     width: 512
     height: 318
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 以整面鱼肚白大理石为主佛背景墙、供奉三世佛与二弟子及两侧文殊普贤金像、两壁设发光万佛墙的现代中式大雄宝殿。
 materials:
 - 鱼肚白大理石
 - 铜鎏金佛像
@@ -57,7 +55,7 @@ tags:
 - 万佛墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

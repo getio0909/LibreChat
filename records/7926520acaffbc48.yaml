@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7926520acaffbc48.jpg
     sha256: df5e94683482a1d5dd4f161345371d9452db2136b7d485b371a14b2a0a38ad87
-    size: 213952
     bytes: 213952
     width: 722
     height: 1445
   thumb512:
     path: assets/thumb512/7926520acaffbc48.webp
     sha256: 9c79d3eeed9a4fdb1cb1b2fd4393150ad0e9841eb2c5147d3322932fc29db890
-    size: 30132
     bytes: 30132
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「蓝金灰（角砾碎花亚类）」的高纯度正射微距纹理标准样本，近距离揭示了该品种独特的砾石级变质角砾与钙质金脉交织的微观地质结构。
 materials:
 - 蓝金灰微距特写
 colors:

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/546eaeccc80fbea4.jpg
     sha256: 74f8d063bb30dfc15a39056e3b52f836a5cfc6392a12935c1fb695ab7f40bf09
-    size: 430232
     bytes: 430232
     width: 1250
     height: 1875
   thumb512:
     path: assets/thumb512/546eaeccc80fbea4.webp
     sha256: e5b267c334731d23de954e9bc6c98553eb6b805ca5c5099656fb1b11846ec614
-    size: 33344
     bytes: 33344
     width: 341
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 东南亚高棉风格圆形红砖锥形穹顶佛殿内部，中央多层折角汉白玉须弥座上供奉黑色青铜七头那伽护法坐佛，四周环绕高耸收分的古旧红砖墙与顶部白色华盖伞。
 materials:
 - 手工青红砖
 - 黑色青铜那伽坐佛
@@ -57,7 +55,7 @@ tags:
 - 石雕台基
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/67869fa9250fe38a.jpg
     sha256: a9e160d08ab83dda971eb839f01030840094a0dd8cd491ac64cee0721daf5fc4
-    size: 356102
     bytes: 356102
     width: 1416
     height: 2048
   thumb512:
     path: assets/thumb512/67869fa9250fe38a.webp
     sha256: 81640c918ef113a0f4c3b729919d87547d5afaec336ed0013035674addf40535
-    size: 31916
     bytes: 31916
     width: 354
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 汉白玉坐佛与鎏金祥云背光局部
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 纯白汉白玉与金黄 / 汉白玉释迦牟尼坐佛、金色祥云浮雕背景、灰纹大理石
 materials:
 - 一级四川汉白玉
 - 24K鎏金祥云浮雕板
@@ -57,7 +55,7 @@ tags:
 - 莲花蒲团
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

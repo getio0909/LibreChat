@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/13e4314323b06c2e.jpg
     sha256: f003275529b76bf673b296251b5a977139c02b34f7d5e7158b7c085e558e173d
-    size: 34203
     bytes: 34203
     width: 353
     height: 382
   thumb512:
     path: assets/thumb512/13e4314323b06c2e.webp
     sha256: 0e44c1a59d53102aaa7283d07c2c0a69dc22f6e004f43d56b9b1adabb0e44cf8
-    size: 21988
     bytes: 21988
     width: 353
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 唐宋风格多层佛教殿堂“地藏殿（地宫出入口）”外立面局部场景，采用四层重檐歇山顶楼阁形制，米白色条石干挂外墙配木斗拱、金色浮雕博风板与翼角风铎。
 materials:
 - 米白干挂条石
 - 青灰筒瓦
@@ -57,7 +55,7 @@ tags:
 - 重檐楼阁
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

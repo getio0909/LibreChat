@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d837a8554982400f.jpg
     sha256: 9c1d49a8d8b36b931871114525de3e7b759fb88fb3e6652a4a397d9ba9fa238c
-    size: 332598
     bytes: 332598
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/d837a8554982400f.webp
     sha256: 6ad98a2dbc6a5c36552dd88cc935b2a0b33743678c4a22499d2f0007de5483ee
-    size: 35842
     bytes: 35842
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法座宝座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 陈设于古典深色实木护墙板佛堂/贵宾室内的藏传佛教八辐法轮墨绿奢石与胡桃木扶手大宝座。与第 10 项的现代浅灰美术馆背景形成鲜明对照，本图展示了该款暗调奢石宝座在传统沉稳木作室内空间中的实际落地视觉效果。
 materials:
 - 墨绿蛇纹石
 - 深胡桃木

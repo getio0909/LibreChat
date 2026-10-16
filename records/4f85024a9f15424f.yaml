@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4f85024a9f15424f.jpg
     sha256: 150b8c812f7700db04f5f12ebc344a268c4bf4c9c3882c163c71cdeae6b2d544
-    size: 242861
     bytes: 242861
     width: 1789
     height: 1398
   thumb512:
     path: assets/thumb512/4f85024a9f15424f.webp
     sha256: 1eb600ab10b94d5ff6807f9dcbb6bf3dcb609a1751a691f08570cfaa2eacdb41
-    size: 27180
     bytes: 27180
     width: 512
     height: 400
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统汉传大雄宝殿“三世佛与二弟子”斜向广角展示场景（深色木壁背景比选版）（空间场景设计）。
 materials:
 - 铜鎏金三世佛与二弟子像
 - 深棕木雕须弥座
@@ -54,7 +52,7 @@ tags:
 - 背景比选方案
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

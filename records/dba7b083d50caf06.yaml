@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/dba7b083d50caf06.jpg
     sha256: d7fd613181349ac27765b705736a944bc12c55cff899b1174b4fa1c2145996cb
-    size: 624566
     bytes: 624566
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/dba7b083d50caf06.webp
     sha256: 768f6e8548b86fc4c4625b33ce374c7196e7df489b60bb1d4148535177b4801e
-    size: 70370
     bytes: 70370
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 陈设于藏式展厅阶梯展台前排的一座藏传八吉祥之“金鱼（Golden Fish / Gaur-Matsya）拱护法轮”圆形实木深浮雕贴金彩绘座屏。在藏传佛教中，双鱼象征着众生超越世间无明苦海、获得解脱自在与坚固活泼的智慧（亦代表恒河与阎摩那河两大圣河）。
 materials:
 - 实木深浮雕
 - 贴金彩绘
@@ -52,7 +50,7 @@ tags:
 - 佛教吉祥摆件
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

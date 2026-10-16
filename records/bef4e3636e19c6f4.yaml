@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/bef4e3636e19c6f4.jpg
     sha256: 17e32ccec986cc55fa8e9ae781530c8ec97758f0b4a7bbb0a641f3be80f776c9
-    size: 499290
     bytes: 499290
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/bef4e3636e19c6f4.webp
     sha256: 121e752933301f5c9fb4488f5c4c04d7c5a72cbe2cfd3d242f265154d430461a
-    size: 52278
     bytes: 52278
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景下以近景俯拍视角聚焦展示的中式佛教莲花主题实木沙发与嵌石镶宝茶几组合。镜头重点突出了中央大型方形茶几的台面石材镶嵌工艺与主沙发、单人椅的实木立体深浮雕细节，并省去了软包坐垫，直接展示实木座板的原木美学。
 materials:
 - 北美黑胡桃木
 - 墨绿蛇纹石

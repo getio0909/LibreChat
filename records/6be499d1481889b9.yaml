@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6be499d1481889b9.jpg
     sha256: 6ac5870bac92733a11e1c8d222b2fd4e19f83a8f0526a766eff045b5614588cf
-    size: 670103
     bytes: 670103
     width: 1873
     height: 2048
   thumb512:
     path: assets/thumb512/6be499d1481889b9.webp
     sha256: 91f2a4bde7444a818732256847ebe375e4dd749e3f36ab87ef280de28b18bee5
-    size: 52460
     bytes: 52460
     width: 468
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统佛教建筑重檐贴金斗拱与透光祥云天幕构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为传统佛殿内部大型佛龛上方或抱厦前檐的唐宋/明清复合式重檐木雕贴金构件仰视正视特写。集深浮雕大梁、透光云石祥云天幕、唐式弧形轩顶、垂莲柱与密集贴金斗拱于一体，代表了传统宗教木作雕刻的最高华丽等级。 构件以深沉的紫檀/酸枝木色为底托，在斗拱、拱眼壁透雕花板、莲花垂柱及平板枋高浮雕上大面积覆贴高纯度亮金箔；顶部正中嵌入一块方形透光云石/艺术琉璃灯箱板，满绘金黄与象牙白交织的吉庆流云纹，自上而下投射出柔和神圣的天光。
 materials:
 - 贴金斗拱
 - 透雕木花板
@@ -54,7 +52,7 @@ tags:
 - 佛教木雕细节
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

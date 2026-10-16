@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ba73c34020468d94.jpg
     sha256: 4c858042e956f76090997e4fa58cec4c7535dbe98680e587db6c8ca62d80e71e
-    size: 42237
     bytes: 42237
     width: 533
     height: 300
   thumb512:
     path: assets/thumb512/ba73c34020468d94.webp
     sha256: 98825c0ae730fc8f13a6a3cbe7e3273ac450f7d59e33716e11bfd6e5e1c9b9d1
-    size: 29926
     bytes: 29926
     width: 512
     height: 288
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 传统唐宋宫殿式重彩佛教主殿室内概念场景，四根朱红金箍大柱撑起青绿斗拱与垂花门罩，中央五级丹墀金栏高台上设雕花金宝座与巨幅青绿重彩荷花壁画屏风。
 materials:
 - 朱漆金箍木柱
 - 鎏金须弥座与宝座
@@ -56,7 +54,7 @@ tags:
 - 中轴对称大殿
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

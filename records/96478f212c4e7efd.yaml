@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/96478f212c4e7efd.jpg
     sha256: 30a42873e43b3eb2b2a1b3a115cf21f6413423bc669acacdd25edb94d094b87e
-    size: 652920
     bytes: 652920
     width: 2048
     height: 1153
   thumb512:
     path: assets/thumb512/96478f212c4e7efd.webp
     sha256: ec05b43c476dad18d6033c3e013bb168455e7a3a135db4e0c46a948681eb101a
-    size: 35610
     bytes: 35610
     width: 512
     height: 288
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-中轴供坛与千佛墙
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图聚焦展位中轴线核心展品——巨型全石雕双层仰覆莲瓣须弥供坛（佛台）与贴金彩绘伽蓝菩萨（关公）坐像，同时右后方完整呈现右翼3×12格透光千佛墙与门廊宫灯。该场景直观展示了寺院大殿主供坛、石雕须弥座护栏、地面石材拼花与背景千佛龛的成套工程交付效果。
 materials:
 - 敦煌金玉石
 - 金镶玉
@@ -59,9 +57,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

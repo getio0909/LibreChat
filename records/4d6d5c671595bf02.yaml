@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4d6d5c671595bf02.jpg
     sha256: 775aae89b1148e414ec8a0ed807affe8c3b644f10fbb9d041c355d53318cfcc8
-    size: 478531
     bytes: 478531
     width: 2048
     height: 1309
   thumb512:
     path: assets/thumb512/4d6d5c671595bf02.webp
     sha256: 825c3539ca05edf0feb383e1bee1ea0b4a5e7627b3c9e71694005b3524049379
-    size: 42082
     bytes: 42082
     width: 512
     height: 327
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正中汉白玉须弥座供奉配圆形放射状法轮背光的一佛二弟子、两侧万佛墙挑出汉白玉台基安奉四大天王的木构大殿。
 materials:
 - 实木万佛墙
 - 汉白玉须弥座挑台
@@ -58,7 +56,7 @@ tags:
 - 环形宫灯
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

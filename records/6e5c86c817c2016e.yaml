@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6e5c86c817c2016e.jpg
     sha256: 08dec29eaf89cbb8a622fb825bcd6f2c36f2a6f3962002df70f7bc7db479abb7
-    size: 399114
     bytes: 399114
     width: 2048
     height: 1538
   thumb512:
     path: assets/thumb512/6e5c86c817c2016e.webp
     sha256: da3b6c3e3fb24d5aaedc6b81655d3f08683fb8d5f0cb3b7abfdcaae593b85901
-    size: 27490
     bytes: 27490
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 地面中央铺设天然榻榻米与3x3米白圆形打坐蒲团矩阵、左侧设满载佛学典籍的通顶原木藏经书柜、右侧设抬高茶席地台的现代居士禅修室。
 materials:
 - 榻榻米席地铺装
 - 米白圆形蒲团阵列
@@ -53,7 +51,7 @@ tags:
 - 茶禅一味空间
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

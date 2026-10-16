@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/00b9d9083badd7e4.jpg
     sha256: 608facf8d2beaa618ea32d9796216abbf2e1692767324e3bcd686291f5f92c1d
-    size: 424135
     bytes: 424135
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/00b9d9083badd7e4.webp
     sha256: 477979d91794fe628cfb731638efbc6515e48df8d8502e6f198c077ba686cb43
-    size: 41650
     bytes: 41650
     width: 384
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 展厅正面全景实拍的一套寺院大殿级全配置藏传佛教高僧大法座装置（Full-Scale Monastic Dharma Throne Ensemble with Side Pulpit and Stairs）。相比第 26
+  项，本套装置不仅尺幅更高、雕工更立体饱满，而且完整包含了中央主法座与经案、左侧高脚侍从经台（配S形双龙戏莲腿）、右侧四级实木登座扶手木梯，是极其难得的完整法台工程实物范本。
 materials:
 - 实木圆雕浮雕
 - 重彩描金
@@ -52,7 +51,7 @@ tags:
 - 金翅大鹏鸟背光
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

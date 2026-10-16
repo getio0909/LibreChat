@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2b9f7d804562a73a.jpg
     sha256: aa88182d41ea24ce61883ae93235c880ba63f653abc07509383f8bbf2376031e
-    size: 400387
     bytes: 400387
     width: 1600
     height: 1200
   thumb512:
     path: assets/thumb512/2b9f7d804562a73a.webp
     sha256: 7849e5138aecde8a09e2b2d54b009b1768a8aa909556fbc6175c438ac4c6fcab
-    size: 38720
     bytes: 38720
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 泰国传统皇家寺院大殿内景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是泰国曼谷云石寺（Wat Benchamabophit，大理石寺）大雄宝殿（Ubosot）内部信众礼佛与僧侣诵经的实景空间场景。
 materials:
 - 鎏金青铜佛像
 - 金彩壁纸

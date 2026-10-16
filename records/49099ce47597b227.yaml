@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/49099ce47597b227.jpg
     sha256: 6c6af26cfc49dee981ede304c98e4a8d5110072a2bb1e44662641783488fa8e1
-    size: 769879
     bytes: 769879
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/49099ce47597b227.webp
     sha256: 953853cc7b8703bb8f73a0102e4a59b9239fe2b93029f3dac10d99c022d123fd
-    size: 41918
     bytes: 41918
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图是「梵高皇 / 敦煌壁」系列中极具代表性的4K 超高清整板正视标准母本图（Master Full-Slab Orthographic Reference）。
 materials:
 - 梵高皇
 colors:

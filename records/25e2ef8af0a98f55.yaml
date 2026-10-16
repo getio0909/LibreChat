@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/25e2ef8af0a98f55.jpg
     sha256: de1cde821ef52895fe37bf0e68d03f6fd25809bed66e2424a7409e3018a92275
-    size: 121207
     bytes: 121207
     width: 720
     height: 960
   thumb512:
     path: assets/thumb512/25e2ef8af0a98f55.webp
     sha256: e490c985aadc7bd9601c65cc5456e7413f82a2c65d107ff9a44bf55f940a4819
-    size: 33456
     bytes: 33456
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 东南亚泰式佛教大藏经图书馆兼白玉佛主展厅，五跨顶天立地的深红木书架陈列数千册红黄蓝精装佛经，正中嵌入泰式火焰尖拱形朱红深龛，供奉纯白汉白玉南传禅定坐佛。
 materials:
 - 汉白玉/缅甸白玉坐佛
 - 朱砂红火焰形佛龛背板
@@ -57,7 +55,7 @@ tags:
 - 佛教博物馆
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

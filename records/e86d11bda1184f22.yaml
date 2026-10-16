@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e86d11bda1184f22.jpg
     sha256: 32b6b010eea2590b2c624e062950b1321e242663c844ad2def85cb1ddd51d785
-    size: 299382
     bytes: 299382
     width: 1983
     height: 1366
   thumb512:
     path: assets/thumb512/e86d11bda1184f22.webp
     sha256: baa280c00ac959cb46895f5015548046a02b4f52573fb30704b6a813498a9600
-    size: 29984
     bytes: 29984
     width: 512
     height: 353
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为五开间重檐红木透雕天宫楼阁大佛龛左前近景仰视展示场景（空间场景设计，与本卷第31号右前斜视图形成左右镜像呼应）。
 materials:
 - 五开间重檐红木透雕天宫佛龛近景
 - 鎏金荷花浮雕护栏
@@ -54,7 +52,7 @@ tags:
 - 大殿左前斜视
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

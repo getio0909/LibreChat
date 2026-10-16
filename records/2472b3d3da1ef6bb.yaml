@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2472b3d3da1ef6bb.jpg
     sha256: 009b5cfc3f763875fe925a84eed1690bd8d9fe6c33475cc215f0337647741863
-    size: 423896
     bytes: 423896
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/2472b3d3da1ef6bb.webp
     sha256: 5c05b8d34faef721fab0d48cdd89fb9c996cb97e694dde9cc6320620c98ce0c2
-    size: 39796
     bytes: 39796
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图展示了一组在工厂红毯检验区完成预铺拼装（Dry-lay）的佛教空间地面石材拼花与波打线镶边模组。
 materials:
 - 天然大理石
 colors:

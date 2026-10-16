@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0c2dff2ac7272526.jpg
     sha256: bb6ccc6d81fe951bb057bf27d169c9ebafc2d10b244f4129814a249a10d4632a
-    size: 220792
     bytes: 220792
     width: 1490
     height: 700
   thumb512:
     path: assets/thumb512/0c2dff2ac7272526.webp
     sha256: 82db10c1d868ffe6012227f2880b34e5e1cbfc59cc3c5b7081782c0a2c9cbb3e
-    size: 35482
     bytes: 35482
     width: 512
     height: 241
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 建筑木石构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 室内仰视拍摄的一座现代藏式佛堂/禅修室专用“外方内圆”实木跌级藻井吊顶与中央立体彩绘曼陀罗（坛城）天花板装饰构件（Tibetan Buddhist Mandala Coffered Ceiling Panel）。在藏传佛教空间法则中，佛堂或宝座正上方的顶棚必须设置坛城藻井（天盖），象征诸佛菩萨居住的清净法界宫殿悬于虚空，庇佑下方礼佛众生。
 materials:
 - 实木跌级吊顶
 - 立体彩绘曼陀罗
@@ -51,7 +49,7 @@ tags:
 - 建筑木雕构件
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

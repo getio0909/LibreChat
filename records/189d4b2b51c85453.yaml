@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/189d4b2b51c85453.jpg
     sha256: e5c371115d30960b825d3c422188127777c985d63a0c53a89f95cff42c989528
-    size: 615578
     bytes: 615578
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/189d4b2b51c85453.webp
     sha256: 73145c857901268ec81dcb3dee268d8462bc972fccda2b9b7506915339fd361d
-    size: 39652
     bytes: 39652
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图展示了石材加工车间内一套已完成精加工与地面预排版的高端佛教展厅/禅堂地面「蓝金灰主砖 + 复合三线波打线」拼贴系统。
 materials:
 - 天然大理石组合
 colors:

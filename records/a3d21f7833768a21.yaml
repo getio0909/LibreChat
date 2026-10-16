@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a3d21f7833768a21.jpg
     sha256: ffacdd206b7dd5bc71596a4625821775db23412a28e144d2a82b33e2f993e964
-    size: 427681
     bytes: 427681
     width: 1024
     height: 2048
   thumb512:
     path: assets/thumb512/a3d21f7833768a21.webp
     sha256: 8ba44ecf85ec9a763dc7e5b72911d8c9d2bc9520205006e059ea02af5313a915
-    size: 29988
     bytes: 29988
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「梵高皇 / 敦煌壁」系列中以炽烈朱砂红与赤金黄为主导色调的 3K 正射微距纹理标准样本。
 materials:
 - 敦煌壁
 colors:

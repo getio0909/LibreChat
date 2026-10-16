@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/28f08b509367ab7f.jpg
     sha256: fb4d7f13f1a9b95f618a47d302dddbbe55f5228303b34235a4924c7faef990db
-    size: 239615
     bytes: 239615
     width: 2048
     height: 1160
   thumb512:
     path: assets/thumb512/28f08b509367ab7f.webp
     sha256: ffdd7aefde48fd32eb62d922782489a87eb616ae96f3b72a8826abe615b83c3f
-    size: 20164
     bytes: 20164
     width: 512
     height: 290
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中央设八角形多层发光红木雕花转轮藏经塔、外围配雕花木栏杆与圆拱藏经壁龛及圆形盘龙藻井的现代佛教经藏展示空间。
 materials:
 - 红木立柱与雕花栏杆
 - 八角发光转轮藏经塔
@@ -53,7 +51,7 @@ tags:
 - 现代佛教展厅
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

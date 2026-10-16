@@ -214,6 +214,40 @@ def test_validator_catches_failure_cases(tmp_path: Path) -> None:
     assert "Orphan derivative file" in joined
 
 
+# 测试校验器对空摘要及必填核心字段缺失/置空时触发Schema校验失败
+def test_validator_fails_on_empty_summary(tmp_path: Path) -> None:
+    repo = _init_temp_repo(tmp_path)
+    img = Image.new("RGB", (900, 900), (140, 120, 100))
+    src_file = tmp_path / "sample.jpg"
+    img.save(src_file, format="JPEG", quality=85)
+
+    rec_path = create_draft_record(src_file, repo, original_rel_path="folder/sample.jpg")
+    base_data = yaml.safe_load(rec_path.read_text(encoding="utf-8"))
+    assert validate_repository(repo, check_images=False) == []
+
+    # 置空summary_zh并验证校验器报错
+    empty_summary_data = json.loads(json.dumps(base_data))
+    empty_summary_data["summary_zh"] = ""
+    rec_path.write_text(
+        yaml.safe_dump(empty_summary_data, allow_unicode=True, sort_keys=False),
+        encoding="utf-8",
+    )
+    errors = validate_repository(repo, check_images=False)
+    assert any("schema error at summary_zh" in err for err in errors)
+
+    # 同时测试title_zh为空与studio_roles为空列表时同样触发Schema报错
+    empty_required_data = json.loads(json.dumps(base_data))
+    empty_required_data["title_zh"] = ""
+    empty_required_data["studio_roles"] = []
+    rec_path.write_text(
+        yaml.safe_dump(empty_required_data, allow_unicode=True, sort_keys=False),
+        encoding="utf-8",
+    )
+    errors_req = validate_repository(repo, check_images=False)
+    assert any("schema error at title_zh" in err for err in errors_req)
+    assert any("schema error at studio_roles" in err for err in errors_req)
+
+
 # 测试真实仓库的368条记录完整性以及索引与分类视图生成无重复和无绝对路径
 def test_build_views_and_live_repository(tmp_path: Path) -> None:
     errors = validate_repository(REPO_ROOT, check_images=False)

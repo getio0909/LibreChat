@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/fe6b43aadc9dd420.jpg
     sha256: baa0d3ac6183f28690dd8727d015039c4c55ad6ddfd6dfa8ca4ed704460f9640
-    size: 837878
     bytes: 837878
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/fe6b43aadc9dd420.webp
     sha256: d9521fc1a7168a72cf5000ed9429c1f9b480d4cc479ea25011a7ef3298599c5e
-    size: 45674
     bytes: 45674
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-天地墙石材交接构造
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图专项拍摄展位顶面“金镶玉透光石莲花藻井吊顶”与立面“金镶玉奢石竖向分缝背景墙”的90度转角交接空间节点，展示了同一品种石材在“超薄背光透光应用”与“厚板高光干挂应用”下的双重视觉表现力。
 materials:
 - 金镶玉透光石藻井
 - 金镶玉竖向墙板
@@ -54,9 +52,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

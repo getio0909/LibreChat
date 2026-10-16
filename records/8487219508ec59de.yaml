@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8487219508ec59de.jpg
     sha256: 9f4d48adcf105ec8b6615542c635873cbe20373968f164bf3b5f40a21d544cda
-    size: 50904
     bytes: 50904
     width: 668
     height: 350
   thumb512:
     path: assets/thumb512/8487219508ec59de.webp
     sha256: ae55b05eede8f43c8421dba2b066f6dec8488291685e5f89300376f26030c26b
-    size: 20428
     bytes: 20428
     width: 512
     height: 268
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代极简禅意白色石材“八角白莲穹顶与三联拱龛万佛展示空间”（空间场景设计）。
 materials:
 - 八角形白色叠涩斗拱发光穹顶配双层立体莲花天池
 - 正面三座石材拱形佛龛（中龛三世佛+侧龛青绿山水壁画坐佛）
@@ -52,7 +50,7 @@ tags:
 - 佛教美术馆空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

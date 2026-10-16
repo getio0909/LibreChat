@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ef1c6fd7d0eb9536.jpg
     sha256: 858e501df9c665b04f449c542c5e5c71c1d576077f015135d0daf5c5f24ffe41
-    size: 450835
     bytes: 450835
     width: 2048
     height: 1530
   thumb512:
     path: assets/thumb512/ef1c6fd7d0eb9536.webp
     sha256: 0ff7ad7a1f4896f7239896df7358e9df217eb8485e6d1064e9ea9e71ae9e91fc
-    size: 38540
     bytes: 38540
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统汉传大雄宝殿“横三世佛 + 阿难迦叶二弟子 + 文殊普贤二大士”全堂供奉正面全景场景（空间场景设计）。
 materials:
 - 铜鎏金三世佛与二弟子像
 - 两侧文殊普贤骑兽金像
@@ -54,7 +52,7 @@ tags:
 - 传统寺院主殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/580f616dfdc38236.jpg
     sha256: 659dd2af6a6b6742663dd5232e24c9c8fb911f2beaa8bb55ff5f0e0a263d2921
-    size: 253458
     bytes: 253458
     width: 2048
     height: 1430
   thumb512:
     path: assets/thumb512/580f616dfdc38236.webp
     sha256: fa73e5899e1efb3900ec25568173cbd6b2f9daea4f61b88165422c4bde8ab429
-    size: 19340
     bytes: 19340
     width: 512
     height: 358
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 药师佛十二大愿主题暗调沉浸式祈福佛堂场景，两侧高墙密布琥珀暖光圆拱形祈福小龛，远端莲花尖拱主龛供奉立佛，倾斜巨柱上镌刻发光《药师经》第四、六、九、十大愿经文。
 materials:
 - 深胡桃木龛架与护墙板
 - 发光经文倾斜方柱
@@ -55,7 +53,7 @@ tags:
 - 千佛光明灯
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

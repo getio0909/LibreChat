@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4485754c17fe88d8.jpg
     sha256: f7a0fe89214d0865bb45e3384068b3882e48036a28d577da738258da6c5c8542
-    size: 455774
     bytes: 455774
     width: 1440
     height: 1080
   thumb512:
     path: assets/thumb512/4485754c17fe88d8.webp
     sha256: 9a00ee4b128e2f6fef6541e7fce6ebdc0342297032ac1c69f5dc4a362787a35a
-    size: 61596
     bytes: 61596
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 一座顶面带彩绘曼陀罗藻井、立面设“十一佛冠顶三联大佛龛”且满配密宗仪轨供品的藏传佛教标准佛堂展厅空间场景。如果说第 19 项展示了空置状态下的十一佛冠大佛柜，那么本图则完美展示了同类十一佛冠大佛柜在装入主尊佛像、点亮龛内灯光、摆满全套铜供水碗与八宝圆牌、并配合顶面坛城藻井后的完整空间落成效果。
 materials:
 - 藏式大佛柜
 - 铜供水碗
@@ -52,7 +50,7 @@ tags:
 - 藻井与佛柜空间
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

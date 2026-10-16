@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a1c29a0cf5306184.jpg
     sha256: 267270af55d3aaee4fdd6d08a4ff813f5941c7a2a3d21cb9a45c88a6af314887
-    size: 451716
     bytes: 451716
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/a1c29a0cf5306184.webp
     sha256: 4227af5b1f9047365eba76ebbeed8934df732eb1fd580ede853f2cfe92b46ffb
-    size: 41418
     bytes: 41418
     width: 384
     height: 512
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 矿山与车间场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为石材加工厂车间内，一组由 12 块大尺寸长方形「梦幻庄园/金镶玉」成品规格板（4列×3行主阵列，左侧辅以窄条收边板）在深褐色防滑垫上进行的出厂前连纹预拼贴场景。
 materials:
 - 梦幻庄园规格板
 - 仓库空间

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2cbdf707a91f9605.jpg
     sha256: 81e047f92fe73ddaac96a9dcc46d39f61149baf0e72e93e918665998ed57aa84
-    size: 257844
     bytes: 257844
     width: 1850
     height: 1290
   thumb512:
     path: assets/thumb512/2cbdf707a91f9605.webp
     sha256: f8d67ad88c98f2873a42cfbe3c5152b74c577edd53551f266263ab77e4c22bd5
-    size: 26894
     bytes: 26894
     width: 512
     height: 357
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 青灰毛石错落佛龛与发光经文墙厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 青灰石材、暖金佛龛与灰纹地面 / 阶梯式拱形石窟佛龛墙、透光石材心经墙
 materials:
 - 青灰自然面乱纹毛石
 - 超薄透光云石镌刻佛经墙
@@ -57,7 +55,7 @@ tags:
 - 石材展厅
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

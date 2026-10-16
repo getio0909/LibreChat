@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/35785af38eab2e24.jpg
     sha256: 64c275ea8692f7cefd1639996268ceef012f57edffcded13bf695317d52fa834
-    size: 544444
     bytes: 544444
     width: 2048
     height: 1153
   thumb512:
     path: assets/thumb512/35785af38eab2e24.webp
     sha256: 699c3eea5bb37624a4d86bab2097f22a688a76c77df3a1ddc3bda62df8379159
-    size: 29742
     bytes: 29742
     width: 512
     height: 288
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-展位全局实景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为2025年秋季佛事展“庄严宝刹”展位的三面开口全局透视实景照。展位整体呈大尺度U型半围合殿堂式格局，巧妙利用传统古建“歇山/卷棚轩顶+中堂藻井”的木构语汇进行现代化转译，在挑高展馆中构建出一座独立、醒目且具有强烈宗教建筑仪式感的石材美学殿堂。
 materials:
 - 金镶玉
 - 敦煌金
@@ -59,9 +57,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8426a59a5172cad5.jpg
     sha256: c68b32925686140ac764aedceac40a9555495dc41e87b621f302f1de9a402d37
-    size: 376322
     bytes: 376322
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/8426a59a5172cad5.webp
     sha256: 8b6486c440b503cc7cffcaffeec2d33c58c970be8800a2d6c7c9ebf5271a6eeb
-    size: 22678
     bytes: 22678
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 7937x5613超清极简禅宗冥想堂与茶道展厅，胡桃木背景墙中央设巨型内发光“一圆相（Enso）”圆环，下置低矮禅茶台与蒲团，两侧对称陈列黑陶枯枝。
 materials:
 - 中央巨型发光圆相（Enso）背景墙
 - 低矮禅修茶台与蒲团
@@ -52,7 +50,7 @@ tags:
 - 枯枝禅意美学
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

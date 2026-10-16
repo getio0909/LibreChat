@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c2ea711c1249822c.jpg
     sha256: fe437cf51d5a6abd5c6e0ea2324168c8c61806ea424c474dd1b4d70a7cee733c
-    size: 228137
     bytes: 228137
     width: 983
     height: 2048
   thumb512:
     path: assets/thumb512/c2ea711c1249822c.webp
     sha256: 6e100d5c49a01184ef6fbf588ba2b8ef3643f2496c6d6bf16f507101044cd586
-    size: 14810
     bytes: 14810
     width: 246
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 下承洁白汉白玉圆鼓石墩、中设六角镂空暖光灯笼、上冠六角攒尖重檐翘角挂铃亭顶的铜鎏金落地长明供灯特写。
 materials:
 - 铜鎏金六角重檐亭阁式落地供灯
 - 镂空花窗灯室
@@ -52,7 +50,7 @@ tags:
 - 佛堂灯饰
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0638dce7be68f6c7.jpg
     sha256: b68b383633b29536ed8b7d1a3b64f87ee3b3b469aed08fba08e16a866c80d8ab
-    size: 390712
     bytes: 390712
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/0638dce7be68f6c7.webp
     sha256: 96df6690ebd91704383ad76fd914f97a31bf6dce5ffdd34bb828e227da4068a5
-    size: 51042
     bytes: 51042
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 与第 23、24 项同款展品的正面标准对称视角全景照——藏传佛教大型双龙耳斗式木雕彩绘供器。通过正视图可以最准确地把握该法器的宽窄比例、斗腹斜度（约 60° 外倾角）、双耳S形曲率以及底座兽面与斗腹法轮的垂直中轴对齐关系。
 materials:
 - 红木圆雕
 - 双狮捧法轮浮雕
@@ -52,7 +50,7 @@ tags:
 - 藏式展厅实拍
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

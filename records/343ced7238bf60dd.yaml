@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/343ced7238bf60dd.jpg
     sha256: f067dbd917154dcf31f9f564b6d1a527b0e81e2437eff630be6ee23534d4ccd1
-    size: 38156
     bytes: 38156
     width: 434
     height: 381
   thumb512:
     path: assets/thumb512/343ced7238bf60dd.webp
     sha256: 208d6cbb333bd69da406af697e223ed2d8e2a8a4f7a4375cc6f5b347bd426ab1
-    size: 22628
     bytes: 22628
     width: 434
     height: 381
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代新唐风佛教建筑双层汉白玉石雕外墙设计，上层为连续石窟式火焰圆拱坐佛壁龛长廊，下层台基嵌巨幅十八罗汉高浮雕长卷。
 materials:
 - 汉白玉罗汉高浮雕台基景墙
 - 连续圆拱形坐佛石龛长廊
@@ -52,7 +50,7 @@ tags:
 - 寺院台基设计
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

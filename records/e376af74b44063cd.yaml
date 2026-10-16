@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e376af74b44063cd.jpg
     sha256: fcdf1575074b164e27a11ca2543dbad6d581b22d4fdd04e1281d34bfa81ee41c
-    size: 69980
     bytes: 69980
     width: 735
     height: 381
   thumb512:
     path: assets/thumb512/e376af74b44063cd.webp
     sha256: ee17fdbf998bbe7d481939d5d4cf7176ec4bf5a786ed14488dea5be161a11c68
-    size: 24160
     bytes: 24160
     width: 512
     height: 265
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 高大汉白玉月台之上矗立重檐歇山顶大殿、重檐间高悬“大雄寶殿”黑底金字匾、八柱敞厅内显三世大金佛及前广场石灯笼参道的寺院建筑场景。
 materials:
 - 重檐歇山顶大雄宝殿
 - 朱红廊柱
@@ -54,7 +52,7 @@ tags:
 - 新唐风古建
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

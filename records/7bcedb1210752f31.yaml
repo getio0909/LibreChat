@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7bcedb1210752f31.jpg
     sha256: 25c1c5593dce96b76e677e1d8a7c1cc4383d6526124b4cde6a8ce1faea9d20c9
-    size: 545688
     bytes: 545688
     width: 2048
     height: 1435
   thumb512:
     path: assets/thumb512/7bcedb1210752f31.webp
     sha256: 88e1922453ceb0757408e6952c870693f40491953976019cf388b47129046a47
-    size: 48418
     bytes: 48418
     width: 512
     height: 359
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为“重彩佛教人物壁画 + 金色发光博古格白玉佛龛 + 高处彩绘悬塑廊”复合立面的大型禅修礼佛大殿斜视图（空间场景设计，本卷第30号为其正视中轴全景）。
 materials:
 - 重彩佛教人物壁画与金色发光博古格（内供白玉佛）交替墙面
 - 高处彩绘悬塑带
@@ -53,7 +51,7 @@ tags:
 - 共修蒲团阵列
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

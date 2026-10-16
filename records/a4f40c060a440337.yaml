@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a4f40c060a440337.jpg
     sha256: 2a5b2de0fa10600ec859044b62d41ecc082b0dadf915b1b67d5b83337e021430
-    size: 279020
     bytes: 279020
     width: 1851
     height: 1220
   thumb512:
     path: assets/thumb512/a4f40c060a440337.webp
     sha256: 1b049f139c7d5481447259ee594f65fa1e1a455167c300c8a76c20e56eceaccf
-    size: 30116
     bytes: 30116
     width: 512
     height: 337
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式雕花木柱功德牌位堂与玉璧陈设场景，中央立镶嵌鎏金雕花板的方形胡桃木大柱与汉白玉方形须弥座柱础，左侧卷书造型供案陈设汉白玉平安扣玉璧，后方为黑金须弥座大佛龛。
 materials:
 - 嵌鎏金雕花板胡桃木方柱
 - 汉白玉方形须弥座柱础
@@ -57,7 +55,7 @@ tags:
 - 卷书供案
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/438d235d60e4cf97.jpg
     sha256: 66dc13d85c5eeed8b5f6e07fb0bee9462fce7d383ad3aa5b7b9689556804096c
-    size: 219284
     bytes: 219284
     width: 940
     height: 940
   thumb512:
     path: assets/thumb512/438d235d60e4cf97.webp
     sha256: 534b8c3c5ed0523aa76965b26f7dc0925decf415f672cca6e94d4f391c29ad6c
-    size: 69292
     bytes: 69292
     width: 512
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 传统与现代融合佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 一座极具殿堂仪式感与中轴对称美学的高端私人/会所藏传佛堂室内供奉空间全景（Luxury Tibetan Buddhist Private Shrine Room Interior）。该案例完美示范了藏式佛堂在现代建筑空间中的“天地墙家具一体化”顶层设计法则：以天花板中心坛城与华盖吊灯为天轴，以正面蓝底金雕大佛龛为背景靠山，以前方独立长方雕花供桌为地轴，构建出严整神圣的礼佛场域。
 materials:
 - 坛城藻井
 - 金铜华盖吊灯
@@ -52,7 +50,7 @@ tags:
 - 室内供奉空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

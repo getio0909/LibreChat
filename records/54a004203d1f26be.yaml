@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/54a004203d1f26be.jpg
     sha256: d89dd6dace3def40b022f9cf96804674065cf35a7fdf0a1845082f65d98e39a4
-    size: 172759
     bytes: 172759
     width: 793
     height: 800
   thumb512:
     path: assets/thumb512/54a004203d1f26be.webp
     sha256: b4f86a625049f5f3b9404bbe7dcf946ea0436bebd8c677e697b28bf42c3b2d2c
-    size: 49686
     bytes: 49686
     width: 508
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 宋明古典青绿朱红撞色风格的寺院礼乐法器壁龛正立面场景，青绿彩绘筒瓦门罩下悬挂巨型同心圆青铜绿锈大圆锣，下方设朱红黑金彩绘供桌与两尊青铜护法瑞兽。
 materials:
 - 青铜绿锈大圆锣
 - 青绿朱红彩绘木门罩
@@ -57,10 +55,10 @@ tags:
 - 对称正立面
 material_ids: []
 provenance:
-  source: ai_generated
+  source: unknown
   url: null
   credit: null
-  license: ai_generated
+  license: unknown
   license_status: unconfirmed
 quality:
   min_side_px: 793

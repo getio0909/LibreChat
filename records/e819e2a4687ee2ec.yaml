@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e819e2a4687ee2ec.jpg
     sha256: d4c709e887f8cc74792c6a2f343615d5a0d60d679507c854f171e5066dae3111
-    size: 791564
     bytes: 791564
     width: 2048
     height: 1434
   thumb512:
     path: assets/thumb512/e819e2a4687ee2ec.webp
     sha256: 73c3c551b77fe1c80e031089f903803497a2019e04cd69a8f5947cc98c6b3715
-    size: 48916
     bytes: 48916
     width: 512
     height: 358
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 汉藏融合双层挑高奢华藏经阁与主殿效果图，满铺鎏金浮雕井字吊顶环绕中心彩绘坛城藻井，前景立两根藏式红褐大柱，中央飞檐木龛以红玛瑙奢石配发光满月圆盘供奉一佛三菩萨。
 materials:
 - 红玛瑙纹天然奢石背板
 - 超白透光云石圆光
@@ -57,7 +55,7 @@ tags:
 - 鎏金井字顶
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

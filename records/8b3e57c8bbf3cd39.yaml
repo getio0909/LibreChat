@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8b3e57c8bbf3cd39.jpg
     sha256: 262a390710c291ce5a85cad3c26f27876ec5ca6cea61c93c0f21fc18c46923a6
-    size: 36215
     bytes: 36215
     width: 546
     height: 350
   thumb512:
     path: assets/thumb512/8b3e57c8bbf3cd39.webp
     sha256: 0f74f985dea64730023cbbb0a9581f43703669e88eb2ae151cf9bef4e7ec3ca1
-    size: 18132
     bytes: 18132
     width: 512
     height: 328
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 新中式素雅白石万佛壁与佛龛展陈空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式佛教文化展厅/纪念堂的核心室内局部场景（与第 09、25 张同属一套空间方案的不同视角）。空间摒弃了传统寺庙浓烈的红黄重彩，转而采用高雅纯净的暖白石材与水墨山水意境，打造出兼具现代美术馆气质与宗教神圣感的礼佛展陈空间。
+  全室墙面及建筑构件均以暖白色/米白色细粒汉白玉（或白砂岩）为主材，呈现温润细腻的哑光石材肌理。正中主龛内供奉古法泥金彩绘释迦牟尼佛（或药师佛）结跏趺坐像，背后为精雕细琢的火焰纹贴金大背光，背光后衬以灰白双色大理石浅浮雕云水山峦背景墙；右侧高台供奉古铜/泥金质感阿难尊者合十立像；踢…
 materials:
 - 汉白玉
 - 浮雕石板
@@ -53,7 +52,7 @@ tags:
 - 发光经文光幕
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

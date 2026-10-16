@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/71c92d4e4b1333c3.jpg
     sha256: 0fdd53f8a9f0f2fcbd35789dcf3a346a0314746231a7140418d6ae7712d566ca
-    size: 891389
     bytes: 891389
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/71c92d4e4b1333c3.webp
     sha256: 0e710488e08483641f7be561d5023f991416eebe3770e39c30e405a25e32e78c
-    size: 53552
     bytes: 53552
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图是陈列于阿利坦石材 A1 区旗舰展厅核心展位（带橙色品牌底座与白色鹅卵石发光展床）的一块近正方形幅面、色彩最为炽烈辉煌的「梵高皇 / 敦煌壁（极品红金版）」4K 正视标准大板（编号03微距纹理即取自此类红金矿脉）。
 materials:
 - 梵高皇
 colors:

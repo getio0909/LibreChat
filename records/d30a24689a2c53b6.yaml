@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d30a24689a2c53b6.jpg
     sha256: ef27b7d4a81bbc0d997a1fe26388efbad43bfee4ff86ade9882ca7e79057bdc7
-    size: 327654
     bytes: 327654
     width: 1085
     height: 2048
   thumb512:
     path: assets/thumb512/d30a24689a2c53b6.webp
     sha256: a1a0bf3b43c59e14927b7349eea77dac382fdb41e2a374947e16d038d6fc649e
-    size: 32200
     bytes: 32200
     width: 271
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 八角观音宝殿竖幅正面全景，完整展现红木供桌、米黄大理石八角须弥坛、双层石雕莲座、纯白汉白玉观音坐像、万佛墙与顶部八角千瓣金莲穹顶。
 materials:
 - 汉白玉观音坐像
 - 双层石雕仰覆莲座
@@ -54,7 +52,7 @@ tags:
 - 千瓣金莲藻井
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

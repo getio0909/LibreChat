@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/133e537f96536eef.jpg
     sha256: b58a948734817a488a7da1105efc733907fbe0cd5adc99d3de5954f080af1e3e
-    size: 454054
     bytes: 454054
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/133e537f96536eef.webp
     sha256: 8bcb7ad0669c8687982e1d64a1cbd22482a1daa14cdd99a408692723d7f47523
-    size: 45576
     bytes: 45576
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 基于第 12 项三层阶梯展台母本，通过 AI 材质重构生成的“紫檀红木攒框 + 豆青玉底板 + 满嵌绿松石红珊瑚”宫廷级三层坛城装饰柜。该设计将原本纯木雕的飞天与八吉祥转化为极具乾隆宫廷“百宝嵌（玉石镶嵌）”风格的木玉复合工艺品。
 materials:
 - 紫檀红木
 - 青玉底板

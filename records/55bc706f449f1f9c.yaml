@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/55bc706f449f1f9c.jpg
     sha256: 6985b53b97f20019d32d8216973d73a50453afb6b77d0bff118c06a63aa0768d
-    size: 701610
     bytes: 701610
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/55bc706f449f1f9c.webp
     sha256: 1b5ce62d2b9145e8ee62fb119c2b5cafb26e90b55ed39eeb413271d4a844d8fe
-    size: 37408
     bytes: 37408
     width: 384
     height: 512
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图展示了在石材工厂红毯质检区内，将「天川金」大板裁切为标准长方形地砖后进行的纵向双列地面主砖预铺及右侧黑白根波打线镶边组合检验。
 materials:
 - 天川金规格砖
 colors:

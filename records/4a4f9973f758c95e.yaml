@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4a4f9973f758c95e.jpg
     sha256: 9d5ce79806e10f987b07d67c6e72f5db76e22a0dc20ba9cbf8ed4b35160fc265
-    size: 171250
     bytes: 171250
     width: 1554
     height: 1157
   thumb512:
     path: assets/thumb512/4a4f9973f758c95e.webp
     sha256: 11918c3b8d27b9cd101eac8c7260a384834603ec970fcd01027c8e7aa5bb05be
-    size: 20214
     bytes: 20214
     width: 512
     height: 381
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统寺院文殊/普贤菩萨配殿正面中轴供奉场景（空间场景设计，本卷第34号为其右侧斜视图）。
 materials:
 - 骑瑞兽铜鎏金菩萨像（配发光火焰背光）
 - 包镶鎏金如意云纹铜套筒木圆柱
@@ -54,7 +52,7 @@ tags:
 - 文殊普贤殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

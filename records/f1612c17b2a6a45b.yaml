@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f1612c17b2a6a45b.jpg
     sha256: 5ed0deab5acb1fb0f4fb5cd6c07380fd3a58cdc5128294739663dc85e2a4d965
-    size: 785500
     bytes: 785500
     width: 1368
     height: 2048
   thumb512:
     path: assets/thumb512/f1612c17b2a6a45b.webp
     sha256: ec268a6687dc155dcf3a63f14e8c8b7d0e3824246b1479be1b49c418041c600b
-    size: 20124
     bytes: 20124
     width: 342
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 古典伊斯兰斜削式抽象木雕花板
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 这是一件9至10世纪伊斯兰阿拔斯王朝（Abbasid，萨马拉风格 Samarra Beveled Style）或埃及图伦时期的古典斜削式抽象木雕嵌板（Carved Wood Panel）实物写实。
 materials:
 - 千年风化古硬木
 - 柚木/雪松木斜削浮雕

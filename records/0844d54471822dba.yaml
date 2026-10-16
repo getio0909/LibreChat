@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0844d54471822dba.jpg
     sha256: 1765f68ed88ff094435cffe4cf6d80ab13cbefdb5f4faaf2fbf1dd1c0772172e
-    size: 766710
     bytes: 766710
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/0844d54471822dba.webp
     sha256: 7209c6381da076eb50530a604b97e21dc4857cd7448d330b438cc2d24cab0cd2
-    size: 48818
     bytes: 48818
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型高端奢石与金碧木作融合的“药师琉璃光如来宝殿”室内装饰全景场景（空间场景设计，本卷第09号为其主坛局部特写）。
 materials:
 - 水墨山水奢石背景墙
 - “药师赐福佑人间”金字楹联
@@ -54,7 +52,7 @@ tags:
 - 贴金莲花藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

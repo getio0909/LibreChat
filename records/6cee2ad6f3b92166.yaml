@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6cee2ad6f3b92166.jpg
     sha256: 5548fd7cf1702325f1a3f60b39d3f6d78c4108450c643122698dcaf267489556
-    size: 542921
     bytes: 542921
     width: 2048
     height: 1531
   thumb512:
     path: assets/thumb512/6cee2ad6f3b92166.webp
     sha256: a1b476e1e88c3366084455d2fb3efc381322dfe40931ca4c8292a10e3aeb2106
-    size: 49582
     bytes: 49582
     width: 512
     height: 383
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 顶部嵌第03号同款八角金色放射状法轮莲花藻井、正中配三轮金光供奉五尊彩绘神像、两侧饰金底云龙壁画的传统殿堂空间。
 materials:
 - 八角放射状金色藻井
 - 彩绘神像坐像
@@ -57,7 +55,7 @@ tags:
 - 传统神殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

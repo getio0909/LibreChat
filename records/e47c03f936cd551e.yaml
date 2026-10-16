@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e47c03f936cd551e.jpg
     sha256: ebcd0950fe334377afab64f98a08f30aaa6a40b51986da01d55f2e0983bc5ad6
-    size: 583321
     bytes: 583321
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/e47c03f936cd551e.webp
     sha256: 9c6a9fb36b9c21cf901a1749b60a54b6376c7cab791901b471cc1eb15851bc89
-    size: 40144
     bytes: 40144
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式大型禅修礼佛大殿（汉白玉主尊配水墨流纹奢石地面方案）（空间场景设计）。
 materials:
 - 水墨流纹灰白奢石大理石地面
 - 汉白玉释迦牟尼坐佛
@@ -54,7 +52,7 @@ tags:
 - 现代新中式禅堂
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

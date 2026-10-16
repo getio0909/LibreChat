@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b19c0a4024c23510.jpg
     sha256: ec0418d836d9a051507066434aaa275a40a2bafc889cb4da5ab70ab7e1b322d7
-    size: 459137
     bytes: 459137
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/b19c0a4024c23510.webp
     sha256: 00e167a922ecbebddd0a66042a22880452f48f3d9930c90c33a09eae0fba8b55
-    size: 46506
     bytes: 46506
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 三层阶梯式坛城装饰柜的“红酸枝主体 + 绿松石满嵌 + 局部青玉开光”折中平衡版设计方案。相比第 13 项大面积使用青玉束腰的高昂造价，本方案将玉石集中在下层柜门的核心视觉区，同时强化了红木本身的醇厚木纹与绿松石珠串的点缀感，更具工程落地可行性。
 materials:
 - 红酸枝木
 - 绿松石圆珠

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ab959bc655b0b943.jpg
     sha256: 41db813797dfbaefc15be3fc65ff25927779b483a0e20b9c06209c3cd7ac164d
-    size: 40671
     bytes: 40671
     width: 312
     height: 381
   thumb512:
     path: assets/thumb512/ab959bc655b0b943.webp
     sha256: e9784a335631e44f94244161d362404ea7914ceadf158cbc6cadd8943551ca80
-    size: 29146
     bytes: 29146
     width: 312
     height: 381
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 汉白玉经幢石柱与罗汉松盆景单品
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 汉白玉纯白、苍松翠绿与古铜 / 汉白玉八角重檐经幢、罗汉松盆景、转经筒
 materials:
 - 房山汉白玉八角经幢石柱
 - 造型罗汉松盆景
@@ -56,7 +54,7 @@ tags:
 - 转经筒背景
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d83d8e96eced4fb4.jpg
     sha256: 2699e98edba799bc456b60d730b3508822a6c844db5ba70f8042a245a86e9120
-    size: 464253
     bytes: 464253
     width: 2048
     height: 1115
   thumb512:
     path: assets/thumb512/d83d8e96eced4fb4.webp
     sha256: d24625963d0e98037d989e76605ca000fb363faf9959943dc358146e7965d792
-    size: 37210
     bytes: 37210
     width: 512
     height: 279
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 金色万佛墙与鎏金圆柱大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 辉煌暖金与米白玉石 / 鎏金雕花石柱、万佛龛墙、汉白玉雕花供台
 materials:
 - 黑钛不锈钢框
 - 高透光软膜灯箱
@@ -56,7 +54,7 @@ tags:
 - 金碧辉煌
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

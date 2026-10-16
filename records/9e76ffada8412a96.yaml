@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9e76ffada8412a96.jpg
     sha256: e9f2e467a5381035fe25cca029ba5c1cd6cf4011f15747e076ed7b07c1bd183d
-    size: 127000
     bytes: 127000
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/9e76ffada8412a96.webp
     sha256: a67a613695ea4bcd3aae0f569456d4d0eb364b69db94ef53a615ca11760d5057
-    size: 4520
     bytes: 4520
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-B立面副入口施工图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展（C5 T026）北侧副迎宾面——B立面图 施工深化图。完整定义了展位 7.5 米宽北向敞开门头的造型比例，并提供了从北侧副入口向南平视展厅内部（正对 D立面叠级佛龛与石雕供桌）的标准正立面透视关系。
 materials:
 - 7150mm敞开门洞
 - PVC字

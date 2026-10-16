@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/46583597183609b8.jpg
     sha256: a803dceb052e082af3c5c518affe703a4598735386d6001edca1f9df8b0ea875
-    size: 451685
     bytes: 451685
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/46583597183609b8.webp
     sha256: f13c7a2a6baec3e3d3f124f540fbc9cc934ddc141fce50d3025fa71d70b0616b
-    size: 51270
     bytes: 51270
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 与第 23、25 项为同一件展品的左前 45° 斜角仰视特写——大型藏传佛教双龙双凤耳斗式木雕彩绘香炉/供器。从这一角度观察，器物右侧的游龙耳柄处于前景视觉焦点，同时将顶部交叉的宝瓶如意杵与展厅天花的九宫格立体木雕藻井形成了绝佳的上下空间呼应。
 materials:
 - 红木圆雕
 - 浮雕彩绘
@@ -52,7 +50,7 @@ tags:
 - 3D重建多视角
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

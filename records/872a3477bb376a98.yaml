@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/872a3477bb376a98.jpg
     sha256: 1af02b82b4f56e338f95dc20e00a18f7e086dcf1eea1f7a6a45e7b6531ff0c65
-    size: 409827
     bytes: 409827
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/872a3477bb376a98.webp
     sha256: 78f6d673fc1ddce7d82defb33d2cb6be7bb44dee0aa1b05212c7d06d96819e5d
-    size: 42044
     bytes: 42044
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为在阿利坦石材水头选材中心（第一大道 B10-B7 展位）内，陈列于黑色重型钢制展示架上的一块带白色加固边框的「梵高皇 / 敦煌壁」精选大板 45 度斜视实景照。
 materials:
 - 梵高皇
 colors:

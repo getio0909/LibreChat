@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/255d04ec6aaacb70.jpg
     sha256: 36bc1d9ec08d4a0752b5f9a47fcec23ff9c9fc516b3499c3b3c9f7766acf6044
-    size: 606758
     bytes: 606758
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/255d04ec6aaacb70.webp
     sha256: 8dd71b16912f53e619739116b0448a9927898b5bae6cc87fae1532f475457023
-    size: 39942
     bytes: 39942
     width: 512
     height: 362
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 大型山地佛教文化旅游园区与摩崖大佛总体规划鸟瞰场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图是一幅超大型山地佛教文化旅游景区暨生态纪念园区的总体规划鸟瞰效果图。项目依山傍水、顺应自然山形水势，将礼佛朝圣区、现代佛教博物馆（金刚宝座塔殿）、摩崖石窟艺术区、露天大佛瞻仰区、禅修剧场与生态塔林纪念园有机串联，展现出宏伟壮丽的“人间佛国净土”规划格局。
+  鸟瞰画面以苍翠浓郁的森林绿、仙气缥缈的云雾白为生态基底；前区传统寺院采用青灰瓦顶与白石广场；中区核心金刚宝座式大殿采用暖米黄色花岗岩干挂立面；山巅大佛通体金光灿烂；后山生态陵园步道采用浅粉与米白石材勾勒出巨大的莲花瓣网格，节点处点缀六座贴金覆钵式藏式/印度…
 materials:
 - 花岗岩建筑群
 - 露天金佛
@@ -54,7 +53,7 @@ tags:
 - 莲花形生态陵园
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

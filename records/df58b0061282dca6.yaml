@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/df58b0061282dca6.jpg
     sha256: 5e0a76067c8c6baa6cabbe5a87000f482cd687831d20d23639603fc469efa328
-    size: 288532
     bytes: 288532
     width: 1961
     height: 1317
   thumb512:
     path: assets/thumb512/df58b0061282dca6.webp
     sha256: 52be4594a6a123f4998e5c4e47e8ed4417e716e5d14278bf9b4207596d3c41cc
-    size: 29356
     bytes: 29356
     width: 512
     height: 344
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统木构大殿侧翼回廊与千佛墙展览空间局部视角（空间场景设计）。
 materials:
 - 红木雕花须弥座护栏
 - 带鎏金莲瓣柱箍与青石莲花柱础红木圆柱
@@ -53,7 +51,7 @@ tags:
 - 红木雕花护栏
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

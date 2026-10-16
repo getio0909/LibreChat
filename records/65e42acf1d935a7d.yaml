@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/65e42acf1d935a7d.jpg
     sha256: 8f0838a021988c9d31e936071a0209502d9072c68758f91e9a72bbd33cae06fa
-    size: 459751
     bytes: 459751
     width: 2048
     height: 1535
   thumb512:
     path: assets/thumb512/65e42acf1d935a7d.webp
     sha256: 7b0ba2a7e6576173001aa13e00bda930940d1a247e1239f303e35424ce661d1e
-    size: 41036
     bytes: 41036
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 星空顶浮雕白石柱与千佛殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 星空深蓝与暖金黄玉 / 白色浮雕八吉祥方柱、彩色千佛柱、黄玉曼荼罗地面
 materials:
 - 米白莱姆石/汉白玉浅浮雕
 - 七彩渐变琉璃千佛柱
@@ -56,7 +54,7 @@ tags:
 - 琉璃千佛柱
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

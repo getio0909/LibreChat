@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c7faf0a960cd5c77.jpg
     sha256: e1c1acf8b4130b177e254cfe50ce4460b1dcb797199af7a360ac8f349de1a4e6
-    size: 291641
     bytes: 291641
     width: 1685
     height: 1253
   thumb512:
     path: assets/thumb512/c7faf0a960cd5c77.webp
     sha256: 2f914dc5daabf2f27f10ff1bc78ded4a07a1721564e3264ca97b9fff50382266
-    size: 37576
     bytes: 37576
     width: 512
     height: 381
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代奢石与汉白玉复合结构的寺院万佛堂主坛展览场景（空间场景设计）。
 materials:
 - 汉白玉雕花台阶与栏杆
 - 二十四辐金色放射状法轮背光
@@ -54,7 +52,7 @@ tags:
 - 镜面奢石地面
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/21c44a1927db1bcd.jpg
     sha256: 6e76c53cf0b66effb862e3412779c8d04ce091802e9840253e8555aa1fdff194
-    size: 42392
     bytes: 42392
     width: 472
     height: 708
   thumb512:
     path: assets/thumb512/21c44a1927db1bcd.webp
     sha256: a4760a773035494922135b5b0cab4a5bfda3731c148a840279b1d87739f0598c
-    size: 10116
     bytes: 10116
     width: 341
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯黑背景下的现代极简层叠木框佛龛单品特写，由九层浅色原木矩形框呈非对称阶梯状向内递进叠套并暗藏顶部暖光，营造深邃石窟透视感，内部供奉羊脂白玉极简无相禅定坐佛。
 materials:
 - 浅色天然硬木(枫木/白蜡木)
 - 羊脂白玉/汉白玉坐佛
@@ -54,7 +52,7 @@ tags:
 - 佛像展柜设计
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/48c69827fdb4bb81.jpg
     sha256: 5fd2d35912d0a224c0ee2ef2da0aedefbd6d41e87599d1d5d2d2796dc89c3c09
-    size: 407574
     bytes: 407574
     width: 2048
     height: 1107
   thumb512:
     path: assets/thumb512/48c69827fdb4bb81.webp
     sha256: eeac795d128808beadc32ac3eb419dfcddb54595dcfc6b0c70f5cc2cf8f91a2d
-    size: 29702
     bytes: 29702
     width: 512
     height: 277
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 潮州金漆木雕多层镂空花板构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 这是一件中国国家级非遗“潮州金漆木雕”极具代表性的“虾蟹篓/鱼蟹水草”题材多层镂空通雕横幅花板（建筑梁托或神龛眉板构件）实物写实。
 materials:
 - 樟木多层镂空圆雕
 - 纯赤金箔贴金

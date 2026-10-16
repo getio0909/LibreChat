@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/745c2f0c2579a47c.jpg
     sha256: 8c304ae4fac24682aeb97f0f723f6d7d57ae3af22ee8b528ba830245488c54a4
-    size: 614540
     bytes: 614540
     width: 2032
     height: 1524
   thumb512:
     path: assets/thumb512/745c2f0c2579a47c.webp
     sha256: ba7a3a96d3f532a4c1ae227064a5bbe8556992efd7f0ab20ced87f239888a8e7
-    size: 37474
     bytes: 37474
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-浅暖灰细密冰裂系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为“鑫盛隆矿业/鑫盛隆石材”厂房内实拍的超高清浅暖灰色细密蛛网冰裂纹天然大理石大板实物写实（属土耳其灰、网纹灰或冰裂灰大理石品系）。
 materials:
 - 天然浅灰大理石
 - 冰裂网纹灰大理石
@@ -52,7 +50,7 @@ tags:
 - 新中式墙地面石材
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

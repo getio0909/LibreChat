@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/52f6abbbdaa5feff.jpg
     sha256: ecd2de425865cb719ec338ef9b944bedc4e6af41053796046228998d733745e9
-    size: 31877
     bytes: 31877
     width: 349
     height: 383
   thumb512:
     path: assets/thumb512/52f6abbbdaa5feff.webp
     sha256: a77dccf2fedaab36cba4e17f2539c25d12011053ee8c5a5bd4595d6a72d2a76e
-    size: 19022
     bytes: 19022
     width: 349
     height: 383
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院红木重檐建筑与禅意罗汉松庭院景观
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图呈现的是传统中式寺院内院的建筑檐下与园林植物小品交融场景。通过一株姿态苍劲的造型罗汉松（或迎客松）将主体大殿与侧翼游廊串联起来，体现了汉传佛教寺院“古刹青松、曲径回廊”的东方禅林意境。 色调以温厚沉稳的赭红/深柚木色古建木作、苍翠欲滴的松针绿以及灰白花岗岩/汉白玉为主。左侧大殿外墙下部为灰白条石台基，上部为原木色直棂方格花窗与圆柱；右侧游廊檐口瓦当滴水整齐，额枋处施以传统青绿金线旋子彩绘与贴金雀替；前景右下角隐现汉白玉雕花莲花望柱栏杆。
 materials:
 - 红木古建
 - 罗汉松
@@ -52,7 +50,7 @@ tags:
 - 游廊彩绘檐口
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

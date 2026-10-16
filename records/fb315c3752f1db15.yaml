@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/fb315c3752f1db15.jpg
     sha256: be16fe732a6cbb4956c18f5ee1c35993dddeddcaa6f5703951242151d134fe63
-    size: 336244
     bytes: 336244
     width: 1600
     height: 1146
   thumb512:
     path: assets/thumb512/fb315c3752f1db15.webp
     sha256: 14e26a20e8da3df3f213dcb5724466496fbb47ee0566d0dde7d25ba1664dd0c3
-    size: 15056
     bytes: 15056
     width: 512
     height: 367
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代极简侘寂风八角天窗佛堂与禅修室，顶部为五层阶梯式内嵌线性灯带折板吊顶汇聚至八角天窗，正中三层莲花尖拱发光壁龛内并列两座原木佛龛供奉白玉坐佛。
 materials:
 - 微水泥艺术肌理漆
 - 原木雕花佛龛
@@ -57,7 +55,7 @@ tags:
 - 双佛龛布局
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

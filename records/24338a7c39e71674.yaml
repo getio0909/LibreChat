@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/24338a7c39e71674.jpg
     sha256: fff9d91df19c210d24324096510f893f94552e53d1f6b3fc20c5343ca585ac21
-    size: 743302
     bytes: 743302
     width: 1254
     height: 2048
   thumb512:
     path: assets/thumb512/24338a7c39e71674.webp
     sha256: c4d3d0cb46e058cec550ef3abb09ff81139fa5ba4b6114811ce758315512f1d0
-    size: 53546
     bytes: 53546
     width: 313
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 展厅竖向构图实拍的一组“上花器、下供柜、后挂屏”三位一体藏式佛堂/玄关端景陈设组合。该图极佳地示范了如何将前文第 23～25 项的大型双龙耳斗式木雕法器转化为实用与美学兼具的大型插花花器，并与下方的藏式对狮双门柜构成完整的竖向视觉中轴线。
 materials:
 - 核桃木彩绘描金
 - 木雕花器
@@ -52,7 +50,7 @@ tags:
 - 木雕柜配插花
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

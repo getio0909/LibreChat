@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/3a72ccdc7e6aca4c.jpg
     sha256: fcc8cfbb1fa14706d7f8344a8626a1978275c95c544ff8f01fe4c86d51ebb1be
-    size: 424766
     bytes: 424766
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/3a72ccdc7e6aca4c.webp
     sha256: cd1c22c16388091149fe2e1ffb073affde0ff4b6c1929e799434ab76a94f8be3
-    size: 42876
     bytes: 42876
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景下的藏汉融合皇家寺院级“五佛宝座式”实木嵌石沙发茶几全套家具。与常规平顶沙发不同，本套家具将主沙发与单人位扶手椅的靠背急剧拔高，直接转化为带有多层莲瓣火焰光背的佛陀法座背光形式，使日常会客家具呈现出极强的殿堂神圣感与宗教仪式感。
 materials:
 - 缅甸柚木
 - 红酸枝

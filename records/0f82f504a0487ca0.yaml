@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0f82f504a0487ca0.jpg
     sha256: 359485c74b7af6032491f41659e58c768b1c4d8c34b660e40abdad082e4c9929
-    size: 250917
     bytes: 250917
     width: 2048
     height: 1146
   thumb512:
     path: assets/thumb512/0f82f504a0487ca0.webp
     sha256: a9fe33fb2aa2c846b1324911bf5b5e57941a7b9defd56c170ed61503c64e1658
-    size: 17124
     bytes: 17124
     width: 512
     height: 287
@@ -32,7 +30,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代极简禅修抄经室与发光山水屏风满月墙场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为一座极致简约、充满宋氏美学与现代东方禅意的“抄经室 / 茶修冥想室 / 禅意雅集空间”正面全景。空间完全隐去了具象的宗教神像，转而以“留白、远山、飞鸟、满月、寒梅、原木矮几”等禅宗自然意象，传达出“万法归宗、明心见性、圆满无碍”的深远禅境。
+  全室以温暖质朴的浅胡桃木/橡木本色、素雅的米白硅藻泥/宣纸肌理墙面、以及明亮温暖的2700K-3000K琥珀黄背光为主色调。地面满铺自然结疤肌理的浅棕实木地板；正面背景墙采用米白艺术肌理漆留白，嵌入两扇夹丝透光山水画玻璃灯箱；右侧护墙板与天花木肋均采用同色系哑光原木饰面。
 materials:
 - 原木护墙与地板
 - 透光山水玻璃
@@ -53,7 +52,7 @@ tags:
 - 极简冥想茶室
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

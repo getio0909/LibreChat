@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d88f29c38fe7d86b.jpg
     sha256: 30bf73552dbd5f593650d554663daf9cc4a943c984265bdc38265e7ac53d019e
-    size: 655993
     bytes: 655993
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/d88f29c38fe7d86b.webp
     sha256: 440f4c726c7ab06220cf583d55dfc1cbecdad0a4ee9b4d820126cb31208cd951
-    size: 42976
     bytes: 42976
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型寺院内部佛陀舍利圣物展示厅（中心塔柱式摩尼宝瓶万佛圣殿）（空间场景设计）。
 materials:
 - 黑底金纹镜面奢石地面
 - 汉白玉月台栏杆
@@ -54,7 +52,7 @@ tags:
 - 汉白玉须弥月台
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

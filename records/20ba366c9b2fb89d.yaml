@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/20ba366c9b2fb89d.jpg
     sha256: e25327a2a6b0b74839f283d13246841c98d71c24d990da07e530e9bbf986fcae
-    size: 52368
     bytes: 52368
     width: 570
     height: 320
   thumb512:
     path: assets/thumb512/20ba366c9b2fb89d.webp
     sha256: 76a13c52c1c4555f4cd0be7d1474221066237687a9d3b5169f3c4ce288c12dc6
-    size: 28884
     bytes: 28884
     width: 512
     height: 287
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 黑金宫殿式佛教文化展厅主厅视角，成排乌木描金大圆柱立于汉白玉莲花柱础上，右侧汉白玉须弥座供奉大型金身坐佛，背后竖立三扇高耸的圆弧顶青白玉山水纹发光奢石屏风。
 materials:
 - 乌木黑漆描金圆柱
 - 汉白玉莲花柱础与须弥座
@@ -57,7 +55,7 @@ tags:
 - 莲花柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

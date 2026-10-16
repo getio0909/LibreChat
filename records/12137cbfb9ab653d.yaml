@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/12137cbfb9ab653d.jpg
     sha256: 89de6383d5fe44305df7ff7051add0ae8986690582f99459de3c9eff4c375026
-    size: 471181
     bytes: 471181
     width: 2048
     height: 1251
   thumb512:
     path: assets/thumb512/12137cbfb9ab653d.webp
     sha256: 2523fe920208b3b44f6e6e7b0eba576ffd74a34872c504276f5626ef8f7083c5
-    size: 37984
     bytes: 37984
     width: 512
     height: 313
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 中式居家与会所佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 右侧立深浮雕花卉方木柱并设金顶木龛供奉彩绘菩萨、左侧设圆形背光白玉璧端景墙配卷书条案与鎏金圆柱落地灯的木作空间。
 materials:
 - 深浮雕花卉木方柱
 - 金顶重檐木佛龛
@@ -58,7 +56,7 @@ tags:
 - 东方艺术会所
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

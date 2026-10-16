@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a4ec9572b74af603.jpg
     sha256: b5897b9b3f355863a7d8da7565875ac6481b05ccb1b0cc9fb95455dd97f9f10a
-    size: 680834
     bytes: 680834
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/a4ec9572b74af603.webp
     sha256: 88dcf92a1e524c5c3841a3aad93f0ff667581d3b735cdfa079e881b329ca1577
-    size: 42134
     bytes: 42134
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为已完成定尺精切、边缘倒角并粘贴了完整工程溯源编码标签（订单号 `QT2411-181`、`1F背景墙` 专用）的「蓝金灰」定制背景墙规格板地面连纹预排版特写。
 materials:
 - 蓝金灰定制规格板
 colors:

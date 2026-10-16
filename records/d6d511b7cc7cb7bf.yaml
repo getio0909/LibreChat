@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d6d511b7cc7cb7bf.jpg
     sha256: 43187b8375714df172822136cd5e7a90c1381b0310c868d0c574bf992f96f847
-    size: 407319
     bytes: 407319
     width: 2048
     height: 1207
   thumb512:
     path: assets/thumb512/d6d511b7cc7cb7bf.webp
     sha256: 4fad2d026ed4da4b8cb9e7dd975a226e35c326d5ccc11ab1a07b69fd95867dba
-    size: 31842
     bytes: 31842
     width: 512
     height: 302
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为多进式“东方净琉璃世界（宝蓝琉璃药师佛主尊）”大殿正面中轴超宽全景场景（空间场景设计，本卷第08号为其左侧回廊斜视图）。
 materials:
 - 宝蓝色古法琉璃药师佛坐像配白色圆光
 - 深棕实木梁柱与万字纹格栅隔断
@@ -54,7 +52,7 @@ tags:
 - 多进木格栅隔断
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

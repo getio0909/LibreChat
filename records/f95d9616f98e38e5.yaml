@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f95d9616f98e38e5.jpg
     sha256: 571faf5543797ddd42534bc18de94dd7e0b6de681b41bbcb71192f4ca3701f80
-    size: 382469
     bytes: 382469
     width: 2048
     height: 1535
   thumb512:
     path: assets/thumb512/f95d9616f98e38e5.webp
     sha256: 38c40c5f8a9ef1424d71d072fe238bc504e699e890dc6c4e88f972ee257e66f8
-    size: 27030
     bytes: 27030
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 前景右侧设粗犷凿面青石块石基座配厚原木台面吧台（陈列黑陶竹枝花器与书法折扇茶席）、后方衔接自然边大茶桌与发光紫砂壶墙的禅茶空间。
 materials:
 - 粗犷凿面青石吧台基座
 - 原木厚板台面
@@ -54,7 +52,7 @@ tags:
 - 紫砂壶博古架
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

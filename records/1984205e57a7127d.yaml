@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1984205e57a7127d.jpg
     sha256: 71c588d0cded601736133e899a7e013a4eff274329bfac1dfcdc95914ccf2b40
-    size: 252425
     bytes: 252425
     width: 1875
     height: 1282
   thumb512:
     path: assets/thumb512/1984205e57a7127d.webp
     sha256: efb209f3bd6b37334d9fc8090c6cf9fb96738f07cffafe529cd75da49b8eeb43
-    size: 25060
     bytes: 25060
     width: 512
     height: 350
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式禅意书画与敦煌壁画艺术展厅对称场景，正中嵌巨幅金地飞天说法图壁画，两侧立鎏金铜箍原木大圆柱与汉白玉柱础，两翼设达摩山水与草书佛经发光画框。
 materials:
 - 原木大圆柱
 - 鎏金回纹铜柱套
@@ -57,7 +55,7 @@ tags:
 - 鎏金柱套
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

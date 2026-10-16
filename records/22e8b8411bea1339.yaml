@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/22e8b8411bea1339.jpg
     sha256: 5a17fafc22e025594a8204196c9510b9ffea317e4cf0d6b018b27fd332ba0fa1
-    size: 262695
     bytes: 262695
     width: 1279
     height: 1358
   thumb512:
     path: assets/thumb512/22e8b8411bea1339.webp
     sha256: 86530b102cc9c71f29934b9a215a5bc53288aee5295d71c112f4c334871d97ba
-    size: 39198
     bytes: 39198
     width: 482
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 独立陈设于现代极简美术馆展厅中央的一座藏汉融合“四角攒尖亭阁式”四面观瞻木质佛龛展览装置（Pavilion-Style Freestanding Wooden Buddhist Shrine）。有趣的是，这件AI生成单品的原型正是第
+  36 项《藏式佛教家具展示空间.jpg》左后方背景中矗立的那座四角亭式木佛龛！AI 将其单独提取至极简展厅中央，并在龛内点亮了一尊金佛。
 materials:
 - 紫檀色实木
 - 鎏金佛像

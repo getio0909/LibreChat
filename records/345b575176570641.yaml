@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/345b575176570641.jpg
     sha256: 76b81c603ae32831e72531d34b7322d4c7e399522c6642b874a45f64e0bc7413
-    size: 510080
     bytes: 510080
     width: 1440
     height: 1080
   thumb512:
     path: assets/thumb512/345b575176570641.webp
     sha256: 146839eaf7900636f87bf7d1d32c872b13b34786e59b8c15e6797d3452372fc4
-    size: 62340
     bytes: 62340
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 一座殿堂级藏传佛教“五开间双层满堂供奉”大型实木雕花佛龛与前置独立供台室内实景场景。该场景完整呈现了藏传寺院或顶级居士佛堂中“上供诸佛菩萨、中设八宝曼扎七支供、下设雕花储物坛城柜、前设独立献供方台”的标准宗教空间陈设体系。
 materials:
 - 巨型红木佛龛
 - 黑铜佛像
@@ -52,7 +50,7 @@ tags:
 - 密宗供品摆放
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

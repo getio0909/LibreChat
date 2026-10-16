@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/680b0adb90270bb5.jpg
     sha256: 732ea1f853efcb4553a2cb53d0df744fed932d7df485c4d2def865d5bec16aa1
-    size: 328257
     bytes: 328257
     width: 2048
     height: 1143
   thumb512:
     path: assets/thumb512/680b0adb90270bb5.webp
     sha256: 3a0556cdc8d1c468bc337d44b71df64a1299d2150d6906a22d0088e0d0188836
-    size: 28224
     bytes: 28224
     width: 512
     height: 286
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统藻井星空顶礼佛大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 深胡桃木与翠绿镜面 / 实木井字梁、星空发光顶、墨绿奢石地面
 materials:
 - 深色胡桃木
 - 暖黄软膜背光
@@ -56,7 +54,7 @@ tags:
 - 石木结合
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

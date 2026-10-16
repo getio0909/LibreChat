@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ef16cb8b465a142c.jpg
     sha256: 7fa6ac7fd9a088dde1b81d311a6a23379d5139a475af85fec56b83049b1a674a
-    size: 279018
     bytes: 279018
     width: 822
     height: 1645
   thumb512:
     path: assets/thumb512/ef16cb8b465a142c.webp
     sha256: be3c106b0963e0ff8cced6b40dd54b0f392dfe440e22ba52222dab2b822ebd7f
-    size: 31514
     bytes: 31514
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为「蓝金灰（流云赤脉亚类）」的标准正射纹理样本，完美呈现了陡斜向的蓝金云带与水平向的赤红铁丝脉纵横交错的独特美学特征。
 materials:
 - 蓝金灰微距特写
 colors:

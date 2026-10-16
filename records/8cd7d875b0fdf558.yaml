@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8cd7d875b0fdf558.jpg
     sha256: e0c79243645b495863c43f7f1955f3f39390109511be759971e6114119bfb9e0
-    size: 303513
     bytes: 303513
     width: 2048
     height: 1154
   thumb512:
     path: assets/thumb512/8cd7d875b0fdf558.webp
     sha256: 2a7cc52ef6b244166e2e45a8ddeaa7a7bfd6144b0813b8c4f5f1295b7309e3a9
-    size: 28794
     bytes: 28794
     width: 512
     height: 288
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正中设青蓝色透光琉璃砖拱框与纯白圆光烘托金身坐佛、两侧配温暖原木方格万佛龛阵列、前设红木供桌的冷暖光对比佛坛空间。
 materials:
 - 青蓝透光琉璃砖
 - 原木方格万佛龛
@@ -58,7 +56,7 @@ tags:
 - 现代佛坛
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

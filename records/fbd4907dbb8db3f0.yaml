@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/fbd4907dbb8db3f0.jpg
     sha256: 82e85b8759356e895c5ae280c47876b312721ac661b35ba43b19028bc35c8fdb
-    size: 267743
     bytes: 267743
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/fbd4907dbb8db3f0.webp
     sha256: 891f85296517ac9904f95f5b3e4715672e9f7d3ff54e84a2bbd4d54a59650d24
-    size: 14876
     bytes: 14876
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 建筑木石构件-汉白玉微缩栏杆与须弥座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为敦煌金须弥座台面前沿安装的天然汉白玉微缩仿古护栏（栏杆）与敦煌金上枭卷草浮雕交接处的微距结构特写。在室内佛堂或展厅佛台中，微缩石栏杆既起到界定神圣佛龛领域（“栏楯”庄严）的宗教象征作用，又极大丰富了台基的天际线层次。
 materials:
 - 天然汉白玉
 - 天然玉石敦煌金
@@ -54,9 +52,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9fca98f313ee62f2.jpg
     sha256: 9a51899a1e1ed9850b36df37f4e00f5ee43abf4e37da9d43092edeb884549011
-    size: 418714
     bytes: 418714
     width: 2048
     height: 1540
   thumb512:
     path: assets/thumb512/9fca98f313ee62f2.webp
     sha256: 28bc403c3d7036be7120772b10126e6fec89ba8917b37aa79516b24c7b88e6de
-    size: 34788
     bytes: 34788
     width: 512
     height: 385
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统大雄宝殿“五尊主像（三世佛+文殊普贤）+ 两侧十八罗汉龛廊”深灰石砖地面版左前斜视图（空间场景设计）。
 materials:
 - 五尊铜鎏金主像配白色海棠框发光石背板
 - 右侧铜鎏金十八罗汉木龛廊
@@ -53,7 +51,7 @@ tags:
 - 深灰石砖地面
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

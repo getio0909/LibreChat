@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4eb9d057658224c6.jpg
     sha256: 90124fbbff2c027551867e43ca10c7c8654f382f3a13014ffaf1d92c4b551cb7
-    size: 23101
     bytes: 23101
     width: 212
     height: 378
   thumb512:
     path: assets/thumb512/4eb9d057658224c6.webp
     sha256: b75df5352392443228352d85db837debfe3d5d2fc844cca2491cded297168be9
-    size: 15148
     bytes: 15148
     width: 212
     height: 378
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 乌金石/青石海水江崖祥云浮雕构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 玄黑紫褐与金色阳光剪影 / 海水江崖波涛纹、如意卷云纹、海棠形开光框
 materials:
 - 深青灰色嘉祥青石/乌金石
 - 多层高浮雕如意祥云纹
@@ -54,7 +52,7 @@ tags:
 - 古建石雕构件
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

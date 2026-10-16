@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/bda837bc2b75707b.jpg
     sha256: 1600716014dba2228293c48437a07637e16fdb12041001194966f358caf6ca46
-    size: 69612
     bytes: 69612
     width: 688
     height: 381
   thumb512:
     path: assets/thumb512/bda837bc2b75707b.webp
     sha256: 86b05150bb4c7c86dd1be4066c13dbfa2bab90945b01c76574260162c415a0aa
-    size: 30028
     bytes: 30028
     width: 512
     height: 284
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 秋日山林中的传统汉式寺院建筑群（妈祖庙）正面全景，中央重檐歇山顶主殿与两侧钟鼓楼对称布局，殿前青石月台踏道入口蹲坐一对汉白玉石狮并配石灯笼。
 materials:
 - 青灰筒瓦
 - 栗褐色木构
@@ -56,7 +54,7 @@ tags:
 - 秋景古建
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

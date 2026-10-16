@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c610e9593b0fbff0.jpg
     sha256: 48a982afb5549c2da3986be42b575629bac0ba4b94409b8ea9dfdeb0a35d6c14
-    size: 428552
     bytes: 428552
     width: 1280
     height: 1136
   thumb512:
     path: assets/thumb512/c610e9593b0fbff0.webp
     sha256: b24543884d02717d18bc67fe9435018d50d2530836d77a6d58e47dda177902e7
-    size: 66766
     bytes: 66766
     width: 512
     height: 454
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 正面实景拍摄的一座大型藏式三联一体多宝格佛龛博古展柜（Tibetan Buddhist Multi-Niche Shrine & Display Cabinet）。整座大柜集成了上部五连拱冠顶、中部三段式多层亮格佛龛、中部八吉祥腰线以及下部多抽屉储物底柜，是藏传佛堂中用于供奉主尊与圣物、收纳经书唐卡与法器的核心定制大家具。
 materials:
 - 红木
 - 矿物质彩绘
@@ -53,7 +51,7 @@ tags:
 - 三联雕花展柜
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

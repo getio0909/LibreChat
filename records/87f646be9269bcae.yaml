@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/87f646be9269bcae.jpg
     sha256: 776920ac92ec72c628275f178425cc31277f2d1473e10712626d94e46eedb742
-    size: 229390
     bytes: 229390
     width: 1740
     height: 1396
   thumb512:
     path: assets/thumb512/87f646be9269bcae.webp
     sha256: e56f3737b7d5b0e13648ab3a1f9394aea5e1269564928f9fda422a0ce886953a
-    size: 23646
     bytes: 23646
     width: 512
     height: 411
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统佛教建筑木雕贴金垂花罩与藻井局部构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为传统汉传佛教殿堂内部梁架与天花交界处的木雕贴金垂花落挂及平棊藻井局部构件写实特写。该构件通常悬设于主佛龛上方或大殿明间、次间梁枋之下，起到限定神圣空间边界、丰富顶部视觉层次的作用。 构件主体采用纹理细腻温润的深胡桃木/老楠木制作，保留半哑光清漆木质肌理；在平棊井芯、套角雕花、镂空卷草花牙子内缘及垂莲柱头圆珠部位施以24K赤金贴箔工艺，并在叠涩木框内侧暗藏2700K暖黄LED灯带，使木作暖棕与璀璨金箔相互辉映。
 materials:
 - 楠木
 - 红木雕刻
@@ -54,7 +52,7 @@ tags:
 - 传统古建木作
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

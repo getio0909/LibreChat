@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c2e67f92dd230fc9.jpg
     sha256: aec46b110ebd65a0c359f4eb197dd05e7293d4ac10e0eb29124aa536a9ae695b
-    size: 476324
     bytes: 476324
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/c2e67f92dd230fc9.webp
     sha256: 7a4745e3dab4d5b2285ffc92b6c3d5b595985567ea4cb3927eb3abd846d186aa
-    size: 31858
     bytes: 31858
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 三开间新中式佛教文化讲堂与藏经展览空间（7937x5613超清），中央设通顶发光博古藏经架与金色山水画轴，配弧形木格栅八角藻井。
 materials:
 - 红棕实木圆柱
 - 弧形木格栅八角藻井
@@ -54,7 +52,7 @@ tags:
 - 新中式禅堂
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

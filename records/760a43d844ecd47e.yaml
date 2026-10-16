@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/760a43d844ecd47e.jpg
     sha256: a8070c2f198a6a6b87d50bdc6edeb59484204ed4a1100582c81a75deb2dcf786
-    size: 251836
     bytes: 251836
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/760a43d844ecd47e.webp
     sha256: 0b3bc75e0510c47e599b29e9294690243f3972072e9e1b2a8a61b983054c1a7e
-    size: 24304
     bytes: 24304
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法座宝座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 独立陈设于现代极简主义美术馆/博物馆展厅中央的晴水绿青白玉嵌南红玛瑙黄花梨须弥法座展品。虽然背板为极简建筑空间，但画面绝对核心仍是这件居中占满画幅的玉石宝座单品，通过剥离繁杂的传统木雕背景，使观者视线完全聚焦于玉石本身的通透度与器型比例。
 materials:
 - 青白玉
 - 胡桃木

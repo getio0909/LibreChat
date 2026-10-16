@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a5279cb31e3e2587.jpg
     sha256: 66ea6d1ac33c7ecbf32542bae4110360b22fb9dbf5144d74064fa4056f216363
-    size: 226144
     bytes: 226144
     width: 1713
     height: 1278
   thumb512:
     path: assets/thumb512/a5279cb31e3e2587.webp
     sha256: 2a4c763edd744039e6cdc75f0d45f23efd63966b30661fbb956432c42686aab5
-    size: 26108
     bytes: 26108
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 新中式室内禅意庭院展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 暖白米棕与苍翠绿意 / 抛光棕灰大理石、罗汉松盆景、青石宫灯、宫灯吊顶
 materials:
 - 纯白石英砂砾
 - 芝麻黑火烧面花岗岩
@@ -56,7 +54,7 @@ tags:
 - 新中式展厅
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

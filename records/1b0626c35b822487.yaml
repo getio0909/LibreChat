@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1b0626c35b822487.jpg
     sha256: 0a0f6ce4eb94ad95e99a27910ab6533405bdd03be365abeccf54df551a3eaa86
-    size: 278873
     bytes: 278873
     width: 2048
     height: 1172
   thumb512:
     path: assets/thumb512/1b0626c35b822487.webp
     sha256: 1cb34cb188d5c5eafcee1f329b6feb9a1b3eca263ae5f12faafd88d781d0bd9a
-    size: 25836
     bytes: 25836
     width: 512
     height: 293
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 药师琉璃佛殿与万佛展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 深木色与宝蓝金黄 / 蓝色琉璃药师佛、透光云石背景、墨绿大理石地面
 materials:
 - 灰白花岗岩条石
 - 深褐色防腐木
@@ -56,7 +54,7 @@ tags:
 - 万佛墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

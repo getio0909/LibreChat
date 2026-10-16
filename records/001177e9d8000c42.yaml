@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/001177e9d8000c42.jpg
     sha256: 86cc711fd56abeba07cf88edaf2c5a9b43dc61c61e5023a15efa37b193961303
-    size: 251628
     bytes: 251628
     width: 2048
     height: 1457
   thumb512:
     path: assets/thumb512/001177e9d8000c42.webp
     sha256: 2600ede7a5702f4004f33393bf628ac6b5a32fd9157bd3070b30cc0ff1942627
-    size: 17760
     bytes: 17760
     width: 512
     height: 364
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 幽蓝琉璃药师佛对称佛龛殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 宝蓝幽光与暗黑木石 / 蓝色琉璃佛坐像、双护法立像、雕花供桌、莲花灯
 materials:
 - 宝蓝色古法透光琉璃
 - 青灰石雕莲花座
@@ -56,7 +54,7 @@ tags:
 - 莲花供灯
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

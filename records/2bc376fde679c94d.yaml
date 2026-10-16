@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2bc376fde679c94d.jpg
     sha256: 82009bd7967cbb4a3ae2ffac0493f9a5fa279aea288f256d1e0c6c3aafa37255
-    size: 300935
     bytes: 300935
     width: 1681
     height: 1255
   thumb512:
     path: assets/thumb512/2bc376fde679c94d.webp
     sha256: 245df2333cdc7ccbc1aae7585d74a40e41fab768879d0c0a394b07b5f2b0f142
-    size: 39002
     bytes: 39002
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 金碧宝盖藻井与汉白玉须弥座佛坛近景场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为上述奢华佛教主殿中央“七宝莲池须弥坛城”的中近景正面特写场景。镜头越过外围巨柱，直接聚焦于汉白玉须弥坛城、护法金刚力士、立体荷花造景与上方垂悬的巨型贴金宝盖，完整展现了主佛坛的石雕、木雕与贴金工艺细节。 近景地面清晰展现出深咖色与黑色交织、带有白色闪电纹理的顶级高光镜面大理石质感；坛城外围矮墙采用暖棕红玉/玛瑙纹大理石砌筑池岸，池内铺设翠绿色石雕荷叶与粉红莲花瓣；中央踏步、望柱与栏板采用纯净无瑕的一级汉白玉；两侧护法神将、中央覆斗形宝座及顶部垂悬华盖均采用辉煌的24K贴金工艺。
 materials:
 - 汉白玉栏杆
 - 镜面啡网石
@@ -55,7 +53,7 @@ tags:
 - 镜面奢石地面
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

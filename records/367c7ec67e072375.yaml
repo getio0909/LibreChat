@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/367c7ec67e072375.jpg
     sha256: a92a57ed82e80c38301b19315b0849b5d9a6d3f1e98d69ef5792dd0ba87e1210
-    size: 828987
     bytes: 828987
     width: 1389
     height: 2048
   thumb512:
     path: assets/thumb512/367c7ec67e072375.webp
     sha256: 1f89a7064f6c935f75b34be0623bb497aac58a27b065175172d0b669673f9f08
-    size: 63462
     bytes: 63462
     width: 347
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 莫卧儿红砂岩几何镂空花窗构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 这是一件印度莫卧儿时期（阿克巴/贾汉吉尔风格）红砂岩双层几何透雕花窗（Red Sandstone Jali）建筑构件实物写实。
 materials:
 - 印度天然红砂岩
 - 双层几何透雕石材

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/014c6197d97eab10.jpg
     sha256: 96eefc045189a6481e04d3a39482c97d25d190b58f2b06c9f46860c28694a6c2
-    size: 24114
     bytes: 24114
     width: 400
     height: 240
   thumb512:
     path: assets/thumb512/014c6197d97eab10.webp
     sha256: d938f9b0c07f2cbbe08c7ffcd994d60c023b62dc06558a3634ee3768ff73cd95
-    size: 14902
     bytes: 14902
     width: 400
     height: 240
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 大型佛教文化园中轴线全景规划场景，山巅矗立巨型露天金身坐佛，下方为阶梯金字塔式石材地宫与白色覆钵佛塔，前庭广场两侧对称分列三层唐风楼阁与护法石雕。
 materials:
 - 贴金锻铜大佛
 - 米白花岗岩地宫外墙
@@ -56,7 +54,7 @@ tags:
 - 朝圣广场
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/239e58bd3b64b612.jpg
     sha256: 7ff67935dc40c3e82d0cec005aff22796e316c64a0c305949059cdf1ee619765
-    size: 104126
     bytes: 104126
     width: 853
     height: 640
   thumb512:
     path: assets/thumb512/239e58bd3b64b612.webp
     sha256: 48115368764bf59351ccf6534d8c9cdbeb964f21cc7b775891e53daa30a9dca9
-    size: 22324
     bytes: 22324
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-浅奶油米白系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为一块高明度的浅奶油米白色天然大理石大板实物写实。
 materials:
 - 天然大理石
 - 浅米白大理石
@@ -52,7 +50,7 @@ tags:
 - 现代禅修空间主材
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

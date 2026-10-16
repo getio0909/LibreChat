@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7baa28b9f6df4827.jpg
     sha256: 0e24dccc9830d0fd772c6aa2fe6179f92a72d38874c97f256f892617c5d63c3b
-    size: 590955
     bytes: 590955
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/7baa28b9f6df4827.webp
     sha256: 5670eb818ca13f884a937063dfe6c177d5ba4c2e8976c88500ece115e9039909
-    size: 30762
     bytes: 30762
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 矿山与车间场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图记录了大型石材精加工车间内，工程团队正在对一整批「梦幻庄园/金镶玉」工程定制板进行全尺寸地面预排版与色差检验的真实生产场景。
 materials:
 - 抛光大理石规格板
 - 天车车间

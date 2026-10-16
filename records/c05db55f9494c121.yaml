@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c05db55f9494c121.jpg
     sha256: a9a0f94098459b30da3594c4b6a3e20bdc404d65a23f7e950890cca002e498a4
-    size: 231967
     bytes: 231967
     width: 994
     height: 2048
   thumb512:
     path: assets/thumb512/c05db55f9494c121.webp
     sha256: 815a291fb91e4de920e7fa3c69b917290d36467f223800fa74279eaff1198132
-    size: 21014
     bytes: 21014
     width: 248
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院星空天窗回廊与发光万佛经变壁长廊场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统佛教寺院经堂、藏经回廊或万佛殿侧翼的纵深长廊空间竖幅场景。空间将传统宫殿式重木结构（红木巨柱、汉白玉覆盆柱础、贴金镂空雀替）与充满浪漫宗教想象的“星空天窗”及“发光万佛长墙”相结合，营造出步入浩瀚佛国星海般的深邃礼佛长廊体验。
+  空间呈现浓郁的“深红棕木作 + 暖金万佛灯光 + 璀璨宝蓝星云 + 墨绿灰高光大理石”四色交响。左侧序列方柱与远端隔扇采用深红棕色菠萝格/老红木，底部承托洁白温润的汉白玉三层叠涩覆莲须弥柱础；右侧万佛墙下部护墙底座采用深色金属/古铜木雕，凸显一排暖光打亮的立体仰莲瓣浮雕带；地面…
 materials:
 - 红木巨柱
 - 汉白玉莲花柱础
@@ -56,7 +55,7 @@ tags:
 - 贴金木雕雀替
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

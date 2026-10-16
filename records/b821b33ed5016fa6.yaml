@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b821b33ed5016fa6.jpg
     sha256: 05dd2fa0af8392d885d69c34aa00c3c697ffedaa042e2c0b889e217e959b1c8d
-    size: 340587
     bytes: 340587
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/b821b33ed5016fa6.webp
     sha256: 5ef031725ebd40ff763962717751dd6df18dac15589acd157c8e082e5c728b92
-    size: 38722
     bytes: 38722
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 置于藏式展厅五彩几何羊毛地毯上的一座大型三层阶梯式藏传佛教须弥座木质展台/立体坛城底座（Mandala Pedestal Cabinet）。此类家具在藏传寺院与高端佛堂中专门用于承托大型铜鎏金立体坛城、舍利宝塔或主尊佛像，采用“下柜上台、层层收分”的须弥山金字塔式阶梯结构，同时兼具下层储物柜功能。
 materials:
 - 核桃实木
 - 矿物彩绘
@@ -52,7 +50,7 @@ tags:
 - ControlNet实景母本
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

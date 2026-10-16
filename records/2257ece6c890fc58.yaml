@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2257ece6c890fc58.jpg
     sha256: d20300566d2fc3be5f32d5aabdd33fd5043b7eb9850cc215a21ad3e3e757b9f1
-    size: 408764
     bytes: 408764
     width: 1440
     height: 1080
   thumb512:
     path: assets/thumb512/2257ece6c890fc58.webp
     sha256: 0d3eb0970a062ebe0f0211c6ca99554950fe350d5d1deb296c3f7f56e5b323e8
-    size: 51862
     bytes: 51862
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 陈设于现代展厅轨道射灯下的一座殿堂级藏传佛教“十一佛冠顶”三联多宝格大佛龛展柜。整座佛柜以藏传寺院大经堂建筑立面为蓝本，将飞檐斗拱、转经筒排、双鹿法轮、火焰拱门（巴卡拱）与下层储物供柜融为一体，体量宏伟，雕工极尽繁复。
 materials:
 - 实木
 - 矿彩沥粉贴金
@@ -52,7 +50,7 @@ tags:
 - 矿彩描金木雕
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

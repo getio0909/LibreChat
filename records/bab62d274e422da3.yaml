@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/bab62d274e422da3.jpg
     sha256: bbc3787c4d4670b8ea978b0ca6e071fb2716234e24968df999db8353fd04b4db
-    size: 54615
     bytes: 54615
     width: 646
     height: 380
   thumb512:
     path: assets/thumb512/bab62d274e422da3.webp
     sha256: 5684896d53f6202756640e27b98ee1d7b03fbf6c518d7d279bfb530ced1ff262
-    size: 24236
     bytes: 24236
     width: 512
     height: 301
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代新中式三宝殿建筑与禅院
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 原木暖棕、青灰瓦与灰白广场 / “三宝殿”主殿、木构“禅”字亭、石经幢
 materials:
 - 青灰筒瓦屋面
 - 防腐原木禅亭
@@ -56,7 +54,7 @@ tags:
 - 石经幢
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

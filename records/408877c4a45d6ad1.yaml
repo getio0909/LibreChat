@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/408877c4a45d6ad1.jpg
     sha256: e6998bf6cba6dd8bc8dbb6bc33bf83dff531f472e34b87070711e698e4d728e0
-    size: 813168
     bytes: 813168
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/408877c4a45d6ad1.webp
     sha256: 12920c8490e53f8c20d09f2fe6e5083a9ad98e4c457964ace74dd012d1261a19
-    size: 40424
     bytes: 40424
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-佛龛中轴对称与地面倒影
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展南侧 D立面庄严佛龛的正视中轴对称竖幅全景照。通过天地镜像的极致对称构图，淋漓尽致地展现了“双层折角藏光佛龛 + 禅境灰蓝天地满铺石材 + 敦煌金玉石须弥座佛台”三位一体所营造出的宗教神圣感与殿堂级光影美学。
 materials:
 - 禅境灰蓝大理石
 - 敦煌金供桌

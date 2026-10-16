@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/cb9670bd3879a048.jpg
     sha256: 8876c160878dc3e7ce0f81055d8d8de6872cd7c9adbe9645154adf2af1bb25cd
-    size: 464915
     bytes: 464915
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/cb9670bd3879a048.webp
     sha256: e516de5ab579b446634f63ab0c20128811363d3dfb116e9cb9cd012ac1777710
-    size: 55790
     bytes: 55790
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法座宝座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 陈设于传统中式红木雕花展厅中的一座汉白玉与小叶紫檀复合镶嵌须弥座法座（佛像宝座或高僧法座）。该器型严格遵循佛教须弥座（Sumeru Pedestal）与身光、头光背屏规制：上部为葫芦形双圆弧头光与身光背板，中部为宽平仰覆莲座面，下部为束腰须弥座，既可作为中型佛像的专用供奉宝座，亦可作为佛教仪轨中的尊贵法座。
 materials:
 - 汉白玉
 - 小叶紫檀

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4f7f6890a76fb075.jpg
     sha256: 4f413b08e2e08480fee3dbbbd55240865fee88d7f867120e7a75e77196bbf77a
-    size: 393576
     bytes: 393576
     width: 1526
     height: 2048
   thumb512:
     path: assets/thumb512/4f7f6890a76fb075.webp
     sha256: 2f941d51bc71f713246637d7b2bfed933e12648b39a00d7f52081d0c14fb19d0
-    size: 24078
     bytes: 24078
     width: 381
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 建筑木石构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 中心雕八瓣莲花与卷草如意纹、外圈呈二十四道金光辐条发散的透光云石与鎏金圆形放射状浮雕构件特写。
 materials:
 - 透光云石
 - 鎏金浮雕
@@ -53,7 +51,7 @@ tags:
 - 八瓣莲花纹
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

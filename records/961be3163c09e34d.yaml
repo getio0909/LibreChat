@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/961be3163c09e34d.jpg
     sha256: 36d5fe5eaddd035ae3a4f7df4b4dc9d819f4e083bc77500c66535840a91e6767
-    size: 181269
     bytes: 181269
     width: 1280
     height: 642
   thumb512:
     path: assets/thumb512/961be3163c09e34d.webp
     sha256: 83b14235190b87f47627a4a9271d03e8a79c70a88b08251b61fd74f053a9b237
-    size: 27650
     bytes: 27650
     width: 512
     height: 257
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代东方禅意奢石展览大厅，采用严格中轴对称构图，两侧高墙干挂竖向黄洞石大板并内嵌洗墙灯带，四坡木格栅天井垂落飞鸟水晶吊灯，正对青玉宝瓶水景与千佛龛背景墙。
 materials:
 - 暖黄洞石/砂岩大板
 - 胡桃木条形格栅
@@ -57,7 +55,7 @@ tags:
 - 现代禅意大堂
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

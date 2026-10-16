@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/cfa5560c74124d1b.jpg
     sha256: 77eaebaaaea738303f256cb093af2c97d9fca6ef42c21537d46370ac5537fc35
-    size: 337571
     bytes: 337571
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/cfa5560c74124d1b.webp
     sha256: 8734befb10fc2c967ae7e0330d08a5c5addb9e52534c0c06b55329b11e6000f6
-    size: 32688
     bytes: 32688
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景下的暖金色调汉藏融合实木雕花会客家具全套组合。相较于前几款的深沉冷峻，本款以明亮富丽的皇家暖黄木色与温润黄白玉石为主导，整体气质温暖、吉祥、辉煌，极富盛唐与明清宫廷佛堂的华贵气韵。
 materials:
 - 黄花梨木
 - 金丝楠木

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2d0c019cbe2ca6fe.jpg
     sha256: 6729cd37dd6dfb5443277407c2d8ea75dc9f82602d86a4c02c8c67f89e080ead
-    size: 404079
     bytes: 404079
     width: 1920
     height: 860
   thumb512:
     path: assets/thumb512/2d0c019cbe2ca6fe.webp
     sha256: ca598d8365f8774d998f9fc1f922d12f3d49e0f5c9bf89d91638e0547239d762
-    size: 27760
     bytes: 27760
     width: 512
     height: 229
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 石材矿山与源头基地-露天白石矿场
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为庄严宝刹（Alitan Stone）源头矿山基地的无人机高空航拍实景宣传横幅图（Banner）。
 materials:
 - 天然白色大理石矿山
 - 汉白玉荒料原石
@@ -52,7 +50,7 @@ tags:
 - 展会宣传背板
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

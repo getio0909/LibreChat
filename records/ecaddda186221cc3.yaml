@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ecaddda186221cc3.jpg
     sha256: 1df6bb2531ddc5b5980e3cba30b0393c6f9d4ebd110c43faa9291ae511d970a1
-    size: 456908
     bytes: 456908
     width: 2048
     height: 1351
   thumb512:
     path: assets/thumb512/ecaddda186221cc3.webp
     sha256: 52e0028212120cf948553f7d0b9a258a1bd9b9a3660d58be276d73338ac1456e
-    size: 37588
     bytes: 37588
     width: 512
     height: 338
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 飞天藻井与七彩琉璃佛龛大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 宝蓝、金黄、翡翠绿与棕绿奢石 / 七彩琉璃佛像壁龛、圆形飞天藻井
 materials:
 - 七彩古法脱蜡烧制琉璃
 - 白色GRG飞天浮雕圆形藻井
@@ -57,7 +55,7 @@ tags:
 - 对称大殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

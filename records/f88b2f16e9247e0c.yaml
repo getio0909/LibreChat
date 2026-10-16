@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f88b2f16e9247e0c.jpg
     sha256: 0fa2f99435ac670db78efee47417ef99ec3ab70394a89113977d46b6315681bb
-    size: 557539
     bytes: 557539
     width: 1906
     height: 2048
   thumb512:
     path: assets/thumb512/f88b2f16e9247e0c.webp
     sha256: 11103baffcec1d86ea7a257b2ddc79a007ee23ffd899721e9b3a06c9edfa7bb2
-    size: 42812
     bytes: 42812
     width: 477
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统八角斗拱与阿拉伯/梵式莲瓣龛星空穹顶构件写实
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为大型佛教殿堂顶部核心“八角斗拱莲花星空穹顶（藻井）”仰视写实特写。设计巧妙融合了中国传统古建八角木构斗拱、古印度/丝路石窟的菩提叶尖拱壁龛、佛教仰覆莲花座以及现代光纤LED“浩瀚星空”天幕，在殿堂顶部浓缩展现了佛教“三千大千世界、华藏庄严海”的宏大宇宙观。
+  构件下部与中部采用温暖的浅胡桃木/金丝楠木色实木雕刻与米黄色砂岩/GRG浮雕构件，配合各层暗藏的2700K暖黄洗墙灯带，呈现出温润醇厚的暖金色调；而穹顶最核心的圆形天心则采用深邃浓郁的宝蓝色/午夜蓝吸音天幕涂装，并嵌入数十颗高亮度纯白光纤星光点，形成强…
 materials:
 - 雕花木斗拱
 - 莲瓣发光壁龛
@@ -53,7 +52,7 @@ tags:
 - 大殿吊顶设计
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

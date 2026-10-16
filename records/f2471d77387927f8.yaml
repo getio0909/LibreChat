@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f2471d77387927f8.jpg
     sha256: 2e71c6095206fb00bd7090599e76d5e89c1d37276c0dd1f4ad41cfad00127d6e
-    size: 344357
     bytes: 344357
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/f2471d77387927f8.webp
     sha256: 05b91289911dc3a929bc73933bff81dcee236a915db395a40e34dcbdee034c4f
-    size: 27326
     bytes: 27326
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 建筑木石构件-玉石仰莲供坛局部
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为展位中央大型玉石须弥供坛（佛台）侧面双层仰莲瓣的高浮雕/立体圆雕工艺微距特写。通过纵向浅景深顺光/侧逆光拍摄，重点展现庄严宝刹（Alitan Stone）在厚重整石雕刻上的精湛刀工与天然玉石丰富的色彩变幻。
 materials:
 - 天然玉石（敦煌金/五彩玉）高浮雕
 colors:
@@ -55,9 +53,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

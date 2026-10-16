@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1d87ac64a2de94ec.jpg
     sha256: 8c4d9cf2d39acb1ceca88d86f5ca55bd5362c2dc192e5ccbb3266c1c3b4ca4e6
-    size: 21191
     bytes: 21191
     width: 281
     height: 378
   thumb512:
     path: assets/thumb512/1d87ac64a2de94ec.webp
     sha256: 9dff61118033a7be08be597a04184faa2079ca308036f06a9b7656a470e84014
-    size: 12350
     bytes: 12350
     width: 281
     height: 378
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 佛像造像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯黑博物馆背景下经顶部聚光灯照亮的宋辽风格木雕敷彩贴金观音菩萨坐像，头戴高花冠、胸饰璎珞，保留斑驳朱砂石绿矿物彩绘包浆。
 materials:
 - 宋辽风格木雕彩绘贴金水月/自在观音坐像
 - 斑驳矿物彩绘肌理
@@ -52,7 +50,7 @@ tags:
 - 古典佛教造像
 material_ids: []
 provenance:
-  source: museum
+  source: unknown
   url: null
   credit: null
   license: unknown

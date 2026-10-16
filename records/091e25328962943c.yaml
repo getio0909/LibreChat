@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/091e25328962943c.jpg
     sha256: 44c41771c2b989f92ffd55617151626c52fd38bd8f2cb9b96bd70bc208602f1d
-    size: 305287
     bytes: 305287
     width: 1149
     height: 2048
   thumb512:
     path: assets/thumb512/091e25328962943c.webp
     sha256: 2b9cb4a978728e8d32f717241c818ed2bc531165750feff37a4d1f699bd9144f
-    size: 29068
     bytes: 29068
     width: 287
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 室内红木底座与多层莲花须弥座上供奉的藏汉融合铜鎏金覆钵式舍利宝塔，塔腹开火焰壶门内供坐佛，前伴橙色琉璃莲花供灯。
 materials:
 - 铜鎏金覆钵式舍利宝塔
 - 十三天相轮与流苏华盖
@@ -53,7 +51,7 @@ tags:
 - 莲花供灯
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

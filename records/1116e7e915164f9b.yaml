@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1116e7e915164f9b.jpg
     sha256: fb101b17418621533ca599b4254974da9f9d6edf4a429faf450ab339b4cfd2a3
-    size: 350883
     bytes: 350883
     width: 2048
     height: 1327
   thumb512:
     path: assets/thumb512/1116e7e915164f9b.webp
     sha256: 7242509f64c621ba00ab9212a857b094cf0b91af69af9517ba81eb7b34165929
-    size: 26304
     bytes: 26304
     width: 512
     height: 332
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为新中式与传统融合风格的寺院天王殿（布袋弥勒佛殿）室内供奉场景（空间场景设计）。
 materials:
 - 铜鎏金大肚弥勒佛坐像配双圈白色发光圆光
 - 木雕须弥座与缠枝莲供桌
@@ -53,7 +51,7 @@ tags:
 - 木雕护法壁画
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

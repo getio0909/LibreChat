@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f6e0019182627dad.jpg
     sha256: f34371ab5a11b4a010ee44bd29f4b5013b27b625e577aeba77b0edbd21e07670
-    size: 128655
     bytes: 128655
     width: 1200
     height: 554
   thumb512:
     path: assets/thumb512/f6e0019182627dad.webp
     sha256: c167f037b32d98d8fe470a9c53dc03f87433d09ba9986af37f87bfcd11dbcfa4
-    size: 20734
     bytes: 20734
     width: 512
     height: 236
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 东亚/日式传统古刹大雄宝殿宽画幅场景，幽暗大殿中耸立高光黑漆巨柱，聚光灯照亮中央丈六纯金坐佛、舟形金色大光背、唐破风天盖、金色幢幡及两侧大理石石灯笼。
 materials:
 - 纯金箔大佛与舟形光背
 - 高光黑漆大木柱
@@ -56,7 +54,7 @@ tags:
 - 戏剧光影
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

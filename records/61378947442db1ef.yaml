@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/61378947442db1ef.jpg
     sha256: e59a19dfafa6471f727e6926d9c6e5bc496a23c865aea44af0cf56bf9bcf6c4a
-    size: 662667
     bytes: 662667
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/61378947442db1ef.webp
     sha256: 2587f25472d0fdd5898218b033c75b480d38bd66925d099af3bdc2d43c2967d7
-    size: 42984
     bytes: 42984
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 8K超清金身财宝天王青玉莲座殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 璀璨赤金、暖黄与咖啡网纹石 / 聚宝盆金身坐像、青玉莲座、八吉祥拱门
 materials:
 - 羊脂青白玉巨型莲花座
 - 24K真金财宝天王与摇钱树
@@ -56,7 +54,7 @@ tags:
 - 弧形万佛墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

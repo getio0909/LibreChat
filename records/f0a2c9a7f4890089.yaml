@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f0a2c9a7f4890089.jpg
     sha256: 28a6a44ede4d60bc2b84c93ee4c36f15d494aab1bd4e65087a83b583d5a54ec0
-    size: 307404
     bytes: 307404
     width: 1344
     height: 2048
   thumb512:
     path: assets/thumb512/f0a2c9a7f4890089.webp
     sha256: 068529d8f812739c0be653e18ae1ddf3e7a0889c70dba811d1548851efc8f93c
-    size: 20220
     bytes: 20220
     width: 336
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代暖金米黄大理石鱼鳞叠瓦状如意宝相花浮雕肌理板
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为一款应用于佛教殿堂主背景墙、佛龛背板或穹顶内壁的“鱼鳞叠瓦状如意宝相花”连续几何石材浮雕肌理板写实特写。设计将中国传统古建筑及铠甲中的“叠胜纹/鱼鳞纹”与佛教“如意云头、宝相团花”巧妙结合，形成极具律动感与华贵金石质感的装饰面层。
+  材质采用暖金米黄色大理石（如金碧辉煌、埃及米黄、黄洞石）或表面施以仿金箔古法擦色工艺的浮雕砂岩板，在暖黄色侧光照射下，凸起的阳纹受光面泛出柔和璀璨的琥珀金光，凹陷的阴纹暗部则呈现温润的焦糖棕色调，立体浮雕质感极强。
 materials:
 - 米黄大理石
 - 砂岩CNC浅浮雕
@@ -53,7 +52,7 @@ tags:
 - 佛堂背景墙材质
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

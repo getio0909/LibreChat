@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/09fc6054931d97e2.jpg
     sha256: 3f2ed1f082ddc9840c48d2dfe7b200335ccd134dcabb3cd397c433f6616714dc
-    size: 356814
     bytes: 356814
     width: 1199
     height: 2048
   thumb512:
     path: assets/thumb512/09fc6054931d97e2.webp
     sha256: 672f9b8ecf99aa16985407b529469585c0bb267920cdc5a10f733bec4b6e6253
-    size: 21238
     bytes: 21238
     width: 300
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 安放于深色雕花红木供桌上、炉腹饰仰莲宝相花浮雕、两侧立雕双龙耳且炉盖顶立鎏金瑞狮钮的铜鎏金三足熏香炉特写。
 materials:
 - 铜鎏金双龙耳三足熏炉
 - 镂空金狮钮炉盖
@@ -52,7 +50,7 @@ tags:
 - 佛堂供具
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

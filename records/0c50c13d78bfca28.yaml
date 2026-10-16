@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0c50c13d78bfca28.jpg
     sha256: 1d9bd5b62b43eb9923c9a3c2cc5efb9c7fc6def92d53e952269fef3450d60f86
-    size: 228810
     bytes: 228810
     width: 1204
     height: 2048
   thumb512:
     path: assets/thumb512/0c50c13d78bfca28.webp
     sha256: f604768299e2fee81ff6320bf8ef7363eab9a3af6429eb89053cf45df897177a
-    size: 17512
     bytes: 17512
     width: 301
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 新中式圆形背光佛龛与金身大肚弥勒佛供奉场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为新中式寺院天王殿迎门主龛、佛教文化展厅或高端中式佛堂内的“大肚弥勒佛（布袋和尚/笑佛）”独立供奉龛正面场景。弥勒佛象征“大肚能容天下难容之事，开口便笑世间可笑之人”的欢喜、宽容与招财纳福寓意，空间设计简练大气、圆融喜庆。
+  空间以温润醇厚的深胡桃木色、纯净素白墙面、暖金色佛身与耀眼纯白月轮光带构成鲜明层次。主尊弥勒佛及下方双层祥云莲花座采用暖金色木雕（金丝楠木/黄杨木雕或鎏金铜雕）工艺，质感温润细腻；外框与前方供桌采用深棕色胡桃木精雕；供桌上的三足香炉与高脚烛台采用哑光纯银/白铜材质，两侧铜花瓶内插自然风干…
 materials:
 - 金色木雕
 - 铜雕弥勒佛
@@ -55,7 +54,7 @@ tags:
 - 新中式佛龛设计
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/895500304ec17db8.jpg
     sha256: 1dcedd6f34b39aa5d7d4430585b78bf1d307ba13721e526e3abeff07af31debe
-    size: 187519
     bytes: 187519
     width: 1024
     height: 1024
   thumb512:
     path: assets/thumb512/895500304ec17db8.webp
     sha256: 948bcf27207f1b4ceec6835c566a8e58f1531b63b04e12eaca8dad3a0a91aa3d
-    size: 34462
     bytes: 34462
     width: 512
     height: 512
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 当代美术馆大地艺术与禅修冥想装置展览空间，清水混凝土顶板与白方柱展厅地面开凿多个不规则曲线下沉池，内部铺满红棕色陶粒砂石并塑造成波浪状微地形沙丘供观众坐卧冥想。
 materials:
 - 红棕色陶粒/火山砂砾
 - 清水混凝土顶板
@@ -55,10 +53,10 @@ tags:
 - 先锋展陈设计
 material_ids: []
 provenance:
-  source: ai_generated
+  source: unknown
   url: null
   credit: null
-  license: ai_generated
+  license: unknown
   license_status: unconfirmed
 quality:
   min_side_px: 1024

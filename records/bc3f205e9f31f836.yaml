@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/bc3f205e9f31f836.jpg
     sha256: 83c81e4e65b92d00faad707aa6dc764f9662d1e9eabef231110d3e32617863e0
-    size: 382099
     bytes: 382099
     width: 2048
     height: 1533
   thumb512:
     path: assets/thumb512/bc3f205e9f31f836.webp
     sha256: b081eaf33712f59b854d5c7795e5bcf95e0d084720fe9e85dedcfadd0b2f8d60
-    size: 27612
     bytes: 27612
     width: 512
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 原木方柱与竖向木格栅回廊环绕中央下沉式枯山水内庭院，庭院内白砂耙出涟漪水纹并点缀青苔微丘、黑山石、修竹与迎客松盆景的禅意长廊。
 materials:
 - 原木列柱与竖格栅外廊
 - 下沉式白砂枯山水庭院
@@ -53,7 +51,7 @@ tags:
 - 木格栅灰空间
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1a62c5d8745899e6.jpg
     sha256: 98d5c68b8f57b7e339a885c8082922bf3bdfcefa1c597c43a2d2cda9f82bee12
-    size: 309680
     bytes: 309680
     width: 1358
     height: 2048
   thumb512:
     path: assets/thumb512/1a62c5d8745899e6.webp
     sha256: ab3901b257059ad2e422297f4b95f4ddbf8db44deac4151b4cd77d167619a2ff
-    size: 25568
     bytes: 25568
     width: 339
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 新中式藏经阁与佛教法器文物独立展柜空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为新中式寺院藏经阁（大藏经楼）兼佛教传世法器、瓷器文物珍宝馆室内场景。空间将浩瀚的古典经籍书墙与博物馆级独立文物展柜相结合，营造出书香氤氲、古雅深邃的佛学研修与文物鉴赏空间。 空间以温润的胡桃木本色、深绿与褐棕色奢石/大理石、素白古籍纸本色构成醇厚色调。前景三座并列独立展柜的底座采用天然大理石整石包覆：左侧底座为墨绿/森林绿云纹大理石（如大花绿/雨林绿），中间与右侧底座为深褐棕色乱纹大理石（如咖啡网纹/古木纹石）；地面外圈及前景铺设高光深绿色云纹大理石（右下角带浅浮雕莲花暗纹），展柜底座四周地面设一圈米白石…
 materials:
 - 深绿大理石
 - 褐棕奢石
@@ -55,7 +53,7 @@ tags:
 - 线装佛经书墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f79c52a91699df77.jpg
     sha256: c04cf49ca2c471aa1c88f9b749bf5e085720191ce70d19003621ba9cf1392602
-    size: 944404
     bytes: 944404
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/f79c52a91699df77.webp
     sha256: b598c1833c3878363f94860e98eaf50e3d5c5ca1988ae8713d4e44eb0167c966
-    size: 47998
     bytes: 47998
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-对纹奢石背景墙局部
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展（C5 T026展位）西侧 C立面核心展墙——“天然美石 · 佛國畫卷”的中近景特写。重点呈现了如何运用大幅天然奢石的镜像对称拼贴（Bookmatching），在现代商业展厅中营造出无需人工雕琢却自带“石蕴佛塔”宗教神圣感的艺术画廊场景。
 materials:
 - 佛国画卷(敦煌金大理石)
 - 雕花木线

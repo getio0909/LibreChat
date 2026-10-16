@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/97a1b0a22480aeac.jpg
     sha256: e60905c0273f3fb33a40d3bc6328ca0a0b29bf79a95e4db570e6ed057a9ac1de
-    size: 18281
     bytes: 18281
     width: 400
     height: 134
   thumb512:
     path: assets/thumb512/97a1b0a22480aeac.webp
     sha256: 9c1ef8ec67a590d586d3246a23becc478bea0d75f901c0f5037ba8d6abae633f
-    size: 13754
     bytes: 13754
     width: 400
     height: 134
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中央矗立汉白玉莲座露天大金佛、后倚传统重檐古建大殿、前设圆形白石莲花喷泉广场并环绕假山跌水与菩提伽耶式佛塔的佛教园林鸟瞰。
 materials:
 - 露天巨型铜鎏金坐佛
 - 汉白玉莲座
@@ -53,7 +51,7 @@ tags:
 - 菩提伽耶佛塔
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

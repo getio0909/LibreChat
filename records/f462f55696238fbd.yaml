@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f462f55696238fbd.jpg
     sha256: 4f051fe0ba3ecf77c7fea1da23149be1ae84d1c97c54bf1d3816a1d89218f468
-    size: 463364
     bytes: 463364
     width: 2048
     height: 1335
   thumb512:
     path: assets/thumb512/f462f55696238fbd.webp
     sha256: ba2d08ad56cab309726f081f63e32d34074514bfc62d188532c7a5ba29c6de0b
-    size: 37440
     bytes: 37440
     width: 512
     height: 334
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 说法图巨幅发光壁画与须弥座厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 暖金米黄与墨黑青石 / 巨幅佛陀说法壁画、汉白玉束腰须弥座、雕花隔扇门
 materials:
 - 高显色内透光重彩壁画软膜
 - 汉白玉束腰须弥座
@@ -57,7 +55,7 @@ tags:
 - 鎏金浮雕吊顶
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

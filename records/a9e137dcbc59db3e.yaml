@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a9e137dcbc59db3e.jpg
     sha256: 83ed58a5008afa75c2d20db552465b7541147d05f4f453921a1bf7991f5d53fc
-    size: 215426
     bytes: 215426
     width: 1600
     height: 824
   thumb512:
     path: assets/thumb512/a9e137dcbc59db3e.webp
     sha256: bfbe4d3cdf797321ab5a0b11c7f176eb6040db21dc9d35814c808b971541d244
-    size: 20852
     bytes: 20852
     width: 512
     height: 264
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式高定会所佛堂与文化展厅室内效果图，中央设带庑殿飞檐的三开间胡桃木雕花大佛龛供奉三尊金佛，配金色暗纹背板、井字吊顶、刺绣袈裟挂画与多宝格茶席。
 materials:
 - 深胡桃木/红木
 - 金色暗纹锦缎背板
@@ -57,7 +55,7 @@ tags:
 - 金佛供奉
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

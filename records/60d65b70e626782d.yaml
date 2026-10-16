@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/60d65b70e626782d.jpg
     sha256: b67fed9ee35c1e3d97daf54e9e197d53081b53672fe6bf5d6899710d1f060d17
-    size: 960425
     bytes: 960425
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/60d65b70e626782d.webp
     sha256: 9ce86f7e8a3cae4f45979a5d53d0e1c1639dd25279141e1cee9bb8923929f924
-    size: 59498
     bytes: 59498
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-深绿层叠网纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为带有绿色安全捆扎带的整扎天然深绿色云雾网纹大理石大板（丹东绿/森林绿奢石）展厅标准陈列写实图。
 materials:
 - 天然深绿大理石
 - 丹东绿/森林绿奢石
@@ -53,7 +51,7 @@ tags:
 - 丹东绿纹理
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

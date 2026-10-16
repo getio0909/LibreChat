@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/becd28c463a78bed.jpg
     sha256: 518f15831a1185bed97262a292f4d27e1946b6c50bcd32a32eeebc7fbd598e0a
-    size: 419444
     bytes: 419444
     width: 2048
     height: 1317
   thumb512:
     path: assets/thumb512/becd28c463a78bed.webp
     sha256: 97097d1af79ad3b7795f228019e8753b9cbe407c8019961741e5ea9eabfbd85b
-    size: 33034
     bytes: 33034
     width: 512
     height: 329
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 设八角金莲蓝天主藻井与双圆副藻井、悬挑木雕华盖、三联白色海棠发光龛供奉三世佛二弟子及两壁十八罗汉金像的全木作大殿。
 materials:
 - 红木整装木作
 - 铜鎏金佛像与罗汉
@@ -57,7 +55,7 @@ tags:
 - 海棠形佛龛
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

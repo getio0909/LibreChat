@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/34f2ff7773d666b0.jpg
     sha256: 7111d01c3bedb5c2dbb518fad256a8e4c678aed0db5f5bdb955acba2e541f4f4
-    size: 664396
     bytes: 664396
     width: 2048
     height: 1153
   thumb512:
     path: assets/thumb512/34f2ff7773d666b0.webp
     sha256: b81ce24fe714ace659556b410b11eb7d99434ad91fdea2705866c3e7c0475755
-    size: 32240
     bytes: 32240
     width: 512
     height: 288
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为阿利坦展厅核心展位上单块完整「梦幻庄园」巨幅大板的正视标准写实照。
 materials:
 - 梦幻庄园大板
 colors:

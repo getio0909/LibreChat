@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d2687237473d263a.jpg
     sha256: c4772ed65d0f3ce2b6b2872d70c20e9c2c1f7e8786f06712f7acb5f46175c997
-    size: 126245
     bytes: 126245
     width: 720
     height: 823
   thumb512:
     path: assets/thumb512/d2687237473d263a.webp
     sha256: d65fa70bcb926bb88744dcded999363bd116299a4b2d3116a2d00f8866422c98
-    size: 36126
     bytes: 36126
     width: 448
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 安藤忠雄“头大佛殿”内部极低角度超广角仰拍场景，数十道放射状折板清水混凝土肋板围合出顶部锯齿状圆形苍穹天窗，将灰白花岗岩大佛头像框于蓝天圆光中心，前景红衣女子背影走向佛台。
 materials:
 - 放射状折板清水混凝土
 - 灰白花岗岩巨型大佛
@@ -56,7 +54,7 @@ tags:
 - 极简宗教地标
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

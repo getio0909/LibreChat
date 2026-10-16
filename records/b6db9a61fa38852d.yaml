@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b6db9a61fa38852d.jpg
     sha256: 3fd1a5e510835c00485cfae08b28efd886e9910027d2eb7a363c64a3a96f8bcf
-    size: 59695
     bytes: 59695
     width: 688
     height: 382
   thumb512:
     path: assets/thumb512/b6db9a61fa38852d.webp
     sha256: 70594e8980949549c5a3d86c0bdfcbee1e2aa153e00e1f83650d8dfacdee9431
-    size: 24330
     bytes: 24330
     width: 512
     height: 284
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 传统宫殿式重檐歇山顶寺院主殿（天后宫）正立面全景效果图，建于高耸汉白玉须弥座台基之上，正中嵌巨幅“福”字浮雕照壁，两侧设对称折线形雕花石栏杆踏道。
 materials:
 - 青灰筒瓦
 - 赭红木构梁柱
@@ -56,7 +54,7 @@ tags:
 - 天后宫
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

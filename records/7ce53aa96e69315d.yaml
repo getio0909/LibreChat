@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7ce53aa96e69315d.jpg
     sha256: dcff1d6a87ac30352507a57beea0c5601f930df663c965bb3d4074b286aa56ea
-    size: 403021
     bytes: 403021
     width: 1984
     height: 1488
   thumb512:
     path: assets/thumb512/7ce53aa96e69315d.webp
     sha256: fd4e50ae8a7855f88bc99b1e7d323695b527cf1e7faef4ea287f5b3318c0f500
-    size: 32574
     bytes: 32574
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-暖灰粗白斜纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为石材厂房内实拍的超高清天然暖灰色斜向闪电白纹大理石大板（编号“19”板，属云朵拉灰/古堡灰/爱马仕灰优质切板）。
 materials:
 - 天然灰色大理石
 - 云朵拉灰大理石
@@ -52,7 +50,7 @@ tags:
 - 19号大板
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

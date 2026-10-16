@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9ce7f8617c698949.jpg
     sha256: 276cf28a30b90f15e6a717e5f7deef46261448cf78e2127ad792157c35caa18c
-    size: 40504
     bytes: 40504
     width: 332
     height: 383
   thumb512:
     path: assets/thumb512/9ce7f8617c698949.webp
     sha256: f61dfe0d4ccfb255411a5c007a8607d7dad0b289c0a55c033329001787d40bd6
-    size: 27514
     bytes: 27514
     width: 332
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代新中式禅意庭院水景与日式/唐式石灯笼景观场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式禅意寺院、佛学院或高端禅修会所的户外内庭院水景小品场景。设计以“静水、白石、古松、石灯笼、木格栅”五大东方禅宗园林核心要素，构建出空灵澄澈、新旧交融的当代禅意景观空间。 色调清新明快、自然雅致：前景石灯笼与池岸护栏采用洁净的芝麻白/白麻花岗岩；水池底面铺设浅蓝色马赛克或反光石材，映射出清澈蔚蓝的水色；中景植物呈现深浅不一的松翠绿与嫩绿草坪色；背景建筑外立面则采用高挑挺拔的暖棕原木色（铝代木/防腐木）竖向格栅与深灰Low-E玻璃幕墙。
 materials:
 - 白麻石灯笼
 - 罗汉松
@@ -56,7 +54,7 @@ tags:
 - 新中式木格栅立面
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

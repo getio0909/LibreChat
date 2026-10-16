@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/628c2edb40db4881.jpg
     sha256: 763b4eb333c7bd0d6233005ed8f3f91768cad0f494bd309dd763790f6470fa60
-    size: 402491
     bytes: 402491
     width: 1077
     height: 2048
   thumb512:
     path: assets/thumb512/628c2edb40db4881.webp
     sha256: b7818538c73cc92f0583e1705a81ad741359c1d543bffe3b08d56e67aa81f774
-    size: 28182
     bytes: 28182
     width: 269
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 置入中式木格栅与万佛龛背景前、顶冠六角重檐攒尖宝顶、下承白色汉白玉圆鼓底座的铜鎏金宝塔式落地金属宫灯特写。
 materials:
 - 铜鎏金六角重檐宝塔落地宫灯
 - 镂空灯笼
@@ -53,7 +51,7 @@ tags:
 - 汉白玉灯座
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

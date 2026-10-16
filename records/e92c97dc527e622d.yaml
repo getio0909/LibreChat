@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e92c97dc527e622d.jpg
     sha256: 94f52128cc7d31bd73d41c07c7a8e12926c6aada71a124574e2b73b4b965ef83
-    size: 293191
     bytes: 293191
     width: 1713
     height: 1284
   thumb512:
     path: assets/thumb512/e92c97dc527e622d.webp
     sha256: d90bec54733a8a4e2294159cd5be322d57a297822106cf01665f3317691ec6d3
-    size: 35840
     bytes: 35840
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 室内禅意枯山水汀步景观廊
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 浅灰砾石、深灰石板与翠绿 / 发光汀步石、太湖石罗汉松、发光透明屏风
 materials:
 - 芝麻黑火烧面花岗岩汀步
 - 白砂砾石
@@ -56,7 +54,7 @@ tags:
 - 室内禅院
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

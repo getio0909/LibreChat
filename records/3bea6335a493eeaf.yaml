@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/3bea6335a493eeaf.jpg
     sha256: 2c0594048d5e58ef93cf3fb0ffdb62145234af8782a24342faffc92252e58dff
-    size: 971331
     bytes: 971331
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/3bea6335a493eeaf.webp
     sha256: 64c4ab10820a84134ee74baa151e586bf5e8cef61eb617de0e35b2bd16e35277
-    size: 56858
     bytes: 56858
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-奢石墙光学禅诗投影
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为 C立面“天然美石 · 佛國畫卷”背景墙右侧区域的斜向仰视特写，重点展示了“天然奢石肌理 + 光学定制文字投影（Gobo Projection）”的创新展陈手法。通过将品牌原创禅诗直接以光影形式烙印在亿万年天然形成的敦煌金石纹之上，实现了视觉艺术与佛教哲理的深度共鸣。
 materials:
 - 佛国画卷大理石
 - 光学投影灯

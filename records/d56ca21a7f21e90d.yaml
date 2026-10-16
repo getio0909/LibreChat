@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d56ca21a7f21e90d.jpg
     sha256: f97913a22c086c63c031ffbf1298de6e80ab918f3a5f0b7921c263145403fcbf
-    size: 989678
     bytes: 989678
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/d56ca21a7f21e90d.webp
     sha256: 0dd422aab38f8abf194686851199787bd4c26a89dc4261a644f0416e7940e58b
-    size: 65318
     bytes: 65318
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 藏传与多民族融合佛殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 立四根贴金盘龙巨柱、悬三盏白莲吊灯、设彩绘斗拱坛城藻井与万佛墙，供奉三世佛、蓝色忿怒本尊与高耸法座的藏汉融合大殿。
 materials:
 - 贴金盘龙柱
 - 彩绘木斗拱
@@ -58,7 +56,7 @@ tags:
 - 万佛墙
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

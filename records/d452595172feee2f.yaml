@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d452595172feee2f.jpg
     sha256: 1d3c75ca14777aa6006872989e9a83a0bc805bd049c37fe0ae6f6d82db810560
-    size: 34239
     bytes: 34239
     width: 346
     height: 800
   thumb512:
     path: assets/thumb512/d452595172feee2f.webp
     sha256: c87e7b7f38568592d489909ada96730021ee1f7952662aea5a81c0b9c4d40302
-    size: 9108
     bytes: 9108
     width: 221
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 佛像造像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 暗调背景下由单束戏剧性顶光照亮的檀香木整雕手持如意观音菩萨坐像，背后立精致圆形镂空卷草火焰纹木背光，下承山石禅座。
 materials:
 - 整木精雕手持如意观音菩萨坐像
 - 镂空卷草圆背光
@@ -53,7 +51,7 @@ tags:
 - 戏剧性光影
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

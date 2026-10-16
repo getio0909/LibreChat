@@ -290,7 +290,6 @@ def generate_derivatives(
             "ref2048": {
                 "path": ref_rel_path,
                 "sha256": ref_sha256,
-                "size": len(ref_bytes),
                 "bytes": len(ref_bytes),
                 "width": ref_img.width,
                 "height": ref_img.height,
@@ -298,7 +297,6 @@ def generate_derivatives(
             "thumb512": {
                 "path": thumb_rel_path,
                 "sha256": thumb_sha256,
-                "size": len(thumb_bytes),
                 "bytes": len(thumb_bytes),
                 "width": thumb_img.width,
                 "height": thumb_img.height,

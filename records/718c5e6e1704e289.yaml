@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/718c5e6e1704e289.jpg
     sha256: fed528a89aeef3bcd6b682b3323919198972d8536424da6ece9247fe115463d8
-    size: 640667
     bytes: 640667
     width: 2048
     height: 1363
   thumb512:
     path: assets/thumb512/718c5e6e1704e289.webp
     sha256: d7bfb63b508df0bd0b1cb23d3a646baeb6e5269addefad3039d8aa7fdf1a3d5b
-    size: 45550
     bytes: 45550
     width: 512
     height: 341
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 潮州传统祠堂金漆木雕梁架场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是被誉为“潮州木雕第一绝”的广东潮州己略黄公祠（清光绪十三年，1887年建）后厅抱厦檐廊金漆木雕梁架空间场景。
 materials:
 - 潮州金漆木雕梁架
 - 浅灰白花岗岩方柱

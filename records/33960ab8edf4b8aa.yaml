@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/33960ab8edf4b8aa.jpg
     sha256: 8e3cf3b7f342d2a630a234ddaaa1a4489c17d7d1e0a483499cb8e18f19966a9d
-    size: 171838
     bytes: 171838
     width: 900
     height: 1200
   thumb512:
     path: assets/thumb512/33960ab8edf4b8aa.webp
     sha256: 75a7e1a98be831080dfbc02c32872eff42dc4a3e9fab6a494fea9842fd8927a2
-    size: 24796
     bytes: 24796
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代清水混凝土大佛殿近景仰拍场景，顶部弧形混凝土拱梁遮挡佛首，强天光洒在巨型青白石坐佛胸膛与衣褶上，深灰石莲座前设红黄鲜花供案与十级石阶，前景地面铺展金色草编花瓣席。
 materials:
 - 素面清水混凝土锥形墙
 - 青灰白花岗岩巨佛
@@ -56,7 +54,7 @@ tags:
 - 现代禅意空间
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

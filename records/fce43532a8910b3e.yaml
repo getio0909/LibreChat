@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/fce43532a8910b3e.jpg
     sha256: 45eba637e44e7162b1c145c390a4f72fbfe2a47673d7369361a8f9db825a54b8
-    size: 368414
     bytes: 368414
     width: 2048
     height: 1532
   thumb512:
     path: assets/thumb512/fce43532a8910b3e.webp
     sha256: 0086a1fa33e5efa6ce6e8b0ac7d1b6f67f23c706831e199fc57a084b5f21ff56
-    size: 30308
     bytes: 30308
     width: 512
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅堂与讲经礼佛大厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 暖黄原木色 / 实木地板、浅米黄石柱、汉白玉三圣像、黄布蒲团
 materials:
 - 汉白玉
 - 老红木
@@ -57,7 +55,7 @@ tags:
 - 蒲团阵列
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

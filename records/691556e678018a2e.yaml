@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/691556e678018a2e.jpg
     sha256: cc6de6dbfa7e3f65eaed3b77740ee84c5c84c546144e3f1a82087a18e4c57003
-    size: 356829
     bytes: 356829
     width: 2048
     height: 1430
   thumb512:
     path: assets/thumb512/691556e678018a2e.webp
     sha256: d212adbec225482a352f12eacec7fa356d5992a50b504336c403ab34056aff35
-    size: 27428
     bytes: 27428
     width: 512
     height: 357
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院佛殿外侧回廊与藏经展柜空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图呈现的是一座大型传统佛教寺院主殿侧翼的室内外过渡回廊兼藏经文物展陈长廊空间。空间兼具大殿礼佛动线疏导与佛教历史书画、经卷陈列双重功能，尺度高敞深远，散发出庄重、静谧、古雅的传统宗教殿堂氛围。 空间以深沉的紫檀/胡桃木色为主基调，辅以汉白玉的温润素白与暖黄灯光。左侧承重方柱采用深红棕色名贵硬木包镶，底部承托三层叠涩青白石覆盆式仰覆莲瓣须弥柱础（底层四角雕卷草纹）；左侧大殿主坛基座采用汉白玉精雕祥云栏板，其上隐现贴金繁复浮雕须弥座；右侧整面长墙定制通顶深色红木雕花玻璃展柜，下部柜门浮雕传统博古拐子龙纹，上部镶嵌…
 materials:
 - 红木
 - 汉白玉
@@ -54,7 +52,7 @@ tags:
 - 斜坡木椽吊顶
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

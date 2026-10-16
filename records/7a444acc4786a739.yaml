@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7a444acc4786a739.jpg
     sha256: b384919a7761c76d949f81868019b8a4ee3c7353a4c3acc9d4b37db524a8ae8f
-    size: 372677
     bytes: 372677
     width: 2048
     height: 1959
   thumb512:
     path: assets/thumb512/7a444acc4786a739.webp
     sha256: ec540c09d91163186e0f9b0841b0c655a441da5dd422c374fa9c3f6ad4189b88
-    size: 29356
     bytes: 29356
     width: 512
     height: 490
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 前景右侧米黄石雕须弥座与发光莲花墙前安奉汉白玉普贤骑象像、左后方白光拱龛供奉汉白玉观音坐像的双区雅致展陈空间。
 materials:
 - 汉白玉普贤骑象像
 - 汉白玉观音坐像
@@ -58,7 +56,7 @@ tags:
 - 造像展览馆
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

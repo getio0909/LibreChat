@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/35476edbe045fb04.jpg
     sha256: d22eaef2fa8c787e72097e2267be14b2a8573f756480ec4d7395035d0224e248
-    size: 827366
     bytes: 827366
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/35476edbe045fb04.webp
     sha256: e1edb0ae226f64bd969c284d4a6d5b8745e45740d361385e00a6ddf58532cb6a
-    size: 47634
     bytes: 47634
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-禅境灰蓝满铺地面实景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展（C5 T026）内部空间的高角度斜向俯视地面铺装专题实景照。将超过三分之二的画幅留给 75m² 满铺的“禅境灰蓝”（金镶玉大理石系列，2800元/M²）大板地面，直观展示了该品种在大面积地面工装应用中的整体气场与纹理延展性。
 materials:
 - 禅境灰蓝(金镶玉系列)地面
 colors:

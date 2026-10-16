@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7b0f1ff4c1e9590c.jpg
     sha256: a795fa7491325deafdffbe0e2059f753e91982b48013966467e1565d851d4936
-    size: 242006
     bytes: 242006
     width: 1600
     height: 960
   thumb512:
     path: assets/thumb512/7b0f1ff4c1e9590c.webp
     sha256: 09ab7868badc363afb1d7b76f3e65c1972c142e3feea2772007408dc2deae80b
-    size: 14104
     bytes: 14104
     width: 512
     height: 307
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代奢石博物馆风暗调佛像展厅效果图，前景与两侧门洞采用斜向纹理灰褐天然木纹奢石包柱，深炭灰背景墙嵌圆形竖条金属格栅，聚光灯精准打亮中央黑石底座上的汉白玉水月观音坐像。
 materials:
 - 斜纹天然木纹奢石大板
 - 汉白玉水月观音雕像
@@ -57,7 +55,7 @@ tags:
 - 圆月格栅背景
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

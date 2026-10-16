@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/dc82007ad8dff0ee.jpg
     sha256: c64ac3bc210ce9564dd31d6f66b824824e16e25933f79de83ad324e08633d7dc
-    size: 309519
     bytes: 309519
     width: 1542
     height: 2048
   thumb512:
     path: assets/thumb512/dc82007ad8dff0ee.webp
     sha256: cafdb4868b796224b4f32e8b6573429907487743c4ca39bcfee0c6dd1cc2846f
-    size: 22754
     bytes: 22754
     width: 385
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式佛教文化展馆入口门厅对称场景，设暖胡桃木四扇团寿纹隔扇大门、汉白玉覆盆柱础、门楣斗拱八角宫灯、现代折扇百叶发光吊灯及浅灰褐高光大理石地面。
 materials:
 - 胡桃木隔扇门
 - 汉白玉覆盆柱础
@@ -56,7 +54,7 @@ tags:
 - 大理石地面
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

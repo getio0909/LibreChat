@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7add4830cb7e7f0c.jpg
     sha256: f904ca7dd4a714b32c50f6c75e282fc716ae6ddd92263561b959a922536524d5
-    size: 968998
     bytes: 968998
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/7add4830cb7e7f0c.webp
     sha256: a6ea0229088c2b2e24737da06deda1b7f30e0b06bcdbbcb51df6665857fb8feb
-    size: 58228
     bytes: 58228
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-深绿碎裂网纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为陈列于“澳盛大板市场”展架上的超高清天然深绿色角砾网纹大理石（属丹东绿、蛇纹石化大理岩或印度绿/雨林绿品系）大板写实图。
 materials:
 - 天然深绿大理石
 - 丹东绿大理石
@@ -53,7 +51,7 @@ tags:
 - 澳盛大板市场
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

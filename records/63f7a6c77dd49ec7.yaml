@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/63f7a6c77dd49ec7.jpg
     sha256: 65b4ae4ad6891601ac84d89d9420d40da34bcb40f0969e73e99dbab66275462d
-    size: 172967
     bytes: 172967
     width: 834
     height: 1280
   thumb512:
     path: assets/thumb512/63f7a6c77dd49ec7.webp
     sha256: 3bb2b8b4bb7149e4b43cb11ddb0d47595144d6d95d477e67cca66420c6d4226c
-    size: 29684
     bytes: 29684
     width: 334
     height: 512
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 现代极简人间佛教禅宗寺院大法堂早晚课共修实景，浅米色莱姆石高台等距供奉三尊带舟形鎏金背光的三世坐佛，右侧嵌竖向玻璃砖透光墙，数十名僧侣整齐列队合十礼赞。
 materials:
 - 米白莱姆石干挂墙板
 - 古铜金三世坐佛
@@ -56,7 +54,7 @@ tags:
 - 玻璃砖采光墙
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

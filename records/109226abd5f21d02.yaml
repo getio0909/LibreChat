@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/109226abd5f21d02.jpg
     sha256: 10c5d698b5f8ec50f9167cbff78b37f3f4097105cb08a36816e0c12e2f450c3a
-    size: 613458
     bytes: 613458
     width: 2048
     height: 1437
   thumb512:
     path: assets/thumb512/109226abd5f21d02.webp
     sha256: 4305396e53470e2f5fdaa05c18ecb1f200b7fb77a6fd0aa12274a7d76f47adb5
-    size: 53058
     bytes: 53058
     width: 512
     height: 359
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 藏汉融合金碧盘龙柱三世佛与大威德金刚佛殿场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为一座气势磅礴的汉藏融合（显密双修）大雄宝殿正面主佛坛陈设全景。空间将汉传佛教经典的“三世佛 + 二弟子”五尊造像体系与藏传佛教无上瑜伽部本尊“大威德金刚（或时轮金刚）双身忿怒尊”及藏式法座、经堂坐垫融为一体，呈现出极尽庄严华美、显密圆融的宗教殿堂气象。
+  全殿主佛坛通体采用高纯度24K贴金木雕/铜雕工艺，散发出耀眼夺目的赤金光泽；主尊正前方的密宗护法本尊采用藏传唐卡式矿物重彩（深邃宝蓝身色、五骷髅冠、多臂持法器、下踏莲台）塑造；法座与前排四列经箱坐垫采用纯正的藏式朱红/大红漆艺，绘制金彩八吉祥与雪狮团花图案…
 materials:
 - 贴金木雕盘龙柱
 - 金身佛像
@@ -54,7 +53,7 @@ tags:
 - 藏式法座陈设
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

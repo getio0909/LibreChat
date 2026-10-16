@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/24ff302a74a27106.jpg
     sha256: b62e62e1b8b3cb30eda80671dd6694876f71148d98e9a9af9a7e4f698b513c90
-    size: 68703
     bytes: 68703
     width: 708
     height: 383
   thumb512:
     path: assets/thumb512/24ff302a74a27106.webp
     sha256: 684417a100b4d2422753e02f6ebd665a864f9564af1bcde17ff9c5b190f982aa
-    size: 26544
     bytes: 26544
     width: 512
     height: 277
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑与园林景观
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 前景花岗岩广场嵌圆形浮雕地景圆盘、中景立青瓦歇山顶“天王殿”（内供金身弥勒佛）与一对汉白玉守门石狮、两翼展弧形木格栅连廊的寺院入口景观。
 materials:
 - 汉白玉守门石狮
 - 圆形浮雕地景石材
@@ -58,7 +56,7 @@ tags:
 - 弧形木连廊
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

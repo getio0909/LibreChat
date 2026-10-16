@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ba304f1a3dd23bb8.jpg
     sha256: 7ec8e7c4f94aca9ea1a99d8ddaa11bacb44d2d12ccef1ae7bd62a36fcd676a03
-    size: 222050
     bytes: 222050
     width: 1873
     height: 1249
   thumb512:
     path: assets/thumb512/ba304f1a3dd23bb8.webp
     sha256: fda8d2bad0648330ff237346679df9dd68de9f81bf2b5790ef00274312c9cf31
-    size: 21036
     bytes: 21036
     width: 512
     height: 341
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式禅意书画展厅木构大门内立面对称场景，正中为三开间六扇竖向木格栅大门配方形铜拉手，两侧立鎏金铜箍原木大圆柱与汉白玉覆盆柱础，两翼嵌四幅水墨山水国画灯箱。
 materials:
 - 原木格栅大门与圆柱
 - 鎏金回纹铜柱套
@@ -57,7 +55,7 @@ tags:
 - 青石方砖
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

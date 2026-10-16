@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/928e19f0f7ee006f.jpg
     sha256: 6f85fa348b1c698081e530a362044d2c6a32c1eaf99bab951d4bff6350765eb2
-    size: 213101
     bytes: 213101
     width: 2048
     height: 1544
   thumb512:
     path: assets/thumb512/928e19f0f7ee006f.webp
     sha256: e96c6a57d1c63ff3a41b689516edb766703fe93bd4f83eb6ff52db9e05d4c7ca
-    size: 15256
     bytes: 15256
     width: 512
     height: 386
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 幽蓝冷光金刚护法万佛长廊
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 深邃幽蓝与玄黑石材 / 蓝光万佛格、石雕天王护法像、深灰雕花石栏板
 materials:
 - 青黑石雕彩绘护法像
 - 深胡桃木壁龛
@@ -56,7 +54,7 @@ tags:
 - 暗调宗教空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

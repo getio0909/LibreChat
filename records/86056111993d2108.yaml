@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/86056111993d2108.jpg
     sha256: 9f866587033796b9b74e209665febb146b4b45f5fd387fe9f8bfe66d1ce6bcca
-    size: 481101
     bytes: 481101
     width: 2048
     height: 1307
   thumb512:
     path: assets/thumb512/86056111993d2108.webp
     sha256: 3e986c0b732387971ae2aaff525b3bb3629ccd3972e629703983006fd4de9c62
-    size: 40616
     bytes: 40616
     width: 512
     height: 327
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型寺院“太阳放射佛光主尊 + 两侧汉白玉须弥座十尊护法天王 + 通顶万佛墙”大殿正面中轴全景场景（空间场景设计，本卷第24号为其右侧壁斜视特写）。
 materials:
 - 双圈太阳放射状佛光背板与铜鎏金坐佛
 - 两侧汉白玉须弥座十尊巨型护法金刚立像
@@ -53,7 +51,7 @@ tags:
 - 双层圆形宫灯
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

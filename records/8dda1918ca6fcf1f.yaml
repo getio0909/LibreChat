@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8dda1918ca6fcf1f.jpg
     sha256: dab655f26b7bb8873d0cc44f0d2aeb973cd59019886b6fd471fc2165e00e8ac4
-    size: 233472
     bytes: 233472
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/8dda1918ca6fcf1f.webp
     sha256: ebc06a80cc2db0eb350acd7c8ee370cc4d6886247f99c4f1add264c03c9e5eb8
-    size: 21582
     bytes: 21582
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景下的“净土白玉风”全套雕花会客家具创意设计。该方案大胆突破传统红木深色系的束缚，将整套传统宫廷雕花沙发、茶几、角几及配饰全面转化为羊脂白玉、汉白玉与浅奶油色白蜡木/枫木的纯净组合，象征佛教“琉璃净土、清净无染”的崇高美学境界。
 materials:
 - 羊脂白玉
 - 阿富汗白玉

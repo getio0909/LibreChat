@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9ffe71e1ee8bd6e7.jpg
     sha256: 000ad53ce285cd6946181d0a25d1babf139ac8397993a2abc61a55b42023e1bd
-    size: 1240373
     bytes: 1240373
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/9ffe71e1ee8bd6e7.webp
     sha256: 2eb0bf84bd8678dbaa718bd27579f3296daed4361a2eadf2d6e96ca2c20b0eaa
-    size: 70234
     bytes: 70234
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 建筑木石构件-敦煌金五层高浮雕须弥座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展 D立面佛龛前陈设的镇馆石雕重器——“天然玉石 · 敦煌金”五层传统规制高浮雕须弥座大供桌（佛台，总长 3310mm）的 45° 斜向全身写实照。该作品代表了当代寺院大型礼佛供具将“顶级天然黄玉石原料”与“传统皇家官式须弥座深浮雕工艺”相结合的最高水准。
 materials:
 - 天然玉石敦煌金
 - 禅境灰蓝地面

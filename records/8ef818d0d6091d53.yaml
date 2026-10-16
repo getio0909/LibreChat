@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8ef818d0d6091d53.jpg
     sha256: cadf8336f800572dbaf6928bfbf4b64a955501bc6196efeded9a117ae4c0530a
-    size: 406311
     bytes: 406311
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/8ef818d0d6091d53.webp
     sha256: 1568959cbc61065269fb5751e966b79e45b81a874aa8b64ddf9737706e0a62cb
-    size: 26316
     bytes: 26316
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 7937x5613超清现代新唐风佛教文化中心建筑外观全景，底层汉白玉十八罗汉浮雕台基、二层石窟拱龛坐佛外廊、中央四大天王门厅配金属大坡顶。
 materials:
 - 汉白玉罗汉浮雕基座与拱龛长廊
 - 四大天王入口门厅
@@ -53,7 +51,7 @@ tags:
 - 四大天王门厅
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

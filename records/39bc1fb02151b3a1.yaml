@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/39bc1fb02151b3a1.jpg
     sha256: 7e2a78a198adc99a81d7bdd6b14df17e79f9fa4753e07e6763efc7bbd38b089d
-    size: 396489
     bytes: 396489
     width: 2048
     height: 1022
   thumb512:
     path: assets/thumb512/39bc1fb02151b3a1.webp
     sha256: 6c7b9c848d11fd5bae91911a9c111c7b94f0cd922b590a164de947d32df71d4d
-    size: 30556
     bytes: 30556
     width: 512
     height: 256
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式大型禅修礼佛大殿（水墨流纹奢石地面配汉白玉坐佛）2:1 超宽画幅全景场景（空间场景设计，与本卷第12号同属一案的不同画幅版本）。
 materials:
 - 2:1超宽画幅水墨流纹奢石地面
 - 汉白玉释迦牟尼坐佛
@@ -54,7 +52,7 @@ tags:
 - 新中式佛殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

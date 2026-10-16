@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/63c121773c74203c.jpg
     sha256: f8d2e4e40797132fe33fb6da5764cc8d629a1683519076c9aa51c2191462d02f
-    size: 368379
     bytes: 368379
     width: 2048
     height: 1235
   thumb512:
     path: assets/thumb512/63c121773c74203c.webp
     sha256: 9fbba2aa1fb64c5af8a61d95d061d5e85881753bbf207487619e534c45b2185c
-    size: 26006
     bytes: 26006
     width: 512
     height: 309
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 中式居家与会所佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 浅灰大理石地面配金色九宫格藻井、正中海棠框发光莲瓣龛供奉地藏菩萨、右墙挂“静·悟·禅”水墨三联画的新中式佛堂。
 materials:
 - 浅灰大理石地面
 - 海棠形发光莲花龛
@@ -58,7 +56,7 @@ tags:
 - 浅灰大理石
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

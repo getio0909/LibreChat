@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f6d6162f34012cf6.jpg
     sha256: 9997f48d40b0aa908ba5d14dd787da1f156eaf590bd9e39150956720c5be8708
-    size: 504714
     bytes: 504714
     width: 2048
     height: 1313
   thumb512:
     path: assets/thumb512/f6d6162f34012cf6.webp
     sha256: bcd0a14d10af24096ee67853677de4f823092fb98a7341c9f2456c5f746b228f
-    size: 44204
     bytes: 44204
     width: 512
     height: 328
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型万佛护法大殿右侧壁“汉白玉须弥座五护法大龛 + 通顶万佛墙”斜向透视展示场景（空间场景设计，本卷第23号为其正视中轴全景）。
 materials:
 - 通长汉白玉精雕须弥座台基
 - 五尊巨型铜鎏金护法天王立像大龛
@@ -54,7 +52,7 @@ tags:
 - 五大护法天王
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

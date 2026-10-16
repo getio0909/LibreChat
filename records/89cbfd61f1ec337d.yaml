@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/89cbfd61f1ec337d.jpg
     sha256: 8e7493bb181bc70449bb936de191fc9e8b95ebbba5006ab743a541feab154408
-    size: 246100
     bytes: 246100
     width: 2048
     height: 1402
   thumb512:
     path: assets/thumb512/89cbfd61f1ec337d.webp
     sha256: 3315e72ec900923e935e615a0a40998adddef818ac9e4b3aa1ac1296264ef7c3
-    size: 19026
     bytes: 19026
     width: 512
     height: 350
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 药师经发光斜梁与立佛回廊
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 暖金琥珀与深褐木石 / 药师大愿发光斜梁、万佛壁龛、菩萨壁画、立佛龛
 materials:
 - 深黑哑光钢结构斜梁
 - 内透金光书法镂空板
@@ -56,7 +54,7 @@ tags:
 - 万佛长廊
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

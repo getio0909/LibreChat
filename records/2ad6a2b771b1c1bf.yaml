@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/2ad6a2b771b1c1bf.jpg
     sha256: 284db578990f4867a19fa02a5a3df508a4150b558a628da538e24fdc4b9cbdc8
-    size: 479979
     bytes: 479979
     width: 2048
     height: 1107
   thumb512:
     path: assets/thumb512/2ad6a2b771b1c1bf.webp
     sha256: 5935530ce88ed128052113955c77aa16cd7f056582f810ad12d7ff254273ffc5
-    size: 36108
     bytes: 36108
     width: 512
     height: 277
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院五开间木雕贴金牌位祖堂/功德堂祭坛场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图是一幅严格遵循中轴对称礼制的寺院五开间大型木雕贴金祭坛（祖师堂、往生堂或功德牌位堂）正面全景。空间通过连续五个规整开间的重檐木构神龛与五组一字排开的供桌礼器，构建出极其肃穆、井然有序的宗祠与佛教追思祭祀空间。 整体采用“深棕红木
+  + 赤金贴箔 + 暖黄原木 + 朱红点缀”的庄重配色。后方高大神龛与六根立柱采用深胡桃木/老红木材质，在柱头、柱中箍带、横披额枋及下碱纹饰处大量施以高光24K贴金箔工艺；前方五张供桌采用色泽略浅的暖棕胡桃木，桌裙浮雕卷云如意纹；供桌上是温润的白瓷高足果盘、鲜红苹果、朱红蜡烛与古朴的…
 materials:
 - 雕花红木
 - 金箔
@@ -55,7 +54,7 @@ tags:
 - 祖师堂空间设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

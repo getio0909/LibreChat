@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/749cc3b797a3ea13.jpg
     sha256: d464d4bae3222b1f8bccb22faea39b3bbf4fe9d6917834db1044152c6f0e43eb
-    size: 89446
     bytes: 89446
     width: 541
     height: 800
   thumb512:
     path: assets/thumb512/749cc3b797a3ea13.webp
     sha256: b96a185831ac1d9e98b71c1732a457a5b60caa223c3eaef5b78bc21aac4cd135
-    size: 23274
     bytes: 23274
     width: 346
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 建筑木石构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 传统汉传佛教寺院正立面朱红色红木双开格扇大门构件特写，门扇上部满雕精密万字回纹，两侧配鎏金护板、朱漆大圆柱与青白石覆盆柱础。
 materials:
 - 红木/花梨木
 - 鎏金铜雕护板
@@ -57,10 +55,10 @@ tags:
 - 古建筑构件
 material_ids: []
 provenance:
-  source: ai_generated
+  source: unknown
   url: null
   credit: null
-  license: ai_generated
+  license: unknown
   license_status: unconfirmed
 quality:
   min_side_px: 541

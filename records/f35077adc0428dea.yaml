@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f35077adc0428dea.jpg
     sha256: 8d9566f2542e647e4d4fc15a7e09f61987db597586f41e241872012126dc17a4
-    size: 524652
     bytes: 524652
     width: 2048
     height: 1155
   thumb512:
     path: assets/thumb512/f35077adc0428dea.webp
     sha256: f57b95a8f0fd64b860ab194a924a332b8842b9345dc254003a175727f8fe0dbe
-    size: 39794
     bytes: 39794
     width: 512
     height: 289
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 闽南古刹飞天斗拱与八角藻井仰视场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是中国建筑史上极具盛名的福建泉州开元寺大雄宝殿（紫云大殿，“百柱殿”）室内顶部八角藻井、悬空仙鹤宝盖与“迦陵频伽”飞天乐伎斗拱的仰视空间场景。
 materials:
 - 朱红大漆木构梁架
 - 圆雕彩绘鎏金飞天乐伎斗拱

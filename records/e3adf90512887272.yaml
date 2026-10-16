@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e3adf90512887272.jpg
     sha256: 0f9cb34fe3fc8b0a295193915628f24d008b1de3cf41ba300a6b94ae6aec31a2
-    size: 28387
     bytes: 28387
     width: 348
     height: 381
   thumb512:
     path: assets/thumb512/e3adf90512887272.webp
     sha256: 8bfcb32efbc78358195bf40d526742b1246f398ffbcbe160b719df41c8215ced
-    size: 15586
     bytes: 15586
     width: 348
     height: 381
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 传统寺院大殿前月台局部写实场景，前景为爪抚幼狮的汉白玉圆雕护法石狮与青白石镂空卍字纹护栏，背景为朱红大圆柱、金龙彩画额枋与木格扇门窗。
 materials:
 - 汉白玉石狮
 - 青白石卍字栏杆
@@ -56,7 +54,7 @@ tags:
 - 传统石雕
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

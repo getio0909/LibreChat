@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/732cb87a2bddcfdf.jpg
     sha256: e311cf983b59c6462a6b5c7d6315cab01a93e1e3a65f8a23775b4d9cd43b273d
-    size: 75573
     bytes: 75573
     width: 636
     height: 381
   thumb512:
     path: assets/thumb512/732cb87a2bddcfdf.webp
     sha256: d5df018c8b9a795c72cbbf3715a84e1f810403603997bf7be19f4b62ec5661f7
-    size: 39526
     bytes: 39526
     width: 512
     height: 307
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑园林
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 依山而建的佛教生态人文纪念园与山体大佛高空鸟瞰全景，左中景端坐巨型金身释迦牟尼佛，左下角为覆钵塔地宫，后山采用扇形生态梯田塔林布局，山巅环列五座白塔。
 materials:
 - 贴金铜佛
 - 汉白玉莲花宝座
@@ -56,7 +54,7 @@ tags:
 - 覆钵塔群
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

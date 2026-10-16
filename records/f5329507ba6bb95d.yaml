@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f5329507ba6bb95d.jpg
     sha256: 9f8da7c48e073b11310a11457f9285daeabc7b8921073ff7971aba5804f4c5a1
-    size: 171763
     bytes: 171763
     width: 1370
     height: 984
   thumb512:
     path: assets/thumb512/f5329507ba6bb95d.webp
     sha256: 39435cecfffa511cc0ff87629b00be36689df49f19a6f07cbefea906b4c4b17b
-    size: 28344
     bytes: 28344
     width: 512
     height: 368
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 地面满铺高光翠绿褐纹奢石、左设带鎏金莲瓣基座的红木护墙、右设黄蓝红三色千佛墙与蓝底格栅藻井的展厅空间。
 materials:
 - 翠绿褐纹奢石大理石
 - 鎏金莲瓣木基座
@@ -57,7 +55,7 @@ tags:
 - 佛教展厅
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

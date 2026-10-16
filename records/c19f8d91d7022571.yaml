@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c19f8d91d7022571.jpg
     sha256: fe89d5ab171f118c9c04684b4bc8acb06790c03378f190c3d21a0a6ac4f73efd
-    size: 406785
     bytes: 406785
     width: 2048
     height: 1358
   thumb512:
     path: assets/thumb512/c19f8d91d7022571.webp
     sha256: d0ee05a43f9f4c8bfc1665c57eaef60e398e5b82812fdfed38672271f5fd13cc
-    size: 31460
     bytes: 31460
     width: 512
     height: 339
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 中式居家与会所佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正中设金色雕花华盖佛龛（供奉三世佛与文殊普贤五尊金像）并连体博古架、两侧白墙挂六幅重彩菩萨画的新中式佛堂案例。
 materials:
 - 金色雕花华盖佛龛
 - 实木博古架
@@ -58,7 +56,7 @@ tags:
 - 会所佛堂
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

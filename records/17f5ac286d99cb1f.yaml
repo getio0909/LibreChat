@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/17f5ac286d99cb1f.jpg
     sha256: 9ce47f7250f12a7eb177eb4b142409dc27676003a8fb1ce39e5e1d24ca0321dc
-    size: 257831
     bytes: 257831
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/17f5ac286d99cb1f.webp
     sha256: 76bcb79dd9fdcf3dabb57bf703e3fb189237a62069949bc052eba6d6dce2c886
-    size: 12686
     bytes: 12686
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-D立面佛龛与d剖面施工图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展南侧核心礼佛区——D 立面图 与 d 剖面图 施工深化详图。完整揭示了现场极具视觉冲击力的“双层亚字形折角倒圆角暗藏灯带佛龛”的精确木作尺寸与隐藏式灯光槽剖面构造。
 materials:
 - 木作倒圆角(R200/R100)
 - 灯带

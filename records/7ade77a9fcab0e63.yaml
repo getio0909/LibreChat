@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7ade77a9fcab0e63.jpg
     sha256: c20405ef173496b33777a00ecd2c5c25c16bb3aa04290f1482855359f9029738
-    size: 239090
     bytes: 239090
     width: 2048
     height: 1531
   thumb512:
     path: assets/thumb512/7ade77a9fcab0e63.webp
     sha256: dc91fafd3095c934a4b06392abc053f05cc04554540a85ac873c702762256713
-    size: 15062
     bytes: 15062
     width: 512
     height: 383
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 侧向广角展现的新中式禅意卧室与茶室套房设计，右侧设胡桃木框架大床，左侧配置实木罗汉床茶席、圆形水墨远山挂画与竖向木格栅移门。
 materials:
 - 胡桃木框架大床与罗汉榻
 - 圆形水墨挂画
@@ -52,7 +50,7 @@ tags:
 - 水墨圆画
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/40463792bdaf091e.jpg
     sha256: 0a900781ca787a8c281521021e8605f8c0d38a227c590bf4dd85cfe3bdeb3fe9
-    size: 238661
     bytes: 238661
     width: 1836
     height: 1236
   thumb512:
     path: assets/thumb512/40463792bdaf091e.webp
     sha256: b545df43fc74d47ebbd64920672efb4fad58311754445af449d98746f1fd63bc
-    size: 22162
     bytes: 22162
     width: 512
     height: 345
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 奢石大板对称列柱中轴展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 金棕奢石、黑白拼花与暖白 / 竖向奢石大板阵列框、地面黑白水刀拼花
 materials:
 - 金棕与青绿天然奢石大板
 - 爵士白大理石地毯
@@ -58,7 +56,7 @@ tags:
 material_ids:
 - dunhuang-gold
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b9ee104e0f4cf508.jpg
     sha256: 12107ea91e4982696c4490eaa21307b597d91f27ad692fd8e8d5a219045ce558
-    size: 416594
     bytes: 416594
     width: 2048
     height: 1151
   thumb512:
     path: assets/thumb512/b9ee104e0f4cf508.webp
     sha256: ef4b6bd6b313cfac429b0cb6edbbed8568bf85efed6ba94cd243e5001151d006
-    size: 32744
     bytes: 32744
     width: 512
     height: 288
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型双层挑空“圆通宝殿（千手千眼观音金殿）”正面中轴对称全景场景（空间场景设计）。
 materials:
 - 双层挑空千手观音主尊
 - 通体贴金浮雕巨柱
@@ -55,7 +53,7 @@ tags:
 - 圆通宝殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

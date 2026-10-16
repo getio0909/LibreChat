@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5e96f6a16b5332f0.jpg
     sha256: d4515a8040fd73871f7e1e7830096bacf64a76293c35eb6d1928d0bc49d3085f
-    size: 208621
     bytes: 208621
     width: 1982
     height: 1187
   thumb512:
     path: assets/thumb512/5e96f6a16b5332f0.webp
     sha256: bc938f8d60e0af85b51700e580e323434bf068ced34edf729f9ae06e9fa84fb5
-    size: 16902
     bytes: 16902
     width: 512
     height: 307
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代新中式佛教文物与壁画博物馆展陈长廊场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式博物馆级佛教造像与壁画文物展陈长廊空间（与第 27 张为同一展厅长廊的正反两个对向视角）。空间融合了现代博物馆的专业展陈照明体系与东方禅意建筑语汇，营造出静谧、雅致、引人专注品鉴的文物观赏动线。 空间以温润的浅胡桃木/白橡木原木色、素白背光灯箱布与深灰黑色仿古青石地砖为主材质。地面采用哑光深灰黑青石方砖铺贴，防眩光且凸显展柜亮度；左侧及中轴线展柜底座采用浅胡桃木饰面，柜门镶嵌竖条中式花格与圆形铜饰，下部设黑色大理石内退踢脚；右侧前景门洞侧壁镶嵌浅灰色水波海浪纹石雕挂板，正中嵌一枚圆形鎏金兽面（椒…
 materials:
 - 原木展柜
 - 超白玻璃
@@ -55,7 +53,7 @@ tags:
 - 新中式展陈空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

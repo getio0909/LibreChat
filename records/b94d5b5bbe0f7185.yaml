@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b94d5b5bbe0f7185.jpg
     sha256: 692789eb6594a53d6131ac0e1e2317dd7fc90fda6d9bf35fc21ca107354b1288
-    size: 489460
     bytes: 489460
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/b94d5b5bbe0f7185.webp
     sha256: ca7b63dab31de907128dd7c6a9b163a8d613ba4ad778779222f3cac13073d26c
-    size: 29702
     bytes: 29702
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 顶部覆巨型米白石材八角叠涩斗拱藻井、正面设心经山水中央主龛与青绿云水海棠形侧龛的现代白色石材万佛大殿。
 materials:
 - 米白石材斗拱藻井
 - 白石万佛墙
@@ -57,7 +55,7 @@ tags:
 - 石材大殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1e244f82172fdec5.jpg
     sha256: 88e433c721d0bd321ac83f3806ba1d5b6d693565608b56f826715b69b1bd8452
-    size: 392941
     bytes: 392941
     width: 2048
     height: 1427
   thumb512:
     path: assets/thumb512/1e244f82172fdec5.webp
     sha256: ff9301fbadf29d3b711a7d293808c5457cde755e72e41b6d2a7e52cbc89c244d
-    size: 32172
     bytes: 32172
     width: 512
     height: 357
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 地藏殿与功德堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 前景设汉白玉回纹莲瓣柱础木柱与镂空挂落框景，内室正中白光拱龛供奉地藏王菩萨金像、两侧配发光莲位格与巨幅菩萨画的功德堂空间。
 materials:
 - 水刀拼花大理石
 - 汉白玉雕花柱础
@@ -58,7 +56,7 @@ tags:
 - 框景构图
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

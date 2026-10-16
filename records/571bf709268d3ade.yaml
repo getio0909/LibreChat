@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/571bf709268d3ade.jpg
     sha256: 2aa0645d988b31dfe9e71ce57c3e2e68eb94b3f833c216fef1c9646b2a6d63d0
-    size: 369810
     bytes: 369810
     width: 2048
     height: 1433
   thumb512:
     path: assets/thumb512/571bf709268d3ade.webp
     sha256: abf7e6f77253580f5853aa9647d67f2836cd21be78e6e3103619907167f87125
-    size: 29812
     bytes: 29812
     width: 512
     height: 358
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式拱形格栅穹顶禅修讲堂与后殿功德牌位堂二进式复合场景，前景设鎏金铜箍大木柱、三跨弧形木格栅天花、水墨罗汉画墙与抄经矮桌，远端后殿设金地壁画与发光牌位架。
 materials:
 - 暖原木大圆柱与拱形格栅天花
 - 鎏金回纹铜柱套
@@ -57,7 +55,7 @@ tags:
 - 二进式空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

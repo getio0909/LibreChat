@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/3b020f71e7b60ddc.jpg
     sha256: 5407e157fbbb6b290b2771191dee6caa1022e0be15ba63f91355659365efe6d6
-    size: 458190
     bytes: 458190
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/3b020f71e7b60ddc.webp
     sha256: d30df8ad87f68eb205d40f194aecf4cd85b2d7cd0165ae77d5f116479ad99530
-    size: 45810
     bytes: 45810
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 三层阶梯式坛城陈列柜的“纯实木原木本色浮雕（Unpainted Solid Wood Relief）”版本。针对偏好新中式原木风、明式家具风或现代禅意风（反感浓烈藏式红绿彩绘与满铺宝石）的客户群体，本方案将三层阶梯柜的所有雕花统一为与柜体同材质的琥珀红棕实木本色雕刻。
 materials:
 - 缅甸花梨木
 - 本色浮雕

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9b5e36d2dbd4ae27.jpg
     sha256: 948a111af77784a915225c5e45dfad2db288a3f823d3bc9c7a430b49b82be76f
-    size: 287769
     bytes: 287769
     width: 1966
     height: 1263
   thumb512:
     path: assets/thumb512/9b5e36d2dbd4ae27.webp
     sha256: 44c6c143440c24689070ea62d371f240b3385051851ff134fde365025f41ec45
-    size: 30296
     bytes: 30296
     width: 512
     height: 329
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为五开间重檐红木透雕天宫楼阁大佛龛右前斜视内部陈设场景（空间场景设计，与本卷第28号左前斜视图互为镜像补充）。
 materials:
 - 五开间重檐红木大佛龛右前斜视图
 - 前景红木巨柱鎏金莲瓣柱箍与青石多层莲花柱础特写
@@ -53,7 +51,7 @@ tags:
 - 重檐木雕帐龛
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5f33a0e607969b2d.jpg
     sha256: d863b5661a4accf3e16a1dca979c6a137bb96959debfa9f2ce3fb48ddf33bea1
-    size: 384887
     bytes: 384887
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/5f33a0e607969b2d.webp
     sha256: 87217c716531cafcf671ec204993ef1beb13364a7bc8ba152c639709e1c387a0
-    size: 32248
     bytes: 32248
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景下的“黑金翠玉”高定佛教主题实木嵌石沙发茶几组合。作为第 01 项的姊妹升级版，本款去除了茶几上的茶具摆件，完整裸露出整块冰种翠绿玉石台面，并将木框雕花升级为更加精细硬朗的黑漆描金嵌绿松石工艺。
 materials:
 - 乌木黑檀
 - 冰种翠绿玉石

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/fa6046d32aed939b.jpg
     sha256: d53633dfc29b2e14214c2f41ca762c988b1c409019fb9258da923f618f386787
-    size: 477683
     bytes: 477683
     width: 2048
     height: 1528
   thumb512:
     path: assets/thumb512/fa6046d32aed939b.webp
     sha256: dc5066d12f3605f67bbf30f3ef3bc452b502d247f4e537162ed01540fe99ec25
-    size: 38844
     bytes: 38844
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统木构唐卡屏风与壁画展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 温润红木与翠绿奢石 / 实木雕花唐卡座屏、千手观音唐卡、墨绿大理石地面
 materials:
 - 高光墨绿纹理奢石
 - 老红木精雕座屏
@@ -56,7 +54,7 @@ tags:
 - 中式美术馆
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

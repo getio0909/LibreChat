@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/52f415c457e7c9dd.jpg
     sha256: 80807c8210ee630e9828ce958d2553691a5d6c1391fc5397f292f01343f42608
-    size: 472756
     bytes: 472756
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/52f415c457e7c9dd.webp
     sha256: 464af9610e51dad89ce7d792d8a7c774e9e95267f65cfd8c46cad8d6813bf83c
-    size: 56590
     bytes: 56590
     width: 384
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法座宝座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 与第 07 项同处于中式红木雕花挂屏展厅场景中的和田晴水绿青白玉与黄花梨木复合镶嵌须弥法座。通过固定空间背景与器型结构，将原本冷峻庄严的“汉白玉+紫檀+青金石”全面转换为温润明快的“晴水绿玉+黄花梨+南红玛瑙”，展现了
+  AI 在奢石家具CMF（色彩、材料、表面处理）开发中的强大能力。
 materials:
 - 和田青白玉
 - 黄花梨

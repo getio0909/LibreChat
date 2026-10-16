@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9199c838d035c994.jpg
     sha256: 0673dda1203f7c4dcc5aafbe91d47c90f812764d833c9198c19a7d8632c56044
-    size: 660401
     bytes: 660401
     width: 2048
     height: 1365
   thumb512:
     path: assets/thumb512/9199c838d035c994.webp
     sha256: 187bb9e1881e8ea0dd81a76b47a77ea0a7ce72bcad4feb12d0d0840c6a98d3a4
-    size: 35638
     bytes: 35638
     width: 512
     height: 341
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为竖立在展厅黑色重型底座上的一整块极具艺术感染力的「蓝金灰（深蓝灰斜带配绯霞角）」大板正视标准照（编号07微距特写即取自此板右半部）。
 materials:
 - 蓝金灰大板
 colors:

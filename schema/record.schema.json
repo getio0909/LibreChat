@@ -34,7 +34,8 @@
     },
     "title_zh": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "\\S"
     },
     "source": {
       "type": "object",
@@ -99,6 +100,7 @@
     },
     "library_type": {
       "type": "string",
+      "minLength": 1,
       "enum": [
         "造像雕塑",
         "石刻纹样",
@@ -117,6 +119,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
+        "minLength": 1,
         "enum": ["参考", "物件", "造型", "材质", "纹样", "风格"]
       }
     },
@@ -133,7 +136,9 @@
       "enum": ["实物对象写实", "空间场景设计", "工程设计图纸"]
     },
     "summary_zh": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
     },
     "materials": {
       "type": "array",
@@ -268,7 +273,7 @@
     "derivative": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "sha256", "size", "bytes", "width", "height"],
+      "required": ["path", "sha256", "bytes", "width", "height"],
       "properties": {
         "path": {
           "type": "string",
@@ -277,10 +282,6 @@
         "sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
-        },
-        "size": {
-          "type": "integer",
-          "minimum": 1
         },
         "bytes": {
           "type": "integer",

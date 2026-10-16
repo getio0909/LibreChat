@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/63046abfa229875d.jpg
     sha256: 9dbef5c690ddbdcf217c8d7317b458ad1c913e6e7718aadd10933c1237d23f4e
-    size: 624682
     bytes: 624682
     width: 2048
     height: 1541
   thumb512:
     path: assets/thumb512/63046abfa229875d.webp
     sha256: 7e307090a1644b8b8577d9d06d57c76194ecde8dd7e26847165cde304a60b39d
-    size: 58586
     bytes: 58586
     width: 512
     height: 385
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代绚彩琉璃万佛墙与双身背靠背金佛圆殿场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为一座极具现代声光电沉浸感的多边形/圆形万佛宝殿内部场景。空间以中心环绕式礼佛（右绕佛塔/佛像）为动线逻辑，中央供奉双身（或多面）高大金佛立像，四周墙柱以绚丽多彩的琉璃背光万佛龛环抱，完美诠释了佛经中“东方净琉璃世界”与“极乐七宝池、八功德水、五色毫光”的奇幻宗教视觉意象。
+  色彩极其绚烂大胆：中央双佛立像及底层高浮雕覆莲须弥座采用高光鎏金青铜材质；中间层仰莲座采用暖橙黄色透光琉璃/树脂锻造，内部自发光如盛开金莲；四周弧形墙面与四根承重圆柱表面密布白色亚克力/透光云石小佛龛，内设RGBW多彩分区LED背光，呈…
 materials:
 - 蓝
 - 青
@@ -57,7 +56,7 @@ tags:
 - 中心坛城设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

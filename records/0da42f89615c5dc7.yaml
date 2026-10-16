@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0da42f89615c5dc7.jpg
     sha256: 98ab27bedb58f3dac2feaca00027fe1fc5fde47be68f066a3e3ae0601e7246bd
-    size: 358642
     bytes: 358642
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/0da42f89615c5dc7.webp
     sha256: 61d2b80b51f9848e058385dc98fb30fc88ee0d14588923e689ad7bb3dcbae648
-    size: 37518
     bytes: 37518
     width: 384
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法座宝座
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 置于现代极简展厅中央的一座带双扶手的藏汉结合墨绿奢石与胡桃木嵌宝法轮大宝座。与前几款无扶手佛像底座不同，本款明确配置了宽阔威严的太师椅式双扶手与方形靠背外框，属于专为活佛、高僧大德或宗师级人物设计的“转法轮王座（Chakravartin
+  / Dharma Master Throne）”。
 materials:
 - 墨绿蛇纹玉石
 - 胡桃木

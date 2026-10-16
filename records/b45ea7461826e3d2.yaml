@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b45ea7461826e3d2.jpg
     sha256: bcbb4a1d47262bce6f52c7f8ca44f8446e8384e22adf4c6b648c65e885b9ca66
-    size: 90718
     bytes: 90718
     width: 853
     height: 640
   thumb512:
     path: assets/thumb512/b45ea7461826e3d2.webp
     sha256: b9eaff3f8ad8609baf7582e7306d0547c48989d21bf2211bc23b7a6f13bd7294
-    size: 18388
     bytes: 18388
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-暖米黄均匀系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为单块大体量暖米黄色系天然大理石大板写实图（属经典米黄类石材，如白玉兰、莎安娜米黄或土耳其米黄品系），陈列于石材厂房“D区”木架之上，是宗教建筑与高端精装空间中最常用的基础百搭型主材。
 materials:
 - 天然大理石
 - 白玉兰米黄大理石
@@ -52,7 +50,7 @@ tags:
 - 佛堂地面石材
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a3d2df1e86748b33.jpg
     sha256: ed424b6f960368f5b37300699948f944c8fbd390d39bf8fc13bb5a7c93221db0
-    size: 607294
     bytes: 607294
     width: 2048
     height: 1538
   thumb512:
     path: assets/thumb512/a3d2df1e86748b33.webp
     sha256: d472292efc903755a160ced91700df01b755ca739478ab419806ce54812ff819
-    size: 60808
     bytes: 60808
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 低角度仰视巨型八角千瓣金莲穹顶藻井与发光万佛墙下，伫立于米黄石雕仰莲座上的高大汉白玉合十持珠观音菩萨立像空间。
 materials:
 - 汉白玉观音立像
 - 米黄石雕仰莲座
@@ -55,7 +53,7 @@ tags:
 - 圆通宝殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

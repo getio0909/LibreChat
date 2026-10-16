@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a8ffe9b14cb87351.jpg
     sha256: dd422bc8d73f54080db4d76897d82e671011b69d0ebcec1801f4324fe19864dd
-    size: 158242
     bytes: 158242
     width: 690
     height: 690
   thumb512:
     path: assets/thumb512/a8ffe9b14cb87351.webp
     sha256: 2ecac8589e9cdd11c9b5db28145511276bda84ed395e4ff45079571747143c4d
-    size: 69162
     bytes: 69162
     width: 512
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 建筑木石构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 中国传统佛教寺院大殿八角重层斗拱彩绘藻井垂直仰视构件特写，外方内八角再收束为中心发光千叶莲花曼荼罗圆顶，十六道放射状橘红斗拱层层悬挑，四角饰金绿凤凰角花。
 materials:
 - 传统木作榫卯斗拱
 - 青绿旋子重彩贴金彩画
@@ -56,7 +54,7 @@ tags:
 - 木作穹顶构件
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

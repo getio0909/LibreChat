@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/488c2fa8aab5f5a0.jpg
     sha256: 5c2f8d9003a81bf1329cbadc9642581a9934456c79ef1067c21abb27ee51845f
-    size: 369453
     bytes: 369453
     width: 2048
     height: 1017
   thumb512:
     path: assets/thumb512/488c2fa8aab5f5a0.webp
     sha256: d2b6b9e056570e20088ebbec088f00c531b847078881f1f4af0c31455c3b5f5a
-    size: 27626
     bytes: 27626
     width: 512
     height: 254
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 灰褐带翠绿斑纹奢石地面上整齐排列48个明黄圆蒲团阵列、远端供奉汉白玉坐佛配金色祥云背板的现代大型禅修礼佛大殿。
 materials:
 - 山水绿灰褐奢石
 - 汉白玉佛像
@@ -58,7 +56,7 @@ tags:
 - 金色祥云背景
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

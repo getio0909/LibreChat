@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/601b800a8f28e1dc.jpg
     sha256: 66c65a3daea3e83a02b303fb2ce738fe29e6cc50e18d63ffee9b9d512e5db6e3
-    size: 321231
     bytes: 321231
     width: 1996
     height: 1417
   thumb512:
     path: assets/thumb512/601b800a8f28e1dc.webp
     sha256: c567aa6e483e54a83a70ebe3060d17fcde31bd7f2a5be08e6b5bf5a369d3ae12
-    size: 20336
     bytes: 20336
     width: 512
     height: 363
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-展位正面3D效果图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为2025年秋季佛事展“庄严宝刹”展位的官方正面中轴对称3D渲染方案效果图（灰色纯色摄影棚背景）。通过与前文第01、02、03张现场实景照片对比可见，现场施工几乎1:1完美还原了本设计图的木构挑檐、透光藻井、U型须弥座围栏、黑白金拼花地面与中央莲花供坛，仅将效果图中两侧千佛墙的“蓝光琉璃佛像”在现场优化为更温暖庄严的“琥珀金光琉璃佛像”，并在背景墙增加了西方三圣立像。
 materials:
 - 透光云石
 - 古建木构轩顶
@@ -59,9 +57,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 1417
   low_res: false

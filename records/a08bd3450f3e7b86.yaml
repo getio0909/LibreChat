@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a08bd3450f3e7b86.jpg
     sha256: 4dabb811534861a470fd454d98fa7d1cee92c0a09f8eeaea96f4465516fc629c
-    size: 84241
     bytes: 84241
     width: 828
     height: 622
   thumb512:
     path: assets/thumb512/a08bd3450f3e7b86.webp
     sha256: 6d5ee0cfcd840b2a9a1d688b59f64ab2812bd0dccbd2f44b31be781a80f240f5
-    size: 22352
     bytes: 22352
     width: 512
     height: 385
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-白底双斜带纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为刚刚下线或陈列于“奥特晶”高光度磨抛车间前的大型白底银灰斜纹天然大理石大板实物写实。
 materials:
 - 天然白色大理石
 - 奥特晶高光抛光大板
@@ -51,7 +49,7 @@ tags:
 - 高洁净度背景墙
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

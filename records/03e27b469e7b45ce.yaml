@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/03e27b469e7b45ce.jpg
     sha256: cdfac743ea7888c49a547015cd4ed6b43fa1e8d78d6632ca5ad6d65f4b25e846
-    size: 421482
     bytes: 421482
     width: 2048
     height: 1522
   thumb512:
     path: assets/thumb512/03e27b469e7b45ce.webp
     sha256: 608d4e53b01eb9e6a9463fe45b73d6b942b39d207fd975ff24b46fcaa94f4ace
-    size: 34204
     bytes: 34204
     width: 512
     height: 381
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大雄宝殿侧壁“通长木雕十八罗汉壁龛长廊”与主佛坛侧翼空间展示场景（空间场景设计）。
 materials:
 - 通长木雕十八罗汉壁龛长廊
 - 铜鎏金罗汉坐像群
@@ -54,7 +52,7 @@ tags:
 - 汉白玉多层柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

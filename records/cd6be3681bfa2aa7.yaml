@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/cd6be3681bfa2aa7.jpg
     sha256: cb49208e585f95c6babf45d9b1e99f2661901bf1c5fac5f393f4ccb1f2259e00
-    size: 606307
     bytes: 606307
     width: 2048
     height: 1625
   thumb512:
     path: assets/thumb512/cd6be3681bfa2aa7.webp
     sha256: c137b3e64117d60ea187c7c38ad2b39e9ac09b63c132c176dfc04ce9d3e2eb34
-    size: 50286
     bytes: 50286
     width: 512
     height: 406
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型药师佛殿主坛双层汉白玉精雕须弥座与护法金像近景特写展示场景（空间场景设计，本卷第29号为其完整大广角全景）。
 materials:
 - 双层汉白玉精雕仰覆莲须弥座
 - 铜鎏金药师佛与日光菩萨
@@ -54,7 +52,7 @@ tags:
 - 慧日照天
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

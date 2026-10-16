@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/497bf7c150a0cccd.jpg
     sha256: e80a0ac9762f7e90ddf586d0aee76a818b5ea2465ec7ff156e0e31a64d5fbb8f
-    size: 254937
     bytes: 254937
     width: 1748
     height: 1214
   thumb512:
     path: assets/thumb512/497bf7c150a0cccd.webp
     sha256: 0687d190af365dc2eb91a735807620e713fa3bb7b8e2c391db4325332377cf72
-    size: 28752
     bytes: 28752
     width: 512
     height: 356
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 道教/民俗五路财神与天尊供奉殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 金黄暖木与米黄大理石 / 五尊彩绘神像、圆形发光背光、实木大供案、拜垫
 materials:
 - 脱胎彩绘描金神像
 - 拉丝金圆形发光背光盘
@@ -55,7 +53,7 @@ tags:
 - 彩绘塑金神像
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

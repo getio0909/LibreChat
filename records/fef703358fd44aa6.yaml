@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/fef703358fd44aa6.jpg
     sha256: 369da01d51fd853688962d9eef05f8110b8885379ef38e2b70cca38c2ef32875
-    size: 132512
     bytes: 132512
     width: 834
     height: 626
   thumb512:
     path: assets/thumb512/fef703358fd44aa6.webp
     sha256: 62a237e9ec8afbfe45da672334cc24869d301c06af837401540f08ef4a2e3f4f
-    size: 39678
     bytes: 39678
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用奢石大板-浅蓝紫冰晶斜纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为陈列于大型专业石材大板市场（5A栋1区）展厅内的天然蓝色系奢石大板写实图（市场俗称“蓝天白云”、“蓝水晶”或“梦幻蓝”大理石/方钠石钙质岩）。
 materials:
 - 天然蓝色大理石
 - 蓝天白云奢石
@@ -53,7 +51,7 @@ tags:
 - 展厅大板实拍
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

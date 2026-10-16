@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/d90b200331880727.jpg
     sha256: 8616ef35a065ebbf05c88feaa4623c9bfddb439666eb54db0cf20979ae75d82d
-    size: 302379
     bytes: 302379
     width: 1448
     height: 1086
   thumb512:
     path: assets/thumb512/d90b200331880727.webp
     sha256: 6a1296258bd837f1e2a05139b51f54662b6071235ce41bc4b90203eb92d1a206
-    size: 28444
     bytes: 28444
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 现代侘寂原木石雕空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是一幅现代侘寂风（Wabi-Sabi）与自然禅意融合的静修茶室/现代佛堂接待空间场景设计图。
 materials:
 - 米白莱姆石莲花浮雕
 - 天然米黄洞石

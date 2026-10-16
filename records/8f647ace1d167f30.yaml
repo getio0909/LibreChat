@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8f647ace1d167f30.jpg
     sha256: ed538783cb82192bdef2085e74a9b289c43d17f1bb6a947b44108ea259c4434c
-    size: 190965
     bytes: 190965
     width: 1490
     height: 980
   thumb512:
     path: assets/thumb512/8f647ace1d167f30.webp
     sha256: b816d4429b63c9fc43f9d2352c736fd5689de1676fc299e25a0f45673e1893b3
-    size: 28228
     bytes: 28228
     width: 512
     height: 337
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式药师琉璃光佛殿前厅与十二药叉大将壁画展厅场景，右侧敞门内可见宝蓝色琉璃药师佛，外厅设发光神将壁画与宝蓝星空木藻井天花，地面满铺灰绿色高光奢石大板。
 materials:
 - 深胡桃木梁柱与格扇
 - 宝蓝色琉璃药师佛像
@@ -56,7 +54,7 @@ tags:
 - 星空藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

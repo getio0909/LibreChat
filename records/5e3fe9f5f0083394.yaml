@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5e3fe9f5f0083394.jpg
     sha256: a94c4fcb5646df0e5f90689b02bf57ff82e559a5c624a6cf0819841c188c69bf
-    size: 486363
     bytes: 486363
     width: 2048
     height: 1531
   thumb512:
     path: assets/thumb512/5e3fe9f5f0083394.webp
     sha256: 3b53ee0bed01b842052c9d4f7ce66a5e441e62d4365a0772e773ce85131cefcb
-    size: 44386
     bytes: 44386
     width: 512
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统汉藏融合金碧彩绘佛殿与禅修礼拜空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图展示了一座极具皇家寺院与汉藏融合色彩的豪华佛殿内部礼拜与共修空间。空间将壁画艺术、悬塑艺术、万佛格龛与传统藻井天花融为一体，色彩浓烈绚烂、法相庄严，专为大型法会礼拜、诵经禅修而设计。 空间采用深红棕酸枝木色、璀璨赤金色与重彩壁画色（朱红、石青、石绿、泥金）搭配，地面则以沉稳的深灰青石板平衡视觉重心。环殿护墙底座为深红木高浮雕须弥座，满雕金色仰覆莲瓣与卷草纹；墙面核心区镶嵌巨幅传统工笔重彩描金菩萨说法图壁画；吊顶采用贴金木雕构件与黑底描金彩绘结合，地面铺陈数十个米黄色表面、朱红滚边的硬质方形拜垫（蒲团）。
 materials:
 - 贴金木作
 - 重彩壁画
@@ -54,7 +52,7 @@ tags:
 - 礼拜蒲团阵列
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

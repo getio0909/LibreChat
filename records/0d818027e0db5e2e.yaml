@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0d818027e0db5e2e.jpg
     sha256: 73a630dc23e7060d1abf0a483d666d1596cc6305717320a31e8c64ee97d84217
-    size: 11943
     bytes: 11943
     width: 238
     height: 378
   thumb512:
     path: assets/thumb512/0d818027e0db5e2e.webp
     sha256: 04a18bbfe57d3cbed7f30025fb6853948531716da639d6d4e29bec4ef67186b1
-    size: 5276
     bytes: 5276
     width: 238
     height: 378
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 博物馆暗调聚光石雕文殊菩萨骑狮坐像文物写实
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为一件供奉或展陈于博物馆暗场环境中的古代风格石刻（黄褐砂岩/青石）“文殊菩萨骑狮坐像”单体写实摄影。造像兼具唐宋石窟造像的饱满气韵与民间石雕的浑厚刀法，通过右下角威猛咆哮的瑞狮底座明确表征大智文殊师利菩萨身份。 造像采用质地古朴粗砺的暖黄褐色红砂岩（或风化青砂石）整料圆雕而成，表面保留天然石材的细微砂粒感与岁月包浆；背景为完全消光的纯黑暗场，一束约
+  2700K 的高显指暖黄聚光灯自左上方精准投射于菩萨面庞与胸腹，形成柔美而富有体积感的伦勃朗式雕塑光影。
 materials:
 - 砂岩
 - 青石高浮雕与圆雕
@@ -52,7 +51,7 @@ tags:
 - 石窟造像艺术
 material_ids: []
 provenance:
-  source: museum
+  source: unknown
   url: null
   credit: null
   license: unknown

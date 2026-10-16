@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f7437e88c869025e.jpg
     sha256: 2df1221e3bc98b2bf53d3e77a301c059ef1addc278585227407dfbc8b97bfd13
-    size: 745871
     bytes: 745871
     width: 1800
     height: 1200
   thumb512:
     path: assets/thumb512/f7437e88c869025e.webp
     sha256: da272233fbbb0a7b7395b74217e473f2d3fbd505d32d1eff2fd46aec2ff8e689
-    size: 51976
     bytes: 51976
     width: 512
     height: 341
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 东阳传统花格窗与满堂红宫灯穿堂场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是浙江东阳卢宅肃雍堂建筑群中的“穿堂”室内空间场景。
 materials:
 - 东阳花格木扇窗
 - 红绸六角木框宫灯

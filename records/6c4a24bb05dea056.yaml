@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6c4a24bb05dea056.jpg
     sha256: 0e111dfd7c319b91318a40cee1709460ad566e068cd6a0474b1a096e65d577f2
-    size: 351310
     bytes: 351310
     width: 1289
     height: 2048
   thumb512:
     path: assets/thumb512/6c4a24bb05dea056.webp
     sha256: d8aab25c0774ac8c7f54072e6106182b5ad2b4a1b6d9ae9ff65764619dd22343
-    size: 21712
     bytes: 21712
     width: 322
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 佛像造像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 铜鎏金释迦牟尼禅定坐像配双层镂空火焰纹大背光，背衬竖排繁体金色高浮雕汉译《吉祥经》全文赭红背景墙，前景陈设铜鎏金香炉与盛开粉白荷花。
 materials:
 - 铜鎏金释迦牟尼禅定坐像
 - 双层镂空火焰纹大背光
@@ -53,7 +51,7 @@ tags:
 - 火焰纹背光
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

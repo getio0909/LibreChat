@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/72fd081294087523.jpg
     sha256: 1bda2690bb53681fd4327adf53bf9f173c63a75df24d7a99e2069db3f6eb39ff
-    size: 105193
     bytes: 105193
     width: 600
     height: 750
   thumb512:
     path: assets/thumb512/72fd081294087523.webp
     sha256: 02bcd87ae347784a204efb35e180cf9479c699e4c8d723e2af2e50da39681004
-    size: 38422
     bytes: 38422
     width: 410
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式高定别墅家宅佛堂与茶禅一体室内场景，水磨石台基上设深胡桃木子母翘头供桌与“丙子”牌位，配对称弧形隐藏暖光背景墙与前景蔺草榻榻米茶席。
 materials:
 - 水磨石台基
 - 深胡桃木
@@ -57,7 +55,7 @@ tags:
 - 水磨石台基
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

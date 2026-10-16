@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/3fb487aab5efe2b2.jpg
     sha256: 26185a743f9474f08c96fefd6f1f5332335e517272eb731e02567806005caf8d
-    size: 308378
     bytes: 308378
     width: 1440
     height: 1080
   thumb512:
     path: assets/thumb512/3fb487aab5efe2b2.webp
     sha256: 38ba4cb94c56ad99d5689e2ce66d50ed165e7571bf3df189b004a022189e3cc5
-    size: 31750
     bytes: 31750
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图呈现了阿利坦石材（Alitan Stone）水头旗舰展厅内，通过天车白色吊装带将整块「梦幻庄园/金镶玉」巨幅大板凌空悬挂于白色鹅卵石展床上方的实景展示场景。
 materials:
 - 梦幻庄园大板
 - 白色鹅卵石展床

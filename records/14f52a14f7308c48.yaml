@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/14f52a14f7308c48.jpg
     sha256: 471e268cea19395dec184318b07ec7f83bb265608a198e543e2e59301fd14693
-    size: 327023
     bytes: 327023
     width: 2048
     height: 1542
   thumb512:
     path: assets/thumb512/14f52a14f7308c48.webp
     sha256: ec27b031fa3062ce6477033d22a74796df5a70f69cbee63b68912c997089d8c6
-    size: 22650
     bytes: 22650
     width: 512
     height: 385
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 右侧矗立带白色汉白玉石雕鼓形柱础的粗壮天然原木大圆柱与老榆木茶桌，左侧设方形坐垫与四幅内发光金箔水墨山水竖屏的现代禅意木质空间。
 materials:
 - 原木圆柱配白色石雕柱础
 - 发光金箔山水竖屏
@@ -54,7 +52,7 @@ tags:
 - 寺院客堂设计
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

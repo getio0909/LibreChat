@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/193d4d61d02c6b68.jpg
     sha256: 868905a94d7a598aa2859c317e1a677ebf797bf283da83eda982ac84802ab3f0
-    size: 262230
     bytes: 262230
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/193d4d61d02c6b68.webp
     sha256: 0898eec32a4bccfa1c75f2e7e241068beeceb009570d6aa732a1414caadbfaa4
-    size: 19982
     bytes: 19982
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 药师大愿发光斜梁万佛回廊
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 暗金黑胡桃与暖琥珀 / 发光经文斜梁、暖黄万佛龛、金色坐佛、深色石材
 materials:
 - 深黑胡桃木/古铜钢梁
 - 激光镂空发光亚克力字
@@ -56,7 +54,7 @@ tags:
 - 戏剧性光影
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

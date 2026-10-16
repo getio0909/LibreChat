@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/376b18423c9637d5.jpg
     sha256: f33caf71a328a620b276690f82e66b1e94a054dc1191d3eb686c8f41b90589ea
-    size: 814487
     bytes: 814487
     width: 1366
     height: 2048
   thumb512:
     path: assets/thumb512/376b18423c9637d5.webp
     sha256: 1cd81d4b574cf82d3f63ad32575e1d7c2eb91c2a03c134fdc37d72d749697000
-    size: 57092
     bytes: 57092
     width: 341
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 建筑木石构件-透光石莲花藻井吊顶
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图专项展示展位顶部“莊嚴寶刹”品牌门头标识与天然玉石金镶玉透光石藻井天花系统。设计将中国传统皇家与大寺大殿的“平綦藻井”构造，创新升级为“实木井字梁+超薄复合透光玉石+金色佛教宝相莲花丝印/蚀刻纹+内藏LED均光灯箱”的现代装配式吊顶案例。
 materials:
 - 金镶玉透光石
 - 实木格栅
@@ -57,9 +55,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2245
   low_res: false

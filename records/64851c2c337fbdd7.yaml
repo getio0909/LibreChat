@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/64851c2c337fbdd7.jpg
     sha256: 8b504ed1de543347f57e01aff8273ea3902bf37df7e71d927712a3c73afb625b
-    size: 420220
     bytes: 420220
     width: 2048
     height: 1413
   thumb512:
     path: assets/thumb512/64851c2c337fbdd7.webp
     sha256: bee2a2d8ce0ca3a1d5e7c49762619848ac81580b8d6aaf35efd87ebff68a188f
-    size: 34716
     bytes: 34716
     width: 512
     height: 353
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为五开间重檐木雕天宫佛龛大殿左侧礼佛通道纵深透视场景（空间场景设计）。
 materials:
 - 五开间重檐红木精雕大佛龛
 - 红木雕花供桌阵列
@@ -53,7 +51,7 @@ tags:
 - 青石莲花柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

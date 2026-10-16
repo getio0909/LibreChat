@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e643c37ec2d3fb9d.jpg
     sha256: 98ce4b7826704bb5ae0c220a9e4f16420f6bc2c0ea5a8430cb990f3f3ff72cbc
-    size: 243781
     bytes: 243781
     width: 1054
     height: 1706
   thumb512:
     path: assets/thumb512/e643c37ec2d3fb9d.webp
     sha256: a3ccdb21a02957454fcdb344252e0c795463bea4181f8a6fb858bd75112b262f
-    size: 19340
     bytes: 19340
     width: 316
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 现代禅意空间
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 一座将现代极简酒店式照明设计与传统藏传佛教建筑门饰完美融合的“佛堂入户玄关走廊与朱红装饰门”空间场景（Modern Tibetan-Zen Corridor & Ornate Entrance Door）。该场景展示了从日常现代居住空间步入神圣佛堂空间的“心理转换过渡甬道（Threshold
+  Space）”，兼具极高的当代东方室内设计水准。
 materials:
 - 浅木护墙板
 - 朱红漆雕花门
@@ -52,10 +51,10 @@ tags:
 - 线性灯带走廊
 material_ids: []
 provenance:
-  source: ai_generated
+  source: unknown
   url: null
   credit: null
-  license: ai_generated
+  license: unknown
   license_status: unconfirmed
 quality:
   min_side_px: 1054

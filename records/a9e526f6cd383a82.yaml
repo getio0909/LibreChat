@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a9e526f6cd383a82.jpg
     sha256: 165ca91dd92736ea1ea14867890baa75dc13293b99056dff32074bafcc34d3fd
-    size: 949370
     bytes: 949370
     width: 2048
     height: 1365
   thumb512:
     path: assets/thumb512/a9e526f6cd383a82.webp
     sha256: bde50cfcf7ca38f216d07304ecc1617afeeb029a79445df193e838783d5f0342
-    size: 63880
     bytes: 63880
     width: 512
     height: 341
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 东南亚寺庙黑底描金壁画内景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是老挝传统寺院大殿内部（门楣上方及内墙界面）的黑底金箔叙事壁画与红底金纹建筑内景。
 materials:
 - 黑漆墙面
 - 纯金箔模板壁画

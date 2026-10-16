@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/daa491ceee9abb25.jpg
     sha256: 1b8a9e387184f3992be845fb830bcfce697917f7f4c063fc4ad24fe617e4138d
-    size: 318902
     bytes: 318902
     width: 2048
     height: 1528
   thumb512:
     path: assets/thumb512/daa491ceee9abb25.webp
     sha256: 88ade919aeb063e42fde5b0421c520aab3ce409f94387ab0926a58ddf594bb9d
-    size: 21186
     bytes: 21186
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代日式/新中式禅修书院
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 浅原木与深灰青石 / 原木书架格栅、深灰哑光石材水景、榻榻米坐垫
 materials:
 - 七彩古法烧制琉璃
 - 深色红木龛框
@@ -57,7 +55,7 @@ tags:
 - 藏经书院
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

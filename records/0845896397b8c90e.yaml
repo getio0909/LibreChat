@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0845896397b8c90e.jpg
     sha256: d7fd740e918695fef70864ccffb073e40e2992ae311f7ada627d235c21956f64
-    size: 288936
     bytes: 288936
     width: 2048
     height: 1213
   thumb512:
     path: assets/thumb512/0845896397b8c90e.webp
     sha256: 02cc5c43f0b85ee6d563bd7cced062c3de5782252498b190865481b966b61976
-    size: 22182
     bytes: 22182
     width: 512
     height: 303
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 博物馆式玻璃展柜白玉佛像长廊
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 浅原木、纯白石雕与深灰地面 / 汉白玉立姿观音玻璃展柜、大型浮雕壁画
 materials:
 - 低反射超白夹胶玻璃展柜
 - 原木叠涩倒斗形发光顶罩
@@ -57,7 +55,7 @@ tags:
 - 文博展陈设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

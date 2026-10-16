@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4996a8f02d109e8c.jpg
     sha256: f3a8bd3a45208a936217fbb64b665d4c43a7c71ae66d8a923a484420a5d50f2c
-    size: 435672
     bytes: 435672
     width: 2048
     height: 788
   thumb512:
     path: assets/thumb512/4996a8f02d109e8c.webp
     sha256: 81903292926e4135972dd7b51b93c5b668dbe071263b5ac957ac03ade88b0ba2
-    size: 29608
     bytes: 29608
     width: 512
     height: 197
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 超宽全景展示中央三尊巨型火焰背光金佛配汉白玉须弥座、两侧十八罗汉金像与巨幅说法壁画及三座八角藻井的恢弘大雄宝殿。
 materials:
 - 铜鎏金大佛
 - 汉白玉须弥座
@@ -56,7 +54,7 @@ tags:
 - 八角藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -260,9 +260,9 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
                 errors.append(
                     f"{rel_rec}: {exp_ref_rel} sha256 mismatch (expected {ref_meta.get('sha256')}, got {actual_sha})"
                 )
-            if actual_size != ref_meta.get("size") or actual_size != ref_meta.get("bytes"):
+            if actual_size != ref_meta.get("bytes"):
                 errors.append(
-                    f"{rel_rec}: {exp_ref_rel} size mismatch (file={actual_size}, size={ref_meta.get('size')}, bytes={ref_meta.get('bytes')})"
+                    f"{rel_rec}: {exp_ref_rel} bytes mismatch (file={actual_size}, bytes={ref_meta.get('bytes')})"
                 )
             if check_images:
                 try:
@@ -291,9 +291,9 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
                 errors.append(
                     f"{rel_rec}: {exp_thumb_rel} sha256 mismatch (expected {thumb_meta.get('sha256')}, got {actual_sha})"
                 )
-            if actual_size != thumb_meta.get("size") or actual_size != thumb_meta.get("bytes"):
+            if actual_size != thumb_meta.get("bytes"):
                 errors.append(
-                    f"{rel_rec}: {exp_thumb_rel} size mismatch (file={actual_size}, size={thumb_meta.get('size')}, bytes={thumb_meta.get('bytes')})"
+                    f"{rel_rec}: {exp_thumb_rel} bytes mismatch (file={actual_size}, bytes={thumb_meta.get('bytes')})"
                 )
             if check_images:
                 try:

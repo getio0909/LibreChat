@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a4eafd8acb77c781.jpg
     sha256: d64840040a094d05e35e2a76382c695a8c953403b80667e9d69f466d6499435b
-    size: 445481
     bytes: 445481
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/a4eafd8acb77c781.webp
     sha256: ee8466128c7b1b9e6a6324fa36eb3bf38ae1fe81739765cecccf987e57539185
-    size: 44172
     bytes: 44172
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 三层阶梯式坛城装饰柜的“三层整板青玉台面 + 正面重工嵌宝 + 侧面素面红木”现代改良版方案。在实际佛堂使用中，水平承重台面经常需要摆放酥油灯、香炉、净水碗等法器，将三层水平盖板全部升级为耐热易清洁且视觉通透的天然青玉/奢石大板，兼具极高的实用价值与现代奢石美学。
 materials:
 - 红酸枝
 - 冰种青玉大板

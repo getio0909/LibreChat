@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/33f2b14f759a6496.jpg
     sha256: 7cbfbbd4e3b550e4477bea7916c168f66443dce82e72226e61240474daa364c5
-    size: 836308
     bytes: 836308
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/33f2b14f759a6496.webp
     sha256: 87063c19def2d7e9742567fcdb2855cce201a8bc4744392d09647f93f2add204
-    size: 51896
     bytes: 51896
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 佛像造像-彩绘观世音菩萨立像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为展位西方三圣之左胁侍——汉传极彩描金观世音菩萨立像（配青绿镂空卷草莲花大背光）的近景写实特写。造像端庄柔美，兼具盛唐菩萨的丰腴气度与宋明彩塑造像的精微衣纹表现力。
 materials:
 - 贴金彩绘造像
 - 镂空莲花背光
@@ -57,9 +55,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

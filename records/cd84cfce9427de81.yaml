@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/cd84cfce9427de81.jpg
     sha256: 53f78164de48bcad36ba76d9019043030bff0d0702674d5bc1e792d5593ffdd2
-    size: 530209
     bytes: 530209
     width: 2048
     height: 1735
   thumb512:
     path: assets/thumb512/cd84cfce9427de81.webp
     sha256: bc809c0f2f29c837067b67841737d2f0d692ee9e2d891f2da4844f6491785703
-    size: 49302
     bytes: 49302
     width: 512
     height: 434
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 星空顶琉璃千佛柱石窟展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 星空蓝与暖黄橙玉 / 星空天幕、七彩千佛方柱、石窟山体群雕、黄玉地面
 materials:
 - 米白砂岩/汉白玉群雕
 - 七彩渐变琉璃千佛柱
@@ -56,7 +54,7 @@ tags:
 - 曼荼罗地拼
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

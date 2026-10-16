@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ec4f6792816e317b.jpg
     sha256: a6e4cf5c424da7bf4a8e719cc782bf2a2bf8caa85c7b6de74a14e69bff6d5059
-    size: 792342
     bytes: 792342
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/ec4f6792816e317b.webp
     sha256: 0709ae1c1e50d40303d79ff4e4a09a05d096d18ea6d591a6bbea785675914179
-    size: 41400
     bytes: 41400
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-佛国画卷奢石墙正视全景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为第 15 张《天然美石佛国画卷立面设计图（C立面图）》在展会现场 1:1 完美落成的正面平视全景照片。通过将 CAD 施工图与本张正视实景照直接对比，可以清晰评估从工程图纸到真实商业空间的还原度与材质升级效果。
 materials:
 - 佛国画卷四联对拼大板
 - 黑色轨道射灯

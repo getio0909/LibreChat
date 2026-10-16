@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/142e6dc146e5cf09.jpg
     sha256: b710c52a92eb429f0490903adb7fa6f956822f263af773ed8b2ed8af5cae7f6d
-    size: 27935
     bytes: 27935
     width: 377
     height: 383
   thumb512:
     path: assets/thumb512/142e6dc146e5cf09.webp
     sha256: 2a161b4b05d28ca07dddf43fb5419bab6095e1bb39cc34362a400c9fe1fb0646
-    size: 17504
     bytes: 17504
     width: 377
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 左前景安放古朴青石禅定释迦坐像、右侧配两盆苍劲迎客松盆景、暖黄肌理背景墙上由隐藏低位光源投射出硕大虚化佛陀打坐剪影的禅意造景。
 materials:
 - 青灰石雕禅定释迦坐像
 - 苍劲迎客松盆景
@@ -53,7 +51,7 @@ tags:
 - 虚实光影美学
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

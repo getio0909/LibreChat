@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6a967d278951e9da.jpg
     sha256: 08c9012586d4122a2d34bc6cfbf261c22bff540e8f547a78588d7bb77b790167
-    size: 265751
     bytes: 265751
     width: 1007
     height: 2048
   thumb512:
     path: assets/thumb512/6a967d278951e9da.webp
     sha256: 43358dd22ea8f7c4fecd49f9199a66b57e25e84244738e933c7261bba3d8d515
-    size: 24566
     bytes: 24566
     width: 252
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 建筑木石构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 底部为高大方形汉白玉仰覆莲瓣须弥座柱础、中部深红木柱身四面镶嵌铜鎏金卷草与佛龛高浮雕板的佛殿室内复合装饰方柱特写。
 materials:
 - 多层汉白玉仰覆莲瓣柱础
 - 深色红木柱体
@@ -52,7 +50,7 @@ tags:
 - 佛殿立柱节点
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

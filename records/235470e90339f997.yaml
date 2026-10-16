@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/235470e90339f997.jpg
     sha256: 5bda08cb2a7881690d093d434b783f1b5094a3e5e4829202de5f1d7a63f1d10e
-    size: 689808
     bytes: 689808
     width: 2048
     height: 1529
   thumb512:
     path: assets/thumb512/235470e90339f997.webp
     sha256: 799b9a8be1143a691f1854b3e4b5d5eb19a326dd902e5f09ea9043e5af64a0ae
-    size: 63578
     bytes: 63578
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中心发光橙金莲座耸立巨型四面金身立佛、四周环绕多彩背光圆柱形千佛柱与弧形万佛墙、顶覆蓝天星象金穹顶的圆厅圣殿。
 materials:
 - 四面铜鎏金立佛
 - 橙金透光琉璃莲座
@@ -57,7 +55,7 @@ tags:
 - 橙金琉璃莲座
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

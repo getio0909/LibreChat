@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/97aa6a841e174263.jpg
     sha256: d87f1ee22665d4bf5693cf93eb22b7ae6484b7c928e3ee02cf4173d9e650034f
-    size: 387910
     bytes: 387910
     width: 2048
     height: 1245
   thumb512:
     path: assets/thumb512/97aa6a841e174263.webp
     sha256: ad4aa93905ba163c2e0ec00b12ed091ae7953686de25eca5b960dcc39e5976c7
-    size: 32354
     bytes: 32354
     width: 512
     height: 311
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 药师琉璃佛与护法殿堂全景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 深褐木色与琉璃宝蓝 / 蓝色琉璃药师佛、橙玉护法像、绿纹大理石地面
 materials:
 - 深胡桃木框架
 - 白色抹灰山墙
@@ -56,7 +54,7 @@ tags:
 - 青石浮雕柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

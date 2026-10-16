@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9e45447d00ab249e.jpg
     sha256: 5c18c276d8f50e29cc1984f0e2ce58e4534e624ca888e8c403a278bc35bcabc6
-    size: 895027
     bytes: 895027
     width: 1536
     height: 2048
   thumb512:
     path: assets/thumb512/9e45447d00ab249e.webp
     sha256: 6bcbdb9b39261f9bad5265e0e1f9cb370bb84bccb4634510477594372f743453
-    size: 44874
     bytes: 44874
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-天然美石背景墙左段
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为 C立面 9米奢石长卷展墙的左端起始段局部特写，与第 01 图（中段“· 佛國畫卷”）左右无缝衔接。重点展示了巨幅对纹奢石画框在墙角处的木作收边工艺，以及高抛光奢石与展厅环境光影的交互效果。
 materials:
 - 佛国画卷奢石
 - 莲瓣木线

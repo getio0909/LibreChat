@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7411deda27002708.jpg
     sha256: 2b71ff24906d8d2a93c4e09a44eb6ecb01857d760431ebde12d853c11cd8c158
-    size: 420614
     bytes: 420614
     width: 2048
     height: 1533
   thumb512:
     path: assets/thumb512/7411deda27002708.webp
     sha256: 4a2c809c77eff3c74172ea3fd4e2bf4b2c795d4c01d1d4029590a678cb1eb1ad
-    size: 36568
     bytes: 36568
     width: 512
     height: 383
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统八角藻井壁画书法展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 金棕红木与深灰青石 / 贴金八角藻井、大型佛教壁画、发光书法灯箱
 materials:
 - 实木书架与屏风
 - 宣纸书法与古籍
@@ -56,7 +54,7 @@ tags:
 - 中轴对称
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f26fd8ebcd5502cf.jpg
     sha256: a9476892bb90fddfa5dca05c1beefbb684bf2ade99036686998eb7171f358f1f
-    size: 395633
     bytes: 395633
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/f26fd8ebcd5502cf.webp
     sha256: 7c1c6497c7cffb444f265092d16dbb00a7e2fe15ad9a4c613e4901c00ac2afde
-    size: 22754
     bytes: 22754
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-亚克力悬浮千佛灯箱
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图以极具创意的柜底垂直90度仰视视角，拍摄展位两侧“透明亚克力格栅千佛发光墙”的局部阵列。由于高透水晶亚克力隔板在纯白漫射背光下几乎隐形，一尊尊橙黄琥珀色的琉璃/树脂佛像宛如凌空悬浮于无垠白光净土之中，展现出极高的现代佛教装置艺术美感。
 materials:
 - 高透亚克力网格
 - 黄琉璃坐佛
@@ -56,9 +54,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

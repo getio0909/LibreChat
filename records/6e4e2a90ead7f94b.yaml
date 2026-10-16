@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6e4e2a90ead7f94b.jpg
     sha256: 453211ca7281649ea05d59691ea34e5cbe65c19a5e55ddd69737836a70b44870
-    size: 364377
     bytes: 364377
     width: 2048
     height: 1540
   thumb512:
     path: assets/thumb512/6e4e2a90ead7f94b.webp
     sha256: 722226c07820b7f5844df23a5752e006828fea31cf5ee31e205368ff7d855115
-    size: 30642
     bytes: 30642
     width: 512
     height: 385
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代大跨度禅修堂斜视场景与金色莲花蒲团阵列
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为大型现代佛教禅修大厅/共修讲堂的斜向对角线广角场景（与第 07 张正面中轴图形成完整空间立体表达）。该视角以近景地面成百上千个明黄色莲花蒲团阵列与右侧粗壮的鎏金铜套石柱为视觉引导，生动展现了超大型现代禅堂的恢宏气度与秩序美学。
+  近景特写清晰展示了四大核心材质细节：①地面铺装：大规格浅灰色云纹大理石高光板材，反射出柔和的蒲团与天幕光影；②禅修蒲团：高密度圆柱形海绵外包明黄色棉麻/丝绒布料，顶面居中印制精致的深褐色双层八瓣莲花团花图案；③承重巨柱：上部为暖灰褐色石材圆柱，下部包嵌一圈高浮雕24K鎏金缠枝宝相莲…
 materials:
 - 浅灰云纹大理石
 - 印莲花蒲团
@@ -55,7 +54,7 @@ tags:
 - 大跨度佛教空间
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

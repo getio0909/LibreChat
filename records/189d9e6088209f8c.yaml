@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/189d9e6088209f8c.jpg
     sha256: 1de69661e738b3eb3ffb8a48a4777ffe73665004ca0b7d24558939f438dc4657
-    size: 790160
     bytes: 790160
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/189d9e6088209f8c.webp
     sha256: 962da57991ee6136346ac4f8be91c948e8c882cc84a3ad3692a116eec01977ae
-    size: 39480
     bytes: 39480
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-叠级藏光佛龛与佛台
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图完整展示了 2026年春季佛事展（C5 T026）南侧 D立面庄严佛龛核心陈列区与东侧 A立面入口品牌形象柱内侧的空间组合。设计将传统寺院大殿的“背光佛龛+须弥座佛台+礼佛拜垫”进行现代极简新中式转译，打造出既可作为高端家宅佛堂样板间、又可展现寺院大型石雕工艺的沉浸式场景。
 materials:
 - 禅境灰蓝大理石
 - 敦煌金玉石供桌

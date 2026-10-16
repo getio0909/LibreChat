@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5dcb048ab69e7b57.jpg
     sha256: 5c93ecf484a5d4e4551d133e5822111e156e8d1940094539a7d4c1cc7721edd2
-    size: 300136
     bytes: 300136
     width: 2048
     height: 1150
   thumb512:
     path: assets/thumb512/5dcb048ab69e7b57.webp
     sha256: b092dc6e3bd0dc18a5e5227ef9b3ced4234a8fb04b2379a5b6e07add4abcb3e4
-    size: 28930
     bytes: 28930
     width: 512
     height: 288
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 紫微星空弧形万佛金龛走道
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 璀璨金黄与紫蓝星空 / 金色浮雕佛龛、铜雕莲花护墙板、黑金镜面石材地面
 materials:
 - 24K镀金万佛浮雕龛
 - 紫铜手工锻造立体莲花板
@@ -55,7 +53,7 @@ tags:
 - 步步生莲
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

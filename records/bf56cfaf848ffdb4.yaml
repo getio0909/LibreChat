@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/bf56cfaf848ffdb4.jpg
     sha256: fd1d0964ebcfeefa65eeafc864d0dd607323fb935ede185f22ed31372ee502bc
-    size: 639944
     bytes: 639944
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/bf56cfaf848ffdb4.webp
     sha256: 24d0b9adf84dbad4dfb3c59adc38afe3cc17f8c7d94f9f56dd06d37639e017e6
-    size: 37662
     bytes: 37662
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为当代“黑金新中式”木构与三联透光奢石玉屏风融合的大雄宝殿展示场景（空间场景设计）。
 materials:
 - 乌木黑漆描金梁架斗拱与立柱
 - 三联式冰花玉/山水纹透光奢石屏风
@@ -53,7 +51,7 @@ tags:
 - 乌木描金斗拱
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

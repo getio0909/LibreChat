@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/30d2a10aaf3df1f9.jpg
     sha256: af04e645b5089b8717051aa4c58befb6210ec89bbeaf69cfc235bc2884668257
-    size: 414046
     bytes: 414046
     width: 2048
     height: 1528
   thumb512:
     path: assets/thumb512/30d2a10aaf3df1f9.webp
     sha256: 3d10d30bb741ee60c5d989be9ac38913cbe8935fa844e21643bea0f22edd7572
-    size: 33560
     bytes: 33560
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正中供奉汉白玉观音坐像、背后为海棠形发光《般若波罗蜜多心经》全文浮雕墙、供台两侧对称矗立铜鎏金六角重檐落地宫灯与博古架的中式观音殿。
 materials:
 - 汉白玉观音坐像
 - 海棠形发光《般若波罗蜜多心经》浮雕背板
@@ -53,7 +51,7 @@ tags:
 - 金莲藻井
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

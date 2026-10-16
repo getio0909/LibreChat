@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/58820d45651fe3aa.jpg
     sha256: b591aa5fce2906f5315ca809060b3c701ff4e3b55076c37a75d8285276716eae
-    size: 419454
     bytes: 419454
     width: 2048
     height: 1540
   thumb512:
     path: assets/thumb512/58820d45651fe3aa.webp
     sha256: ac41164183f7a2204ef77926ce7f0abbb5952913c4156842b72445508334b3b8
-    size: 35030
     bytes: 35030
     width: 512
     height: 385
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院藏经阁与禅修阅览室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 暖琥珀木色 / 通顶实木发光书架、长条实木阅览桌、深色木地板
 materials:
 - 原木书架
 - 青石雕禅定佛像
@@ -56,7 +54,7 @@ tags:
 - 单点透视
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

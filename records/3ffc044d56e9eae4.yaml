@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/3ffc044d56e9eae4.jpg
     sha256: 105b55bdb40d1fbc0119ff1925852aa02812692ab82786e8d58003612353b10c
-    size: 24611
     bytes: 24611
     width: 405
     height: 349
   thumb512:
     path: assets/thumb512/3ffc044d56e9eae4.webp
     sha256: 90017e73d9829475c2b085ee1db01c3543803c5366b6e123221cbeb114f407ea
-    size: 12434
     bytes: 12434
     width: 405
     height: 349
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代素白石材矩阵千佛龛与三圣立像展示墙场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为新中式素白石材佛教展厅内核心“千佛三圣浮雕展示墙”的立面场景（对应第 09 张左侧长墙）。设计将传统石窟的“千佛龛”概念转化为高度秩序化、模数化的现代建筑表皮，兼具大型功德认捐佛龛墙与佛教雕塑艺术背景墙双重属性。
+  整面展示墙通体采用暖白色细粒汉白玉或高品质白砂岩/人造透光石通过数控CNC精雕而成，表面呈柔和细腻的哑光石材肌理；每个大小圆拱龛底部或内壁暗藏3000K暖黄洗墙灯带，将纯白石雕造像烘托得圣洁温润；下部墙裙采用浅灰米色大理石并雕刻一圈连续宝相莲花浮雕带，地面为灰绿色系大理石。
 materials:
 - 汉白玉
 - 白砂岩CNC雕刻
@@ -54,7 +53,7 @@ tags:
 - 现代素雅佛堂
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b655bafe26cde807.jpg
     sha256: 5bdef5aa45a340f1eed17b654ac2abb59966310013e5ad0063112f358d8de0ab
-    size: 340385
     bytes: 340385
     width: 2048
     height: 1296
   thumb512:
     path: assets/thumb512/b655bafe26cde807.webp
     sha256: cafa6ac8058521a211afd4b2edcaf0096676752aab8b53229f4a8cae7af3ee01
-    size: 27058
     bytes: 27058
     width: 512
     height: 324
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 深邃黑色光纤星空吊顶下，黄色锦缎须弥长坛上安奉巨型汉白玉/米白大理石整雕释迦牟尼佛右胁吉祥卧像，后配弧形阶梯暖光背光墙。
 materials:
 - 巨型整雕汉白玉/米白石释迦涅槃卧佛
 - 黄绸须弥长坛
@@ -53,7 +51,7 @@ tags:
 - 佛教空间案例
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

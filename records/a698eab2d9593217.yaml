@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a698eab2d9593217.jpg
     sha256: f68ed8830f0974e97e39489c89b6267673c1342b675534fef87d8af08f6345d8
-    size: 510125
     bytes: 510125
     width: 1675
     height: 2048
   thumb512:
     path: assets/thumb512/a698eab2d9593217.webp
     sha256: 0fda891454cc9d2262ce6e280f33557b51c78a5edb097b67e9abc4187c91f4f8
-    size: 46902
     bytes: 46902
     width: 419
     height: 512
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 灰褐高光大理石地面排列明黄圆蒲团、立汉白玉柱础木柱、大型背光木格栅花窗前陈列成排中式实木禅椅的现代禅堂空间。
 materials:
 - 灰褐纹理大理石
 - 背光木格栅花窗
@@ -57,7 +55,7 @@ tags:
 - 汉白玉柱础
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

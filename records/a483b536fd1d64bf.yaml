@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a483b536fd1d64bf.jpg
     sha256: 9d3d1ada7f8ae06b2c6991f4c3023a0f5535a88b2c265fc5a75faae1e2444777
-    size: 878507
     bytes: 878507
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/a483b536fd1d64bf.webp
     sha256: 2cf739aef36f2815106fa5cff581ae750defbed59e65a024aa5b7e0503f61aa0
-    size: 52564
     bytes: 52564
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 佛像造像-彩绘阿弥陀佛立像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为展位后方主背景墙前供奉的西方三圣主尊——汉传极细彩绘描金阿弥陀佛接引立像（配青绿镂空卷草莲花大背光）正面半身至全身特写。造像融合了唐代丰满端庄的体态与明清宫廷“极彩泥金/描金漆画”的繁复装饰工艺。
 materials:
 - 贴金彩绘木雕/树脂
 - 金镶玉背板
@@ -57,9 +55,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

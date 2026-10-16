@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/3f33064b44fdf342.jpg
     sha256: aeea8fb475a69b8e54ee8bcf2e9b3ad81182b0068b8871a59f52b1b95bf9272c
-    size: 251898
     bytes: 251898
     width: 2048
     height: 1407
   thumb512:
     path: assets/thumb512/3f33064b44fdf342.webp
     sha256: 59c559c36f2280d27cea3183698911ddbe208f3ac91d8704085a39d903587a90
-    size: 20502
     bytes: 20502
     width: 512
     height: 352
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 幽蓝万佛格中轴过渡门厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 幽蓝冷光与深灰石木 / 蓝光琉璃砖柱、观音壁画龛、楼梯通道与禅意造景
 materials:
 - 宝蓝透光压花琉璃砖
 - 黑色半透镜面玻璃
@@ -56,7 +54,7 @@ tags:
 - 三开间立面
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

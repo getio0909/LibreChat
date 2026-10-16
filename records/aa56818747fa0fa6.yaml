@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/aa56818747fa0fa6.jpg
     sha256: a90b7aec5c0447384fbc9ce85d6c73d3748369d4f3e6e497054e19180879c023
-    size: 511822
     bytes: 511822
     width: 2048
     height: 1622
   thumb512:
     path: assets/thumb512/aa56818747fa0fa6.webp
     sha256: b380a7c256d8d770ead237d46cce3f013e1bd053ec770a5e88be42bc44ed5ca8
-    size: 43338
     bytes: 43338
     width: 512
     height: 406
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正中设金色镂空华盖与木雕《心经》背板供奉汉白玉观音坐像、左侧临窗辟木地台禅茶席的佛堂茶室一体化空间。
 materials:
 - 汉白玉观音坐像
 - 金色镂空华盖
@@ -57,7 +55,7 @@ tags:
 - 禅茶空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

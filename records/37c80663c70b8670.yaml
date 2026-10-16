@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/37c80663c70b8670.jpg
     sha256: 82d9776afca8a06d15014b09eb99c2166364845f8d1f663d9412d52277e96a65
-    size: 372239
     bytes: 372239
     width: 2048
     height: 1181
   thumb512:
     path: assets/thumb512/37c80663c70b8670.webp
     sha256: 8841fdc5f3d8ec6f41b9747a6f6c9c32529d6473a87d5c20ca6a9441d3f8c961
-    size: 28514
     bytes: 28514
     width: 512
     height: 295
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代新中式三世佛白玉造像展厅场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为现代新中式佛教艺术馆/佛堂内“三世佛”（横三世佛：中央释迦牟尼佛、左侧药师佛、右侧阿弥陀佛）正面陈设场景。设计以现代极简石材构成手法重构传统三佛并坐格局，兼具博物馆级雕塑展陈质感与现代禅意美学。 空间以温润的米黄色砂岩/莱姆石、纯白汉白玉与深紫褐色石材地面构成沉稳典雅的色调体系。三尊大佛及仰覆莲座采用雪白细腻的汉白玉雕刻；下方长条形须弥座、后方三联佛龛外框及两侧方柱均采用暖米黄色哑光石材；方柱底部采用黑金花大理石覆斗形柱础并内嵌洗墙射灯；柱旁隔扇内镶嵌浅灰色水波海浪纹石雕板与鎏金铜雕瑞兽圆盘；吊顶下方悬挂…
 materials:
 - 汉白玉佛像
 - 米黄砂岩
@@ -55,7 +53,7 @@ tags:
 - 海浪纹石雕板
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6e26f9367d4baabd.jpg
     sha256: 906632974aca3e9af14b880b277b3bbb80c72e1f53dbecc8d822b4c53f0fcc73
-    size: 541544
     bytes: 541544
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/6e26f9367d4baabd.webp
     sha256: 2a7122d6a3d12ee0d6acf17bc8f098c49237c1029bb53769a2ed6b5134b9004d
-    size: 34300
     bytes: 34300
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中心双层发光白玉莲座安奉汉白玉涅槃卧佛、上下呼应圆形木构斗拱藻井与地面圆形莲花水刀拼花、配汉白玉柱础木柱的卧佛殿空间。
 materials:
 - 汉白玉卧佛雕像
 - 透光云石莲花座
@@ -58,7 +56,7 @@ tags:
 - 圆形斗拱藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

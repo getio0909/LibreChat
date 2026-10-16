@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4926412051ace119.jpg
     sha256: 57343c7e6c451a17dccb86e5b953b6adf814e570135c14b4eb7903999297a537
-    size: 46614
     bytes: 46614
     width: 486
     height: 321
   thumb512:
     path: assets/thumb512/4926412051ace119.webp
     sha256: 22a892d6257d9e8f2d79971f6db8a8d61708940a057e7a524de74b0d59bc624e
-    size: 30958
     bytes: 30958
     width: 486
     height: 321
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 黑金宫殿式佛教文化艺术展厅室内场景，成排乌木黑漆大圆柱配鎏金卷草柱箍与汉白玉莲花柱础，顶部为黑金月梁藻井，远端金色云海墙悬挂四幅罗汉高僧立轴。
 materials:
 - 乌木黑漆描金木柱
 - 汉白玉仰覆莲柱础
@@ -56,7 +54,7 @@ tags:
 - 罗汉画轴
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

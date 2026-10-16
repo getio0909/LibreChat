@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7213dbec062d89c7.jpg
     sha256: f662bb942c2181010ce6779a8b7304ded02c5ecbf7158fcddaee7898c3cdc6f2
-    size: 508624
     bytes: 508624
     width: 2048
     height: 1129
   thumb512:
     path: assets/thumb512/7213dbec062d89c7.webp
     sha256: 3ac603e51a287d115f48f634dcae73a54504e549bb7e0a04f7370574ab993fae
-    size: 42342
     bytes: 42342
     width: 512
     height: 282
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为“重彩佛教群像壁画 + 金色发光白玉千佛格 + 高处二十诸天彩绘悬塑廊”大型禅修大殿正面中轴超宽全景场景（空间场景设计，本卷第25号为其右侧斜视图）。
 materials:
 - 中央铜鎏金大佛配双层圆形贴金飞天藻井
 - 三壁重彩壁画与发光白玉佛格交替立面
@@ -53,7 +51,7 @@ tags:
 - 共修大殿设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

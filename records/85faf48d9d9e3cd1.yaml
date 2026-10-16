@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/85faf48d9d9e3cd1.jpg
     sha256: 7d70613c477f257d932c3befc4d23e164ff91f7e36c5880bdd22f3609d2b43f0
-    size: 550687
     bytes: 550687
     width: 1440
     height: 1211
   thumb512:
     path: assets/thumb512/85faf48d9d9e3cd1.webp
     sha256: 210ae0eae8b90007b04ebee13965fccebe7b005c269047593eab69aed72a8d08
-    size: 69970
     bytes: 69970
     width: 512
     height: 431
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 展厅正面实拍的一座藏汉宫廷技艺巅峰融合的“大鹏双龙冠顶 + 盘龙抱柱”三联多宝格大佛龛展柜。与第 19 项纯藏式十一佛冠不同，本座大柜将汉传皇家建筑的镂空游龙冠顶、高浮雕盘龙抱柱与藏传佛教的金翅大鹏鸟（迦楼罗）、双鹿法轮、兰札体梵藏铭文、护法力士金刚杵完美熔铸于一体。
 materials:
 - 核桃木
 - 贴金彩绘
@@ -52,7 +50,7 @@ tags:
 - 力士八吉祥腰线
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

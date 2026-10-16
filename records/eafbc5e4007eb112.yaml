@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/eafbc5e4007eb112.jpg
     sha256: c241eae3f0015e8806dbf3c915a97986f0d2f62da25de39c68080047090ad18a
-    size: 655993
     bytes: 655993
     width: 1800
     height: 1200
   thumb512:
     path: assets/thumb512/eafbc5e4007eb112.webp
     sha256: 763eb275dc179efc3fde4d754a31808ecbc8e7bb97e3c3c7377b2774916b1448
-    size: 52402
     bytes: 52402
     width: 512
     height: 341
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 传统与跨文化风格
 category_l2: 东阳传统厅堂梁架与九狮球花灯场景
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 这是素有“民间故宫”之称的浙江东阳卢宅核心建筑“肃雍堂”（明代巨型厅堂）内部中轴梁架、堂匾与巨型九狮球大堂灯空间场景。
 materials:
 - 东阳木雕冬瓜梁
 - 黑漆合抱木柱

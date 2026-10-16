@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/87d7bc8ed7cad53c.jpg
     sha256: 27b291092c4b156082b7d24a346c30909e50a394a9b09a8a977586a0c0add99b
-    size: 283520
     bytes: 283520
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/87d7bc8ed7cad53c.webp
     sha256: b2b48e2196b61f494ae0c82d41d06190fe82938473b9b9159dc93192c2f6cd14
-    size: 14776
     bytes: 14776
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-03平面尺寸与铺装施工图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为施工图册第 3 页——03 平面尺寸图。作为全展位地面石材铺装、木结构墙体放线定位及四立面（A/B/C/D）空间索引的核心基准平面图。
 materials:
 - 满铺大理石斜网格
 - 不锈钢收边

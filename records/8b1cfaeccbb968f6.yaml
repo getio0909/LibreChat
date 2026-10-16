@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/8b1cfaeccbb968f6.jpg
     sha256: fd352e2fb63aac4e38dfce0ae2ca418972f4c73572737279148dda336c26bf82
-    size: 403510
     bytes: 403510
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/8b1cfaeccbb968f6.webp
     sha256: 1a9576616f35ee702dc2e7dea9fa976548ca9098700923814c4b448f8f4fdb19
-    size: 42834
     bytes: 42834
     width: 384
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景（上半部留白）下以高机位纵深一点透视拍摄的一套大型藏式宫廷风“玻璃覆面内嵌立体坛城木雕”十人位长方形餐桌/禅茶桌椅与茶具布置组合（Tibetan Carved Mandala-Inlaid Dining & Tea
+  Table Set）。该设计巧妙解决了传统重工深浮雕桌面无法平稳摆放杯盘的痛点——在深凹的实木雕花槽上方平铺一整块高透超白钢化玻璃，既使整张桌面成为一件可俯瞰鉴赏的巨型立体坛城艺术品，又具备完美平整的现代实用台面。
 materials:
 - 实木雕花
 - 钢化玻璃

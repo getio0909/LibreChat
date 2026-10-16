@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/4ecd0891cab8d71e.jpg
     sha256: 5ad7de878aecdefc3850a95279dd9a8429ad969e51971c83f95f8165080e725b
-    size: 153351
     bytes: 153351
     width: 739
     height: 2048
   thumb512:
     path: assets/thumb512/4ecd0891cab8d71e.webp
     sha256: 2064a678d02710598e879c4406b8dd9429e687b6b96bee2cc9fdda0599d4ba79
-    size: 12462
     bytes: 12462
     width: 185
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 顶部为露明木梁人字坡内嵌发光软膜天棚、两侧实木框对称装裱工笔重彩佛菩萨画作、地面铺哑光青石砖直通浅木色双开禅门的寺院艺术走廊。
 materials:
 - 露明木梁人字坡顶
 - 发光宣纸/透光膜天棚
@@ -53,7 +51,7 @@ tags:
 - 现代禅意空间
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

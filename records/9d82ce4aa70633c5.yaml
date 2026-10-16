@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9d82ce4aa70633c5.jpg
     sha256: f206a183e95a3d03c5bb1414dcf14c80bd106fe5acb593f15557241a64e8b134
-    size: 311647
     bytes: 311647
     width: 2048
     height: 1537
   thumb512:
     path: assets/thumb512/9d82ce4aa70633c5.webp
     sha256: 64fafbefaa0437eae1b546f690ae157dbb4e433c8532fea6a30b87fe103db57a
-    size: 20496
     bytes: 20496
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 中央陈设自然边浅色原木长条大茶桌与玻璃气泡吊灯、左后方设发光紫砂壶博古展示墙、四周以通高竖向原木格栅推拉隔断围合的现代禅意茶室。
 materials:
 - 原木竖向格栅隔断与推拉门
 - 自然边整木大茶桌
@@ -53,7 +51,7 @@ tags:
 - 原木大茶桌
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/def3570bcb8265a1.jpg
     sha256: a781c33e561a2bf927c5e2e942b2fb18ad2f69f4e0a96b944e4331a9584cfa57
-    size: 85140
     bytes: 85140
     width: 828
     height: 620
   thumb512:
     path: assets/thumb512/def3570bcb8265a1.webp
     sha256: 0db7e9c99c395986526fd87454b5e9c6373a7994fd4f5cff190ec7bc619e09b1
-    size: 21852
     bytes: 21852
     width: 512
     height: 383
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-白底宽带斜纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为石材厂房内展示的大型白底宽带斜纹天然大理石大板实物写实。
 materials:
 - 天然大理石
 - 雅士白大理石
@@ -52,7 +50,7 @@ tags:
 - 新中式背景墙
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

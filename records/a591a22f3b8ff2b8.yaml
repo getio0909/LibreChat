@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a591a22f3b8ff2b8.jpg
     sha256: db68f81ccf63734bb6a2da449fc2b1bf8dc44f0f7e91debc32b5f765e4a9ca2e
-    size: 471992
     bytes: 471992
     width: 1962
     height: 1184
   thumb512:
     path: assets/thumb512/a591a22f3b8ff2b8.webp
     sha256: b8c8dd41dbb95b42513a7fb2de894ac3b35a38fa7dbf8590c2ecbf659b7508da
-    size: 37308
     bytes: 37308
     width: 512
     height: 309
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统青白石彩绘浅浮雕瑞兽麒麟/狻猊踏浪祥云纹构件
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为一件用于佛教殿堂丹陛御道圆盘、地面藻井中心石或须弥座束腰部位的“瑞兽（狻猊/麒麟/海兽）踏浪祥云纹”彩绘石材浅浮雕构件局部特写（与第 08、12、14 张中的圆形地面/墙面装饰盘同源）。狻猊为龙生九子之一，喜烟好坐，常饰于香炉及佛座，象征护持正法、镇宅辟邪、吉祥瑞应。
+  基底采用温润细腻的米灰白色大理石/青白石，通过多层次阴线刻与浅浮雕（铲地浮雕）技法雕出纹样后，在中心瑞兽躯干部位施以古雅的青蓝灰色（石青调墨）矿物彩绘，眼部、口鼻与爪部点染白粉与淡金，周围水浪与祥云则保留米白与浅灰的天然石材本色对比。
 materials:
 - 汉白玉
 - 青白石浅浮雕
@@ -54,7 +53,7 @@ tags:
 - 佛教传统纹饰
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

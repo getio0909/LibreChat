@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9639b73dd76f5f08.jpg
     sha256: d52dc712a462f2745cf5a773fc6fead598152dd21dd928dc3994dac4a640e7e7
-    size: 484328
     bytes: 484328
     width: 1024
     height: 2048
   thumb512:
     path: assets/thumb512/9639b73dd76f5f08.webp
     sha256: 32a2f9381b461b05e43a1e2bbe581c853734d35493b76ea021c3d556b6ad4ddf
-    size: 29978
     bytes: 29978
     width: 256
     height: 512
@@ -31,7 +29,8 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图是完美诠释阿利坦自有奢石「梵高皇」（Van Gogh Imperial）命名精髓的 4K 正射微距纹理标准样本！画面中密集的短促矿物结晶条带与炽烈的色彩碰撞，神似后印象派大师文森特·梵高（Vincent van Gogh）笔下充满生命律动的厚涂油画（Impasto
+  Brushstrokes）笔触。
 materials:
 - 梵高皇超清特写
 colors:

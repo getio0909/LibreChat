@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ffc8820e3d69674a.jpg
     sha256: ed424b6f960368f5b37300699948f944c8fbd390d39bf8fc13bb5a7c93221db0
-    size: 607294
     bytes: 607294
     width: 2048
     height: 1538
   thumb512:
     path: assets/thumb512/ffc8820e3d69674a.webp
     sha256: d472292efc903755a160ced91700df01b755ca739478ab419806ce54812ff819
-    size: 60808
     bytes: 60808
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 广角低机位仰视大型八角观音宝殿，中央米黄石雕须弥座上供奉巨型纯白汉白玉观音坐像，四周八面通高发光万佛墙环绕，顶悬八角千瓣金莲穹顶藻井。
 materials:
 - 巨型汉白玉观音菩萨坐像
 - 八角千瓣金莲穹顶藻井
@@ -52,7 +50,7 @@ tags:
 - 仰视穹顶构图
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

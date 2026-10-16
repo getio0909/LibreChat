@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/90e4691d98f6270b.jpg
     sha256: 8058421d96b8fb9edb41ed852425279ad91b230f605d917a77938e0050962aa9
-    size: 232011
     bytes: 232011
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/90e4691d98f6270b.webp
     sha256: 4b6bfcf535cf42222790dc30692affaf031861f9dbc0f7941c1d181474487d82
-    size: 14826
     bytes: 14826
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 正面广角展现的现代简约新中式禅意套房（与图18同空间多视角对照），左区为圆形水墨画、罗汉床与方茶几，右区为胡桃木大床，配无主灯暖光吊顶。
 materials:
 - 新中式木框软包床
 - 中式罗汉床茶座
@@ -53,7 +51,7 @@ tags:
 - 卧房茶室一体化
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

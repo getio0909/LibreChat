@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/59342e856d78dc0f.jpg
     sha256: b4845c6b4244d1595662eba5dfe45651b0a39180d8d11e7fb496be94b10b469f
-    size: 374210
     bytes: 374210
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/59342e856d78dc0f.webp
     sha256: c9086704157c0638c029b8588c34eb08090cb6678cda7383d3f26ad22118721a
-    size: 39408
     bytes: 39408
     width: 384
     height: 512
@@ -33,7 +31,8 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景下的藏传佛教经典双层阶梯顶双门储物供柜（Tibetan Buddhist Altar Sideboard / Offering Cabinet）标准单品图。该器型采用“外罩倒U形立体叠涩门套框 + 内嵌双抽屉双开门柜体
+  + 顶部双层阶梯供台”的复合结构，浓缩了藏传佛教最核心的四大吉祥图像学体系。
 materials:
 - 硬木
 - 赤金箔
@@ -52,7 +51,7 @@ tags:
 - 五欲妙供
 material_ids: []
 provenance:
-  source: own_product
+  source: unknown
   url: null
   credit: null
   license: unknown

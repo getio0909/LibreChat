@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/85efa325f192bf8d.jpg
     sha256: 941e71cd188bb911aedc1f91fbdabb811269cb9488403c32a43d416bc04ef9e4
-    size: 520586
     bytes: 520586
     width: 2048
     height: 1565
   thumb512:
     path: assets/thumb512/85efa325f192bf8d.webp
     sha256: d52e269e11c490b44cf170798898ec3e38649bf579f4ede46c1c027db4c13414
-    size: 40824
     bytes: 40824
     width: 512
     height: 391
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 中式居家与会所佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 全屋采用拼花木地板与中式木格栅花窗（含右侧圆形月洞花窗）、顶部设金色方格藻井、正中金龛供奉自在观音坐像的古典木作佛堂。
 materials:
 - 花梨木格栅花窗
 - 几何拼花木地板
@@ -58,7 +56,7 @@ tags:
 - 全木作空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

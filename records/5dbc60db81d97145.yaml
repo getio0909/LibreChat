@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/5dbc60db81d97145.jpg
     sha256: 81eb400cf68b83070d5ba928533fd8ad8f4f83cc867100149863ed7b87e041a7
-    size: 80684
     bytes: 80684
     width: 828
     height: 622
   thumb512:
     path: assets/thumb512/5dbc60db81d97145.webp
     sha256: 872ffdb965bc509af5252d3ed4b698f5f5a67b90af406ece958a7cbf1135e171
-    size: 20224
     bytes: 20224
     width: 512
     height: 385
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 常用石材大板
 category_l2: 常用大理石大板-白底灰斜纹系
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为单块大体量白色系天然大理石精抛光大板的正面写实展示（属雅士白/雪花白或爵士白斜纹品类）。
 materials:
 - 天然大理石
 - 雅士白大理石
@@ -53,7 +51,7 @@ tags:
 - 佛堂背景墙选材
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

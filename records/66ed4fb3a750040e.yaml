@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/66ed4fb3a750040e.jpg
     sha256: b4a4b68324d77d21f3fa44f007ccd7d92179b33505895841bb53e551db8f5dc2
-    size: 753229
     bytes: 753229
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/66ed4fb3a750040e.webp
     sha256: cbd5b7cf3e2496b5057f84a425aeb29489b11c4273ac2fca53b3ab729eadd6f0
-    size: 39648
     bytes: 39648
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图是阿利坦石材（Alitan Stone）水头鹏翔石材城 A1 区旗舰展厅内，「天川金」官方认证整扎大板（扎号 3-2，共 38 片，总面积 51.97㎡）的权威基准展示图。
 materials:
 - 天川金官方标板
 colors:

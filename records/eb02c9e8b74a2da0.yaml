@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/eb02c9e8b74a2da0.jpg
     sha256: f939a937b90f7da96ca5249a426861a2691ced1e056a00b3125bddd0b007ad27
-    size: 427953
     bytes: 427953
     width: 1264
     height: 2048
   thumb512:
     path: assets/thumb512/eb02c9e8b74a2da0.webp
     sha256: 626ad62c287284697de0c02433f3a4ac296450ff9086f30afc1c1b0f5347085c
-    size: 32956
     bytes: 32956
     width: 316
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 佛像造像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯黑背景下展示的铜鎏金五佛宝冠毗卢遮那佛坐像，配精雕放射光芒与双龙戏珠火焰纹镂空黄金大背光，顶悬圆形鎏金莲花华盖与对称金属雕花垂幡。
 materials:
 - 铜鎏金五佛宝冠毗卢遮那佛/宝冠释迦坐像
 - 火珠双龙戏珠大背光
@@ -52,7 +50,7 @@ tags:
 - 铜鎏金造像
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

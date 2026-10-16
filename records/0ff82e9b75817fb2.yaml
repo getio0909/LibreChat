@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0ff82e9b75817fb2.jpg
     sha256: db1827d622811320ec0e8a34f23cf83d0e96fec2f86f810022cde5b196b60959
-    size: 500536
     bytes: 500536
     width: 2048
     height: 1152
   thumb512:
     path: assets/thumb512/0ff82e9b75817fb2.webp
     sha256: ec29e5fdaf4ce5d9eb612088c9ea65fe7545c7fd2bb57abea163c00f38ec4045
-    size: 27938
     bytes: 27938
     width: 512
     height: 288
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图展示了位于水头鹏翔石材城 A1 区阿利坦展位内的一块近正方形幅面「梦幻庄园」精选展示大板，左右两侧均围绕着涂刷蓝色防护背胶并贴有防裂背网的同系列大板扎堆，展现了充足的现货储备与方正饱满的板型。
 materials:
 - 梦幻庄园大板
 colors:

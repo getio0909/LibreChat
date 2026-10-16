@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1c4b7f9762932f1e.jpg
     sha256: 8bc03198c0d76413a7668071b827c656a18231e1ec2c975a0896d4a4ca7d30ed
-    size: 683346
     bytes: 683346
     width: 1153
     height: 2048
   thumb512:
     path: assets/thumb512/1c4b7f9762932f1e.webp
     sha256: 301ec61eeebb3e984770d9a07e971ba2702ff0a5f1956a8f26eec5ce5d910401
-    size: 39254
     bytes: 39254
     width: 288
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 建筑木石构件-敦煌金束腰浮雕特写
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为天然玉石·敦煌金须弥座中段“束腰花板”与下段“覆莲瓣/圭角”的超近距工艺剖析图，旨在向专业买家与设计师展示该石材在深浮雕加工后的不起砂、不崩边特性及极高的抛光光泽度。
 materials:
 - 天然玉石敦煌金高光抛光浮雕
 colors:
@@ -53,9 +51,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 1994
   low_res: false

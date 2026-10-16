@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c86951995fa0240c.jpg
     sha256: b024085d222bd68b2a951fa1830285d2aa57daf4531ff216d009f397161758a0
-    size: 445535
     bytes: 445535
     width: 2048
     height: 1598
   thumb512:
     path: assets/thumb512/c86951995fa0240c.webp
     sha256: 7e8cf270269fb67f5a0ce7cdadc82bec24491481d624cc0430f8494cc0943135
-    size: 36028
     bytes: 36028
     width: 512
     height: 399
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代禅修茶室
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 新中式大悲咒发光经文墙与居士共修禅堂场景，左右整墙镌刻立体白字发光《大悲咒》全文，正前方设青石台基、双联雕花供桌与巨幅说法图壁画，地面阵列35个明黄色莲花蒲团。
 materials:
 - 浅米灰石材背景墙
 - 立体发光亚克力汉字
@@ -57,7 +55,7 @@ tags:
 - 说法图壁画
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

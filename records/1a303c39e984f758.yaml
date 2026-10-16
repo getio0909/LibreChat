@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1a303c39e984f758.jpg
     sha256: 095a94e11c697ba359704229a79404b9a0148f8c11c286858405e6a8ce761f45
-    size: 515586
     bytes: 515586
     width: 2048
     height: 1535
   thumb512:
     path: assets/thumb512/1a303c39e984f758.webp
     sha256: 701ab3e3d77339085a999e272fba9c54ec917265139ba9e7c08d5c53597033c3
-    size: 43392
     bytes: 43392
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 地面满铺高光镜面翠绿奢石大理石、正中设《心经》浮雕背板与“三宝常护念/六时恒吉祥”楹联三世佛龛的豪华佛堂空间。
 materials:
 - 翠绿奢石大理石
 - 红木雕花供桌
@@ -57,7 +55,7 @@ tags:
 - 石材装修设计
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

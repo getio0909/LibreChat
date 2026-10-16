@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/a88794cbc840dfdb.jpg
     sha256: cbe2adef714640ca7090d54052396c7fbb8a9e27fcbf4b3c4c6c1b03bbd2c0c1
-    size: 560977
     bytes: 560977
     width: 2048
     height: 1591
   thumb512:
     path: assets/thumb512/a88794cbc840dfdb.webp
     sha256: 4d0436b1233bac19cb547c81fabc80d4c108c9965abdad29b0015257d275d226
-    size: 48130
     bytes: 48130
     width: 512
     height: 398
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为传统大雄宝殿“五尊主像 + 十八罗汉廊”暖红棕几何拼花木地板比选方案右前斜视图（空间场景设计）。
 materials:
 - 暖红棕几何席纹拼花木地板
 - 五尊铜鎏金主像配白色发光石背板
@@ -54,7 +52,7 @@ tags:
 - 八角贴金藻井
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

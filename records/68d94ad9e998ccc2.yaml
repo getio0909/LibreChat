@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/68d94ad9e998ccc2.jpg
     sha256: 4923bb09c1dea349d068f0d7d647a7d7f157dae1f51ec1130d2ebc1e53e515c2
-    size: 673091
     bytes: 673091
     width: 2048
     height: 1365
   thumb512:
     path: assets/thumb512/68d94ad9e998ccc2.webp
     sha256: 0f5ee44657978719ab92ab871471483619468daaf63c89626ee2fa116ca77c62
-    size: 35320
     bytes: 35320
     width: 512
     height: 341
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图展示了「蓝金灰」品种中极具代表性的「钢蓝角砾 + 黄金网脉」均质碎花型整块大板正视标准照。
 materials:
 - 蓝金灰大板
 colors:

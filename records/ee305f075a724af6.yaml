@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/ee305f075a724af6.jpg
     sha256: 7f0b2f8c889eb168a5906d7f0f50b4bb6883ecdbf11c1a40803aa53666d96f5d
-    size: 780601
     bytes: 780601
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/ee305f075a724af6.webp
     sha256: 0c7f31d9268325415376c17d51bded2c8fd8bb24aac2e1ec8139a422ef645848
-    size: 51982
     bytes: 51982
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 8K超清寺院文化园与湖心金莲鸟瞰
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 青灰瓦、原木与碧水绿林 / 传统院落群、湖心八瓣莲花坛城、七层佛塔、塔林
 materials:
 - 汉白玉八瓣莲花湖心岛
 - 24K贴金盛世金莲佛坛
@@ -57,7 +55,7 @@ tags:
 - 七层佛塔
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

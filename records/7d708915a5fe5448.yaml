@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/7d708915a5fe5448.jpg
     sha256: 3e93c663741a5d9e53bbc1841739decf262b3df57b6be69dc190475066b10fe2
-    size: 280406
     bytes: 280406
     width: 773
     height: 2048
   thumb512:
     path: assets/thumb512/7d708915a5fe5448.webp
     sha256: e0e5cfd47446f9a03e98d9f74d7cd76a4dbe82ec67a2335fa3dafaedcb602c4c
-    size: 23630
     bytes: 23630
     width: 193
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 藏式雕花家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 采用繁复24K真金贴金与红蓝藏式重彩木雕工艺打造的重檐转角佛龛与三层阶梯供台，密集供奉铜鎏金密宗佛像、酥油灯、曼扎盘与八吉祥法器。
 materials:
 - 藏式/汉藏融合重檐贴金彩绘转角佛龛与供台
 - 八吉祥浮雕
@@ -52,7 +50,7 @@ tags:
 - 密宗坛城陈设
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/71b91e9bb16ffc73.jpg
     sha256: 9e74bdbef029be246c0b42d167ddd5ea33b78ca47fb95732a045e27052a6a8e8
-    size: 96391
     bytes: 96391
     width: 1030
     height: 344
   thumb512:
     path: assets/thumb512/71b91e9bb16ffc73.webp
     sha256: 080c6f985a34a240026280f375e156e2c1411d91b2181f942070a069ac3251cf
-    size: 20132
     bytes: 20132
     width: 512
     height: 171
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 弧形万佛墙与金身财宝天王殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 辉煌暖金与青白玉 / 巨型青玉莲花座、金身财神/天王像、叠级圆角藻井
 materials:
 - 青白玉整雕巨型仰莲座
 - 24K真金贴金造像
@@ -56,7 +54,7 @@ tags:
 - 金碧辉煌
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

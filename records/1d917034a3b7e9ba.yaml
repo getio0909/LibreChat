@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/1d917034a3b7e9ba.jpg
     sha256: d91c06c844a84f82eeb11ed3f527e3aa27a5235d3c4e0b737e4b2abfd6b5b811
-    size: 747094
     bytes: 747094
     width: 2048
     height: 1153
   thumb512:
     path: assets/thumb512/1d917034a3b7e9ba.webp
     sha256: 0abe8ef77511742315dfaec75c68551c21d8f80a1c53654772891a03deae1bdd
-    size: 40238
     bytes: 40238
     width: 512
     height: 288
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 现代佛教展厅-西方三圣石材背景墙
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图完整展示了展位后方“金镶玉奢石高大背景墙 + 西方三圣（阿弥陀佛、观世音菩萨、大势至菩萨）彩绘立像 + 敦煌金须弥座汉白玉护栏”的标准寺院佛殿后壁展陈系统。
 materials:
 - 金镶玉大板
 - 汉白玉栏杆
@@ -58,9 +56,9 @@ material_ids:
 provenance:
   source: own_project
   url: null
-  credit: null
-  license: unknown
-  license_status: unconfirmed
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
 quality:
   min_side_px: 2252
   low_res: false

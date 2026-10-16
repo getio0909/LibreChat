@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e93c97f4605a35fe.jpg
     sha256: 7ffe03bc9f72b0b17e2fdb99c3d843f1a266992844a2bcffd011cdf76c7408c0
-    size: 490220
     bytes: 490220
     width: 2048
     height: 1153
   thumb512:
     path: assets/thumb512/e93c97f4605a35fe.webp
     sha256: 6a97690f1dfd14cffe55bb43b3fcef0f7fad669cd2f9ebfb6acec19c22dff28e
-    size: 24816
     bytes: 24816
     width: 512
     height: 288
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为一块竖立于现代化大板展厅通道中央的「蓝金灰」（浅银灰蓝暖金调批次）整板正视标准照。
 materials:
 - 蓝金灰大板
 colors:

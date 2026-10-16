@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/09ee78208c025684.jpg
     sha256: 636a02eaacd478440053ed04a03eef84218c76600ae0e085bbf995fa50f8bfd5
-    size: 255217
     bytes: 255217
     width: 1234
     height: 2048
   thumb512:
     path: assets/thumb512/09ee78208c025684.webp
     sha256: 6da941c0311ab640e57550df8c91339638510c569f7e70dff87318ab7c54b437
-    size: 18820
     bytes: 18820
     width: 309
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 佛像造像
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 室内暖白背光木框壁龛内供奉的天然暖米黄玉石/大理石精雕大肚弥勒笑佛坐像，左手托元宝、右手持布袋，端坐双层石雕莲座之上。
 materials:
 - 天然暖黄玉石/米黄大理石精雕布袋弥勒坐像
 - 双层石雕莲座
@@ -52,7 +50,7 @@ tags:
 - 发光佛龛
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

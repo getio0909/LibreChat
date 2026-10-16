@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/864aa459a6f7dd5e.jpg
     sha256: 08c8c6079359d540a29157abe07a27b93285b4c123b229798de20ce7bc6fe1c9
-    size: 423865
     bytes: 423865
     width: 2048
     height: 1528
   thumb512:
     path: assets/thumb512/864aa459a6f7dd5e.webp
     sha256: bbabd57ef1581df9e5c8b9df96cf1830c707e5ff339aef9e577e11077ddf5906
-    size: 34152
     bytes: 34152
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 立带鎏金莲瓣柱脚包箍与青石柱础的实木巨柱、覆金色方格藻井、远端长龛供奉十八罗汉金像的传统木构大殿侧视空间。
 materials:
 - 实木大圆柱
 - 鎏金莲瓣柱脚铜箍
@@ -58,7 +56,7 @@ tags:
 - 木构大殿
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

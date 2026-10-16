@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/6ab6165b2a3b0048.jpg
     sha256: 0ea46f51de20faa3b3ab96396606cd566e1c4615baa2819c52e9d0835ed61fd5
-    size: 144572
     bytes: 144572
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/6ab6165b2a3b0048.webp
     sha256: 7cbd2c444cd45fbd20ac894773d9c217688433928555dc533e24f3c29e217c88
-    size: 6950
     bytes: 6950
     width: 512
     height: 362
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-迎宾接待台正背面施工图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为展位东北角主入口处的定制道具施工图——接待台（服务台）正背面 3D 轴测深化图。兼具品牌视觉锤（正面书法标识）与展会现场高频收纳（背面双层分格+带锁底柜）双重实用属性。
 materials:
 - 木结构贴纸
 - PVC字

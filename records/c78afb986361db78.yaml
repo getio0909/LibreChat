@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/c78afb986361db78.jpg
     sha256: 82c947fbd53cb21f3e0da98675d9b8878cb2426835a148ad17eb0ea6feb266d6
-    size: 256431
     bytes: 256431
     width: 1686
     height: 1264
   thumb512:
     path: assets/thumb512/c78afb986361db78.webp
     sha256: b07da74b5bff7ccb9d4bdedc47b02306cf627a1bd8b5164b04312564af42c6ad
-    size: 31350
     bytes: 31350
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 现代奢石万佛堂
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 前景设深褐石雕须弥座护栏、中景左设汉白玉拱龛坐佛、远景设汉白玉御道丹墀与圆形放射状背光立佛及同款圆形藻井的奢石万佛堂。
 materials:
 - 深啡网高光大理石
 - 深褐石雕须弥座护栏
@@ -57,7 +55,7 @@ tags:
 - 御道丹墀
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

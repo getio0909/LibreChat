@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/0e3d9389fb1dcf67.jpg
     sha256: 2f17f7ddda9a5c4a20b246bc685ca56c4b5704fc8e050b1a277a460e5e04729e
-    size: 534443
     bytes: 534443
     width: 2048
     height: 1530
   thumb512:
     path: assets/thumb512/0e3d9389fb1dcf67.webp
     sha256: de45bd41c5f3366a2314bc9198ffbf649434251c176c253c5404ed473c4df39f
-    size: 46426
     bytes: 46426
     width: 512
     height: 382
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 传统寺院大殿
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 本图为寺院孔雀明王殿（密教护法专殿）核心佛龛与供桌陈设近景空间（空间场景设计，本卷第22号为其拉远全景图）。
 materials:
 - 四臂孔雀明王骑孔雀彩绘金像
 - 唐破风贴金斗拱佛龛
@@ -54,7 +52,7 @@ tags:
 - 白玉圆璧陈设
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

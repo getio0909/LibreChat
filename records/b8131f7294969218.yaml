@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/b8131f7294969218.jpg
     sha256: 988ffb8a6d41f7637a8844ccec8f27e644c0127648ac68ed4111f8dbcb824b94
-    size: 259076
     bytes: 259076
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/b8131f7294969218.webp
     sha256: 119901218dc7a01f30d852eaa01f4580b031fba0e63918ccd5d4f1f19e24ffd1
-    size: 12756
     bytes: 12756
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-04天花灯梁与灯具定位图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为施工图册第 4 页——04灯位图（天花过梁结构与照明电气定位平面图）。详细定义了如何通过“井”字形顶部结构梁架与双类型专业展陈灯具（共 44 个发光点位），将 75m² 展厅的墙面奢石、地面大理石与核心佛像照得璀璨通透。
 materials:
 - 11盏长臂铲灯
 - 11组三头轨道灯

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/e286aa40d8e96d63.jpg
     sha256: 804fc95196cd790bc7cb0e63482610f668502737e2d7ef593f26efe5a62bb10e
-    size: 637053
     bytes: 637053
     width: 1279
     height: 1706
   thumb512:
     path: assets/thumb512/e286aa40d8e96d63.webp
     sha256: 0ebea8a390c2095f8392260f89783490d46413f3f0b3592eaca0cdd9918a4619
-    size: 68550
     bytes: 68550
     width: 384
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 法器供具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 置于实木柜台之上、靠暖黄色肌理墙面陈设的一座藏传佛教经典题材《和气四瑞图（瑞兽同心）》圆形实木深浮雕彩绘座屏（Tabletop Circular Wood Carving Screen）。该故事源自佛陀本生传《毗奈耶经》，讲述贡布森林中沙鸡（松鸡）、山兔、猕猴、大象四兽按寻得果树种子发芽先后的长幼次序，由大象驮猴、猴托兔、兔顶鸟共同采摘高处果实的典故，象征家庭与僧团尊老爱幼、和睦吉祥。
 materials:
 - 实木高浮雕
 - 矿物彩绘
@@ -52,7 +50,7 @@ tags:
 - 案头陈设摆件
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

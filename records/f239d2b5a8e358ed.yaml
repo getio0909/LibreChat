@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/f239d2b5a8e358ed.jpg
     sha256: e934577dc81228448815e9b5583af3779c4b4716c1097a5313623a9bebde6d64
-    size: 715255
     bytes: 715255
     width: 2048
     height: 1365
   thumb512:
     path: assets/thumb512/f239d2b5a8e358ed.webp
     sha256: 62f858411916e78e41ca9ed3e25812394a597a6f167d680e34e3daf27beae9d3
-    size: 34866
     bytes: 34866
     width: 512
     height: 341
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图是完美诠释「金镶玉」（Gold Inlaid with Jade）命名由来的典范级整扎大板正面标准照！大板呈近正方形的大幅面比例，通过两条绿色塑钢带固定于整扎大板最外层，是极其珍贵的佛堂核心背景板材样本。
 materials:
 - 金镶玉大板
 colors:

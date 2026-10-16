@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/abf58027af310d66.jpg
     sha256: 3dc6d1945c8945483d5afb0946546e97a34dda0fb00983a3e4261b9a9bbe9ec2
-    size: 576353
     bytes: 576353
     width: 2048
     height: 1536
   thumb512:
     path: assets/thumb512/abf58027af310d66.webp
     sha256: 3f6cb0c96263f58b56ef3a6fdabf4188ce1719c61b3c56416ab20094dbb9e892
-    size: 24382
     bytes: 24382
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为一块竖立于现代化石材大板市场黑色展架上的近正方形大幅面浅暖黄色系「天川金」（柔光香槟金批次）展示大板。
 materials:
 - 天川金大板
 colors:

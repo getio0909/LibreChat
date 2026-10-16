@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/68f502e1f825e1b3.jpg
     sha256: df2243861bab66d6224c6aa26b0b61a27398e6c48e75b01b75b78bfcfb00090d
-    size: 384791
     bytes: 384791
     width: 1024
     height: 2048
   thumb512:
     path: assets/thumb512/68f502e1f825e1b3.webp
     sha256: 89653aba1f9c20f7a8b4be088015e7ecd85b75a654980be0a58870e3eeae3757
-    size: 23648
     bytes: 23648
     width: 256
     height: 512
@@ -31,7 +29,7 @@ studio_roles:
 category_l1: 自家核心石材大板
 category_l2: 奢石大板样本
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 本图为阿利坦自有核心品种「敦煌壁」（Dunhuang Mural）的 4K 超高清正射微距纹理标准样本（Master PBR Albedo Map）。
 materials:
 - 敦煌壁超清特写
 colors:

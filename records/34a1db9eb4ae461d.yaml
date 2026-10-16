@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/34a1db9eb4ae461d.jpg
     sha256: 941310f971ec477cb3ef0fa37e60df4d27c806c8c75f54e7e0ad15023960f9c5
-    size: 155664
     bytes: 155664
     width: 2048
     height: 1448
   thumb512:
     path: assets/thumb512/34a1db9eb4ae461d.webp
     sha256: 6d64129e7141d22263c15d9f711a35f0159394bc798ff75d4b4313f3c3753a2f
-    size: 5974
     bytes: 5974
     width: 512
     height: 362
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛事展展位方案
 category_l2: 展览工程图纸-A立面主入口施工图
 entity_type: 工程设计图纸
-summary_zh: ''
+summary_zh: 本图为 2026年春季佛事展（C5 T026展位）东侧主迎宾面——A立面图 施工深化图。完整定义了 10 米跨度主入口的门头造型比例、叠级中式回纹框线尺寸、品牌形象柱发光字工艺以及从入口向内看去的内部空间透视关系。
 materials:
 - 木结构贴纸
 - 背发光字

@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/9275c7843570d954.jpg
     sha256: 449fcf32472d493706829f5b3338a0623fbf067d8eb19cdac6fc862640dd398a
-    size: 58761
     bytes: 58761
     width: 638
     height: 383
   thumb512:
     path: assets/thumb512/9275c7843570d954.webp
     sha256: efc59f9c0acb11b7486a42ef50204019bd743c5340df44b4c911a176d723b462
-    size: 26050
     bytes: 26050
     width: 512
     height: 307
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 寺院建筑与园林景观
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 前景设圆形荷花池广场与中央大台阶、左右对称立三层重檐歇山顶配殿、后方白石宝座台基上耸立巨型露天金身大佛的寺院景观。
 materials:
 - 花岗岩广场石材
 - 汉白玉宝座台基
@@ -57,7 +55,7 @@ tags:
 - 金刚宝座台基
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

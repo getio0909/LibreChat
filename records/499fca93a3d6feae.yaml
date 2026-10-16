@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/499fca93a3d6feae.jpg
     sha256: 934a65217955fa1c44d2256dd0bdba3a402c1142c3e538a5eba2b05dc017b203
-    size: 150754
     bytes: 150754
     width: 683
     height: 1024
   thumb512:
     path: assets/thumb512/499fca93a3d6feae.webp
     sha256: 6f2ca67009715a190551a440c3a71b72ba5fce61fde6e1ca620f9b71dba278cf
-    size: 33066
     bytes: 33066
     width: 341
     height: 512
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛堂空间参考
 category_l2: 现代佛教展厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 东南亚兰纳/泰式禅意奢华酒店大堂空间，巨型乌木圆柱下部包镶古铜色錾刻如意宝相花浮雕护套并承以汉白玉仰覆莲柱础，顶部外露原木桁架悬挂长圆柱阵列吊灯。
 materials:
 - 深黑褐乌木圆柱
 - 古铜錾刻浮雕包柱
@@ -57,7 +55,7 @@ tags:
 - 酒店大堂设计
 material_ids: []
 provenance:
-  source: web
+  source: unknown
   url: null
   credit: null
   license: unknown

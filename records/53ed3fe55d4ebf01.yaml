@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/53ed3fe55d4ebf01.jpg
     sha256: a1a4441cff6922b80ac30b14a737c33a972ad6dfa0486475e508363c557f6d3d
-    size: 213909
     bytes: 213909
     width: 2048
     height: 1535
   thumb512:
     path: assets/thumb512/53ed3fe55d4ebf01.webp
     sha256: f417eedbbf59c7bb2f37614ea0b7ffa9eeb87edbb36a9d712220713964223180
-    size: 14822
     bytes: 14822
     width: 512
     height: 384
@@ -32,7 +30,7 @@ studio_roles:
 category_l1: 佛教空间案例
 category_l2: 幽蓝冷光天王护法与琉璃佛侧厅
 entity_type: 空间场景设计
-summary_zh: ''
+summary_zh: 幽蓝冷光与深灰石材 / 石雕天王立像、蓝色琉璃坐佛、蓝光万佛格墙
 materials:
 - 青黑石雕护法天王像
 - 宝蓝色古法琉璃药师佛
@@ -55,7 +53,7 @@ tags:
 - 暗调展览空间
 material_ids: []
 provenance:
-  source: own_project
+  source: unknown
   url: null
   credit: null
   license: unknown

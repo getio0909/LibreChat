@@ -14,14 +14,12 @@ derivatives:
   ref2048:
     path: assets/ref2048/63bddda2ba2d4cb8.jpg
     sha256: 2256cf22f6566b02b619ad535b15ae127127df7c799498b92dba83339981ab88
-    size: 348597
     bytes: 348597
     width: 1706
     height: 1279
   thumb512:
     path: assets/thumb512/63bddda2ba2d4cb8.webp
     sha256: cb9805183c94c98a19924f8c5e8a5f7b01d58233409d1d76a4f706177c41d1f0
-    size: 32798
     bytes: 32798
     width: 512
     height: 384
@@ -33,7 +31,7 @@ studio_roles:
 category_l1: 佛教家具与陈设
 category_l2: 汉式嵌石家具
 entity_type: 实物对象写实
-summary_zh: ''
+summary_zh: 纯白背景（Studio White Background）下的中式宫廷风结合佛教瑞兽花卉题材的重型实木嵌石会客家具组合。整套家具由一张三屏风式高靠背三人座主沙发、左二右一对称围合的单人位扶手太师椅、三张方形角几以及中央一张巨型双层底座四方茶几组成，器型敦厚威严，兼具清代宫廷宝座规制与现代奢石镶嵌工艺。
 materials:
 - 乌木黑檀
 - 孔雀石绿玉
