@@ -1,0 +1,74 @@
+id: 3ffc044d56e9eae4
+title_zh: 佛教石刻雕像展示墙
+source:
+  original_path: 佛教空间设计案例/佛教石刻雕像展示墙.jpg
+original:
+  path: 佛教空间设计案例/佛教石刻雕像展示墙.jpg
+  sha256: 3ffc044d56e9eae44da726f5e8e7b0c6b3d31b3accdf709b775ec33facafd744
+  bytes: 97573
+  width: 405
+  height: 349
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/3ffc044d56e9eae4.jpg
+    sha256: 105b55bdb40d1fbc0119ff1925852aa02812692ab82786e8d58003612353b10c
+    bytes: 24611
+    width: 405
+    height: 349
+  thumb512:
+    path: assets/thumb512/3ffc044d56e9eae4.webp
+    sha256: 90017e73d9829475c2b085ee1db01c3543803c5366b6e123221cbeb114f407ea
+    bytes: 12434
+    width: 405
+    height: 349
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代素白石材矩阵千佛龛与三圣立像展示墙场景
+entity_type: 空间场景设计
+summary_zh: 本图为新中式素白石材佛教展厅内核心“千佛三圣浮雕展示墙”的立面场景（对应第 09 张左侧长墙）。设计将传统石窟的“千佛龛”概念转化为高度秩序化、模数化的现代建筑表皮，兼具大型功德认捐佛龛墙与佛教雕塑艺术背景墙双重属性。
+  整面展示墙通体采用暖白色细粒汉白玉或高品质白砂岩/人造透光石通过数控CNC精雕而成，表面呈柔和细腻的哑光石材肌理；每个大小圆拱龛底部或内壁暗藏3000K暖黄洗墙灯带，将纯白石雕造像烘托得圣洁温润；下部墙裙采用浅灰米色大理石并雕刻一圈连续宝相莲花浮雕带，地面为灰绿色系大理石。
+materials:
+- 汉白玉
+- 白砂岩CNC雕刻
+- 背光灯带
+colors:
+- 暖白石色
+- 柔和暖黄背光
+- 浅灰石裙
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：现代素白石材千佛墙/功德墙立面设计 / 大小拱龛模数化嵌套构图参考 / 汉白玉CNC雕刻背景墙生成；推荐搭配：米白汉白玉/白砂岩整墙CNC雕刻 + 汉白玉三圣立像与千佛小坐像 + 龛底嵌入式3000K微型防眩洗墙灯条
+  + 浅灰石材浮雕墙裙
+prompt_zh: 现代新中式佛教展厅素白石材千佛雕像展示墙场景，整面高墙由暖白色汉白玉石材精雕而成，密布横竖整齐排列的圆拱形内发光小佛龛，每个小龛内供奉一尊白玉小坐佛；墙面中央并列嵌入三个跨越多格的大型圆拱形壁龛，三座大龛内分别供奉三尊姿态优雅、脚踏祥云莲花座的汉白玉立姿佛与菩萨雕像，内置柔和温暖的黄色洗墙背光；墙面底部设有连续莲花浮雕纹带与浅灰色大理石高踢脚线，纯净圣洁，现代极简禅意建筑设计。
+tags:
+- 石刻雕像展示墙
+- 汉白玉千佛墙
+- 模数化佛龛设计
+- 白玉三圣立像
+- 现代素雅佛堂
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 349
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代素白石材模数化千佛龛与三圣立像展示墙局部三维效果图，原图分辨率偏低（405x349）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 405x349 (<800px short side)'

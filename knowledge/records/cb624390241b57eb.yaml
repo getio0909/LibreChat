@@ -1,0 +1,80 @@
+id: cb624390241b57eb
+title_zh: 河北满城窦绾墓透雕圆盖圈足铜熏炉
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-河北满城窦绾墓透雕圆盖圈足铜熏炉-commons30568452.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-河北满城窦绾墓透雕圆盖圈足铜熏炉-commons30568452.jpg
+  sha256: cb624390241b57eb09321227797c95a5cc9b24d8dd8621e0317b4966adf27ed1
+  bytes: 2492025
+  width: 3265
+  height: 3257
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/cb624390241b57eb.jpg
+    sha256: 9fe008a33911fe3fd05c2eb4a4558c658d43c8102ba94a0e470aa25a9ce1c903
+    bytes: 712205
+    width: 2048
+    height: 2043
+  thumb512:
+    path: assets/thumb512/cb624390241b57eb.webp
+    sha256: 32b47a8a3f986d6c2fe98c2a0a93864ba02d85efeb8cb743586a2fa90c6189b3
+    bytes: 40600
+    width: 512
+    height: 511
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 河北满城窦绾墓透雕圆盖圈足铜熏炉
+entity_type: 实物对象写实
+summary_zh: 【图中可见】半球形炉身配圆拱镂空盖，盖顶有环钮，两侧垂环耳，腹部有多道弦纹，底部为短柄圈足。【来源著录】Bronze incense burner B from tomb of Dou Wan.jpg；文化或地点依据：Commons
+  明确著录出土于河北满城窦绾墓，西汉；按出土地归入中国北方。
+materials:
+- 青铜
+colors:
+- 灰褐
+- 暗金
+- 青绿
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，半球形炉身配圆拱镂空盖，盖顶有环钮，两侧垂环耳，腹部有多道弦纹，底部为短柄圈足。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Bronze incense burner B from tomb of Dou Wan.jpg. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 河北满城窦绾墓透雕圆盖圈足铜熏炉
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Bronze_incense_burner_B_from_tomb_of_Dou_Wan.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/a/a8/Bronze_incense_burner_B_from_tomb_of_Dou_Wan.jpg
+  credit: BabelStone; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 3257
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

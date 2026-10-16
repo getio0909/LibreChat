@@ -1,0 +1,30 @@
+schema: 1
+id: "9999999999999991"
+title_zh: 佛教主题展览空间设计-敦煌壁画方柱案例
+library_type: 空间展陈
+studio_roles:
+  - 参考
+  - 风格
+category_l1: 佛事展展位方案
+materials:
+  - 敦煌重彩壁画包柱
+  - 暖黄木饰面
+material_ids: []
+colors:
+  - 暖黄
+  - 朱红
+style:
+  - 敦煌重彩壁画风
+tags:
+  - 敦煌壁画方柱
+  - 展览空间
+summary_zh: 展览空间设计案例，四周立柱饰以敦煌重彩壁画与木饰面收口。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: approved

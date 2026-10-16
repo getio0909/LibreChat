@@ -1,0 +1,80 @@
+id: 498fb29138772f8e
+title_zh: 吉美博物馆高棉多龛人物卷草门楣
+source:
+  original_path: 石刻纹样开放授权实物参考/东南亚与南亚-吉美博物馆高棉多龛人物卷草门楣-commons5691009.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/02-东南亚与南亚石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/东南亚与南亚-吉美博物馆高棉多龛人物卷草门楣-commons5691009.jpg
+  sha256: 498fb29138772f8eeb169752848647ee0da10799225d0700b3b4503d06ed1dbb
+  bytes: 526020
+  width: 1920
+  height: 617
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/498fb29138772f8e.jpg
+    sha256: 92940ca939944b90401b7b5cae164de5c384961a55b542fc67109e6888e1dda2
+    bytes: 521166
+    width: 1920
+    height: 617
+  thumb512:
+    path: assets/thumb512/498fb29138772f8e.webp
+    sha256: 29e611458bfd562af8e73a19262825342a57909ae9c87995bed0385130f2bb51
+    bytes: 37310
+    width: 512
+    height: 165
+library_type: 石刻纹样
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 吉美博物馆高棉多龛人物卷草门楣
+entity_type: 实物对象写实
+summary_zh: 【图中可见】长方门楣以反复卷叶包围多组人形和兽面，左右形成连续节奏，右上部有一块明显残缺，部分人形带扇形多头蛇状背饰。【来源著录】Guimet-JAN09-Linteau Khmer-7.jpg；文化或地点依据：来源说明为巴黎吉美博物馆的
+  Khmer lintel，未注明具体出土地和年代。
+materials:
+- 石材（图中可见）
+colors:
+- 黄褐色
+- 灰褐色
+style: 东南亚/南亚传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，长方门楣以反复卷叶包围多组人形和兽面，左右形成连续节奏，右上部有一块明显残缺，部分人形带扇形多头蛇状背饰。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Guimet-JAN09-Linteau Khmer-7.jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 石刻纹样
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 吉美博物馆高棉多龛人物卷草门楣
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Guimet-JAN09-Linteau_Khmer-7.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Guimet-JAN09-Linteau_Khmer-7.jpg/1920px-Guimet-JAN09-Linteau_Khmer-7.jpg
+  credit: Ddalbiez; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 617
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review
+  - low_resolution

@@ -1,0 +1,76 @@
+id: c4f23463a8d07b69
+title_zh: 佛教室内供桌与佛像场景
+source:
+  original_path: 佛教空间设计案例/佛教室内供桌与佛像场景.jpg
+original:
+  path: 佛教空间设计案例/佛教室内供桌与佛像场景.jpg
+  sha256: c4f23463a8d07b69a9ea2065ea3157c9f3c3747daab2f47fa035593204d3deb8
+  bytes: 3411205
+  width: 4105
+  height: 2651
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c4f23463a8d07b69.jpg
+    sha256: b8d5542182092b096c7b3d278be1402aa6365076a6909cb1a1675c0dc559f700
+    bytes: 339436
+    width: 2048
+    height: 1323
+  thumb512:
+    path: assets/thumb512/c4f23463a8d07b69.webp
+    sha256: 4af679738f02736867e762f28739fc9525278fd21adccf4ff5129169bb459ade
+    bytes: 24654
+    width: 512
+    height: 331
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 中式居家与会所佛堂
+entity_type: 空间场景设计
+summary_zh: 设《心经》背板与“三宝常护念/六时恒吉祥”楹联、供奉带火焰背光三世佛、前设单张宽体红木供桌与三个黄底红边方蒲团的传统佛堂。
+materials:
+- 红木雕花供桌
+- 火焰背光鎏金三世佛
+- 心经浮雕背板
+- 暖棕石材方砖
+- 黄底红边方蒲团
+colors:
+- 深红木色
+- 辉煌金
+- 暖棕色
+- 纯白色
+- 明黄配朱红
+style: 传统中式红木精舍佛堂风
+ai_design_usage: 传统红木三世佛佛堂标准陈设参考、供桌器物摆场与火焰背光三世佛搭配、同户型不同地面与供桌变体比选
+prompt_zh: 传统中式红木佛堂室内供桌与佛像陈设场景，正中央红木雕花佛龛内设海棠形发光金色《般若波罗蜜多心经》浮雕背板，两侧刻有“三宝常护念、六时恒吉祥”金色对联，前方并列供奉三尊带金色镂空火焰背光的铜鎏金三世佛坐像，佛前居中摆放一张宽大的红木束腰雕花供桌，陈列香炉红烛与鲜果，桌前地垫上排列三个黄底红边方形蒲团，两侧立红木落地宫灯，左右白墙悬挂框装佛教壁画，暖棕色方格石材地面，红木方格藻井吊顶，8K效果图
+tags:
+- 红木供桌
+- 火焰背光三世佛
+- 心经背板
+- 三宝常护念
+- 传统佛堂陈设
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2651
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a traditional redwood Buddhist shrine room enshrining three flame-halo golden Buddhas before a carved
+    Heart Sutra screen and couplet ('三宝常护念 / 六时恒吉祥') with a long offering table and three kneeling cushions.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

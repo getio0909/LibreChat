@@ -1,0 +1,72 @@
+id: f6d6162f34012cf6
+title_zh: 佛教寺庙大殿内部场景-09
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-09.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-09.jpg
+  sha256: f6d6162f34012cf6b252a8d2f212b21dd64c7a125ff66608a284fbdb2abff86e
+  bytes: 4060886
+  width: 3793
+  height: 2432
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f6d6162f34012cf6.jpg
+    sha256: 9997f48d40b0aa908ba5d14dd787da1f156eaf590bd9e39150956720c5be8708
+    bytes: 504714
+    width: 2048
+    height: 1313
+  thumb512:
+    path: assets/thumb512/f6d6162f34012cf6.webp
+    sha256: bcd0a14d10af24096ee67853677de4f823092fb98a7341c9f2456c5f746b228f
+    bytes: 44204
+    width: 512
+    height: 328
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为大型万佛护法大殿右侧壁“汉白玉须弥座五护法大龛 + 通顶万佛墙”斜向透视展示场景（空间场景设计，本卷第23号为其正视中轴全景）。
+materials:
+- 通长汉白玉精雕须弥座台基
+- 五尊巨型铜鎏金护法天王立像大龛
+- 通顶万佛墙
+- 双圈太阳放射背光主佛
+- 双层圆宫灯
+colors:
+- 辉煌金
+- 深青灰色
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 万佛护法大殿侧壁汉白玉须弥座与护法大龛斜向透视深化、万佛墙嵌大型护法神龛比例关系参考
+prompt_zh: 佛教寺庙万佛护法大殿内部右侧斜向广角透视，深青灰色石板地面，画面左前方主坛上供奉铜鎏金坐佛，背后是璀璨的双圈圆形金色太阳放射状佛光背板与胁侍菩萨，最左侧墙面镶嵌大幅发光重彩佛教壁画，画面右侧整面高墙密布红底发光小佛龛（万佛墙），墙面底部筑有通长的洁白汉白玉精雕莲花须弥座台基，台基上等距开启五个大型金色火焰背光神龛，供奉五尊威武高大的铜鎏金护法天王立像，顶部为弧形木椽吊顶、多层贴金斗拱与双层圆形红金宫灯，8K超清建筑渲染
+tags:
+- 护法神龛万佛墙
+- 汉白玉通长台基
+- 太阳放射圆光
+- 大殿斜向透视
+- 五大护法天王
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2432
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大型万佛护法大殿右侧壁汉白玉须弥座五护法大龛与万佛墙斜视三维效果图，地面局部残留三维辅助线框。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

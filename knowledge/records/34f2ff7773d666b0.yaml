@@ -1,0 +1,70 @@
+id: 34f2ff7773d666b0
+title_zh: 展览中的多色天然石材板
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/展览中的多色天然石材板.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/展览中的多色天然石材板.jpg
+  sha256: 34f2ff7773d666b0dac8ac5a3c71a7aa1ca06de816f92774a6d1a7d4091a56cb
+  bytes: 2165477
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/34f2ff7773d666b0.jpg
+    sha256: 7111d01c3bedb5c2dbb518fad256a8e4c678aed0db5f5bdb955acba2e541f4f4
+    bytes: 664396
+    width: 2048
+    height: 1153
+  thumb512:
+    path: assets/thumb512/34f2ff7773d666b0.webp
+    sha256: b81ce24fe714ace659556b410b11eb7d99434ad91fdea2705866c3e7c0475755
+    bytes: 32240
+    width: 512
+    height: 288
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为阿利坦展厅核心展位上单块完整「梦幻庄园」巨幅大板的正视标准写实照。
+materials:
+- 梦幻庄园大板
+colors:
+- 暖金橘
+- 珊瑚粉
+- 烟灰蓝角砾纹
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 佛堂主背景墙整板贴图母本 / 对开连纹（Bookmatch）背景墙设计源图 / 奢石材质高精度细节参考
+prompt_zh: 正面超清写实摄影，一整块巨幅梦幻庄园天然奢石大板竖立在黑色方钢展架与白色鹅卵石底座上，板面呈现冷调烟灰蓝角砾块与左下至右上斜向奔涌的暖珊瑚橙、琥珀金云带，表层密布精致的金黄色与铁锈红蛛网细脉，高光镜面抛光质感，色彩绚丽庄严，4K商业石材摄影。
+tags:
+- 梦幻庄园
+- 整板标准照
+- 对开连纹母本
+- 佛堂背光墙材质
+- 暖金蓝灰撞色
+- 阿利坦石材
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K front-on view of a full Gold-Jade (梦幻庄园) slab on display in the Alitan Stone showroom.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

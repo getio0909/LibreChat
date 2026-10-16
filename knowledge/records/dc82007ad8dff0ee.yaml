@@ -1,0 +1,75 @@
+id: dc82007ad8dff0ee
+title_zh: 中式传统建筑入口场景
+source:
+  original_path: 佛教空间设计案例/中式传统建筑入口场景.jpg
+original:
+  path: 佛教空间设计案例/中式传统建筑入口场景.jpg
+  sha256: dc82007ad8dff0eef6aab4a42afa471785996bcf603956e452126bc64d88d6e1
+  bytes: 1634584
+  width: 1995
+  height: 2650
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/dc82007ad8dff0ee.jpg
+    sha256: c64ac3bc210ce9564dd31d6f66b824824e16e25933f79de83ad324e08633d7dc
+    bytes: 309519
+    width: 1542
+    height: 2048
+  thumb512:
+    path: assets/thumb512/dc82007ad8dff0ee.webp
+    sha256: cafdb4868b796224b4f32e8b6573429907487743c4ca39bcfee0c6dd1cc2846f
+    bytes: 22754
+    width: 385
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 新中式佛教文化展馆入口门厅对称场景，设暖胡桃木四扇团寿纹隔扇大门、汉白玉覆盆柱础、门楣斗拱八角宫灯、现代折扇百叶发光吊灯及浅灰褐高光大理石地面。
+materials:
+- 胡桃木隔扇门
+- 汉白玉覆盆柱础
+- 浅灰褐高光云石大板
+- 透光宣纸百叶灯罩
+colors:
+- 暖胡桃木色
+- 浅灰白色
+- 浅灰褐色
+- 暖白光色
+style: 现代禅意
+ai_design_usage: 佛堂与佛教文化馆门厅立面生成、中式木构门楼ControlNet控制及地面镜面云石材质替换
+prompt_zh: 新中式佛教文化展馆入口门厅室内设计，正面中轴对称构图，高耸的暖胡桃木四扇传统雕花隔扇大门，上部通透万字格玻璃窗，下部团寿纹浮雕裙板，两侧粗壮木圆柱立于浅灰汉白玉鼓形柱础上，门楣四组斗拱悬挂精致八角宫灯，顶部深灰吊顶安装三盏现代中式折扇百叶发光大吊灯，地面铺设浅灰褐色高光抛光大理石大板，倒影清晰，庄严禅意氛围，8K超高清建筑渲染。
+tags:
+- 佛教空间案例
+- 新中式门厅
+- 木作隔扇门
+- 汉白玉柱础
+- 折扇吊灯
+- 大理石地面
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1995
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering of a New Chinese Buddhist exhibition hall entrance with walnut lattice doors, white
+    marble column bases, bracket-hung palace lanterns, and pleated ceiling lights.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

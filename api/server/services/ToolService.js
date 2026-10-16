@@ -19,6 +19,7 @@ const {
   isActionDomainAllowed,
   buildWebSearchContext,
   buildImageToolContext,
+  buildMCPImageToolContext,
   buildToolClassification,
   supportsProgrammaticCodeExecution,
   getCodeFileLocation,
@@ -844,6 +845,7 @@ async function loadToolDefinitionsWrapper({
   codeExecutionContext,
   attachedEnvironmentOptOut,
   accessibleMcpServerNames,
+  mcpImageFiles,
   signal,
   upstreamTokenProvider: suppliedUpstreamTokenProvider,
   upstreamTokenProviderResolver,
@@ -1617,6 +1619,17 @@ async function loadToolDefinitionsWrapper({
     }
   }
 
+  // 当挂载了 MCP 服务且存在图像文件时，注入中立图像列表与契约真实参数名
+  const mcpImages = mcpImageFiles ?? imageFiles;
+  if (hasFilteredMCPTools && mcpImages.length > 0) {
+    const toolContext = buildMCPImageToolContext({
+      imageFiles: mcpImages,
+    });
+    if (toolContext) {
+      dynamicToolContextMap.mcp_image_context = toolContext;
+    }
+  }
+
   approvalMetadata.attach(toolDefinitions);
   return {
     toolRegistry,
@@ -1677,6 +1690,7 @@ async function loadAgentTools({
   codeExecutionContext: providedCodeExecutionContext,
   attachedEnvironmentOptOut,
   accessibleMcpServerNames,
+  mcpImageFiles,
   upstreamTokenProvider,
   upstreamTokenProviderResolver,
 }) {
@@ -1694,6 +1708,7 @@ async function loadAgentTools({
         codeExecutionContext: providedCodeExecutionContext,
         attachedEnvironmentOptOut,
         accessibleMcpServerNames,
+        mcpImageFiles,
         signal,
         upstreamTokenProvider,
         upstreamTokenProviderResolver,
@@ -1874,6 +1889,18 @@ async function loadAgentTools({
     fileStrategy: appConfig.fileStrategy,
     imageOutputType: appConfig.imageOutputType,
   });
+
+  // 当非仅定义模式同样挂载了 MCP 服务且存在图像文件时，补充注入中立图像上下文
+  const runtimeImageFiles =
+    mcpImageFiles ?? tool_resources?.[EToolResources.image_edit]?.files ?? [];
+  if (mcpServerContext && runtimeImageFiles.length > 0 && dynamicToolContextMap) {
+    const toolContext = buildMCPImageToolContext({
+      imageFiles: runtimeImageFiles,
+    });
+    if (toolContext) {
+      dynamicToolContextMap.mcp_image_context = toolContext;
+    }
+  }
 
   /** Build tool registry from MCP tools and create PTC/tool search tools if configured */
   const deferredToolsEnabled = checkCapability(AgentCapabilities.deferred_tools);

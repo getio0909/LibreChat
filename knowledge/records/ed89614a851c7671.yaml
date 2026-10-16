@@ -1,0 +1,80 @@
+id: ed89614a851c7671
+title_zh: 杭州灵隐寺药师殿立面与宽石阶
+source:
+  original_path: 建筑景观开放授权实景参考/中国南方-杭州灵隐寺药师殿立面与宽石阶-commons141421361.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/04-中国南方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国南方-杭州灵隐寺药师殿立面与宽石阶-commons141421361.jpg
+  sha256: ed89614a851c7671ddb8885a80f7c43cc2d59a10de38411203ee23f4359a8a47
+  bytes: 2470198
+  width: 1800
+  height: 1200
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ed89614a851c7671.jpg
+    sha256: bdca94144d0a49b51517f4eb73691f223a2d3d69c80e54503c615bf4162b3807
+    bytes: 839409
+    width: 1800
+    height: 1200
+  thumb512:
+    path: assets/thumb512/ed89614a851c7671.webp
+    sha256: c397d40c1a7e3b8f3ce4964f7513e585f095c03b0cf7afea965c080db4119649
+    bytes: 56354
+    width: 512
+    height: 341
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 杭州灵隐寺药师殿立面与宽石阶
+entity_type: 空间场景设计
+summary_zh: 【图中可见】殿堂设上下两层屋檐，红褐色柱门与黄色侧墙对照；大幅匾额位于门上，中央为宽石阶，两侧可见石栏与圆形透空构件。【来源著录】20231124 Lingyin Temple 02.jpg；文化或地点依据：来源标为杭州灵隐寺；药师殿名称由照片匾额直接可读，不另推定建造年代。
+materials:
+- 瓦
+- 木构件
+- 石材（外观依据）
+colors:
+- 红褐色
+- 黄色
+- 灰色
+style: 中国南方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，殿堂设上下两层屋檐，红褐色柱门与黄色侧墙对照；大幅匾额位于门上，中央为宽石阶，两侧可见石栏与圆形透空构件。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 20231124 Lingyin Temple 02.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国南方
+- 开放授权
+- 真实摄影
+- 杭州灵隐寺药师殿立面与宽石阶
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20231124_Lingyin_Temple_02.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/6/65/20231124_Lingyin_Temple_02.jpg
+  credit: Windmemories; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1200
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,70 @@
+id: 84172b5ff89881f3
+title_zh: 国际石作参考｜白色大理石镂空屏
+source:
+  original_path: 设计风格精选20260930/marble-jali.jpg
+original:
+  path: 设计风格精选20260930/marble-jali.jpg
+  sha256: 84172b5ff89881f3eefcaa5ec3fe2af0870c8d850260dc679ae47f6ff1d5cd72
+  bytes: 2796229
+  width: 2511
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/84172b5ff89881f3.jpg
+    sha256: 70a4dcd09010f44996195f8d5bb101d902cee2b5770561cf5628ae5036c76305
+    bytes: 463649
+    width: 1286
+    height: 2048
+  thumb512:
+    path: assets/thumb512/84172b5ff89881f3.webp
+    sha256: dedf114e7868050073c4abcc5785824d89cabfb9472e3b4ef9ec704aad7c6a95
+    bytes: 28854
+    width: 321
+    height: 512
+library_type: 石刻纹样
+region: 南亚东南亚
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 伊斯兰/莫卧儿大理石镂空花窗构件
+entity_type: 实物对象写实
+summary_zh: 这是一件16至17世纪印度莫卧儿帝国（Mughal）风格的整石透雕白色大理石镂空花窗屏板（Jali Screen）实物写实。
+materials:
+- 印度马克拉纳白色大理石
+- 整石透雕构件
+colors:
+- 暖象牙白
+- 浅米灰色
+style: 跨文化莫卧儿石雕 / 几何透雕艺术
+ai_design_usage: 石材水刀与五轴CNC镂空屏风研发 / 现代禅意/跨文化佛堂隔断设计 / 几何光影投射构件参考
+prompt_zh: 博物馆级印度莫卧儿风格白色大理石透雕花窗（Jali）构件写实，灰色纯净背景，竖向长方形外框内嵌尖拱形窗框，拱肩两侧各有一朵高浮雕八瓣莲花，窗心由极其精密的八角形、菱形与十字星几何网格镂空透雕而成，大理石线条表面带有立体的斜削倒角，呈现温暖的象牙白包浆与淡淡的天然灰纹理，棚拍柔和侧光，超高清文物摄影。
+tags:
+- 大理石镂空花窗
+- 莫卧儿Jali石雕
+- 几何透雕隔断
+- 石材CNC屏风
+- 八角莲花石构件
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/453261
+  credit: The Metropolitan Museum of Art, 1985.240.2
+  license: cc0
+  license_status: confirmed
+quality:
+  min_side_px: 2511
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Museum studio photograph of a Mughal carved white marble pierced lattice screen (jali) with arched frame and lotus
+    spandrel rosettes.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,75 @@
+id: 5f33a0e607969b2d
+title_zh: 佛教风格雕花家具套装
+source:
+  original_path: 佛教家具与陈设素材/佛教风格雕花家具套装.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格雕花家具套装.jpg
+  sha256: 5f33a0e607969b2d4383472cf3fce59c1768e5ec05d9b42265cf75b3bcd5a88f
+  bytes: 363534
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5f33a0e607969b2d.jpg
+    sha256: d863b5661a4accf3e16a1dca979c6a137bb96959debfa9f2ce3fb48ddf33bea1
+    bytes: 384887
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/5f33a0e607969b2d.webp
+    sha256: 87217c716531cafcf671ec204993ef1beb13364a7bc8ba152c639709e1c387a0
+    bytes: 32248
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: 纯白背景下的“黑金翠玉”高定佛教主题实木嵌石沙发茶几组合。作为第 01 项的姊妹升级版，本款去除了茶几上的茶具摆件，完整裸露出整块冰种翠绿玉石台面，并将木框雕花升级为更加精细硬朗的黑漆描金嵌绿松石工艺。
+materials:
+- 乌木黑檀
+- 冰种翠绿玉石
+- 金线描金
+colors:
+- 乌黑描金配冰翠绿
+style: 汉藏融合宫廷嵌石风
+ai_design_usage: 黑金配翠绿奢石家具方案生成 / 绿松石点缀与大漆描金工艺参考 / 顶级私人会所佛堂茶室软装设计
+prompt_zh: 商业家具摄影，纯白渐变背景，一套顶级奢华的黑檀木描金嵌翠玉佛教雕花沙发茶几组合，深黑亮光黑檀木框架配金色线条勾勒与绿松石宝珠镶嵌，所有坐面和中央方形大茶几台面均镶嵌高光镜面冰种翡翠绿大理石，搭配墨绿色刺绣金团花抱枕，雕工繁复华丽，黑金翠绿强烈对比，8K商业渲染。
+tags:
+- 黑檀描金
+- 冰种翠玉台面
+- 绿松石镶嵌
+- 黑金翠绿配色
+- 奢石茶几套装
+- 新中式顶奢家具
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a black ebony and gold-traced sofa set with emerald green
+    jade tabletop on white background. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

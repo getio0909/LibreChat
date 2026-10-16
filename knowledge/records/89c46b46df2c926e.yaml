@@ -1,0 +1,77 @@
+id: 89c46b46df2c926e
+title_zh: 佛教主题室内展览空间-05
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-05.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-05.jpg
+  sha256: 89c46b46df2c926effa0d1b7c6d1c79e2693435d21897be6f9a6f1825de29515
+  bytes: 4004761
+  width: 4399
+  height: 2544
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/89c46b46df2c926e.jpg
+    sha256: 9324f87762230ebad94f90feb3bbb2758ef9ab922089f992fd721197d1c86655
+    bytes: 401354
+    width: 2048
+    height: 1184
+  thumb512:
+    path: assets/thumb512/89c46b46df2c926e.webp
+    sha256: 30d12a4060142c50febc0bb3e1e1053920e452f7567df6229de672615e8daa9b
+    bytes: 33674
+    width: 512
+    height: 296
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 药师琉璃光如来三圣主殿中轴对称全景，正中供奉澄澈宝蓝色琉璃药师佛与金身日光月光菩萨，顶部高悬多层立体发光白莲花穹顶藻井，两侧设8组蓝金双色万佛龛墙。
+materials:
+- 宝蓝色透光琉璃佛像
+- 透光云石立体白莲花穹顶
+- 深胡桃木方柱
+- 汉白玉雕花柱础
+- 深灰褐高光大理石
+colors:
+- 琉璃宝蓝
+- 莲花纯白
+- 佛光暖金
+- 深胡桃木褐
+style: 现代奢石展陈
+ai_design_usage: 药师琉璃光如来主殿中轴全景设计、多层立体发光莲花穹顶藻井与蓝金万佛墙配色参考
+prompt_zh: 药师琉璃光如来主殿室内全景设计，宏伟的中轴对称广角构图，正中央须弥座上供奉东方三圣，主尊为通体澄澈宝蓝色半透明琉璃质感的药师佛坐像，左右两侧为金身立姿日光菩萨与月光菩萨，后方为祥云仙山与飞鹤巨幅壁画，主尊正上方天花高悬一座巨大的五层立体绽放白色发光莲花圆形穹顶藻井，大殿两侧墙面对称嵌入八组通高万佛龛，每格小龛均散发宝蓝色与金色双色琉璃光芒，四根深胡桃木方形大柱立于汉白玉雕花柱础上，高光抛光深灰褐色大理石地面将蓝色大佛与彩色佛龛清晰倒映，殿前摆放六个黄色方形拜垫，净琉璃世界庄严景象，8K超高清渲染。
+tags:
+- 佛教空间案例
+- 药师琉璃光佛
+- 东方三圣
+- 发光莲花穹顶
+- 蓝金万佛墙
+- 高光大理石倒影
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2544
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering of the symmetrical Medicine Buddha main hall featuring a blue liuli Medicine Buddha
+    flanked by golden Suryaprabha and Candraprabha Bodhisattvas, white lotus dome ceiling, and 8 vertical blue-gold thousand-Buddha
+    niche walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

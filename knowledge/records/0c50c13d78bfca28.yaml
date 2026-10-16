@@ -1,0 +1,76 @@
+id: 0c50c13d78bfca28
+title_zh: 佛教笑佛雕像展览场景
+source:
+  original_path: 佛教空间设计案例/佛教笑佛雕像展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教笑佛雕像展览场景.jpg
+  sha256: 0c50c13d78bfca282c9857ef747f769eff1cad990f1da7cdb9e01e9fd966f8fb
+  bytes: 1112549
+  width: 1541
+  height: 2622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0c50c13d78bfca28.jpg
+    sha256: 1d9bd5b62b43eb9923c9a3c2cc5efb9c7fc6def92d53e952269fef3450d60f86
+    bytes: 228810
+    width: 1204
+    height: 2048
+  thumb512:
+    path: assets/thumb512/0c50c13d78bfca28.webp
+    sha256: f604768299e2fee81ff6320bf8ef7363eab9a3af6429eb89053cf45df897177a
+    bytes: 17512
+    width: 301
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 物件
+category_l1: 佛教空间案例
+category_l2: 新中式圆形背光佛龛与金身大肚弥勒佛供奉场景
+entity_type: 空间场景设计
+summary_zh: 本图为新中式寺院天王殿迎门主龛、佛教文化展厅或高端中式佛堂内的“大肚弥勒佛（布袋和尚/笑佛）”独立供奉龛正面场景。弥勒佛象征“大肚能容天下难容之事，开口便笑世间可笑之人”的欢喜、宽容与招财纳福寓意，空间设计简练大气、圆融喜庆。
+  空间以温润醇厚的深胡桃木色、纯净素白墙面、暖金色佛身与耀眼纯白月轮光带构成鲜明层次。主尊弥勒佛及下方双层祥云莲花座采用暖金色木雕（金丝楠木/黄杨木雕或鎏金铜雕）工艺，质感温润细腻；外框与前方供桌采用深棕色胡桃木精雕；供桌上的三足香炉与高脚烛台采用哑光纯银/白铜材质，两侧铜花瓶内插自然风干…
+materials:
+- 金色木雕
+- 铜雕弥勒佛
+- 红木雕花供桌
+- 银质香炉
+colors:
+- 暖金佛身
+- 纯白月轮光
+- 深胡桃木色
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：新中式佛堂/天王殿大肚弥勒佛供奉龛立面设计 / 正圆形内发光月轮背光佛龛参考 / 标准中式供桌五供（香炉、红烛、莲蓬瓶）与拜垫陈设生成；推荐搭配：金丝楠木/黄铜鎏金大肚弥勒佛坐像 + 纯白微水泥正圆形暗藏灯带月轮背光龛
+  + 深胡桃木壶门外框与雕花供桌 + 纯银香炉烛台与干莲蓬插花
+prompt_zh: 新中式佛教展厅大肚弥勒佛（笑佛）供奉龛正面竖幅场景，严格中轴对称构图，外围为深胡桃木雕花壶门形木框，内部素白墙面正中设有一个正圆形内凹白色发光月轮背光龛；龛内祥云仰覆莲花宝座上端坐一尊笑容可掬、袒胸露腹的暖金色大肚弥勒佛雕像，右手扶布袋，左手托金元宝；佛龛前方陈设一张精雕细琢的中式深木色供桌，桌上对称摆放三足银香炉、一对银座红烛和插有干莲蓬的铜花瓶，供桌下方地面并列放置两个米黄色带红边的方形拜垫，庄重喜庆，禅意雅致，高清室内效果图。
+tags:
+- 大肚弥勒佛
+- 笑佛供奉场景
+- 圆形月轮背光龛
+- 中式五供陈设
+- 新中式佛龛设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1541
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 室内八角多层木雕万佛宝塔供案及蒲团渲染图，左下角蒲团处带有半透明白色莲花图形水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 左下角存在第三方半透明莲花图形水印

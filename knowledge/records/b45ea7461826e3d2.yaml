@@ -1,0 +1,75 @@
+id: b45ea7461826e3d2
+title_zh: 大型浅色石材板
+source:
+  original_path: 常用石材大板/大型浅色石材板.jpg
+original:
+  path: 常用石材大板/大型浅色石材板.jpg
+  sha256: b45ea7461826e3d2f07ed0261c877acea564546488a0fff5f8c652a3ca574e2f
+  bytes: 189851
+  width: 853
+  height: 640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b45ea7461826e3d2.jpg
+    sha256: bcbb4a1d47262bce6f52c7f8ca44f8446e8384e22adf4c6b648c65e885b9ca66
+    bytes: 90718
+    width: 853
+    height: 640
+  thumb512:
+    path: assets/thumb512/b45ea7461826e3d2.webp
+    sha256: b9eaff3f8ad8609baf7582e7306d0547c48989d21bf2211bc23b7a6f13bd7294
+    bytes: 18388
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-暖米黄均匀系
+entity_type: 实物对象写实
+summary_zh: 本图为单块大体量暖米黄色系天然大理石大板写实图（属经典米黄类石材，如白玉兰、莎安娜米黄或土耳其米黄品系），陈列于石材厂房“D区”木架之上，是宗教建筑与高端精装空间中最常用的基础百搭型主材。
+materials:
+- 天然大理石
+- 白玉兰米黄大理石
+- 高光抛光石材
+colors:
+- 暖米黄色
+- 奶油杏色
+- 浅驼色
+style: 现代奢石展陈 / 传统与现代百搭
+ai_design_usage: 传统与现代佛堂地面大面积通铺 / 暖色调墙面基底贴图 / 罗马柱与门套石材包覆材质
+prompt_zh: 大型浅米黄色天然大理石板材正面展示，温暖的奶油米色与浅杏色基底，细腻均匀的云雾状微晶团块与生物沉积纹理，无突兀杂乱大纹路，高光抛光镜面质感，放置在石材加工厂木托架上，温和雅致的暖色调建筑石材，8K高清实拍。
+tags:
+- 米黄大理石
+- 白玉兰石材
+- 暖色调大板
+- 均匀弱纹理
+- 佛堂地面石材
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 640
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 暖黄褐波浪纹天然石材大板实拍，原图853x640分辨率偏低，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 853x640 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（853x640，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印

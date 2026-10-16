@@ -1,0 +1,73 @@
+id: 35476edbe045fb04
+title_zh: 佛教石材雕刻展览场景
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材雕刻展览场景.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材雕刻展览场景.jpg
+  sha256: 35476edbe045fb043b6cf978831656d4f4d0630d7a61b66d7676a94bc49e910e
+  bytes: 4291506
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/35476edbe045fb04.jpg
+    sha256: d22eaef2fa8c787e72097e2267be14b2a8573f756480ec4d7395035d0224e248
+    bytes: 827366
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/35476edbe045fb04.webp
+    sha256: e1edb0ae226f64bd969c284d4a6d5b8745e45740d361385e00a6ddf58532cb6a
+    bytes: 47634
+    width: 384
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 材质
+- 参考
+- 风格
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-禅境灰蓝满铺地面实景
+entity_type: 空间场景设计
+summary_zh: 本图为 2026年春季佛事展（C5 T026）内部空间的高角度斜向俯视地面铺装专题实景照。将超过三分之二的画幅留给 75m² 满铺的“禅境灰蓝”（金镶玉大理石系列，2800元/M²）大板地面，直观展示了该品种在大面积地面工装应用中的整体气场与纹理延展性。
+materials:
+- 禅境灰蓝(金镶玉系列)地面
+colors:
+- 烟岚灰蓝
+- 冰川白
+- 琥珀金
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 大面积“禅境灰蓝”金丝脉络大理石地面密缝铺装与空间光影参考
+prompt_zh: 高角度斜向俯拍新中式禅意石材展厅地面与佛台空间，大面积满铺“禅境灰蓝”（金镶玉大理石系列）高档天然大理石地面，烟岚灰蓝色与冰川白底色上流淌着华丽的金黄色与古铜色天然闪电状脉络，无缝镜面抛光地面反射出柔和的金色佛龛灯带倒影与射灯光斑，画面远端摆放一座敦煌金黄玉石高浮雕须弥座供桌、明黄色团莲坐垫的实木拜凳以及白色花盆绿植，尽显东方奢华与禅意静谧，8K室内实景摄影。
+tags:
+- 26年春季佛事展
+- 禅境灰蓝
+- 金镶玉大理石系列
+- 大理石地面铺装
+- 新中式地面石材
+- 展厅实景
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展禅境灰蓝（金镶玉系列）满铺大理石地面与远景敦煌金供桌高角度俯视实景。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh串入同展位其他照片的''2800元/M²''价格与''75m²''面积数据，本图无相关标牌'

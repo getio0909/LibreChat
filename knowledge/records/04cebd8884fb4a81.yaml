@@ -1,0 +1,79 @@
+id: 04cebd8884fb4a81
+title_zh: 印度桑奇一号塔西塔门与覆钵塔体
+source:
+  original_path: 建筑景观开放授权实景参考/东南亚与南亚-印度桑奇一号塔西塔门与覆钵塔体-commons33567558.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/02-东南亚与南亚建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/东南亚与南亚-印度桑奇一号塔西塔门与覆钵塔体-commons33567558.jpg
+  sha256: 04cebd8884fb4a811d0f4f9f446c7c7bfed8615cf20f4bee1c4f7f658ea1e171
+  bytes: 810090
+  width: 1920
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/04cebd8884fb4a81.jpg
+    sha256: b5216f21d20a264d56ae37523860d6dd3ad8a9b96a9a5311577cfb770ebb1d0d
+    bytes: 788408
+    width: 1920
+    height: 1280
+  thumb512:
+    path: assets/thumb512/04cebd8884fb4a81.webp
+    sha256: 31a70c0acac0591d5d8796107ae161b128fcccbc19f1ccb9d7eeb2f4a79275bd
+    bytes: 39554
+    width: 512
+    height: 341
+library_type: 建筑景观
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 印度桑奇一号塔西塔门与覆钵塔体
+entity_type: 空间场景设计
+summary_zh: 【图中可见】半球状塔体外绕石栏，前方双立柱承托三道横梁式塔门，梁端为圆形涡卷，柱头和梁柱表面密布浮雕。【来源著录】Stupa 1, Sanchi 02.jpg；文化或地点依据：来源明确为印度 Sanchi 的 Stupa
+  1 西侧 torana。
+materials:
+- 石材（图中可见）
+colors:
+- 土黄色
+- 浅褐色
+- 灰色
+style: 东南亚/南亚传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，半球状塔体外绕石栏，前方双立柱承托三道横梁式塔门，梁端为圆形涡卷，柱头和梁柱表面密布浮雕。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Stupa 1, Sanchi 02.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 印度桑奇一号塔西塔门与覆钵塔体
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Stupa_1,_Sanchi_02.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Stupa_1%2C_Sanchi_02.jpg/1920px-Stupa_1%2C_Sanchi_02.jpg
+  credit: Bernard Gagnon; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

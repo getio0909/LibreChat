@@ -1,83 +1,157 @@
-import { writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { parseEnv } from 'node:util';
 import { randomBytes } from 'node:crypto';
 
-const deploymentUrl = new URL(process.env.DEPLOY_URL);
-if (deploymentUrl.protocol !== 'https:' || deploymentUrl.username || deploymentUrl.password) {
-  throw new Error('DEPLOY_URL must be an HTTPS URL without credentials.');
-}
-const downloadLinkTtlSeconds = Number(process.env.CAD_DOWNLOAD_LINK_TTL_SECONDS || 86400);
-if (
-  !Number.isInteger(downloadLinkTtlSeconds) ||
-  downloadLinkTtlSeconds < 60 ||
-  downloadLinkTtlSeconds > 7 * 86400
-) {
-  throw new Error('CAD_DOWNLOAD_LINK_TTL_SECONDS must be an integer between 60 and 604800.');
-}
-const target = path.join(process.env.RUNNER_TEMP, 'bundle');
-const maxPdfPages = Number(process.env.CAD_MAX_PDF_PAGES || 32);
-if (!Number.isInteger(maxPdfPages) || maxPdfPages < 1 || maxPdfPages > 128) {
-  throw new Error('CAD_MAX_PDF_PAGES must be an integer between 1 and 128.');
-}
-const renderMemoryMb = Number(process.env.CAD_RENDER_MEMORY_MB || 256);
-if (!Number.isInteger(renderMemoryMb) || renderMemoryMb < 64 || renderMemoryMb > 384) {
-  throw new Error('CAD_RENDER_MEMORY_MB must be an integer between 64 and 384.');
-}
-const hostImageLimit = Number(parseEnv(process.env.LIBRECHAT_ENV || '').MCP_IMAGE_DATA_MAX_BYTES);
-const maxImageBytes =
-  Number.isSafeInteger(hostImageLimit) && hostImageLimit > 0
-    ? Math.min(10 * 1024 * 1024, hostImageLimit)
-    : 10 * 1024 * 1024;
-const accounts = {};
-for (const account of ['admin', 'user']) {
-  const prefix = account.toUpperCase();
-  const values = {
-    email: process.env[`${prefix}_EMAIL`],
-    username: process.env[`${prefix}_USERNAME`],
-    password: process.env[`${prefix}_PASSWORD`],
-  };
-  if (
-    !values.username ||
-    !values.password ||
-    /[:@|\r\n]/.test(values.username) ||
-    /[@|\r\n]/.test(values.password)
-  ) {
-    throw new Error('CAD file credentials contain unsupported delimiter characters.');
+// 校验必须为单行且不包含单引号、反斜杠或换行的密钥字段。
+function requireSafeSingleLineSecret(name) {
+  const value = process.env[name];
+  if (!value || typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`Missing required environment variable: ${name}`);
   }
-  accounts[account] = values;
-  writeFileSync(
-    path.join(target, `design-${account}.json`),
-    JSON.stringify({
-      workspaceUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-files/${account}/`,
-      downloadUrl: `${process.env.DEPLOY_URL.replace(/\/$/, '')}/cad-downloads/${account}/`,
-      downloadSigningKey: randomBytes(32).toString('hex'),
-      downloadLinkTtlSeconds,
-      maxImageBytes,
-      maxPdfPages,
-      maxRenderMemoryBytes: renderMemoryMb * 1024 * 1024,
-      arkApiKey: process.env.ARK_API_KEY,
-      geminiApiKey: process.env.GEMINI_API_KEY,
-    }),
-    { mode: 0o600 },
-  );
-  writeFileSync(
-    path.join(target, `files-${account}.yaml`),
-    JSON.stringify({
-      'serve-path': '/data',
-      bind: '0.0.0.0',
-      port: 5000,
-      'path-prefix': `/cad-files/${account}`,
-      auth: [`${values.username}:${values.password}@/:rw`],
-      'allow-upload': true,
-      'allow-delete': true,
-      'allow-search': true,
-      'allow-archive': true,
-      'allow-symlink': false,
-      hidden: ['.????????-????-????-????-????????????.tmp'],
-      'log-format': '$remote_addr "$request" $status',
-    }),
-    { mode: 0o600 },
-  );
+  if (/[\r\n'\\]/.test(value)) {
+    throw new Error(`${name} must be a single-line value without single quotes or backslashes.`);
+  }
+  return value;
 }
-writeFileSync(path.join(target, 'accounts.json'), JSON.stringify(accounts), { mode: 0o600 });
+
+// 校验镜像引用为非空单行字符串且不包含空白或特殊转义字符。
+function requireImageReference(name) {
+  const value = process.env[name];
+  if (!value || typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`Missing required image reference: ${name}`);
+  }
+  if (/[\r\n'\\\s]/.test(value)) {
+    throw new Error(`${name} must be a single-line image reference without whitespace or quotes.`);
+  }
+  return value;
+}
+
+// 校验默认预置账户的邮箱、用户名与密码格式。
+function requireAccountConfig(prefix) {
+  const email = process.env[`${prefix}_EMAIL`];
+  const username = process.env[`${prefix}_USERNAME`];
+  const password = process.env[`${prefix}_PASSWORD`];
+  if (!email || !email.includes('@') || /[\r\n]/.test(email)) {
+    throw new Error(`${prefix}_EMAIL must be a valid single-line email address.`);
+  }
+  if (!username || username.length < 3 || /[\r\n]/.test(username)) {
+    throw new Error(`${prefix}_USERNAME must be a single-line string of at least 3 characters.`);
+  }
+  if (!password || password.length < 8 || /[\r\n]/.test(password)) {
+    throw new Error(`${prefix}_PASSWORD must be a single-line string of at least 8 characters.`);
+  }
+  return { email, username, password };
+}
+
+// 解析或生成至少 32 字节（64 位十六进制）的 Studio 共享认证令牌。
+function resolveStudioSharedToken() {
+  const provided = process.env.STUDIO_SHARED_TOKEN;
+  if (!provided) {
+    return randomBytes(32).toString('hex');
+  }
+  if (/[\r\n'\\]/.test(provided) || provided.length < 64) {
+    throw new Error(
+      'STUDIO_SHARED_TOKEN must be at least 64 characters without quotes, newlines, or backslashes.',
+    );
+  }
+  return provided;
+}
+
+// 解析或生成 32 字节（64 位十六进制）的三维模型文件 HMAC 签名密钥；若目标目录已存在有效密钥则优先复用。
+function resolveFileSigningKey(targetDir) {
+  const provided = process.env.STUDIO_FILE_SIGNING_KEY;
+  if (!provided) {
+    if (targetDir) {
+      const existingStudioPath = path.join(targetDir, 'studio.json');
+      if (existsSync(existingStudioPath)) {
+        try {
+          const existing = JSON.parse(readFileSync(existingStudioPath, 'utf8'));
+          if (
+            typeof existing.file_signing_key === 'string' &&
+            /^[0-9a-fA-F]{64}$/.test(existing.file_signing_key)
+          ) {
+            return existing.file_signing_key;
+          }
+        } catch {
+          // 忽略损坏的旧配置并生成新密钥。
+        }
+      }
+    }
+    return randomBytes(32).toString('hex');
+  }
+  if (!/^[0-9a-fA-F]{64}$/.test(provided)) {
+    throw new Error('STUDIO_FILE_SIGNING_KEY must be an exact 64-character hexadecimal string.');
+  }
+  return provided;
+}
+
+// 解析公开部署基础 URL（来自 DEPLOY_URL，用于拼接签名下载链接）。
+function resolvePublicBaseUrl() {
+  const raw = process.env.DEPLOY_URL || 'https://dev.xuqian.io';
+  const cleaned = raw.trim().replace(/\/+$/, '');
+  if (!/^https?:\/\/[^\s'\\]+$/.test(cleaned)) {
+    throw new Error('DEPLOY_URL must be a valid single-line HTTP(S) URL.');
+  }
+  return cleaned;
+}
+
+const runnerTemp = process.env.RUNNER_TEMP;
+if (!runnerTemp) {
+  throw new Error('Missing required environment variable: RUNNER_TEMP');
+}
+
+const target = path.join(runnerTemp, 'bundle');
+mkdirSync(target, { recursive: true });
+
+const geminiApiKey = requireSafeSingleLineSecret('GEMINI_API_KEY');
+const openrouterApiKey = requireSafeSingleLineSecret('OPENROUTER_API_KEY');
+const arkApiKey = requireSafeSingleLineSecret('ARK_API_KEY');
+const librechatImage = requireImageReference('LIBRECHAT_IMAGE');
+const studioImage = requireImageReference('STUDIO_IMAGE');
+const sharedToken = resolveStudioSharedToken();
+const fileSigningKey = resolveFileSigningKey(target);
+const publicBaseUrl = resolvePublicBaseUrl();
+const accounts = {
+  admin: requireAccountConfig('ADMIN'),
+  user: requireAccountConfig('USER'),
+};
+
+// 将基础环境变量与 Google、OpenRouter 及 Studio 共享令牌写入 .env。
+const baseEnv = (process.env.LIBRECHAT_ENV || '').replace(/\s+$/, '');
+const envLines = [
+  ...(baseEnv ? [baseEnv] : []),
+  `GOOGLE_KEY='${geminiApiKey}'`,
+  `OPENROUTER_API_KEY='${openrouterApiKey}'`,
+  `STUDIO_SHARED_TOKEN='${sharedToken}'`,
+  '',
+];
+writeFileSync(path.join(target, '.env'), envLines.join('\n'), { mode: 0o600 });
+
+// 写入不可变镜像引用文件 image.env。
+const imageEnvContent = `LIBRECHAT_IMAGE=${librechatImage}\nSTUDIO_IMAGE=${studioImage}\n`;
+writeFileSync(path.join(target, 'image.env'), imageEnvContent, { mode: 0o600 });
+
+// 生成权限为 0600 的 studio.json 配置文件。
+const studioSettings = {
+  shared_token: sharedToken,
+  file_signing_key: fileSigningKey,
+  public_base_url: publicBaseUrl,
+  gemini_api_key: geminiApiKey,
+  ark_api_key: arkApiKey,
+  seedream_model: 'doubao-seedream-5-0-pro-260628',
+  seed3d_model: 'doubao-seed3d-2-0-260328',
+  planner_model: 'gemini-4-argon',
+  planner_thinking_level: 'HIGH',
+  max_parallel_per_user: 3,
+  seed3d_max_parallel: 5,
+  seedream_timeout_seconds: 240,
+  planner_timeout_seconds: 540,
+};
+writeFileSync(path.join(target, 'studio.json'), `${JSON.stringify(studioSettings, null, 2)}\n`, {
+  mode: 0o600,
+});
+
+// 写入默认管理员与普通用户账户配置 accounts.json。
+writeFileSync(path.join(target, 'accounts.json'), `${JSON.stringify(accounts)}\n`, {
+  mode: 0o600,
+});

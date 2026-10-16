@@ -1,0 +1,75 @@
+id: 90e4691d98f6270b
+title_zh: 现代简约室内设计场景
+source:
+  original_path: 佛教空间设计案例/现代简约室内设计场景.jpg
+original:
+  path: 佛教空间设计案例/现代简约室内设计场景.jpg
+  sha256: 90e4691d98f6270b864246f4d9f892c2b357cc6f47076d423e08443753e0df39
+  bytes: 1799589
+  width: 3440
+  height: 2580
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/90e4691d98f6270b.jpg
+    sha256: 8058421d96b8fb9edb41ed852425279ad91b230f605d917a77938e0050962aa9
+    bytes: 232011
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/90e4691d98f6270b.webp
+    sha256: 4b6bfcf535cf42222790dc30692affaf031861f9dbc0f7941c1d181474487d82
+    bytes: 14826
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 正面广角展现的现代简约新中式禅意套房（与图18同空间多视角对照），左区为圆形水墨画、罗汉床与方茶几，右区为胡桃木大床，配无主灯暖光吊顶。
+materials:
+- 新中式木框软包床
+- 中式罗汉床茶座
+- 圆形留白水墨画
+- 木格栅移门
+- 漫反射灯带吊顶
+colors:
+- 暖木棕
+- 浅米灰色
+style: 现代简约新中式禅意栖居风
+ai_design_usage: 新中式禅意居所/禅修会馆客房正视全景设计（与图18同空间多视角对照方案）
+prompt_zh: 超高清现代简约新中式禅意卧室与茶室一体化室内设计，横幅正面广角构图，左侧会客茶区正对一面素白墙，墙上悬挂大幅圆形水墨远山意境挂画，下方设中式条案、实木罗汉床沙发、方形实木茶几与禅椅，茶几上摆放白瓷茶具与禅意插花；最左侧为半通透竖向木格栅推拉门；右侧睡眠区摆放胡桃木框架大床与床尾凳，床头对称布置木格栅与暖光台灯；浅灰色哑光石材地砖，无主灯暗藏暖光灯带吊顶，宁静空灵，8K室内效果图
+tags:
+- 现代简约室内
+- 新中式禅意居所
+- 禅修套房
+- 圆形水墨画
+- 卧房茶室一体化
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2580
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代新中式禅意卧房茶室渲染图（与#276同空间另一视角）。左下角带有半透明“一圆居空间设计”印章水印；summary_zh、materials、tags将左侧竖幅卷轴画与后方横幅框画误述为“圆形留白水墨画”。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 左下角存在第三方“一圆居空间设计”印章水印
+  - summary_zh、materials、tags存在幻觉（误称圆形留白水墨画，实际为竖幅长方形卷轴画与横幅长卷画）

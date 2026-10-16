@@ -1,0 +1,77 @@
+id: 12137cbfb9ab653d
+title_zh: 佛教室内展览空间-04
+source:
+  original_path: 佛教空间设计案例/佛教室内展览空间-04.jpg
+original:
+  path: 佛教空间设计案例/佛教室内展览空间-04.jpg
+  sha256: 12137cbfb9ab653d129ee6c8574c28c9897c400565265f9d6349460f81d3e0e2
+  bytes: 4839198
+  width: 4303
+  height: 2629
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/12137cbfb9ab653d.jpg
+    sha256: 89de6383d5fe44305df7ff7051add0ae8986690582f99459de3c9eff4c375026
+    bytes: 471181
+    width: 2048
+    height: 1251
+  thumb512:
+    path: assets/thumb512/12137cbfb9ab653d.webp
+    sha256: 2523fe920208b3b44f6e6e7b0eba576ffd74a34872c504276f5626ef8f7083c5
+    bytes: 37984
+    width: 512
+    height: 313
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 中式居家与会所佛堂
+entity_type: 空间场景设计
+summary_zh: 右侧立深浮雕花卉方木柱并设金顶木龛供奉彩绘菩萨、左侧设圆形背光白玉璧端景墙配卷书条案与鎏金圆柱落地灯的木作空间。
+materials:
+- 深浮雕花卉木方柱
+- 金顶重檐木佛龛
+- 白玉璧摆件
+- 鎏金镂空圆柱落地灯
+- 几何拼花木地板
+- 卷书式实木条案
+colors:
+- 花梨木棕
+- 辉煌金
+- 脂玉白
+- 暖黄色
+- 彩绘丹青色
+style: 奢华东方木作与玉器博古佛堂风
+ai_design_usage: 高端东方佛教艺术会所/私人收藏馆佛堂设计、重檐金顶独立木佛龛与玉璧条案端景搭配参考
+prompt_zh: 奢华中式木作佛教艺术室内展览与供奉空间，右侧礼佛区由两根雕刻深浮雕缠枝花卉纹的方形实木大柱框定，柱下承白石柱础，内部设一座金顶重檐木雕大佛龛，供奉彩绘背光菩萨坐像，前设三个圆形蒲团，左侧木墙中央嵌有外方内圆的背光木雕壁饰，中心陈列一枚洁白温润的白玉璧摆件，下方摆放中式卷书式条案，两侧对称立两盏高挑的鎏金镂空圆柱形落地灯，几何拼花实木地板，弧形木梁吊顶，8K室内效果图
+tags:
+- 金顶木佛龛
+- 白玉璧端景
+- 深浮雕方柱
+- 鎏金落地灯
+- 东方艺术会所
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2629
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of an Oriental woodcraft hall with floral-carved square wooden columns, a golden-roofed shrine cabinet
+    on the right, and a backlit circular wall display with a white jade bi disc on the left.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

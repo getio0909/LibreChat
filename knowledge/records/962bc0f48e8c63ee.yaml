@@ -1,0 +1,79 @@
+id: 962bc0f48e8c63ee
+title_zh: 尼泊尔四臂文殊鎏金坐像
+source:
+  original_path: 造像雕塑开放授权实物参考/东南亚与南亚-尼泊尔四臂文殊鎏金坐像-cma140439.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/02-东南亚与南亚造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/东南亚与南亚-尼泊尔四臂文殊鎏金坐像-cma140439.jpg
+  sha256: 962bc0f48e8c63ee91a85cee96dcdb39d2eca1ea8677e250fe188e4bc42375cb
+  bytes: 1448206
+  width: 2983
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/962bc0f48e8c63ee.jpg
+    sha256: 9a67e7a09eb48d5adf902dde0a7bb8d9db65da8738ccffe46bfa80ec9c6ca299
+    bytes: 409663
+    width: 1797
+    height: 2048
+  thumb512:
+    path: assets/thumb512/962bc0f48e8c63ee.webp
+    sha256: 0690fd647777f91196a76b4d7d820a1fe454a72faaf67f6f85533f217cec574b
+    bytes: 23162
+    width: 449
+    height: 512
+library_type: 造像雕塑
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 尼泊尔四臂文殊鎏金坐像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】四臂戴冠菩萨盘腿端坐，一臂上举持柄，一手外伸持弓形物，冠带和项饰镶蓝绿色饰件。【来源著录】Bodhisattva of Wisdom (Manjushri)；文化或地点依据：Nepal。
+materials:
+- 鎏金青铜及宝石半宝石颜料
+colors:
+- 金黄色
+- 蓝色
+- 绿色
+style: 东南亚/南亚传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，四臂戴冠菩萨盘腿端坐，一臂上举持柄，一手外伸持弓形物，冠带和项饰镶蓝绿色饰件。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Bodhisattva of Wisdom (Manjushri). Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 造像雕塑
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 尼泊尔四臂文殊鎏金坐像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1964.370
+  download_url: https://openaccess-cdn.clevelandart.org/1964.370/1964.370_print.jpg
+  credit: Leonard C. Hanna Jr. Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2983
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

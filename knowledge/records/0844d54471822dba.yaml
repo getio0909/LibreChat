@@ -1,0 +1,73 @@
+id: 0844d54471822dba
+title_zh: 佛教寺庙大殿内部装饰
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部装饰.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部装饰.jpg
+  sha256: 0844d54471822dba205c37f0dd33847959827ef277d5e0122f58748478eac721
+  bytes: 4026566
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0844d54471822dba.jpg
+    sha256: 1765f68ed88ff094435cffe4cf6d80ab13cbefdb5f4faaf2fbf1dd1c0772172e
+    bytes: 766710
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/0844d54471822dba.webp
+    sha256: 7209c6381da076eb50530a604b97e21dc4857cd7448d330b438cc2d24cab0cd2
+    bytes: 48818
+    width: 512
+    height: 362
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 本图为大型高端奢石与金碧木作融合的“药师琉璃光如来宝殿”室内装饰全景场景（空间场景设计，本卷第09号为其主坛局部特写）。
+materials:
+- 水墨山水奢石背景墙
+- “药师赐福佑人间”金字楹联
+- 双层汉白玉精雕须弥座
+- 药师三尊金像
+- 贴金莲花团花方格藻井群
+colors:
+- 辉煌金
+- 米黄奢石色
+style: 现代奢石与传统佛殿融合风
+ai_design_usage: 大型高端药师佛殿全景空间规划、天然水墨山水奢石作为佛像背景墙应用、全贴金莲花藻井与米黄石柱搭配参考
+prompt_zh: 顶级豪华佛教寺庙药师殿内部装饰全景，大广角仰视斜透视构图，浅米灰色高光大理石地面，前景与殿内矗立粗壮的米黄色纹理石材大圆柱，柱身包镶上中下三道精美的鎏金莲瓣宝相花箍带并立于汉白玉雕花柱础上，右侧主佛坛筑有双层洁白的汉白玉高浮雕束腰须弥座，供奉铜鎏金药师佛坐像与日光月光菩萨立像，佛像背后镶嵌整幅天然水墨山水纹奢石大板背景墙，右侧边框竖刻“药师赐福佑人间”金色大字对联，大殿远端墙面为橙金色发光万佛墙与护法天王金像，顶部为满铺的贴金八瓣莲花团花方格发光藻井天花，金碧辉煌，8K超高清渲染
+tags:
+- 药师殿全景
+- 山水奢石背景墙
+- 药师赐福佑人间
+- 双层汉白玉须弥座
+- 贴金莲花藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 药师佛大殿室内装饰超清全景三维效果图，主尊背衬水墨山水奢石大板，下承双层汉白玉须弥座。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: 右侧金字楹联实为“药师菩萨福佑人…”，左侧为“智慧照耀天地”，原标注误作“药师赐福佑人间”'

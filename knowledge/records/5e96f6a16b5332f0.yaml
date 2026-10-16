@@ -1,0 +1,73 @@
+id: 5e96f6a16b5332f0
+title_zh: 佛教文物展览空间
+source:
+  original_path: 佛教空间设计案例/佛教文物展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教文物展览空间.jpg
+  sha256: 5e96f6a16b5332f00e1f9efc8c2a5d16890cb42c8152cee1fd39cf994948a0f9
+  bytes: 769682
+  width: 1982
+  height: 1187
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5e96f6a16b5332f0.jpg
+    sha256: d4515a8040fd73871f7e1e7830096bacf64a76293c35eb6d1928d0bc49d3085f
+    bytes: 208621
+    width: 1982
+    height: 1187
+  thumb512:
+    path: assets/thumb512/5e96f6a16b5332f0.webp
+    sha256: bc938f8d60e0af85b51700e580e323434bf068ced34edf729f9ae06e9fa84fb5
+    bytes: 16902
+    width: 512
+    height: 307
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代新中式佛教文物与壁画博物馆展陈长廊场景
+entity_type: 空间场景设计
+summary_zh: 本图为现代新中式博物馆级佛教造像与壁画文物展陈长廊空间（与第 27 张为同一展厅长廊的正反两个对向视角）。空间融合了现代博物馆的专业展陈照明体系与东方禅意建筑语汇，营造出静谧、雅致、引人专注品鉴的文物观赏动线。 空间以温润的浅胡桃木/白橡木原木色、素白背光灯箱布与深灰黑色仿古青石地砖为主材质。地面采用哑光深灰黑青石方砖铺贴，防眩光且凸显展柜亮度；左侧及中轴线展柜底座采用浅胡桃木饰面，柜门镶嵌竖条中式花格与圆形铜饰，下部设黑色大理石内退踢脚；右侧前景门洞侧壁镶嵌浅灰色水波海浪纹石雕挂板，正中嵌一枚圆形鎏金兽面（椒…
+materials:
+- 原木展柜
+- 超白玻璃
+- 青石板
+- 石雕门框
+colors:
+- 暖米木色
+- 深灰青石
+- 暖白射灯
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：佛教文物博物馆/寺院珍宝馆长廊空间设计 / 独立佛像展柜与双层壁画灯箱墙立面参考 / 新中式展厅入口格栅屏风与烛台框景设计；推荐搭配：浅胡桃木饰面展柜 + 超白低反射夹胶玻璃 + 爵士白/米白石材斜面壁画托台
+  + 深灰哑光青石地砖 + 3000K高显指（Ra≥95）博物馆重点射灯
+prompt_zh: 现代新中式佛教文物博物馆展陈长廊内部场景，单点透视纵深构图，前景两侧为中式竖条木格栅屏风与古典红烛立柱，右侧墙面局部镶嵌灰色海浪纹浮雕石板与圆形鎏金瑞兽圆盘；展厅左侧靠墙排列原木底座独立展柜，陈列金铜佛像、白玉观音与彩绘菩萨，上方设独立方形射灯罩，背景为发光障子纸光幕；中央中轴线排列全透明玻璃罩小型佛像展柜；右侧整面墙为上下两层嵌入式佛教壁画灯箱展柜；顶部为三层跌级暖光灯带吊顶，地面铺设深灰黑色青石板，静谧高雅，高清室内效果图。
+tags:
+- 佛教文物展厅
+- 博物馆长廊设计
+- 佛像玻璃展柜
+- 壁画灯箱展墙
+- 新中式展陈空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1187
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代新中式佛教造像玻璃展柜与双层嵌入式壁画灯箱博物馆长廊三维效果图（与#248互为对向视角）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

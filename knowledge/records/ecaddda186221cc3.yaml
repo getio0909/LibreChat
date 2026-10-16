@@ -1,0 +1,76 @@
+id: ecaddda186221cc3
+title_zh: 佛教主题展览空间设计案例-02
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计案例-02.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计案例-02.jpg
+  sha256: ecaddda186221cc3cadc6e28a8a509b3fa2abf937e23a4d6264a2893fb37e5a5
+  bytes: 3667042
+  width: 3923
+  height: 2587
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ecaddda186221cc3.jpg
+    sha256: 1df6bb2531ddc5b5980e3cba30b0393c6f9d4ebd110c43faa9291ae511d970a1
+    bytes: 456908
+    width: 2048
+    height: 1351
+  thumb512:
+    path: assets/thumb512/ecaddda186221cc3.webp
+    sha256: 52e0028212120cf948553f7d0b9a258a1bd9b9a3660d58be276d73338ac1456e
+    bytes: 37588
+    width: 512
+    height: 338
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 飞天藻井与七彩琉璃佛龛大殿
+entity_type: 空间场景设计
+summary_zh: 宝蓝、金黄、翡翠绿与棕绿奢石 / 七彩琉璃佛像壁龛、圆形飞天藻井
+materials:
+- 七彩古法脱蜡烧制琉璃
+- 白色GRG飞天浮雕圆形藻井
+- 深色红木佛龛墙
+- 镜面高光墨绿奢石
+- 明黄拜垫
+colors:
+- 宝石蓝
+- 琥珀橙
+- 翡翠绿
+- 藻井纯白
+- 墨绿镜面
+style: 恢弘药师七佛七彩琉璃大殿风
+ai_design_usage: 药师七佛七彩古法琉璃大殿全案设计 / 圆形白色GRG飞天祥云浮雕藻井参考 / 墨绿镜面奢石地面与七彩琉璃光影搭配
+prompt_zh: 恢弘壮丽的药师七佛七彩琉璃大殿室内设计，广角对称构图，正中央主龛供奉宝蓝色半透明琉璃药师佛坐像与两尊琥珀色胁侍菩萨，前方摆放六个明黄色方形拜垫，左右两侧八字形展开的红木高墙内对称嵌入六座大型发光佛龛，分别供奉橙红、纯白、明黄、深紫、粉红、翠绿六尊巨型晶莹剔透的古法琉璃坐佛，天花正中是一座巨大的白色飞天祥云圆形浮雕藻井，外围环绕深蓝星空木格，地面为镜面墨绿色奢石大理石并清晰倒映七彩佛光，8k效果图。
+tags:
+- 药师七佛
+- 七彩琉璃佛
+- 飞天浮雕藻井
+- 墨绿奢石地面
+- 对称大殿
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2587
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K 3D render of a Seven Medicine Buddhas hall enshrining seven colorful translucent liuli seated Buddhas
+    on lotus pedestals under a starry flying-apsaras caisson ceiling.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

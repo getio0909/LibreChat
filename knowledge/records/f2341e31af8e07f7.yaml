@@ -1,0 +1,79 @@
+id: f2341e31af8e07f7
+title_zh: 山西司马金龙墓彩绘人物故事漆木屏风板
+source:
+  original_path: 家具木作开放授权实物参考/中国北方-山西司马金龙墓彩绘人物故事漆木屏风板-commons143575640.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/03-中国北方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国北方-山西司马金龙墓彩绘人物故事漆木屏风板-commons143575640.jpg
+  sha256: f2341e31af8e07f70bc37d32338f6c1d25d50e8fb9f3293fc2903ba22fa01d37
+  bytes: 1304726
+  width: 1920
+  height: 2876
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f2341e31af8e07f7.jpg
+    sha256: 597b07a30f9741cd562db8bc860c9c423263705560511fa524153e2348b59c22
+    bytes: 623749
+    width: 1367
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f2341e31af8e07f7.webp
+    sha256: ba5b2898e75255929c04259f143f4636f631fedbd67515836421d164989b0ff2
+    bytes: 27992
+    width: 342
+    height: 512
+library_type: 家具木作
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 山西司马金龙墓彩绘人物故事漆木屏风板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】竖长屏风残板以朱红为底，人物与车舆分层排列，并有黄色文字栏；中部纵向接缝、上缘残缺和局部漆层脱落清楚可见。【来源著录】彩绘人物故事漆屏, 2024-01-06.jpg；文化或地点依据：Commons 说明明确为司马金龙墓出土漆屏，分类为北魏漆器；大同市政府的名城保护规划说明将石家寨司马金龙墓列入本市御东墓葬保护区，故按山西大同归入中国北方。
+materials:
+- 漆木（树种未注明）
+- 彩绘
+colors:
+- 朱红
+- 赭黄
+- 黑褐
+style: 中国北方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，竖长屏风残板以朱红为底，人物与车舆分层排列，并有黄色文字栏；中部纵向接缝、上缘残缺和局部漆层脱落清楚可见。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 彩绘人物故事漆屏, 2024-01-06.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国北方
+- 开放授权
+- 真实摄影
+- 山西司马金龙墓彩绘人物故事漆木屏风板
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:彩绘人物故事漆屏,_2024-01-06.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/%E5%BD%A9%E7%BB%98%E4%BA%BA%E7%89%A9%E6%95%85%E4%BA%8B%E6%BC%86%E5%B1%8F%2C_2024-01-06.jpg/1920px-%E5%BD%A9%E7%BB%98%E4%BA%BA%E7%89%A9%E6%95%85%E4%BA%8B%E6%BC%86%E5%B1%8F%2C_2024-01-06.jpg
+  credit: Siyuwj; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1920
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

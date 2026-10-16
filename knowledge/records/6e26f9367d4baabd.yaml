@@ -1,0 +1,77 @@
+id: 6e26f9367d4baabd
+title_zh: 佛教室内卧佛雕像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教室内卧佛雕像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教室内卧佛雕像展示场景.jpg
+  sha256: 6e26f9367d4baabdd6c74b072ca0bcefdb8c65fe344edf08ee490bbff2d9a5f5
+  bytes: 3532480
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6e26f9367d4baabd.jpg
+    sha256: 906632974aca3e9af14b880b277b3bbb80c72e1f53dbecc8d822b4c53f0fcc73
+    bytes: 541544
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/6e26f9367d4baabd.webp
+    sha256: 2a7122d6a3d12ee0d6acf17bc8f098c49237c1029bb53769a2ed6b5134b9004d
+    bytes: 34300
+    width: 512
+    height: 362
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 中心双层发光白玉莲座安奉汉白玉涅槃卧佛、上下呼应圆形木构斗拱藻井与地面圆形莲花水刀拼花、配汉白玉柱础木柱的卧佛殿空间。
+materials:
+- 汉白玉卧佛雕像
+- 透光云石莲花座
+- 圆形莲花水刀拼花大理石
+- 圆形木斗拱藻井
+- 汉白玉雕花柱础
+- 发光经文方格墙
+colors:
+- 汉白玉白
+- 深灰褐色
+- 暖金色
+- 深木棕
+- 暗红色
+style: 传统汉传涅槃堂与现代石材展陈融合风
+ai_design_usage: 寺院涅槃堂/卧佛殿核心展陈空间设计、大型汉白玉卧佛底座透光照明方案、圆形水刀拼花与藻井上下呼应参考
+prompt_zh: 寺院室内卧佛殿展示空间，中央是一尊洁白温润的大型汉白玉释迦牟尼右胁涅槃卧佛雕像，安卧于双层内藏暖光的透光汉白玉心形莲花瓣须弥座上，下方深灰褐色高光大理石地面镶嵌巨大的圆形盛开莲花水刀拼花，两侧对称立两根深棕色实木大圆柱配汉白玉雕花柱础，卧佛正上方为圆形木构斗拱发光藻井吊顶，右侧墙面设金色三世佛龛与白色发光经文方格墙，庄严神圣，8K超清建筑渲染
+tags:
+- 卧佛殿
+- 汉白玉卧佛
+- 圆形水刀拼花
+- 透光莲花座
+- 圆形斗拱藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K 3D render of a circular Nirvana hall centering on a white marble reclining Buddha atop a backlit lotus
+    pedestal and waterjet marble floor medallion beneath a wooden bracketed caisson dome.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

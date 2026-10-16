@@ -1,0 +1,74 @@
+id: f7437e88c869025e
+title_zh: 东阳卢宅｜格扇与厅堂木作
+source:
+  original_path: 设计风格精选20261010/dongyang-luzhai-lattice.jpg
+original:
+  path: 设计风格精选20261010/dongyang-luzhai-lattice.jpg
+  sha256: f7437e88c869025e4abb578c74a91e577f8e2a3e012cde4e0c10129b31364927
+  bytes: 2465972
+  width: 1800
+  height: 1200
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f7437e88c869025e.jpg
+    sha256: 2df1221e3bc98b2bf53d3e77a301c059ef1addc278585227407dfbc8b97bfd13
+    bytes: 745871
+    width: 1800
+    height: 1200
+  thumb512:
+    path: assets/thumb512/f7437e88c869025e.webp
+    sha256: da272233fbbb0a7b7395b74217e473f2d3fbd505d32d1eff2fd46aec2ff8e689
+    bytes: 51976
+    width: 512
+    height: 341
+library_type: 空间展陈
+region: 中国南方
+studio_roles:
+- 风格
+- 物件
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 东阳传统花格窗与满堂红宫灯穿堂场景
+entity_type: 空间场景设计
+summary_zh: 这是浙江东阳卢宅肃雍堂建筑群中的“穿堂”室内空间场景。
+materials:
+- 东阳花格木扇窗
+- 红绸六角木框宫灯
+- 明式红木圈椅与条案
+- 青砖三合土地面
+colors:
+- 朱砂红
+- 深紫檀红棕
+- 青灰色
+- 赤金色
+style: 江南东阳传统木雕工艺 / 中式古典穿堂廊道
+ai_design_usage: 中式佛堂/禅茶馆长廊与穿堂空间设计 / 传统六角宫灯阵列吊顶参考 / 东阳格扇花窗光影构图迁移
+prompt_zh: 浙江东阳卢宅传统古建筑“穿堂”室内走廊空间，一点透视纵深对称构图，天花板下密集悬挂着数十盏华丽的中国传统朱红木框六角红纱宫灯，宫灯底部垂挂金色流苏；走廊左右两侧为高大通透的深红棕色木质方格花格窗与红底金字抱柱长联，自然光从左侧花窗透入，两侧地面对称摆放明式红木圈椅与方茶几，尽头正中设中堂条案、瓷瓶与挂画，极具中式古典礼仪氛围。
+tags:
+- 东阳卢宅穿堂
+- 六角红纱宫灯
+- 中式格扇花窗
+- 明式圈椅陈设
+- 中轴对称廊道
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20260731_Residence_of_the_Lu_Family_in_Dongyang_11.jpg
+  credit: Windmemories
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1200
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Interior photograph of the Chuantang hall at Dongyang Luzhai lined with wooden lattice doors, traditional armchairs,
+    and hanging hexagonal red silk lanterns.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

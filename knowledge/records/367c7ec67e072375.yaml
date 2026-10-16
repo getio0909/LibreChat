@@ -1,0 +1,71 @@
+id: 367c7ec67e072375
+title_zh: 国际石作参考｜红砂岩镂空屏
+source:
+  original_path: 设计风格精选20260930/sandstone-jali.jpg
+original:
+  path: 设计风格精选20260930/sandstone-jali.jpg
+  sha256: 367c7ec67e072375f93924e2b2544927f5556c0deced57b4e241797b3f23e3ac
+  bytes: 3385520
+  width: 2525
+  height: 3722
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/367c7ec67e072375.jpg
+    sha256: a92a57ed82e80c38301b19315b0849b5d9a6d3f1e98d69ef5792dd0ba87e1210
+    bytes: 828987
+    width: 1389
+    height: 2048
+  thumb512:
+    path: assets/thumb512/367c7ec67e072375.webp
+    sha256: 1f89a7064f6c935f75b34be0623bb497aac58a27b065175172d0b669673f9f08
+    bytes: 63462
+    width: 347
+    height: 512
+library_type: 石刻纹样
+region: 南亚东南亚
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 莫卧儿红砂岩几何镂空花窗构件
+entity_type: 实物对象写实
+summary_zh: 这是一件印度莫卧儿时期（阿克巴/贾汉吉尔风格）红砂岩双层几何透雕花窗（Red Sandstone Jali）建筑构件实物写实。
+materials:
+- 印度天然红砂岩
+- 双层几何透雕石材
+colors:
+- 铁锈红色
+- 赤陶红
+- 浅米黄矿斑
+style: 跨文化莫卧儿石雕 / 几何星芒透雕
+ai_design_usage: 砂岩/红洞石建筑外立面花窗设计 / 复杂几何星芒图案提取 / 佛事展异域石雕艺术展品陈列参考
+prompt_zh: 印度莫卧儿帝国时期红砂岩镂空透雕花窗（Jali）文物正面写实，深色背景，外框环绕一圈十字花形透孔边饰，内部为尖拱形窗框，拱顶饰有莲蕾浮雕，窗格内满布双层立体几何透雕图案，由粗细两级线条交织出繁复的六边形、六角星与五角星放射网格，天然铁锈红色砂岩材质带有细微的浅黄色矿点肌理，正视高保真文物摄影。
+tags:
+- 红砂岩镂空窗
+- 双层几何石雕
+- 六角星格栅
+- 莫卧儿石雕构件
+- 石材幕墙花格
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/453344
+  credit: The Metropolitan Museum of Art, 1993.67.2
+  license: cc0
+  license_status: confirmed
+quality:
+  min_side_px: 2525
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res orthographic photograph of a Mughal red sandstone double-layered geometric pierced screen (jali) with six-pointed
+    star latticework.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

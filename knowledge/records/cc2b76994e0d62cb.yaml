@@ -1,0 +1,80 @@
+id: cc2b76994e0d62cb
+title_zh: 泉州开元寺亭阁式焚香炉
+source:
+  original_path: 法器供器开放授权实物参考/中国南方-泉州开元寺亭阁式焚香炉-commons18731954.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/04-中国南方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国南方-泉州开元寺亭阁式焚香炉-commons18731954.jpg
+  sha256: cc2b76994e0d62cb7bd41e74c05be9a46b7015ebe26fe4f1d0924efc8846c51f
+  bytes: 674460
+  width: 1280
+  height: 1707
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/cc2b76994e0d62cb.jpg
+    sha256: f8137ad9299521eb25418898fecd88c901fa5fbe33d8b8a4945f77ba4955ec11
+    bytes: 660382
+    width: 1280
+    height: 1707
+  thumb512:
+    path: assets/thumb512/cc2b76994e0d62cb.webp
+    sha256: 48946541bd2a9ceddcbd0d9aa9c281e3f881cca658cef511a8dc25e870888ebe
+    bytes: 40282
+    width: 384
+    height: 512
+library_type: 法器供器
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 泉州开元寺亭阁式焚香炉
+entity_type: 实物对象写实
+summary_zh: 【图中可见】三足圆腹炉体上叠起两层亭阁式盖，檐角有兽首和悬铃，炉颈两侧设高起折耳，正面镂空卍字与回纹分带。【来源著录】Kaiyuan Temple - main courtyard - ritual furnace -
+  DSCF8591.JPG；文化或地点依据：来源题名为泉州开元寺主院落 ritual furnace，依此确定为寺院焚香炉；实物文字用于地点核对，不作无依据断代。
+materials:
+- 金属（图中可见；合金未由来源注明）
+colors:
+- 灰褐色
+- 红褐色
+- 暗金色
+style: 中国南方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，三足圆腹炉体上叠起两层亭阁式盖，檐角有兽首和悬铃，炉颈两侧设高起折耳，正面镂空卍字与回纹分带。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Kaiyuan Temple - main courtyard - ritual furnace - DSCF8591.JPG.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国南方
+- 开放授权
+- 真实摄影
+- 泉州开元寺亭阁式焚香炉
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Kaiyuan_Temple_-_main_courtyard_-_ritual_furnace_-_DSCF8591.JPG
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Kaiyuan_Temple_-_main_courtyard_-_ritual_furnace_-_DSCF8591.JPG/1280px-Kaiyuan_Temple_-_main_courtyard_-_ritual_furnace_-_DSCF8591.JPG
+  credit: User:Vmenkov; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

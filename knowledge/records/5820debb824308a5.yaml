@@ -1,0 +1,78 @@
+id: 5820debb824308a5
+title_zh: 甘肃北魏435年滑石小佛塔
+source:
+  original_path: 法器供器开放授权实物参考/中国北方-甘肃北魏435年滑石小佛塔-cma155644.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/03-中国北方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国北方-甘肃北魏435年滑石小佛塔-cma155644.jpg
+  sha256: 5820debb824308a593bc9bb28efca827614d9f6a232c83c142f5c74b3bba092e
+  bytes: 1384334
+  width: 2610
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5820debb824308a5.jpg
+    sha256: de4a8b7f6724f94d362b516a5e999989400d33793684b10de716b8aa8eeb6ae2
+    bytes: 322217
+    width: 1572
+    height: 2048
+  thumb512:
+    path: assets/thumb512/5820debb824308a5.webp
+    sha256: a89c1ff79568c445202a75586e3877c98cf1636d0359114e6071f370ee44be3e
+    bytes: 12000
+    width: 393
+    height: 512
+library_type: 法器供器
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 甘肃北魏435年滑石小佛塔
+entity_type: 实物对象写实
+summary_zh: 【图中可见】圆筒状器物分层，上层环绕火焰形佛龛及坐像，中段密排铭文，下段为人物线刻，底缘为起伏弧口。【来源著录】Miniature Votive Stupa；文化或地点依据：馆方明确著录 China, Gansu province,
+  Northern Wei dynasty；归入中国北方甘肃汉地佛教供器。
+materials:
+- 滑石
+colors:
+- 灰绿色
+- 褐色
+style: 中国北方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，圆筒状器物分层，上层环绕火焰形佛龛及坐像，中段密排铭文，下段为人物线刻，底缘为起伏弧口。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Miniature Votive Stupa. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国北方
+- 开放授权
+- 真实摄影
+- 甘肃北魏435年滑石小佛塔
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1990.84
+  download_url: https://openaccess-cdn.clevelandart.org/1990.84/1990.84_print.jpg
+  credit: Purchase from the J. H. Wade Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2610
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

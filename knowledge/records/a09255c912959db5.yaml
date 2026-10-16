@@ -1,0 +1,83 @@
+id: a09255c912959db5
+title_zh: 奥托博伊伦教堂曲线框饰与彩绘穹顶
+source:
+  original_path: 建筑景观开放授权实景参考/西方-奥托博伊伦教堂曲线框饰与彩绘穹顶-commons93730707.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/01-西方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/西方-奥托博伊伦教堂曲线框饰与彩绘穹顶-commons93730707.jpg
+  sha256: a09255c912959db55b37ebbf27926aeca7366d3ab406768c6475434771637174
+  bytes: 840746
+  width: 1920
+  height: 1298
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a09255c912959db5.jpg
+    sha256: d07b704a7e43944d8c15e92a5d465880ecd73b3f896a46502ec0463d64a7ce73
+    bytes: 821101
+    width: 1920
+    height: 1298
+  thumb512:
+    path: assets/thumb512/a09255c912959db5.webp
+    sha256: d46b609c65cb8bc01571545d504b98c1334fddadf0990fc74f01d1673658d845
+    bytes: 48896
+    width: 512
+    height: 346
+library_type: 建筑景观
+region: 西方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 奥托博伊伦教堂曲线框饰与彩绘穹顶
+entity_type: 空间场景设计
+summary_zh: 【图中可见】仰视空间以白色线脚和曲线框饰包围大面积人物彩绘，灰粉柱面、金色饰带和高窗围绕弧形端部布置。【来源著录】Basílica, Ottobeuren, Alemania, 2019-06-21, DD 126-128
+  HDR.jpg；文化或地点依据：来源题名为德国 Ottobeuren Basilica 的室内仰视照片。
+materials:
+- 材质来源未注明；可见彩绘
+- 线脚与柱面
+colors:
+- 白色
+- 金色
+- 灰粉色
+style: 西方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，仰视空间以白色线脚和曲线框饰包围大面积人物彩绘，灰粉柱面、金色饰带和高窗围绕弧形端部布置。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Basílica, Ottobeuren, Alemania, 2019-06-21, DD 126-128
+  HDR.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do
+  not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 西方
+- 开放授权
+- 真实摄影
+- 奥托博伊伦教堂曲线框饰与彩绘穹顶
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Bas%C3%ADlica,_Ottobeuren,_Alemania,_2019-06-21,_DD_126-128_HDR.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bas%C3%ADlica%2C_Ottobeuren%2C_Alemania%2C_2019-06-21%2C_DD_126-128_HDR.jpg/1920px-Bas%C3%ADlica%2C_Ottobeuren%2C_Alemania%2C_2019-06-21%2C_DD_126-128_HDR.jpg
+  credit: 'Diego Delso (1974–) Alternative names Poco a poco Description Spanish free-license photographer and Wikimedian
+    Date of birth 19 May 1974 Location of birth Alicante Authority file : Q28147777 VIAF : 3616170939435815660001 creator
+    QS:P170,Q28147777; Own work'
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1298
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

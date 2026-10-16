@@ -1,0 +1,28 @@
+schema: 1
+id: "6666666666666661"
+title_zh: AI概念莲花纹浮雕佛龛
+library_type: 石刻纹样
+studio_roles:
+  - 纹样
+  - 造型
+category_l1: 浮雕
+category_l2: 莲花纹
+materials:
+  - 汉白玉
+colors:
+  - 素白
+style:
+  - 明清传统
+tags:
+  - 莲花纹
+  - 佛龛浮雕
+summary_zh: AI生成的莲花纹浮雕参考图。
+provenance:
+  license: customer-supplied-unverified
+  license_status: unconfirmed
+quality:
+  ai_generated: true
+  third_party_watermark: false
+  low_res: false
+review:
+  status: unreviewed

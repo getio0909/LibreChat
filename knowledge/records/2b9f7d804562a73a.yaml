@@ -1,0 +1,73 @@
+id: 2b9f7d804562a73a
+title_zh: 泰国云石寺｜金红礼佛厅实景
+source:
+  original_path: 设计风格精选20260930/thai-marble-hall.jpg
+original:
+  path: 设计风格精选20260930/thai-marble-hall.jpg
+  sha256: 2b9f7d804562a73a59e4538fe326f157d63a74fb03ba1e0f5ecd69d07f8c383e
+  bytes: 681817
+  width: 1600
+  height: 1200
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2b9f7d804562a73a.jpg
+    sha256: aa88182d41ea24ce61883ae93235c880ba63f653abc07509383f8bbf2376031e
+    bytes: 400387
+    width: 1600
+    height: 1200
+  thumb512:
+    path: assets/thumb512/2b9f7d804562a73a.webp
+    sha256: 7849e5138aecde8a09e2b2d54b009b1768a8aa909556fbc6175c438ac4c6fcab
+    bytes: 38720
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 南亚东南亚
+studio_roles:
+- 风格
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 泰国传统皇家寺院大殿内景
+entity_type: 空间场景设计
+summary_zh: 这是泰国曼谷云石寺（Wat Benchamabophit，大理石寺）大雄宝殿（Ubosot）内部信众礼佛与僧侣诵经的实景空间场景。
+materials:
+- 鎏金青铜佛像
+- 金彩壁纸
+- 天然大理石护墙裙
+- 正红地毯
+colors:
+- 帝王金
+- 皇家深宝蓝
+- 正红色
+- 灰褐色
+style: 东南亚泰式皇家寺院 / 金碧辉煌殿堂
+ai_design_usage: 南传/泰式佛殿室内空间设计 / 佛像深蓝背景墙与金色背光色彩搭配参考 / 皇家寺院庄严氛围生成
+prompt_zh: 泰国曼谷云石寺（大理石寺）大雄宝殿室内宏伟场景，中轴对称构图，正中央高耸的贴金佛坛上供奉一尊通体耀眼鎏金的泰式成功佛（钦那拉佛），身后环绕华丽的镂空火焰状金色背光，后方背景墙为深邃的皇家宝蓝色并带有柔和光晕；大殿两侧高墙满绘金色泰式传统菱形纹样，配红底描金的高挑尖拱窗与大理石护墙裙，地面铺设鲜艳红地毯，展示了东南亚皇家佛寺的金碧辉煌与神圣氛围。
+tags:
+- 泰国云石寺内景
+- 钦那拉佛金像
+- 宝蓝背景墙配金佛
+- 火焰背光佛龛
+- 南传皇家寺院
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Wat_Benchamabophit_Dusitvanaram_01.jpg
+  credit: Aimaimyi
+  license: cc-by-sa-3.0
+  license_status: confirmed
+quality:
+  min_side_px: 1200
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Interior photograph of the ordination hall at Wat Benchamabophit (Marble Temple) in Bangkok with the golden Phra
+    Buddha Chinnarat statue against a deep blue alcove.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

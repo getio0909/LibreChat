@@ -1,0 +1,86 @@
+[
+  {
+    "id": "dunhuang-gold",
+    "name": "敦煌金",
+    "aliases": ["天川金", "佛国画卷", "敦煌金大理石系列"],
+    "search_terms": ["阿利坦", "阿力坦", "庄严宝刹", "Alitan"],
+    "group": "天川金大板自家产品",
+    "sample_asset_ids": ["0ec93174938c7fa2", "f2fd846b5a1ccd3c"],
+    "all_slab_asset_ids": [
+      "abf58027af310d66",
+      "0ec93174938c7fa2",
+      "55bc706f449f1f9c",
+      "66ed4fb3a750040e",
+      "f2fd846b5a1ccd3c"
+    ],
+    "notes": [
+      "20-图片笔记/天川金大板自家产品/展览中的黄色纹理石材样品.md",
+      "20-图片笔记/天川金大板自家产品/黄色大理石纹理石材.md"
+    ]
+  },
+  {
+    "id": "dunhuang-wall",
+    "name": "敦煌壁",
+    "aliases": ["梵高皇", "敦煌壁大板"],
+    "search_terms": ["阿利坦", "阿力坦", "庄严宝刹", "Alitan"],
+    "group": "梵高皇敦煌壁大板自家产品",
+    "sample_asset_ids": ["49099ce47597b227", "68f502e1f825e1b3"],
+    "all_slab_asset_ids": [
+      "68f502e1f825e1b3",
+      "9639b73dd76f5f08",
+      "a3d21f7833768a21",
+      "872a3477bb376a98",
+      "8bb48803428b6f2b",
+      "49099ce47597b227",
+      "71c92d4e4b1333c3"
+    ],
+    "notes": [
+      "20-图片笔记/梵高皇敦煌壁大板自家产品/橙红纹理天然石材板.md",
+      "20-图片笔记/梵高皇敦煌壁大板自家产品/佛教石材纹理样本-02.md"
+    ]
+  },
+  {
+    "id": "gold-jade",
+    "name": "金镶玉",
+    "aliases": ["梦幻庄园", "禅境灰蓝", "金镶玉大理石系列", "金镶玉透光石"],
+    "search_terms": ["阿利坦", "阿力坦", "庄严宝刹", "Alitan"],
+    "group": "梦幻庄园金镶玉大板自家产品",
+    "sample_asset_ids": ["d2149859ecaf18f1", "3311484f73d6569f"],
+    "all_slab_asset_ids": [
+      "2472b3d3da1ef6bb",
+      "dccf671fae000a63",
+      "3fb487aab5efe2b2",
+      "34f2ff7773d666b0",
+      "40e5c5a9b592204c",
+      "f239d2b5a8e358ed",
+      "3311484f73d6569f",
+      "d2149859ecaf18f1",
+      "0ff82e9b75817fb2"
+    ],
+    "notes": [
+      "20-图片笔记/梦幻庄园金镶玉大板自家产品/梦幻庄园大理石展示板.md",
+      "20-图片笔记/梦幻庄园金镶玉大板自家产品/暖调金纹天然石材纹理.md"
+    ]
+  },
+  {
+    "id": "blue-gold-grey",
+    "name": "蓝金灰",
+    "aliases": ["蓝金灰大板"],
+    "search_terms": ["阿利坦", "阿力坦", "庄严宝刹", "Alitan"],
+    "group": "蓝金灰大板自家产品",
+    "sample_asset_ids": ["68d94ad9e998ccc2", "4160a59fa255db3e"],
+    "all_slab_asset_ids": [
+      "e93c97f4605a35fe",
+      "68d94ad9e998ccc2",
+      "a4ec9572b74af603",
+      "7926520acaffbc48",
+      "ef16cb8b465a142c",
+      "d17773702457ee14",
+      "4160a59fa255db3e",
+      "189d4b2b51c85453",
+      "9199c838d035c994",
+      "244ebfdadf1acf50"
+    ],
+    "notes": []
+  }
+]

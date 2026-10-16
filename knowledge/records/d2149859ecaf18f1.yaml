@@ -1,0 +1,71 @@
+id: d2149859ecaf18f1
+title_zh: 梦幻庄园大理石展示板
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/梦幻庄园大理石展示板.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/梦幻庄园大理石展示板.jpg
+  sha256: d2149859ecaf18f19023c3e199a992b17b2963bee1e9a710c696421f50c1abd4
+  bytes: 872642
+  width: 2273
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d2149859ecaf18f1.jpg
+    sha256: a77c5a7e3281f91dc3313520b1b1b36233b433e024787761becd8ba47b6805f6
+    bytes: 493582
+    width: 2048
+    height: 1152
+  thumb512:
+    path: assets/thumb512/d2149859ecaf18f1.webp
+    sha256: 0f3d9b7615a878bc7355708eff171109511c7a18a283cc21b7f74785c969949f
+    bytes: 31078
+    width: 512
+    height: 288
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图是阿利坦石材官方认证并粘贴有「梦幻庄园 ALITAN STONE」标准身份铭牌的母本级展示大板。
+materials:
+- 梦幻庄园官方标板
+colors:
+- 暖红棕
+- 赤金细脉
+- 烟灰紫蓝底
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: LibreChat 知识库「梦幻庄园」品种标准问答展示图 / 佛事展展位大板陈列区效果图贴图 / 庄严浓郁型佛堂背景墙材质
+prompt_zh: 阿利坦石材展厅官方标准展示大板，右上角贴有橙色“梦幻庄园 ALITAN STONE”品牌参数标签（规格284x168cm），大板表面呈现浓郁华丽的朱砂橙、琥珀金与深邃烟紫灰色块斜向交织的天然纹理，酷似敦煌重彩壁画肌理，镜面高光抛光，竖立于黑色钢架与白色鹅卵石展床上，4K商业写实摄影。
+tags:
+- 梦幻庄园官方标板
+- 阿利坦品牌标签
+- 规格284x168
+- 敦煌壁画感奢石
+- 重彩暖金大理石
+- ALITAN_STONE
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Full Gold-Jade (梦幻庄园) slab in showroom bearing a physical orange Alitan Stone specification sticker in the top right
+    corner.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

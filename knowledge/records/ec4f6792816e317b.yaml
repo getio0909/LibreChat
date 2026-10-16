@@ -1,0 +1,74 @@
+id: ec4f6792816e317b
+title_zh: 天然美石佛國畫卷展墙
+source:
+  original_path: 26年春季佛事展设计方案/天然美石佛國畫卷展墙.jpg
+original:
+  path: 26年春季佛事展设计方案/天然美石佛國畫卷展墙.jpg
+  sha256: ec4f6792816e317b1c884398107a86ac6378413c893c2e336edaba263168592a
+  bytes: 4454010
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ec4f6792816e317b.jpg
+    sha256: a6e4cf5c424da7bf4a8e719cc782bf2a2bf8caa85c7b6de74a14e69bff6d5059
+    bytes: 792342
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/ec4f6792816e317b.webp
+    sha256: 0709ae1c1e50d40303d79ff4e4a09a05d096d18ea6d591a6bbea785675914179
+    bytes: 41400
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 材质
+- 风格
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-佛国画卷奢石墙正视全景
+entity_type: 空间场景设计
+summary_zh: 本图为第 15 张《天然美石佛国画卷立面设计图（C立面图）》在展会现场 1:1 完美落成的正面平视全景照片。通过将 CAD 施工图与本张正视实景照直接对比，可以清晰评估从工程图纸到真实商业空间的还原度与材质升级效果。
+materials:
+- 佛国画卷四联对拼大板
+- 黑色轨道射灯
+colors:
+- 琥珀金
+- 墨紫
+- 纯白
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 四联镜像对拼奢石背景墙正面双塔对称构图与双排灯梁照明参考
+prompt_zh: 正面平视广角全景摄影，新中式高端石材展厅“天然美石·佛國畫卷”主题背景墙实景，四块巨幅“佛国画卷”敦煌金天然奢石大板镜像对称拼接成8.8米长、2.5米高的壮丽画卷，天然金黄色、琥珀色与深紫黑色纹理形成左右对称的两座佛塔与中央金色祥云光柱图案，右侧石材表面有八列白色发光中文禅诗投影，外围镶嵌100mm实木雕花莲瓣边框与底部900mm深胡桃木回纹护墙板，顶部两道米白色横梁下安装密集的黑色轨道射灯与长臂洗墙灯，前方灰蓝金纹大理石地面上对称摆放两套现代白色圆形洽谈桌椅，灯光璀璨，8K建筑室内实景摄影。
+tags:
+- 26年春季佛事展
+- 佛國畫卷正视图
+- C立面实景落地
+- 四联对称奢石
+- 敦煌金大理石
+- 展厅洽谈区
+material_ids:
+- dunhuang-gold
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展C立面天然美石佛国画卷四联对纹奢石展墙与前景洽谈圆桌椅正面全景实拍。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh跨图引用''第 15 张《天然美石佛国画卷立面设计图》'''

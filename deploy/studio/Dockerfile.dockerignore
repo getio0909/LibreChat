@@ -1,0 +1,24 @@
+# 默认忽略仓库根目录下与工作台容器无关的目录与文件
+*
+
+# 仅允许工作台服务代码与知识库运行时只读资产进入构建上下文
+!deploy
+!deploy/studio
+!deploy/studio/**
+!knowledge
+!knowledge/records
+!knowledge/records/**
+!knowledge/assets
+!knowledge/assets/ref2048
+!knowledge/assets/ref2048/**
+!knowledge/assets/thumb512
+!knowledge/assets/thumb512/**
+!knowledge/catalog
+!knowledge/catalog/**
+
+# 排除本地测试夹具缓存与衍生构建产物
+deploy/studio/tests
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+knowledge/dist

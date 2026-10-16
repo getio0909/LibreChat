@@ -1,0 +1,73 @@
+id: 7ce53aa96e69315d
+title_zh: 灰色大理石板材展示图
+source:
+  original_path: 常用石材大板/灰色大理石板材展示图.jpg
+original:
+  path: 常用石材大板/灰色大理石板材展示图.jpg
+  sha256: 7ce53aa96e69315ddcdc3594a15213da35853e06c667ddbfcb2a4b17c940fb36
+  bytes: 750822
+  width: 1984
+  height: 1488
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7ce53aa96e69315d.jpg
+    sha256: dcff1d6a87ac30352507a57beea0c5601f930df663c965bb3d4074b286aa56ea
+    bytes: 403021
+    width: 1984
+    height: 1488
+  thumb512:
+    path: assets/thumb512/7ce53aa96e69315d.webp
+    sha256: fd4e50ae8a7855f88bc99b1e7d323695b527cf1e7faef4ea287f5b3318c0f500
+    bytes: 32574
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-暖灰粗白斜纹系
+entity_type: 实物对象写实
+summary_zh: 本图为石材厂房内实拍的超高清天然暖灰色斜向闪电白纹大理石大板（编号“19”板，属云朵拉灰/古堡灰/爱马仕灰优质切板）。
+materials:
+- 天然灰色大理石
+- 云朵拉灰大理石
+- 古堡灰大理石
+colors:
+- 暖灰褐色
+- 中灰色
+- 乳白色
+style: 现代奢石展陈 / 现代高级灰禅意
+ai_design_usage: 现代禅意佛堂/会所地面大面积拼花 / 现代佛事展展位外立面与基座包覆 / 高级灰室内空间背景墙贴图
+prompt_zh: 超高清天然暖灰色大理石大板正面特写，云朵拉灰与古堡灰质感，温润的暖灰褐色基底上斜向交织着数道粗壮苍劲的乳白色闪电状主脉与细密支脉，镜面高光抛光处理，表面清晰倒映窗户光影，现代高级灰禅意空间主材，8K超精细实拍。
+tags:
+- 暖灰大理石
+- 古堡灰大板
+- 粗白脉灰石
+- 现代佛堂地面
+- 19号大板
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1488
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Warm grey marble slab with diagonal white veins held by a worker in a warehouse, with window reflection and bottom-right
+    STM石猫 watermark.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

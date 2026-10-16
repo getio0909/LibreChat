@@ -1,0 +1,75 @@
+id: 35785af38eab2e24
+title_zh: 佛教主题石材展位设计
+source:
+  original_path: 25年秋季佛事展设计方案/佛教主题石材展位设计.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教主题石材展位设计.jpg
+  sha256: 35785af38eab2e2492a92d53885fd855c2fc3e451caca387e65f8eb271a0ea7f
+  bytes: 2886444
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/35785af38eab2e24.jpg
+    sha256: 64c275ea8692f7cefd1639996268ceef012f57edffcded13bf695317d52fa834
+    bytes: 544444
+    width: 2048
+    height: 1153
+  thumb512:
+    path: assets/thumb512/35785af38eab2e24.webp
+    sha256: 699c3eea5bb37624a4d86bab2097f22a688a76c77df3a1ddc3bda62df8379159
+    bytes: 29742
+    width: 512
+    height: 288
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-展位全局实景
+entity_type: 空间场景设计
+summary_zh: 本图为2025年秋季佛事展“庄严宝刹”展位的三面开口全局透视实景照。展位整体呈大尺度U型半围合殿堂式格局，巧妙利用传统古建“歇山/卷棚轩顶+中堂藻井”的木构语汇进行现代化转译，在挑高展馆中构建出一座独立、醒目且具有强烈宗教建筑仪式感的石材美学殿堂。
+materials:
+- 金镶玉
+- 敦煌金
+- 防腐木构
+- 亚克力灯箱
+colors:
+- 琥珀金
+- 胡桃木棕
+- 玄黑
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 大型三面开口殿堂式佛事展位全局空间规划与动线参考
+prompt_zh: 大型国际佛事用品展“莊嚴寶刹”佛教石材主题展位45度广角全景实拍，U型三面开放式新中式殿堂架构，中央顶部为三层退台式深木色井字梁嵌金镶玉透光石莲花藻井，两侧延伸弧形白色格栅卷棚轩顶，转角木柱悬挂古典六角宫灯；后方高墙为暖金色金镶玉大理石竖板拼接并陈列三尊彩绘佛像，左右两翼内墙为背光发光的三十六尊橙黄琉璃坐佛陈列格，外围由敦煌金高浮雕石材须弥座与汉白玉微缩栏杆半围合，中央矗立巨型石雕莲花供坛与伽蓝菩萨金身坐像，地面铺设高光黑白金几何拼花大理石，左侧配有寺院宣传大屏与大鼓茶桌，右侧设有白色商务洽谈圆桌，展馆环境真实，8K商业空间摄影。
+tags:
+- 25年秋季佛事展
+- 佛事展展位全景
+- U型半围合展台
+- 卷棚轩顶设计
+- 千佛发光墙
+- 石材展厅设计
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展庄严宝刹U型半围合殿堂式展位全局广角实景照片。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

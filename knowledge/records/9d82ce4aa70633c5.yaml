@@ -1,0 +1,74 @@
+id: 9d82ce4aa70633c5
+title_zh: 现代木质隔断室内空间
+source:
+  original_path: 佛教空间设计案例/现代木质隔断室内空间.jpg
+original:
+  path: 佛教空间设计案例/现代木质隔断室内空间.jpg
+  sha256: 9d82ce4aa70633c591560dae9c4163da2a38b84e47870f836d653e7c8b78c879
+  bytes: 2275109
+  width: 3442
+  height: 2584
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9d82ce4aa70633c5.jpg
+    sha256: f206a183e95a3d03c5bb1414dcf14c80bd106fe5acb593f15557241a64e8b134
+    bytes: 311647
+    width: 2048
+    height: 1537
+  thumb512:
+    path: assets/thumb512/9d82ce4aa70633c5.webp
+    sha256: 64fafbefaa0437eae1b546f690ae157dbb4e433c8532fea6a30b87fe103db57a
+    bytes: 20496
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 中央陈设自然边浅色原木长条大茶桌与玻璃气泡吊灯、左后方设发光紫砂壶博古展示墙、四周以通高竖向原木格栅推拉隔断围合的现代禅意茶室。
+materials:
+- 原木竖向格栅隔断与推拉门
+- 自然边整木大茶桌
+- 背光紫砂壶博古墙
+- 吹制玻璃泡吊灯
+colors:
+- 浅原木色
+- 米灰色
+style: 现代东方自然原木茶禅风
+ai_design_usage: 现代禅意茶室与接待会所空间设计、竖向木格栅半通透隔断与发光茶器展示墙参考
+prompt_zh: 超高清现代禅意茶室与木质格栅隔断室内设计效果图，横幅广角透视，空间中央摆放一张保留自然边肌理的浅色原木长条大茶桌，四周对称陈列极简木质茶椅，桌面布置白瓷茶具与迎客松小盆景；左后方为内嵌柔和暖白背光的方形博古格展示墙，整齐陈列多把紫砂茶壶；后方与右侧采用通顶竖向浅色原木格栅推拉门隔断，透过落地窗与半卷白纱帘可见室外禅意庭院绿植，茶桌上方悬挂一簇透明玻璃球泡吊灯，浅木地板，自然静谧，8K室内渲染
+tags:
+- 木质隔断空间
+- 现代禅意茶室
+- 竖向木格栅
+- 紫砂壶展示墙
+- 原木大茶桌
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2584
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 新中式禅意茶室博古架与原木长茶桌渲染图，左下角带有半透明“一圆居空间设计”印章水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 左下角存在第三方“一圆居空间设计”印章水印

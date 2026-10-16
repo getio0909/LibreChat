@@ -34,17 +34,10 @@ while (( $# > 0 )); do
     *) shift ;;
   esac
 done
-image=$(cat "$root/image.env")
+image=$(tr '\n' ' ' < "$root/image.env")
 printf '%s:%s:%s\n' "$operation" "$closed" "$image" >> "$DEPLOY_TEST_LOG"
 case "$operation" in
   up)
-    if [[ "$image" == *00000000* ]]; then
-      [[ " $* " == *' --force-recreate '* ]]
-    fi
-    if [[ "$*" == *'files-admin files-user design-admin design-user api'* ]]; then
-      [[ " $* " == *' --force-recreate '* ]]
-      printf 'reload-configs\n' >> "$DEPLOY_TEST_LOG"
-    fi
     if [[ "$image" == *11111111* ]]; then
       test -f "$DEPLOY_TEST_GATE"
       if [[ "$DEPLOY_TEST_FAILURE" == health || ( "$DEPLOY_TEST_FAILURE" == final && "$closed" == false ) ]]; then
@@ -56,14 +49,6 @@ case "$operation" in
     "$closed"
     test -f "$DEPLOY_TEST_GATE"
     cat >/dev/null
-    if [[ "$*" == *'config.mcpSettings.allowedAddresses'* ]]; then
-      cat "$root/librechat.yaml"
-      exit 0
-    fi
-    if [[ "$*" != *'/app/config/create-user.js'* ]]; then
-      if [[ "$DEPLOY_TEST_FAILURE" == mcp ]]; then exit 1; fi
-      exit 0
-    fi
     if [[ "$DEPLOY_TEST_FAILURE" == command ]]; then
       exit 1
     fi
@@ -75,24 +60,13 @@ EOF
 cat > "$work/bin/curl" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ "$*" == *'/cad-files/'* ]]; then
-  if [[ "$DEPLOY_TEST_FAILURE" == file-port ]]; then exit 7; fi
-  exit 0
-fi
-if [[ "$*" == *'/download/'* ]]; then
-  if [[ "$DEPLOY_TEST_FAILURE" == download-port ]]; then exit 7; fi
-  printf '403'
-  exit 0
-fi
 while [[ "$1" != -o ]]; do shift; done
 output=$2
 email=$(jq -r .email)
 if [[ "$DEPLOY_TEST_FAILURE" == login ]]; then exit 22; fi
 role=USER
 if [[ "$email" == admin@example.test && "$DEPLOY_TEST_FAILURE" != role ]]; then role=ADMIN; fi
-id=$(printf 'b%.0s' {1..24})
-if [[ "$email" == admin@example.test ]]; then id=$(printf 'a%.0s' {1..24}); fi
-jq -n --arg role "$role" --arg id "$id" '{user: {role: $role, id: $id}}' > "$output"
+jq -n --arg role "$role" '{user: {role: $role}}' > "$output"
 EOF
 cat > "$work/bin/chown" <<'EOF'
 #!/usr/bin/env bash
@@ -102,40 +76,36 @@ test -f "$2"
 printf 'config-owner:%s\n' "${2##*/}" >> "$DEPLOY_TEST_LOG"
 EOF
 chmod 755 "$work/bin/docker" "$work/bin/curl" "$work/bin/chown"
+
 printf 'previous compose\n' > "$work/previous/compose.yml"
 printf 'previous config\n' > "$work/previous/librechat.yaml"
 printf 'ALLOW_REGISTRATION=true\n' > "$work/previous/.env"
-printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\n' 0 > "$work/previous/image.env"
-cp -r "$work/previous" "$work/previous-cad"
-for account in admin user; do
-  printf '{"fixture":"previous provider settings","downloadSigningKey":"%s"}\n' \
-    "$(printf 'a%.0s' {1..64})" > "$work/previous-cad/design-$account.json"
-  printf '{"fixture":"previous file credentials"}\n' > "$work/previous-cad/files-$account.yaml"
-done
+printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%064d\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-prev@sha256:%064d\n' 0 0 > "$work/previous/image.env"
+printf '{"shared_token":"%s","file_signing_key":"%s","public_base_url":"https://dev.xuqian.io","gemini_api_key":"prev-gemini","ark_api_key":"prev-ark"}\n' \
+  "$(printf 'a%.0s' {1..64})" "$(printf 'c%.0s' {1..64})" > "$work/previous/studio.json"
+
 printf 'new compose\n' > "$work/bundle/compose.yml"
 printf 'new config\n' > "$work/bundle/librechat.yaml"
 cp "$work/previous/.env" "$work/bundle/.env"
-cp "$work/bundle/.env" "$work/expected.env"
-printf 'CAD_ADMIN_USER_ID=%s\nCAD_USER_USER_ID=%s\n' "$(printf 'a%.0s' {1..24})" "$(printf 'b%.0s' {1..24})" >> "$work/expected.env"
-printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\n' "$(printf '1%.0s' {1..64})" > "$work/bundle/image.env"
+printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-next@sha256:%s\n' \
+  "$(printf '1%.0s' {1..64})" "$(printf '2%.0s' {1..64})" > "$work/bundle/image.env"
+printf '{"shared_token":"%s","file_signing_key":"%s","public_base_url":"https://dev.xuqian.io","gemini_api_key":"next-gemini","ark_api_key":"next-ark"}\n' \
+  "$(printf 'b%.0s' {1..64})" "$(printf 'd%.0s' {1..64})" > "$work/bundle/studio.json"
 printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
-for account in admin user; do
-  printf '{"workspaceUrl":"https://example.test/cad-files/%s/","downloadSigningKey":"%s"}\n' \
-    "$account" "$(printf 'b%.0s' {1..64})" > "$work/bundle/design-$account.json"
-  printf '{"fixture":true}\n' > "$work/bundle/files-$account.yaml"
-done
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-for scenario in none health mcp command login role final file-port download-port first-none first-login first-role rotated-none rotated-mcp rotated-final; do
+# 重部署成功时应更新 studio.json 中的新配置，但保留服务器已持久化的 file_signing_key。
+mkdir -p "$work/redeployed"
+cp "$work/bundle/compose.yml" "$work/bundle/librechat.yaml" "$work/bundle/.env" "$work/bundle/image.env" "$work/redeployed/"
+jq --arg key "$(printf 'c%.0s' {1..64})" '.file_signing_key = $key' "$work/bundle/studio.json" > "$work/redeployed/studio.json"
+
+for scenario in none health command login role final first-none first-login first-role; do
   failure=${scenario#first-}
-  failure=${failure#rotated-}
-  previous="$work/previous"
-  if [[ "$scenario" == rotated-* ]]; then previous="$work/previous-cad"; fi
   root="$work/$scenario"
   mkdir "$root"
   if [[ "$scenario" != first-* ]]; then
-    cp "$previous/"* "$previous/.env" "$root/"
+    cp "$work/previous/"* "$work/previous/.env" "$root/"
     chmod 600 "$root/"* "$root/.env"
   fi
   : > "$DEPLOY_TEST_LOG"
@@ -147,55 +117,54 @@ for scenario in none health mcp command login role final file-port download-port
     test "$status" != 0
     grep -q 'The failed initial application deployment has been stopped.' "$work/output.log"
     grep -q '^down:' "$DEPLOY_TEST_LOG"
-    for file in compose.yml librechat.yaml .env image.env design-admin.json design-user.json files-admin.yaml files-user.yaml; do test ! -f "$root/$file"; done
+    for file in compose.yml librechat.yaml .env image.env studio.json .file_signing_key; do test ! -f "$root/$file"; done
     test -f "$DEPLOY_TEST_GATE"
   elif [[ "$failure" == none ]]; then
     test "$status" = 0
-    expected="$work/bundle"
+    if [[ "$scenario" == first-none ]]; then
+      expected="$work/bundle"
+      expected_signing_key="$(printf 'd%.0s' {1..64})"
+    else
+      expected="$work/redeployed"
+      expected_signing_key="$(printf 'c%.0s' {1..64})"
+    fi
     grep -q '^up:false:.*11111111' "$DEPLOY_TEST_LOG"
-    grep -q '^reload-configs$' "$DEPLOY_TEST_LOG"
+    test -f "$root/.file_signing_key"
+    test "$(stat -c '%a' "$root/.file_signing_key")" = 600
+    test "$(tr -d '\r\n' < "$root/.file_signing_key")" = "$expected_signing_key"
+    test "$(jq -r '.file_signing_key' "$root/studio.json")" = "$expected_signing_key"
   else
     test "$status" != 0
-    expected="$previous"
+    expected="$work/previous"
     grep -q 'The previous application deployment has been restored.' "$work/output.log"
     grep -q '^up:false:.*00000000' "$DEPLOY_TEST_LOG"
   fi
   grep -q '^up:true:.*11111111' "$DEPLOY_TEST_LOG"
-  for file in design-admin.json design-user.json files-admin.yaml files-user.yaml; do
-    grep -q "^config-owner:$file" "$DEPLOY_TEST_LOG"
-  done
+  grep -q '^config-owner:studio.json$' "$DEPLOY_TEST_LOG"
   if [[ "$scenario" != first-* || "$failure" == none ]]; then
-    for file in compose.yml librechat.yaml .env image.env; do
-      if [[ "$file" == .env && "$failure" == none ]]; then
-        cmp "$work/expected.env" "$root/$file"
-      else
-        cmp "$expected/$file" "$root/$file"
-      fi
+    for file in compose.yml librechat.yaml .env image.env studio.json; do
+      cmp "$expected/$file" "$root/$file"
       test "$(stat -c '%a' "$root/$file")" = 600
     done
     test ! -f "$DEPLOY_TEST_GATE"
-    for account in admin user; do
-      if [[ "$failure" == none ]]; then
-        jq -e '.userId | test("^[a-f0-9]{24}$")' "$root/design-$account.json" >/dev/null
-        key=$(jq -r '.downloadSigningKey' "$root/design-$account.json")
-        expected_key=$(printf 'b%.0s' {1..64})
-        if [[ "$scenario" == rotated-none ]]; then expected_key=$(printf 'a%.0s' {1..64}); fi
-        test "$key" = "$expected_key"
-        cmp "$work/bundle/files-$account.yaml" "$root/files-$account.yaml"
-        test "$(stat -c '%a' "$root/design-$account.json")" = 600
-        test "$(stat -c '%a' "$root/files-$account.yaml")" = 600
-      elif [[ "$scenario" == rotated-* ]]; then
-        cmp "$previous/design-$account.json" "$root/design-$account.json"
-        cmp "$previous/files-$account.yaml" "$root/files-$account.yaml"
-      else
-        test ! -f "$root/design-$account.json"
-        test ! -f "$root/files-$account.yaml"
-      fi
-    done
   fi
   test -z "$(find "$root" -maxdepth 1 -name '.incoming.*' -print -quit)"
   printf 'Deployment recovery test passed: %s\n' "$scenario"
 done
+
+# 验证首次部署生成的签名密钥在后续重部署时不会被新归档中的随机密钥覆盖。
+mkdir -p "$work/bundle2"
+cp "$work/bundle/"* "$work/bundle/.env" "$work/bundle2/"
+jq --arg token "$(printf 'e%.0s' {1..64})" --arg key "$(printf 'f%.0s' {1..64})" \
+  '.shared_token = $token | .file_signing_key = $key' "$work/bundle/studio.json" > "$work/bundle2/studio.json"
+tar -czf "$work/bundle2.tgz" -C "$work/bundle2" .
+export DEPLOY_TEST_FAILURE=none
+SSH_ORIGINAL_COMMAND="deploy $work/first-none" bash "$work/deploy.sh" "$work/first-none" \
+  < "$work/bundle2.tgz" > "$work/output.log" 2>&1
+test "$(jq -r '.shared_token' "$work/first-none/studio.json")" = "$(printf 'e%.0s' {1..64})"
+test "$(jq -r '.file_signing_key' "$work/first-none/studio.json")" = "$(printf 'd%.0s' {1..64})"
+test "$(tr -d '\r\n' < "$work/first-none/.file_signing_key")" = "$(printf 'd%.0s' {1..64})"
+echo 'Deployment signing key persistence test passed.'
 
 printf 'unexpected\n' > "$work/bundle/unexpected.txt"
 tar -czf "$work/invalid.tgz" -C "$work/bundle" .

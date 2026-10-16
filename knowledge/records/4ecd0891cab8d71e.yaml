@@ -1,0 +1,71 @@
+id: 4ecd0891cab8d71e
+title_zh: 现代佛教寺院走廊设计
+source:
+  original_path: 佛教空间设计案例/现代佛教寺院走廊设计.jpg
+original:
+  path: 佛教空间设计案例/现代佛教寺院走廊设计.jpg
+  sha256: 4ecd0891cab8d71eb2d53b09c8acdba431cd3fa9cd2b147b8a72e07a848a547f
+  bytes: 802018
+  width: 929
+  height: 2574
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4ecd0891cab8d71e.jpg
+    sha256: 5ad7de878aecdefc3850a95279dd9a8429ad969e51971c83f95f8165080e725b
+    bytes: 153351
+    width: 739
+    height: 2048
+  thumb512:
+    path: assets/thumb512/4ecd0891cab8d71e.webp
+    sha256: 2064a678d02710598e879c4406b8dd9429e687b6b96bee2cc9fdda0599d4ba79
+    bytes: 12462
+    width: 185
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 顶部为露明木梁人字坡内嵌发光软膜天棚、两侧实木框对称装裱工笔重彩佛菩萨画作、地面铺哑光青石砖直通浅木色双开禅门的寺院艺术走廊。
+materials:
+- 露明木梁人字坡顶
+- 发光宣纸/透光膜天棚
+- 对称工笔重彩佛画
+- 青灰石砖地面
+colors:
+- 原木棕
+- 暖米白
+style: 现代禅意美术馆木构长廊风
+ai_design_usage: 现代佛教美术馆画廊通道、寺院禅堂前厅走廊设计、人字坡木构发光天棚照明参考
+prompt_zh: 现代佛教寺院室内艺术长廊设计，竖幅一点透视对称构图，顶部为传统人字形露明实木梁架坡屋顶，木梁之间内嵌温暖柔和的白色发光软膜天棚，左右两侧墙面以实木立柱分格，对称镶嵌精美的中国传统工笔重彩佛教菩萨壁画，地面铺设哑光青灰色石板砖，走廊尽头为一扇极简浅木色双开禅门，光影静谧神圣，8K室内建筑渲染
+tags:
+- 寺院走廊设计
+- 人字坡发光顶
+- 佛教艺术长廊
+- 工笔佛画展陈
+- 现代禅意空间
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 929
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 高挑佛堂一角竖向裁切图（#290的左半部局部），展示深色木格栅墙、多层搁板小佛像、长条软包坐榻及发光千佛龛局部，无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

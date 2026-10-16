@@ -1,0 +1,78 @@
+id: 8051e453471ae00c
+title_zh: 意大利圣路加牛纹柱头残件
+source:
+  original_path: 石刻纹样开放授权实物参考/西方-意大利圣路加牛纹柱头残件-cma146798.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/01-西方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/西方-意大利圣路加牛纹柱头残件-cma146798.jpg
+  sha256: 8051e453471ae00c77f5d4cfee0391d69b596ea267e483c942ef0f88d035df3c
+  bytes: 5422256
+  width: 3400
+  height: 2725
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8051e453471ae00c.jpg
+    sha256: 5c84db624ad3b1f8a3e03ce804fdccf54de018a6786d5cf2bab5f99246ff15f0
+    bytes: 407674
+    width: 2048
+    height: 1641
+  thumb512:
+    path: assets/thumb512/8051e453471ae00c.webp
+    sha256: 1e8f3b004971e325b108fdbea7f75be1c41e83a4de82c28c023ab7337dfe8e8f
+    bytes: 15360
+    width: 512
+    height: 410
+library_type: 石刻纹样
+region: 西方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 意大利圣路加牛纹柱头残件
+entity_type: 实物对象写实
+summary_zh: 【图中可见】浅色石件上横卧牛形动物，头转向前方，背后残留平直石板与刻字，底缘有断缺。【来源著录】Fragment of a Capital with the Ox of Saint Luke；文化或地点依据：Northern
+  Italy, Emilia (Bologna?), 12th century。
+materials:
+- 大理石
+colors:
+- 浅灰白色
+style: 西方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，浅色石件上横卧牛形动物，头转向前方，背后残留平直石板与刻字，底缘有断缺。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Fragment of a Capital with the Ox of Saint Luke. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.
+tags:
+- 石刻纹样
+- 西方
+- 开放授权
+- 真实摄影
+- 意大利圣路加牛纹柱头残件
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1972.22
+  download_url: https://openaccess-cdn.clevelandart.org/1972.22/1972.22_print.jpg
+  credit: Purchase from the J. H. Wade Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2725
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

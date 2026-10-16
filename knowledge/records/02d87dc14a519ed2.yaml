@@ -1,0 +1,76 @@
+id: 02d87dc14a519ed2
+title_zh: 泰国孟陀罗钵地砂岩佛立像
+source:
+  original_path: 造像雕塑开放授权实物参考/东南亚与南亚-泰国孟陀罗钵地砂岩佛立像-cma147403.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/01-造像雕塑开放授权实物参考库/02-东南亚与南亚造像雕塑参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 造像雕塑开放授权实物参考/东南亚与南亚-泰国孟陀罗钵地砂岩佛立像-cma147403.jpg
+  sha256: 02d87dc14a519ed2e501be7f04d813e4f6cdc034c712b31a9e89f490c5c03f16
+  bytes: 4123441
+  width: 2364
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/02d87dc14a519ed2.jpg
+    sha256: 95a191aa672138dd5a01d84d6aadc7212d2e132c33b69e27d4b59c54990e2bf0
+    bytes: 231884
+    width: 1424
+    height: 2048
+  thumb512:
+    path: assets/thumb512/02d87dc14a519ed2.webp
+    sha256: f84b3a245a1b817a39e11397b40a3fb239cca6a70c14a60b288b25f0b8b6b94e
+    bytes: 9442
+    width: 356
+    height: 512
+library_type: 造像雕塑
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 造像雕塑
+category_l2: 泰国孟陀罗钵地砂岩佛立像
+entity_type: 实物对象写实
+summary_zh: 【图中可见】长耳螺发立像双前臂残失，衣面与身体轮廓贴合，双足站在低矮圆座上。【来源著录】Buddha；文化或地点依据：Thailand, probably Shri Thep, Mon-Dvaravati style。
+materials:
+- 砂岩
+colors:
+- 黄褐色
+style: 东南亚/南亚传统造像雕塑实物参考
+ai_design_usage: 造像姿态、面部与衣纹构成参考
+prompt_zh: 以所附实物照片作形态参考，长耳螺发立像双前臂残失，衣面与身体轮廓贴合，双足站在低矮圆座上。重点保留可辨识的轮廓、纹样疏密与表面色差，用于造像姿态、面部与衣纹构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Buddha. Preserve the visible silhouette, ornament spacing
+  and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 造像雕塑
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 泰国孟陀罗钵地砂岩佛立像
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1973.15
+  download_url: https://openaccess-cdn.clevelandart.org/1973.15/1973.15_print.jpg
+  credit: Leonard C. Hanna Jr. Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2364
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

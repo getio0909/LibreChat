@@ -1,0 +1,80 @@
+id: ff9c69f83f1a2ec9
+title_zh: 尼泊尔陪胪木雕檐撑
+source:
+  original_path: 家具木作开放授权实物参考/东南亚与南亚-尼泊尔陪胪木雕檐撑-walters25.271.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/02-东南亚与南亚家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/东南亚与南亚-尼泊尔陪胪木雕檐撑-walters25.271.jpg
+  sha256: ff9c69f83f1a2ec919c064bde3cddfbc2a70705a1b78032bea9f6e09146500a9
+  bytes: 158694
+  width: 1350
+  height: 1800
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ff9c69f83f1a2ec9.jpg
+    sha256: d1549591c0bbe06b53bf2f99522b03cbd8acb1e17f18d5126bc4e95895153101
+    bytes: 194481
+    width: 1350
+    height: 1800
+  thumb512:
+    path: assets/thumb512/ff9c69f83f1a2ec9.webp
+    sha256: fa8b4f2a9aeb9e0290034e81728963243b4be5d0df1176887d7dce0505d64097
+    bytes: 13552
+    width: 384
+    height: 512
+library_type: 家具木作
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 尼泊尔陪胪木雕檐撑
+entity_type: 实物对象写实
+summary_zh: 【图中可见】竖向木构件正面高浮雕多臂忿怒形象，发冠向上，双眼圆睁，脚下有兽形承托，木面留红绿彩绘。【来源著录】Strut with Bhairava；文化或地点依据：Nepal, Kathmandu Valley (Place
+  of Origin)。
+materials:
+- 木材
+- 颜料残迹
+colors:
+- 棕色
+- 红色
+- 绿色
+style: 东南亚/南亚传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，竖向木构件正面高浮雕多臂忿怒形象，发冠向上，双眼圆睁，脚下有兽形承托，木面留红绿彩绘。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Strut with Bhairava. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 尼泊尔陪胪木雕檐撑
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://art.thewalters.org/object/25.271/
+  download_url: https://art.thewalters.org/images/art/PS4_25.271_Fnt_DD_AT22_37457-tms.jpg
+  credit: The Walters Art Museum; Gift of John and Berthe Ford, 2021
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1350
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

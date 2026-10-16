@@ -1,0 +1,80 @@
+id: d87da4fc4b24fd3e
+title_zh: 北京智化寺智化殿正立面与前庭
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-北京智化寺智化殿正立面与前庭-commons129234758.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-北京智化寺智化殿正立面与前庭-commons129234758.jpg
+  sha256: d87da4fc4b24fd3ee0ef6186c8366d454ea230fee86a72609db88b28f814cc25
+  bytes: 2611004
+  width: 3840
+  height: 2492
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d87da4fc4b24fd3e.jpg
+    sha256: dac5be33ded02c3d83a0074324db1902582959a5034ebf09cb7845afe72eb5a1
+    bytes: 756909
+    width: 2048
+    height: 1329
+  thumb512:
+    path: assets/thumb512/d87da4fc4b24fd3e.webp
+    sha256: 7928e53933f060aba008a4b3ba3d7af8702a4c6779611d006a7c4d23bf3f4915
+    bytes: 36022
+    width: 512
+    height: 332
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 北京智化寺智化殿正立面与前庭
+entity_type: 空间场景设计
+summary_zh: 【图中可见】正面殿堂有深灰瓦屋面、上翘檐角与红色门窗，青蓝彩绘位于檐下，前庭铺石，轴线上立有香炉；立面主体无遮挡，两侧有树木。【来源著录】智化寺智化殿2023.2 (1).jpg；文化或地点依据：Commons 明确著录北京市东城区智化寺；以汉传寺院殿堂正立面替换枝叶遮挡的旧山门照片。
+materials:
+- 木构
+- 砖石
+- 瓦（据可见构造，材种未注明）
+colors:
+- 灰色
+- 朱红
+- 蓝绿
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，正面殿堂有深灰瓦屋面、上翘檐角与红色门窗，青蓝彩绘位于檐下，前庭铺石，轴线上立有香炉；立面主体无遮挡，两侧有树木。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 智化寺智化殿2023.2 (1).jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北京智化寺智化殿正立面与前庭
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:智化寺智化殿2023.2_(1).jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/%E6%99%BA%E5%8C%96%E5%AF%BA%E6%99%BA%E5%8C%96%E6%AE%BF2023.2_%281%29.jpg/3840px-%E6%99%BA%E5%8C%96%E5%AF%BA%E6%99%BA%E5%8C%96%E6%AE%BF2023.2_%281%29.jpg
+  credit: ScareCriterion12; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2492
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

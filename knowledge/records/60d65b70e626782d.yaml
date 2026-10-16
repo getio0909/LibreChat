@@ -1,0 +1,74 @@
+id: 60d65b70e626782d
+title_zh: 绿色大理石板材展示图
+source:
+  original_path: 常用石材大板/绿色大理石板材展示图.jpg
+original:
+  path: 常用石材大板/绿色大理石板材展示图.jpg
+  sha256: 60d65b70e626782da704a70cd53d7b2a76e85a339c6891ea3bd5366f58017246
+  bytes: 1506892
+  width: 2048
+  height: 1536
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/60d65b70e626782d.jpg
+    sha256: b67fed9ee35c1e3d97daf54e9e197d53081b53672fe6bf5d6899710d1f060d17
+    bytes: 960425
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/60d65b70e626782d.webp
+    sha256: 9ce86f7e8a3cae4f45979a5d53d0e1c1639dd25279141e1cee9bb8923929f924
+    bytes: 59498
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-深绿层叠网纹系
+entity_type: 实物对象写实
+summary_zh: 本图为带有绿色安全捆扎带的整扎天然深绿色云雾网纹大理石大板（丹东绿/森林绿奢石）展厅标准陈列写实图。
+materials:
+- 天然深绿大理石
+- 丹东绿/森林绿奢石
+- 黑色承重钢架
+colors:
+- 森林深绿
+- 墨绿色
+- 灰绿色
+- 纯白色
+style: 现代奢石展陈 / 东方奢华禅风
+ai_design_usage: 石材大板市场/展厅空间设计参考 / 深绿奢石背景墙材质提取 / 佛堂深色主景墙与供台设计
+prompt_zh: 高端石材展厅内陈列的超高清深绿色天然大理石大板，深邃的森林绿与墨绿角砾基底，交织着灰绿色与白色的云雾海浪状网纹，放置在重型黑色钢架上，地面环绕白色LED发光灯槽，两侧有绿色固定打包带，深沉华贵的天然绿色奢石，8K实拍。
+tags:
+- 绿色大理石大板
+- 森林绿奢石
+- 展厅钢架陈列
+- 绿白混搭参考
+- 丹东绿纹理
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1536
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Dark green clouded marble slab bundle secured with two vertical green straps on a black steel stand, with STM石猫 watermark
+    in bottom right.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

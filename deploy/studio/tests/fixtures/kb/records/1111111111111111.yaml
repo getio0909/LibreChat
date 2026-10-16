@@ -1,0 +1,34 @@
+schema: 1
+id: "1111111111111111"
+title_zh: 敦煌金奢石大板样板A
+library_type: 材质纹理
+studio_roles:
+  - 材质
+  - 参考
+category_l1: 材质纹理
+category_l2: 石材样板
+entity_type: 大板样图
+materials:
+  - 敦煌金
+  - 天然奢石
+material_ids:
+  - dunhuang-gold
+colors:
+  - 金黄
+  - 暖棕
+style:
+  - 现代中式
+tags:
+  - 大板
+  - 透光奢石
+  - 台面
+summary_zh: 暖金色层叠纹理的天然奢石大板，适合佛堂供桌台面与背板装饰，纹理连贯自然且富有庄严质感，在暖光照射下呈现温润通透的金色光泽，常用于主供台面、佛龛背板以及展厅核心背景墙的高端定制设计，展现东方禅意空间的大气与华美底蕴，兼具现代审美与传统礼佛仪轨需求，纹理细腻层次分明。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: approved

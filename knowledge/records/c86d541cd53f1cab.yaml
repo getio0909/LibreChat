@@ -1,0 +1,78 @@
+id: c86d541cd53f1cab
+title_zh: 大同善化寺三圣殿正立面
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-大同善化寺三圣殿正立面-commons46770035.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-大同善化寺三圣殿正立面-commons46770035.jpg
+  sha256: c86d541cd53f1cab3633a91901cf462de1754a8eafc131b98a1a8aff3131e665
+  bytes: 2762865
+  width: 2542
+  height: 1737
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c86d541cd53f1cab.jpg
+    sha256: 3d763dc6fa9b49ce45619b246cf93d2079bf24c2be59ee7ed8bcf6dab566cec6
+    bytes: 491662
+    width: 2048
+    height: 1399
+  thumb512:
+    path: assets/thumb512/c86d541cd53f1cab.webp
+    sha256: de442d7016a497b5333204256866ea90df84eb4dc8f6ef0f03f390f5b78e29ab
+    bytes: 26734
+    width: 512
+    height: 350
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 大同善化寺三圣殿正立面
+entity_type: 空间场景设计
+summary_zh: 【图中可见】殿堂红色柱门配大面积灰瓦屋面，长直正脊两端有上翘饰件，檐下密排木构，正中匾额下为格心门扇。【来源著录】Datong 307.jpg；文化或地点依据：Commons明确著录山西大同善化寺三圣殿；重建年代等历史资料仅按其说明，不由照片推定。
+materials:
+- 木构件
+- 瓦与石台阶（按可见构件索引）
+colors:
+- 灰色
+- 红色
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，殿堂红色柱门配大面积灰瓦屋面，长直正脊两端有上翘饰件，檐下密排木构，正中匾额下为格心门扇。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Datong 307.jpg. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 大同善化寺三圣殿正立面
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Datong_307.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/f/f5/Datong_307.jpg
+  credit: G41rn8; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1737
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

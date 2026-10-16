@@ -1,0 +1,76 @@
+id: 1984205e57a7127d
+title_zh: 佛教主题传统展览空间
+source:
+  original_path: 佛教空间设计案例/佛教主题传统展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教主题传统展览空间.jpg
+  sha256: 1984205e57a7127d2981642217230b58e26cc475d9ff0351d93ce7542bd6a497
+  bytes: 945444
+  width: 1875
+  height: 1282
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1984205e57a7127d.jpg
+    sha256: 71c588d0cded601736133e899a7e013a4eff274329bfac1dfcdc95914ccf2b40
+    bytes: 252425
+    width: 1875
+    height: 1282
+  thumb512:
+    path: assets/thumb512/1984205e57a7127d.webp
+    sha256: efb209f3bd6b37334d9fc8090c6cf9fb96738f07cffafe529cd75da49b8eeb43
+    bytes: 25060
+    width: 512
+    height: 350
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: 新中式禅意书画与敦煌壁画艺术展厅对称场景，正中嵌巨幅金地飞天说法图壁画，两侧立鎏金铜箍原木大圆柱与汉白玉柱础，两翼设达摩山水与草书佛经发光画框。
+materials:
+- 原木大圆柱
+- 鎏金回纹铜柱套
+- 汉白玉覆盆柱础
+- 金地重彩壁画
+- 仿古青石方砖
+colors:
+- 暖原木色
+- 斑驳金色
+- 深青黑色
+- 宣纸素白
+style: 现代禅意
+ai_design_usage: 新中式佛教美术馆与书画展厅设计、敦煌金地壁画主景墙植入及对称展厅空间生成
+prompt_zh: 新中式佛教书画与壁画艺术展厅室内设计，严谨的中轴对称单点透视构图，正前方主景墙镶嵌巨幅金地重彩敦煌飞天说法壁画，两侧对称矗立粗壮的暖色原木大圆柱，柱脚包镶鎏金回纹铜圈并立于浅灰汉白玉覆盆柱础上，左右两翼展墙内嵌发光宣纸灯箱展示水墨达摩画像、山水画与草书佛经书法，顶部为传统木斗拱藻井与弧形木格栅吊顶，地面满铺深灰黑色仿古青石方砖，两侧对称摆放新中式弧形腿实木长条凳，禅意高雅，8K超高清渲染。
+tags:
+- 佛教空间案例
+- 新中式展厅
+- 敦煌飞天壁画
+- 书画灯箱
+- 青石板地面
+- 鎏金柱套
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1282
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior rendering of a New Chinese Buddhist art and calligraphy hall with central golden Dunhuang-style mural,
+    wood columns with gilt bronze collars and white marble bases, and illuminated calligraphy/painting frames.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,78 @@
+id: 0af386c425d28e2c
+title_zh: 南京栖霞寺舍利塔莲瓣卷纹与石栏
+source:
+  original_path: 石刻纹样开放授权实物参考/中国南方-南京栖霞寺舍利塔莲瓣卷纹与石栏-commons67407000.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/04-中国南方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国南方-南京栖霞寺舍利塔莲瓣卷纹与石栏-commons67407000.jpg
+  sha256: 0af386c425d28e2ca449ac8cf7a8ea56d5d647cb95aa6ed4b1871211cd388a30
+  bytes: 4229194
+  width: 3840
+  height: 5760
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0af386c425d28e2c.jpg
+    sha256: ce7dcb5c9f6e19d15ca132e07cf344fb4a63acaf155e22970f9205e08d5e38b3
+    bytes: 659206
+    width: 1365
+    height: 2048
+  thumb512:
+    path: assets/thumb512/0af386c425d28e2c.webp
+    sha256: cb9af2da50146869df0233ae64345fd64376b9346351ac2974e9755def24f1b3
+    bytes: 35846
+    width: 341
+    height: 512
+library_type: 石刻纹样
+region: 中国南方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 南京栖霞寺舍利塔莲瓣卷纹与石栏
+entity_type: 实物对象写实
+summary_zh: 【图中可见】石塔以多重仿瓦屋檐逐层收分，顶端叠置圆鼓状与莲苞状构件；底部宽莲瓣托住有立像的塔身，外围石栏采用直角折线透空纹。【来源著录】Sarira Pagoda in Qixia Temple 2018.jpg；文化或地点依据：来源明确南京栖霞寺舍利塔；按江苏所在地归中国南方。图中塔体、台基与围栏合为一组，不另分角度计数。
+materials:
+- 石材（来源称舍利塔；石面外观依据）
+colors:
+- 灰褐色
+- 米灰色
+style: 中国南方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，石塔以多重仿瓦屋檐逐层收分，顶端叠置圆鼓状与莲苞状构件；底部宽莲瓣托住有立像的塔身，外围石栏采用直角折线透空纹。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Sarira Pagoda in Qixia Temple 2018.jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 石刻纹样
+- 中国南方
+- 开放授权
+- 真实摄影
+- 南京栖霞寺舍利塔莲瓣卷纹与石栏
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Sarira_Pagoda_in_Qixia_Temple_2018.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Sarira_Pagoda_in_Qixia_Temple_2018.jpg/3840px-Sarira_Pagoda_in_Qixia_Temple_2018.jpg
+  credit: ScareCriterion12; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 3840
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

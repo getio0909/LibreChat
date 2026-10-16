@@ -1,0 +1,81 @@
+id: 99912e99ffa90c5b
+title_zh: 可能苏州制剔红婴戏座屏
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-可能苏州制剔红婴戏座屏-commons77588447.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-可能苏州制剔红婴戏座屏-commons77588447.jpg
+  sha256: 99912e99ffa90c5bb80a7540ba042de2bf9c316e05a9804ed9ba65399d49f13d
+  bytes: 2130352
+  width: 3840
+  height: 3124
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/99912e99ffa90c5b.jpg
+    sha256: 0ec5562e2e8ea573436087d0e49c74d9ea3f2466d776498e77dddc0dbd8c0008
+    bytes: 787539
+    width: 2048
+    height: 1666
+  thumb512:
+    path: assets/thumb512/99912e99ffa90c5b.webp
+    sha256: 2d006b822af07e8d54e02b342b37c277da730361c203a2fab93c4131c09a891a
+    bytes: 49660
+    width: 512
+    height: 417
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 可能苏州制剔红婴戏座屏
+entity_type: 实物对象写实
+summary_zh: 【图中可见】红色座屏中央为多层园林人物浮雕，树木、亭台和儿童密集分布，外框围连续回纹，下部设双龙戏珠式横板及成对曲线支足。【来源著录】Standing screen with boys at play, China, probably
+  Suzhou, Qianlong period, 1736-1795 AD, carved lacquer on wood core - Peabody Essex Museum - DSC07968.jpg；文化或地点依据：Commons题名记为中国、可能苏州，乾隆时期1736–1795；“可能苏州”保留原来源的不确定性。
+materials:
+- 木胎雕漆（Commons题名著录）
+colors:
+- 红色
+- 深红色
+- 褐色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，红色座屏中央为多层园林人物浮雕，树木、亭台和儿童密集分布，外框围连续回纹，下部设双龙戏珠式横板及成对曲线支足。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Standing screen with boys at play, China, probably Suzhou,
+  Qianlong period, 1736-1795 AD, carved lacquer on wood core - Peabody Essex Museum - DSC07968.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 可能苏州制剔红婴戏座屏
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Standing screen with boys at play, China, probably Suzhou, Qianlong period,
+    1736-1795 AD, carved lacquer on wood core - Peabody Essex Museum - DSC07968.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Standing_screen_with_boys_at_play%2C_China%2C_probably_Suzhou%2C_Qianlong_period%2C_1736-1795_AD%2C_carved_lacquer_on_wood_core_-_Peabody_Essex_Museum_-_DSC07968.jpg/3840px-Standing_screen_with_boys_at_play%2C_China%2C_probably_Suzhou%2C_Qianlong_period%2C_1736-1795_AD%2C_carved_lacquer_on_wood_core_-_Peabody_Essex_Museum_-_DSC07968.jpg
+  credit: Daderot; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 3124
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

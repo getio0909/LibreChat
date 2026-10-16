@@ -1,0 +1,69 @@
+id: d17773702457ee14
+title_zh: 天然石材纹理特写
+source:
+  original_path: 蓝金灰大板自家产品/天然石材纹理特写.jpg
+original:
+  path: 蓝金灰大板自家产品/天然石材纹理特写.jpg
+  sha256: d17773702457ee141b1bddff2d0e49fab4b3b0ff61139a827d1bf1aa28306784
+  bytes: 3556033
+  width: 1852
+  height: 3703
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d17773702457ee14.jpg
+    sha256: 9884a75f067423743810c8599a9928eb77c2091635032094b020776cb82d934c
+    bytes: 302371
+    width: 1024
+    height: 2048
+  thumb512:
+    path: assets/thumb512/d17773702457ee14.webp
+    sha256: 04a98da6851bdab9012ea9a902326dbf57d7c93383bbd53e526e8af8ef650459
+    bytes: 15016
+    width: 256
+    height: 512
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为「蓝金灰（浅银米灰素雅亚类）」的超高清工业级数字扫描/正射材质贴图（Ultra-HD Albedo Map），专为大尺寸高清喷绘、超写实 3D 渲染与 AI 细节放大（Tile Upscale）提供极致精度的母本。
+materials:
+- 蓝金灰超清特写
+colors:
+- 浅银米灰
+- 淡青蓝晶块
+- 纤细赤红蛛网纹
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 超写实佛堂效果图4K墙面直接贴图 / ComfyUI Ultimate SD Upscale 材质细节增强母本 / 素雅宋式美学禅堂主材
+prompt_zh: 4K超高清天然蓝金灰奢石竖向正射微距贴图，温润清雅的浅银灰、冰玉白与淡香槟米色半透明基底，下半部镶嵌着棱角分明的深鸽羽蓝与青灰色天然矿物晶块，表面游走着纤细如丝的暗红与金褐色蛛网微脉，玉石般通透细腻，工业级PBR无缝材质。
+tags:
+- 蓝金灰超清贴图
+- 浅银米灰奢石
+- 宋式极简禅意
+- 4K石材扫描贴图
+- 青蓝斑晶大理石
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1852
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res vertical 1:2 orthographic texture scan of light silver-beige Blue-Gold-Grey marble with pale blue clasts
+    and fine reddish-brown webbing.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

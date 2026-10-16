@@ -1,0 +1,82 @@
+id: 2dbdc57f9193da3e
+title_zh: 厦门南普陀寺天王殿三层屋面与山水前景
+source:
+  original_path: 建筑景观开放授权实景参考/中国南方-厦门南普陀寺天王殿三层屋面与山水前景-commons162504767.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/04-中国南方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国南方-厦门南普陀寺天王殿三层屋面与山水前景-commons162504767.jpg
+  sha256: 2dbdc57f9193da3e4c8da2b343bdd3ff1e08f0722bdbee60989434ab3f0d69e0
+  bytes: 3815405
+  width: 3840
+  height: 3072
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2dbdc57f9193da3e.jpg
+    sha256: dffe6fb52c8f2f79de5dec4a4c66ec4bef9b9a161b4c86424734f6fd62e52c59
+    bytes: 1150771
+    width: 2048
+    height: 1638
+  thumb512:
+    path: assets/thumb512/2dbdc57f9193da3e.webp
+    sha256: 1f2a19572a66e6935db6f45aeaee958abe0fa9ebcfcb2fe644e088cda590047a
+    bytes: 53040
+    width: 512
+    height: 410
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 厦门南普陀寺天王殿三层屋面与山水前景
+entity_type: 空间场景设计
+summary_zh: 【图中可见】殿堂以多层绿瓦屋面和上翘屋角构成轮廓，柱间悬红灯笼；前方为水池与石栏，背后为覆绿山坡。【来源著录】(CHN-Fujian) Nanputuo Temple Hall of Four Heavenly Kings
+  2025-03-20.jpg；文化或地点依据：来源明确厦门南普陀寺天王殿；按福建所在地归中国南方。
+materials:
+- 瓦
+- 石材
+- 木构件（外观依据）
+colors:
+- 绿色
+- 红色
+- 灰色
+style: 中国南方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，殿堂以多层绿瓦屋面和上翘屋角构成轮廓，柱间悬红灯笼；前方为水池与石栏，背后为覆绿山坡。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of (CHN-Fujian) Nanputuo Temple Hall of Four Heavenly Kings
+  2025-03-20.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国南方
+- 开放授权
+- 真实摄影
+- 厦门南普陀寺天王殿三层屋面与山水前景
+- CC BY 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:(CHN-Fujian)_Nanputuo_Temple_Hall_of_Four_Heavenly_Kings_2025-03-20.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/%28CHN-Fujian%29_Nanputuo_Temple_Hall_of_Four_Heavenly_Kings_2025-03-20.jpg/3840px-%28CHN-Fujian%29_Nanputuo_Temple_Hall_of_Four_Heavenly_Kings_2025-03-20.jpg
+  credit: S5A-0043; Own work
+  license: cc-by-4.0
+  license_url: https://creativecommons.org/licenses/by/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

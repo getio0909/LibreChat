@@ -1,0 +1,76 @@
+id: 0845896397b8c90e
+title_zh: 佛教主题展览空间设计效果图-02
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计效果图-02.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计效果图-02.jpg
+  sha256: 0845896397b8c90e96279df8b3988eeb3ee2df957cb6af537261d15a6523ef03
+  bytes: 3077723
+  width: 4333
+  height: 2567
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0845896397b8c90e.jpg
+    sha256: d7fd740e918695fef70864ccffb073e40e2992ae311f7ada627d235c21956f64
+    bytes: 288936
+    width: 2048
+    height: 1213
+  thumb512:
+    path: assets/thumb512/0845896397b8c90e.webp
+    sha256: 02cc5c43f0b85ee6d563bd7cced062c3de5782252498b190865481b966b61976
+    bytes: 22182
+    width: 512
+    height: 303
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 博物馆式玻璃展柜白玉佛像长廊
+entity_type: 空间场景设计
+summary_zh: 浅原木、纯白石雕与深灰地面 / 汉白玉立姿观音玻璃展柜、大型浮雕壁画
+materials:
+- 低反射超白夹胶玻璃展柜
+- 原木叠涩倒斗形发光顶罩
+- 汉白玉立姿观音像
+- 重彩浮雕壁画
+- 米黄木纹洞石
+colors:
+- 温润原木色
+- 汉白玉白
+- 洞石米黄
+- 深灰
+- 重彩壁画色
+style: 现代国际文博级佛教雕塑博物馆风
+ai_design_usage: 佛教造像博物馆独立玻璃展柜设计 / 倒斗形叠涩木构发光展柜顶罩参考 / 文博级巨幅壁画与雕塑混展空间构图
+prompt_zh: 高规格现代佛教雕塑与壁画博物馆展厅，4k超清效果图，左侧成排陈列三座全透明超白玻璃独立展柜，每座展柜内供奉一尊洁白高挑的汉白玉立姿观音像，展柜正上方各悬挑一座精致的原木叠涩倒斗形发光藻井灯罩，最左侧墙面设有拱形石龛陈列白玉坐佛，右侧整面长墙在玻璃保护下展示巨幅重彩浮雕佛教经变图壁画，顶部为倾斜的原木椽条坡屋顶配线性洗墙灯，深灰哑光石材地面，文博级专业光影。
+tags:
+- 佛教博物馆
+- 玻璃独立展柜
+- 叠涩木构灯罩
+- 汉白玉观音
+- 文博展陈设计
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2567
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a Buddhist museum gallery displaying white marble standing Guanyin statues inside glass vitrines
+    beneath suspended wooden palace canopies.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

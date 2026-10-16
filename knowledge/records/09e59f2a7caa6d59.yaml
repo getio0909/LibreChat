@@ -1,0 +1,73 @@
+id: 09e59f2a7caa6d59
+title_zh: 蓝灰色条纹石材展板
+source:
+  original_path: 常用石材大板/蓝灰色条纹石材展板.jpg
+original:
+  path: 常用石材大板/蓝灰色条纹石材展板.jpg
+  sha256: 09e59f2a7caa6d598c044ca1212ff602d9ab4fe745fbb990ca0657c2be9dbcce
+  bytes: 248195
+  width: 834
+  height: 626
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/09e59f2a7caa6d59.jpg
+    sha256: a21fad817ecc9439935fda9cd1f06d568d7d4ff94ada26d3c2ef388bda40e7d5
+    bytes: 124774
+    width: 834
+    height: 626
+  thumb512:
+    path: assets/thumb512/09e59f2a7caa6d59.webp
+    sha256: a2154022b7914c16ff88839695c2911ef002fa068b9133fc42e3d5c3c9d38c63
+    bytes: 36978
+    width: 512
+    height: 384
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用奢石大板-蓝灰对角条带系
+entity_type: 实物对象写实
+summary_zh: 本图为陈列于“东元石业”品牌展厅内的天然蓝灰色45度对角条纹奢石大板（蓝天白云/蓝水晶条纹大理石）实物写实。
+materials:
+- 天然蓝灰条纹大理石
+- 蓝水晶/蓝天白云奢石
+colors:
+- 矢车菊蓝
+- 雾霾蓝灰
+- 冰雪白
+- 浅米灰
+style: 现代奢石展陈 / 现代净土冥想风
+ai_design_usage: 四拼菱形放射状“琉璃光”背景墙设计 / 现代禅修冥想室清凉主景墙 / 高端佛事展展位艺术隔断
+prompt_zh: 东元石业展厅陈列的天然蓝灰色斜条纹大理石奢石大板，规整的45度对角线平行条带纹理，由矢车菊蓝、雾霾蓝灰与冰雪白冰晶颗粒带交替排列，质感清透如琉璃冰川，高光镜面抛光，两侧有黑色竖向捆扎带固定，适合制作菱形对称对纹背景墙，8K高清。
+tags:
+- 蓝灰条纹石材
+- 东元石业
+- 45度斜纹奢石
+- 蓝水晶大理石
+- 对纹拼花母板
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 626
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Blue-grey 45-degree diagonally striped marble slab in Dongyuan Stone showroom with STM石猫 watermark in bottom right.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - third_party_watermark
+  - text_overlay

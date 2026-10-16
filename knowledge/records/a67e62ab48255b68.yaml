@@ -1,0 +1,78 @@
+id: a67e62ab48255b68
+title_zh: 平遥双林寺主殿与前庭
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-平遥双林寺主殿与前庭-commons47942483.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-平遥双林寺主殿与前庭-commons47942483.jpg
+  sha256: a67e62ab48255b68257b46fa5fe43744bbbddfa6c421cc672abdee276f8a3599
+  bytes: 739880
+  width: 1920
+  height: 1283
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a67e62ab48255b68.jpg
+    sha256: da738a210d566524b060145ffee10771168e7c93bab67a365216c54048a7ae2f
+    bytes: 721226
+    width: 1920
+    height: 1283
+  thumb512:
+    path: assets/thumb512/a67e62ab48255b68.webp
+    sha256: 2e269f785c00ad366181a3bb1acc1dfd5a08695033fb415ed4d9f4a43144c0d9
+    bytes: 42890
+    width: 512
+    height: 342
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 平遥双林寺主殿与前庭
+entity_type: 空间场景设计
+summary_zh: 【图中可见】主殿以宽大灰瓦屋面压住正面木柱与门窗，脊上有连续彩色装饰，中央开门，石阶与院内铺地连接，两侧树木框景。【来源著录】Pingyao 2009 525.jpg；文化或地点依据：Commons明确著录平遥双林寺主殿；照片日期2009不作建筑年代。
+materials:
+- 木构件
+- 瓦与砖石（按可见构件索引）
+colors:
+- 灰色
+- 棕色
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，主殿以宽大灰瓦屋面压住正面木柱与门窗，脊上有连续彩色装饰，中央开门，石阶与院内铺地连接，两侧树木框景。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Pingyao 2009 525.jpg. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 平遥双林寺主殿与前庭
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Pingyao_2009_525.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Pingyao_2009_525.jpg/1920px-Pingyao_2009_525.jpg
+  credit: G41rn8; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 1283
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,80 @@
+id: 0dccead7485e60ec
+title_zh: 希尔德斯海姆珐琅圣物龛先知饰牌
+source:
+  original_path: 法器供器开放授权实物参考/西方-希尔德斯海姆珐琅圣物龛先知饰牌-cma127944.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/01-西方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/西方-希尔德斯海姆珐琅圣物龛先知饰牌-cma127944.jpg
+  sha256: 0dccead7485e60ec05cceddc0209f75c1fc472209e3679f5bfcd2df8eb353632
+  bytes: 1826764
+  width: 3005
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0dccead7485e60ec.jpg
+    sha256: 0e354a3dc4fbb166ada2ca44044e959000202494638137c6eacbfaf31ab5d48b
+    bytes: 539015
+    width: 1810
+    height: 2048
+  thumb512:
+    path: assets/thumb512/0dccead7485e60ec.webp
+    sha256: b432f277ef560f1648509462b57dd3ae8108240cf9381dc3b291300e515fde36
+    bytes: 30454
+    width: 453
+    height: 512
+library_type: 法器供器
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 希尔德斯海姆珐琅圣物龛先知饰牌
+entity_type: 实物对象写实
+summary_zh: '【图中可见】拱顶长方形饰牌以蓝绿珐琅围住金色坐姿长须人物，人物腰前横置带字卷带，边缘有安装孔。【来源著录】Plaque: Seated Prophet from a Reliquary Shrine；文化或地点依据：Germany,
+  Lower Saxony, Hildesheim, Romanesque period, 12th century。'
+materials:
+- 鎏金铜
+- 内填珐琅
+colors:
+- 金黄色
+- 蓝绿色
+style: 西方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，拱顶长方形饰牌以蓝绿珐琅围住金色坐姿长须人物，人物腰前横置带字卷带，边缘有安装孔。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: 'Design reference study based on the source photograph of Plaque: Seated Prophet from a Reliquary Shrine. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.'
+tags:
+- 法器供器
+- 西方
+- 开放授权
+- 真实摄影
+- 希尔德斯海姆珐琅圣物龛先知饰牌
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1950.574
+  download_url: https://openaccess-cdn.clevelandart.org/1950.574/1950.574_print.jpg
+  credit: Purchase from the J. H. Wade Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 3005
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

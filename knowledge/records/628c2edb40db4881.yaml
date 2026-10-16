@@ -1,0 +1,72 @@
+id: 628c2edb40db4881
+title_zh: 佛教风格金属灯饰
+source:
+  original_path: 佛教空间设计案例/佛教风格金属灯饰.jpg
+original:
+  path: 佛教空间设计案例/佛教风格金属灯饰.jpg
+  sha256: 628c2edb40db48818d0bfc08502aab45e7fbc1852b18ae5ff7ccc3d6919d5a96
+  bytes: 1969501
+  width: 1384
+  height: 2632
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/628c2edb40db4881.jpg
+    sha256: 763b4eb333c7bd0d6233005ed8f3f91768cad0f494bd309dd763790f6470fa60
+    bytes: 402491
+    width: 1077
+    height: 2048
+  thumb512:
+    path: assets/thumb512/628c2edb40db4881.webp
+    sha256: b7818538c73cc92f0583e1705a81ad741359c1d543bffe3b08d56e67aa81f774
+    bytes: 28182
+    width: 269
+    height: 512
+library_type: 法器供器
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 置入中式木格栅与万佛龛背景前、顶冠六角重檐攒尖宝顶、下承白色汉白玉圆鼓底座的铜鎏金宝塔式落地金属宫灯特写。
+materials:
+- 铜鎏金六角重檐宝塔落地宫灯
+- 镂空灯笼
+- 浮雕柱杆
+- 白石圆鼓底座
+colors:
+- 辉煌金
+- 象牙白
+style: 传统中式宝塔宫灯工艺
+ai_design_usage: 佛堂供台两侧高挑金属落地宫灯单品提炼、传统六角重檐灯饰3D建模参考
+prompt_zh: 佛教风格铜鎏金六角重檐宝塔式落地金属宫灯特写，竖幅构图，顶部为双层六角攒尖翘角亭顶并悬挂小风铃，中部六角形镂空雕花灯室散发温暖的黄光，下方为饰有立体莲花瓣与祥云浮雕的修长金色灯杆，底部安装在白色汉白玉圆形石鼓基座上，背景为中式木格栅花窗与暖光万佛龛，金碧辉煌，8K器物写实渲染
+tags:
+- 金属灯饰
+- 佛教落地宫灯
+- 六角宝塔灯
+- 铜鎏金法器
+- 汉白玉灯座
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1384
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 铜鎏金覆莲高足灯座局部特写（源自#290前景右侧供灯下半部裁切），画面无水印但因局部放大略糊。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 局部放大裁切导致细节偏模糊

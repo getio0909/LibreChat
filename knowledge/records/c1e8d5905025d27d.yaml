@@ -1,0 +1,80 @@
+id: c1e8d5905025d27d
+title_zh: 河北正定隆兴寺转轮藏木经架
+source:
+  original_path: 家具木作开放授权实物参考/中国北方-河北正定隆兴寺转轮藏木经架-commons45780251.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/03-中国北方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国北方-河北正定隆兴寺转轮藏木经架-commons45780251.jpg
+  sha256: c1e8d5905025d27d239fef7b535f06430da31b2074348c2bb85010ac7dc809b8
+  bytes: 1791408
+  width: 3840
+  height: 2560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c1e8d5905025d27d.jpg
+    sha256: 179a74520f95e5850a20791d6e2efed39d9806d1d9abd6b4b3d18852cce556e1
+    bytes: 497048
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/c1e8d5905025d27d.webp
+    sha256: 06cf19f5322fd4e24cd43892dc8bca3ddd0973f8555f64b7e1601740a8b1671c
+    bytes: 28628
+    width: 512
+    height: 341
+library_type: 家具木作
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 河北正定隆兴寺转轮藏木经架
+entity_type: 实物对象写实
+summary_zh: 【图中可见】大型多边形经架以柱、枋和密集叠拱构成仿建筑外壳，中段敞开，可见内部木撑；栏板和下缘横枋带连续卷曲纹饰。【来源著录】Zhengding Longxing Si 2013.08.31 16-10-41.jpg；文化或地点依据：Commons
+  明确著录河北正定隆兴寺转轮藏；为汉传佛教木制藏经设施。
+materials:
+- 木材
+- 彩绘
+colors:
+- 灰褐
+- 暗红
+style: 中国北方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，大型多边形经架以柱、枋和密集叠拱构成仿建筑外壳，中段敞开，可见内部木撑；栏板和下缘横枋带连续卷曲纹饰。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Zhengding Longxing Si 2013.08.31 16-10-41.jpg. Preserve
+  the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen
+  construction or dimensions.
+tags:
+- 家具木作
+- 中国北方
+- 开放授权
+- 真实摄影
+- 河北正定隆兴寺转轮藏木经架
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Zhengding_Longxing_Si_2013.08.31_16-10-41.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Zhengding_Longxing_Si_2013.08.31_16-10-41.jpg/3840px-Zhengding_Longxing_Si_2013.08.31_16-10-41.jpg
+  credit: Zhangzhugang; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2560
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

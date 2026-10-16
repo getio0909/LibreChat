@@ -1,0 +1,79 @@
+id: 789c614ac2c6a601
+title_zh: 杭州楼外楼苏轼故事木雕壁板
+source:
+  original_path: 家具木作开放授权实物参考/中国南方-杭州楼外楼苏轼故事木雕壁板-commons38171163.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/04-中国南方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国南方-杭州楼外楼苏轼故事木雕壁板-commons38171163.jpg
+  sha256: 789c614ac2c6a60141f83c47b8e1381dda42421e26a43a3ba96aa8cfaf860331
+  bytes: 716959
+  width: 1920
+  height: 1280
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/789c614ac2c6a601.jpg
+    sha256: 507763af21446c35d5edea0b1106359f2dc5ccf9a60e6c98937f19551502b1d6
+    bytes: 701674
+    width: 1920
+    height: 1280
+  thumb512:
+    path: assets/thumb512/789c614ac2c6a601.webp
+    sha256: 3636912e6e9c958c24f18273323c1f2dca9553a301ee4b7c646f45a9e851a68c
+    bytes: 41052
+    width: 512
+    height: 341
+library_type: 家具木作
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 杭州楼外楼苏轼故事木雕壁板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】木雕长幅壁板以多组人物、树木、山石和竹叶组成连续场景，浅黄褐色人物从深色竖向木板背景中凸出，下缘随云水轮廓起伏。【来源著录】2014.11.21.165447 Su Shi wood carving Lou
+  Wai Lou Restaurant Xihu Hangzhou.jpg；文化或地点依据：来源说明为浙江杭州楼外楼餐厅描绘苏轼事迹的木雕板；照片日期为2014年，未注明木雕制作年代。
+materials:
+- 木雕（来源说明）
+colors:
+- 黄褐色
+- 深褐色
+style: 中国南方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，木雕长幅壁板以多组人物、树木、山石和竹叶组成连续场景，浅黄褐色人物从深色竖向木板背景中凸出，下缘随云水轮廓起伏。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 2014.11.21.165447 Su Shi wood carving Lou Wai Lou Restaurant
+  Xihu Hangzhou.jpg. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference;
+  do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国南方
+- 开放授权
+- 真实摄影
+- 杭州楼外楼苏轼故事木雕壁板
+- CC0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:2014.11.21.165447 Su Shi wood carving Lou Wai Lou Restaurant Xihu Hangzhou.jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/2014.11.21.165447_Su_Shi_wood_carving_Lou_Wai_Lou_Restaurant_Xihu_Hangzhou.jpg/1920px-2014.11.21.165447_Su_Shi_wood_carving_Lou_Wai_Lou_Restaurant_Xihu_Hangzhou.jpg
+  credit: Hermann Luyken; Own work
+  license: cc0
+  license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+  license_status: confirmed
+quality:
+  min_side_px: 1280
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

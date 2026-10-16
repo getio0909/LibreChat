@@ -1,0 +1,31 @@
+schema: 1
+id: "2222222222222221"
+title_zh: 梵高皇奢石大板样板
+library_type: 材质纹理
+studio_roles:
+  - 材质
+  - 参考
+category_l1: 材质纹理
+category_l2: 石材样板
+materials:
+  - 敦煌壁
+material_ids:
+  - dunhuang-wall
+colors:
+  - 金棕
+  - 墨黑
+style:
+  - 现代禅意
+tags:
+  - 背景墙
+  - 奢石
+summary_zh: 梵高皇敦煌壁大板样板，流动金棕纹路。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: approved

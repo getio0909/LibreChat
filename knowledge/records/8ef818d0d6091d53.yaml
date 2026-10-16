@@ -1,0 +1,74 @@
+id: 8ef818d0d6091d53
+title_zh: 现代佛教风格建筑外观效果图
+source:
+  original_path: 佛教空间设计案例/现代佛教风格建筑外观效果图.jpg
+original:
+  path: 佛教空间设计案例/现代佛教风格建筑外观效果图.jpg
+  sha256: 8ef818d0d6091d53d761498e0d4b0cdf23e4aee6938fedb56d4d3d767a4ae992
+  bytes: 2163757
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8ef818d0d6091d53.jpg
+    sha256: cadf8336f800572dbaf6928bfbf4b64a955501bc6196efeded9a117ae4c0530a
+    bytes: 406311
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/8ef818d0d6091d53.webp
+    sha256: 1568959cbc61065269fb5751e966b79e45b81a874aa8b64ddf9737706e0a62cb
+    bytes: 26316
+    width: 512
+    height: 362
+library_type: 建筑景观
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 7937x5613超清现代新唐风佛教文化中心建筑外观全景，底层汉白玉十八罗汉浮雕台基、二层石窟拱龛坐佛外廊、中央四大天王门厅配金属大坡顶。
+materials:
+- 汉白玉罗汉浮雕基座与拱龛长廊
+- 四大天王入口门厅
+- 大挑檐金属瓦屋顶
+- 木格栅幕墙与角楼
+colors:
+- 汉白玉白
+- 原木灰
+style: 现代新唐风大型宗教文化公建
+ai_design_usage: 大型现代佛教文化艺术中心/博物馆建筑外观设计（图06、07之完整7937×5613全景母图）
+prompt_zh: 超高清现代新唐风大型佛教文化中心与博物馆建筑外观全景效果图，宏伟的中轴对称布局，建筑下层台基与两翼裙房采用纯白汉白玉石材建造，底层外墙镶嵌巨幅十八罗汉高浮雕长卷，二层为连续的石窟式火焰圆拱形坐佛壁龛长廊；正中央主入口设宽阔石阶与汉白玉栏杆，原木格栅大门两侧壁龛内矗立四尊高大的汉白玉四大天王护法雕像；建筑主体上层为通透的木格栅幕墙与深远挑檐的深灰色现代金属坡屋顶，两端对称耸立重檐角楼，前景为花岗岩广场与生态水景，8K建筑表现大师级渲染
+tags:
+- 现代佛教建筑
+- 新唐风建筑外观
+- 汉白玉浮雕台基
+- 石窟拱龛外廊
+- 四大天王门厅
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代新中式禅意合院建筑庭院夜景渲染图，角落带有“一圆居空间设计”印章水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 画面角落存在第三方“一圆居空间设计”印章水印

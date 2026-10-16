@@ -1,0 +1,81 @@
+id: 4758eef8b1cd4992
+title_zh: 大理崇圣寺三塔与聚影池景观
+source:
+  original_path: 建筑景观开放授权实景参考/中国南方-大理崇圣寺三塔与聚影池景观-commons192344515.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/04-中国南方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国南方-大理崇圣寺三塔与聚影池景观-commons192344515.jpg
+  sha256: 4758eef8b1cd4992a7f65de80a2d5c2e5a230dd4307cb8c6b643dc867d909495
+  bytes: 3340422
+  width: 3840
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4758eef8b1cd4992.jpg
+    sha256: 90d9994f9cbd2fa1b8ca2f1fea92a0d4cccb5c6705c5b05ebaeb26ee93b72741
+    bytes: 1006062
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/4758eef8b1cd4992.webp
+    sha256: c37298f4ea2c2baabc0ff3ecce2572935b8a166739957f373ecbc6e0b4047151
+    bytes: 48028
+    width: 512
+    height: 384
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 大理崇圣寺三塔与聚影池景观
+entity_type: 空间场景设计
+summary_zh: 【图中可见】三座浅色高塔立于树林后方，中央塔高而密檐，两侧塔较矮；前景水池映出塔影，两岸植被和石栏围合游览空间。【来源著录】20260223 Dali Chongsheng Temple, viewing the Three
+  Pagodas and their reflections from the Juying Pool 02.jpg；文化或地点依据：来源明确云南大理崇圣寺三塔与聚影池；按所在地归中国南方。
+materials:
+- 砌体状塔身
+- 金属状塔刹（外观依据）
+colors:
+- 米白色
+- 灰色
+- 绿色
+style: 中国南方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，三座浅色高塔立于树林后方，中央塔高而密檐，两侧塔较矮；前景水池映出塔影，两岸植被和石栏围合游览空间。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 20260223 Dali Chongsheng Temple, viewing the Three Pagodas
+  and their reflections from the Juying Pool 02.jpg. Preserve the visible silhouette, ornament spacing and surface variation.
+  Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国南方
+- 开放授权
+- 真实摄影
+- 大理崇圣寺三塔与聚影池景观
+- CC BY-SA 4.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:20260223_Dali_Chongsheng_Temple,_viewing_the_Three_Pagodas_and_their_reflections_from_the_Juying_Pool_02.jpg
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/20260223_Dali_Chongsheng_Temple%2C_viewing_the_Three_Pagodas_and_their_reflections_from_the_Juying_Pool_02.jpg/3840px-20260223_Dali_Chongsheng_Temple%2C_viewing_the_Three_Pagodas_and_their_reflections_from_the_Juying_Pool_02.jpg
+  credit: Ngguls; Own work
+  license: cc-by-sa-4.0
+  license_url: https://creativecommons.org/licenses/by-sa/4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2880
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

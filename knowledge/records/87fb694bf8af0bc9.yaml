@@ -1,0 +1,77 @@
+id: 87fb694bf8af0bc9
+title_zh: 西班牙唱诗席圆章人物高侧板
+source:
+  original_path: 家具木作开放授权实物参考/西方-西班牙唱诗席圆章人物高侧板-cma146081.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/01-西方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/西方-西班牙唱诗席圆章人物高侧板-cma146081.jpg
+  sha256: 87fb694bf8af0bc9471f426edde9409a9454cbc6f6060b5cd844a9d279fc3099
+  bytes: 361275
+  width: 1031
+  height: 3400
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/87fb694bf8af0bc9.jpg
+    sha256: c3638f5ff4351f6d05c66b20bf9047cd702a79da46a6e36732372da7b3d26401
+    bytes: 150338
+    width: 621
+    height: 2048
+  thumb512:
+    path: assets/thumb512/87fb694bf8af0bc9.webp
+    sha256: b9785e769d48735c24b5e949fca555b2212a283f2985d0af70f126c0d1298627
+    bytes: 6784
+    width: 155
+    height: 512
+library_type: 家具木作
+region: 西方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 西班牙唱诗席圆章人物高侧板
+entity_type: 实物对象写实
+summary_zh: 【图中可见】瘦高侧板上半部大幅透空，外沿饰弯叶和鸟形怪兽，下段上缘以圆环围住持十字坐姿人物。【来源著录】Panel from a Choir Stall；文化或地点依据：Spain, Catalonia, Monastery
+  of Pedralbes, 14th century。
+materials:
+- 胡桃木
+colors:
+- 红棕色
+style: 西方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，瘦高侧板上半部大幅透空，外沿饰弯叶和鸟形怪兽，下段上缘以圆环围住持十字坐姿人物。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Panel from a Choir Stall. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 西方
+- 开放授权
+- 真实摄影
+- 西班牙唱诗席圆章人物高侧板
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://clevelandart.org/art/1971.270.b
+  download_url: https://openaccess-cdn.clevelandart.org/1971.270.b/1971.270.b_print.jpg
+  credit: John L. Severance Fund
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 1031
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

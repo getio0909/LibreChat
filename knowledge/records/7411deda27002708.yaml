@@ -1,0 +1,78 @@
+id: 7411deda27002708
+title_zh: 佛教主题展览厅
+source:
+  original_path: 佛教空间设计案例/佛教主题展览厅.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览厅.jpg
+  sha256: 7411deda2700270854115599a96cb49faf93b9ab84d732625d292ada32c943e6
+  bytes: 2821707
+  width: 3446
+  height: 2580
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7411deda27002708.jpg
+    sha256: 2b71ff24906d8d2a93c4e09a44eb6ecb01857d760431ebde12d853c11cd8c158
+    bytes: 420614
+    width: 2048
+    height: 1533
+  thumb512:
+    path: assets/thumb512/7411deda27002708.webp
+    sha256: 4a2c809c77eff3c74172ea3fd4e2bf4b2c795d4c01d1d4029590a678cb1eb1ad
+    bytes: 36568
+    width: 512
+    height: 383
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统八角藻井壁画书法展厅
+entity_type: 空间场景设计
+summary_zh: 金棕红木与深灰青石 / 贴金八角藻井、大型佛教壁画、发光书法灯箱
+materials:
+- 实木书架与屏风
+- 宣纸书法与古籍
+- 米黄大理石地面
+- 汉白玉基座
+- 暖白灯膜
+colors:
+- 原木浅褐
+- 宣纸米白
+- 墨黑
+- 米黄
+style: 新中式佛教文化书院与禅茶馆风
+ai_design_usage: 传统八角藻井吊顶设计 / 佛教美术馆中轴对称构图参考 / 斜面背光书画灯箱展陈
+prompt_zh: 中国传统佛教书画壁画展览大厅，中轴对称广角构图，顶部是宏伟的八角形木雕贴金云龙藻井，四周环绕发光如意云头与弧形木椽，正中双圆柱之间镶嵌巨幅金地古风高僧论道壁画，左右两侧墙面设有内倾式背光灯箱展示水墨人物画与草书书法，深灰色青石砖地面，两侧对称摆放波浪形实木长凳，庄严典雅，8k效果图。
+tags:
+- 八角藻井
+- 佛教美术馆
+- 壁画展厅
+- 书法灯箱
+- 中轴对称
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2580
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering (wider angle of 1984205e57a7127d) showing an ornate octagonal gilt dragon-and-cloud
+    caisson ceiling, central golden mural, 3 ink Arhat panels on left, 3 backlit calligraphy panels on right, and dark grey
+    stone floor. Metadata materials/colors fields are misaligned (claiming 实木书架/米黄大理石地面).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials and colors fields claim 实木书架/米黄大理石地面 instead of octagonal caisson ceiling and dark grey stone
+    floor'

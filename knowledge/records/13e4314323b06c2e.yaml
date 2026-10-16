@@ -1,0 +1,77 @@
+id: 13e4314323b06c2e
+title_zh: 传统佛教风格多层建筑
+source:
+  original_path: 佛教空间设计案例/传统佛教风格多层建筑.jpg
+original:
+  path: 佛教空间设计案例/传统佛教风格多层建筑.jpg
+  sha256: 13e4314323b06c2e79f4ce9ba0b796c2e649387fbe2065b4e7d5857bcead3c47
+  bytes: 137140
+  width: 353
+  height: 382
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/13e4314323b06c2e.jpg
+    sha256: f003275529b76bf673b296251b5a977139c02b34f7d5e7158b7c085e558e173d
+    bytes: 34203
+    width: 353
+    height: 382
+  thumb512:
+    path: assets/thumb512/13e4314323b06c2e.webp
+    sha256: 0e44c1a59d53102aaa7283d07c2c0a69dc22f6e004f43d56b9b1adabb0e44cf8
+    bytes: 21988
+    width: 353
+    height: 382
+library_type: 建筑景观
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: 唐宋风格多层佛教殿堂“地藏殿（地宫出入口）”外立面局部场景，采用四层重檐歇山顶楼阁形制，米白色条石干挂外墙配木斗拱、金色浮雕博风板与翼角风铎。
+materials:
+- 米白干挂条石
+- 青灰筒瓦
+- 深褐木斗拱
+- 鎏金浮雕山墙饰件
+colors:
+- 米白色
+- 青灰色
+- 深木褐色
+- 鎏金色
+style: 传统汉传宫殿式
+ai_design_usage: 现代多层复合型佛教建筑（地藏殿/功德楼/地宫入口）唐宋风石木混合外立面设计参考
+prompt_zh: 唐宋风格现代多层佛教寺院建筑“地藏殿”外立面局部效果图，仰视角度，四层重檐歇山顶楼阁结构，外墙采用米白色条石干挂砌筑，每层整齐开设深褐色中式木格窗，层间挑出青灰瓦飞檐翘角并饰有成排深色木斗拱，翼角悬挂金色风铃，顶层人字形山墙饰有金色卷草悬鱼浮雕，底层为青石雕花门廊并挂有“地藏殿
+  地宫出入口”金字标牌，右侧前景盛开粉红色花树，傍晚霞光云天，8K建筑渲染。
+tags:
+- 佛教空间案例
+- 多层佛教建筑
+- 地藏殿
+- 唐宋风建筑
+- 石材干挂外墙
+- 重檐楼阁
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 353
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D architectural rendering (353x382) of a multi-story Tang-Song style building with an entrance sign reading
+    地藏殿 / 地宫出入口.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

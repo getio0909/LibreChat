@@ -1,0 +1,72 @@
+id: e93c97f4605a35fe
+title_zh: 大型天然石材展示图-02
+source:
+  original_path: 蓝金灰大板自家产品/大型天然石材展示图-02.jpg
+original:
+  path: 蓝金灰大板自家产品/大型天然石材展示图-02.jpg
+  sha256: e93c97f4605a35fe94b6a8a9877e3fb051042027ba5e3d9be967735e2d6dedd7
+  bytes: 2553652
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e93c97f4605a35fe.jpg
+    sha256: 7ffe03bc9f72b0b17e2fdb99c3d843f1a266992844a2bcffd011cdf76c7408c0
+    bytes: 490220
+    width: 2048
+    height: 1153
+  thumb512:
+    path: assets/thumb512/e93c97f4605a35fe.webp
+    sha256: 6a97690f1dfd14cffe55bb43b3fcef0f7fad669cd2f9ebfb6acec19c22dff28e
+    bytes: 24816
+    width: 512
+    height: 288
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为一块竖立于现代化大板展厅通道中央的「蓝金灰」（浅银灰蓝暖金调批次）整板正视标准照。
+materials:
+- 蓝金灰大板
+colors:
+- 浅银灰蓝
+- 暖米金
+- 深墨蓝斜带
+- 赤红细脉
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 现代极简佛堂/禅茶室山水意境背景墙贴图 / 佛事展主形象墙奢石材质 / ControlNet Tile 高清细节重构
+prompt_zh: 4K超清正面写实摄影，一块巨大的蓝金灰天然奢石大板竖立在现代化展厅中，清雅的浅银灰蓝与暖米金色基底，中下部有一道深邃的墨青色山形斜向色带，表面游走着精致鲜明的朱砂红与铁锈红丝状细脉，高光镜面抛光质感，宛如天然青绿金碧山水画卷。
+tags:
+- 蓝金灰
+- 山水意境奢石
+- 银蓝暖金大理石
+- 赤红细脉
+- 现代禅意背景墙
+- 整板标准照
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K front-on photograph of a Blue-Gold-Grey (蓝金灰) marble slab with silver-blue, warm beige-gold bands, and fine red
+    veins in a showroom aisle.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

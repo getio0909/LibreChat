@@ -1,0 +1,75 @@
+id: f35077adc0428dea
+title_zh: 泉州开元寺｜甘露戒坛梁架与藻井
+source:
+  original_path: 设计风格精选20261010/quanzhou-kaiyuan-caisson.jpg
+original:
+  path: 设计风格精选20261010/quanzhou-kaiyuan-caisson.jpg
+  sha256: f35077adc0428dea2ec4168ba5b9d62cf67ea8533b8479ce453712b615e825b0
+  bytes: 5727478
+  width: 4896
+  height: 2760
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f35077adc0428dea.jpg
+    sha256: 8d9566f2542e647e4d4fc15a7e09f61987db597586f41e241872012126dc17a4
+    bytes: 524652
+    width: 2048
+    height: 1155
+  thumb512:
+    path: assets/thumb512/f35077adc0428dea.webp
+    sha256: f57b95a8f0fd64b860ab194a924a332b8842b9345dc254003a175727f8fe0dbe
+    bytes: 39794
+    width: 512
+    height: 289
+library_type: 建筑景观
+region: 中国南方
+studio_roles:
+- 风格
+- 造型
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 闽南古刹飞天斗拱与八角藻井仰视场景
+entity_type: 空间场景设计
+summary_zh: 这是中国建筑史上极具盛名的福建泉州开元寺大雄宝殿（紫云大殿，“百柱殿”）室内顶部八角藻井、悬空仙鹤宝盖与“迦陵频伽”飞天乐伎斗拱的仰视空间场景。
+materials:
+- 朱红大漆木构梁架
+- 圆雕彩绘鎏金飞天乐伎斗拱
+- 八角盘龙木藻井
+- 鎏金仙鹤华盖
+- 花岗岩石柱
+colors:
+- 朱砂红
+- 赤金色
+- 彩绘暖棕
+- 米白灰
+style: 闽南潮州传统工艺 / 宋元遗风汉传佛殿
+ai_design_usage: 汉传佛教大雄宝殿顶部藻井与斗拱空间设计 / 飞天乐伎（妙音鸟）木雕构件研发 / 佛像上方悬空华盖宝顶设计
+prompt_zh: 福建泉州开元寺大雄宝殿室内殿顶仰视宏伟场景，朱红色传统木构梁架与层层叠涩的八角盘龙大藻井，斗拱前端精雕出展翅欲飞的“迦陵频伽”妙音鸟飞天乐伎圆雕木像（人身鸟翼，手持宝剑或琵琶法器）；藻井正下方由一根彩绘斜梁悬空挑起一座华丽的八角形木雕鎏金宝盖，宝盖内雕刻多只展翅金鹤与祥云，正下方可见金色大佛头顶肉髻与宝冠，天窗透入神圣光束，超高清古建摄影。
+tags:
+- 泉州开元寺大殿
+- 八角盘龙藻井
+- 飞天乐伎斗拱
+- 迦陵频伽木雕
+- 悬空仙鹤宝盖
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:泉州開元寺甘露戒壇.jpg
+  credit: AmbroseLim
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2760
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Upward view inside the Mahavira Hall of Quanzhou Kaiyuan Temple showing red timber beams, Kalavinka flying-apsara
+    brackets, octagonal caisson, and suspended canopy.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

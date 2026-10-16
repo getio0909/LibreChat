@@ -1,0 +1,77 @@
+id: a5fb2a250b8857f7
+title_zh: 佛教主题室内展览场景-02
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览场景-02.jpg
+  sha256: a5fb2a250b8857f773421742622f1f2756c4d698332f300d129badeed9ce5a06
+  bytes: 1829702
+  width: 2539
+  height: 2559
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a5fb2a250b8857f7.jpg
+    sha256: 87b68d55451897a0e93eb858825e730ef4332940531c8fe1a95af71b7222ae93
+    bytes: 333685
+    width: 2032
+    height: 2048
+  thumb512:
+    path: assets/thumb512/a5fb2a250b8857f7.webp
+    sha256: 29f8915452a052f56846df54c84d08c245202245c5943641b9c428995352992c
+    bytes: 18166
+    width: 508
+    height: 512
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: 新中式佛堂茶室禅意端景墙软装局部特写，暖褐木饰面墙体左侧嵌入圆形月亮门发光背景龛，右侧黑陶大瓮斜插金黄秋叶枝条伸入光晕之中，下部设实木展台与经卷。
+materials:
+- 胡桃木竖向木饰面
+- 圆形透光宣纸/云石壁龛
+- 粗陶黑釉花瓮
+- 实木展台
+colors:
+- 暖胡桃木褐
+- 琥珀暖黄光
+- 秋叶金黄
+- 黑陶炭黑
+style: 现代禅意
+ai_design_usage: 佛堂与禅茶室端景墙软装设计、圆形透光云石背景龛生成及宋式极简禅意插花构图参考
+prompt_zh: 新中式禅意佛堂茶室局部端景墙软装设计特写，非对称画意构图，背景为温润的暖褐色竖向木饰面墙体，左侧嵌入一个大型圆形月亮门式内凹发光壁龛，内藏3000K暖黄灯带形成柔和满月光晕，右侧摆放一件古朴粗犷的哑光黑陶大花瓮，瓶中斜插一枝金黄色的秋叶枝条伸入圆形光晕前，下方设双层实木展台并叠放素白古籍经书，宋代极简禅意美学，柔和光影，8K超高清室内摄影质感。
+tags:
+- 佛教空间案例
+- 新中式禅意
+- 发光月亮门
+- 禅意插花造景
+- 佛堂端景墙
+- 东方极简美学
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2539
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 3D interior vignette rendering of a warm wood-paneled wall with a circular illuminated moon-gate niche, black pottery
+    vase with yellow autumn branches, and wood display shelves with sutra books. Semi-transparent lotus watermark in bottom-right
+    corner.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark

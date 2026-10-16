@@ -1,0 +1,77 @@
+id: b22027a7c44dd495
+title_zh: 佛教寺庙主殿佛像陈设场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙主殿佛像陈设场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙主殿佛像陈设场景.jpg
+  sha256: b22027a7c44dd4958922fbdac609376507c34601059975c08029bf35fe2eca01
+  bytes: 3584028
+  width: 3772
+  height: 2565
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b22027a7c44dd495.jpg
+    sha256: 2c3a5f8a511e7d106c24f370ced536ce26f5d82d0a1bf6cab34cdc3c0c6b3f6e
+    bytes: 428928
+    width: 2048
+    height: 1393
+  thumb512:
+    path: assets/thumb512/b22027a7c44dd495.webp
+    sha256: 78dd1ce866add96c9392571d793e51ae00ddbefd971c8ea8a7228fd7882affde
+    bytes: 33508
+    width: 512
+    height: 348
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 传统木梁架门罩下设米黄石雕通长须弥座供奉四尊金佛、背衬嵌汉白玉圆环的暖红金祥云浮雕墙与两侧折面飞天壁画的主殿场景。
+materials:
+- 米黄石雕须弥座长坛
+- 祥云浮雕背景墙
+- 汉白玉圆环构件
+- 四尊铜鎏金坐佛
+- 白石底座镂空圆柱金灯
+- 彩绘飞天壁画
+colors:
+- 暖红金色
+- 辉煌金
+- 米黄色
+- 深木棕
+- 汉白玉白
+style: 传统汉传主殿与石雕须弥座重彩壁画风
+ai_design_usage: 寺院四方佛殿/主殿佛像陈设设计、米黄石材通长须弥座与祥云浮雕背景墙搭配、折面飞天壁画屏风设计参考
+prompt_zh: 庄严的佛教寺庙主殿四方佛陈设场景，中轴对称构图，前景上方为传统实木梁架与雕花雀替门罩，内部设一座通长的米黄色石雕束腰仰覆莲须弥座佛坛，并列供奉四尊金身坐佛，背后是漫天暖红金色祥云高浮雕背景墙，正中央镶嵌一圈洁白的汉白玉圆环与金色浮雕圆盘，佛坛左右两侧折面墙绘有绚丽的彩绘飞天菩萨壁画，佛坛前摆放两张木雕供桌与三盏白石底座鎏金镂空圆柱形落地灯，高光灰褐大理石地面配圆形拼花，8K建筑渲染
+tags:
+- 四方佛陈设
+- 石雕须弥座长坛
+- 祥云浮雕墙
+- 汉白玉圆环
+- 飞天壁画
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2565
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a temple hall enshrining four gilded seated Buddhas on a continuous beige stone Sumeru pedestal before
+    a red-gold cloud relief backdrop with a central white marble ring and flying-apsaras side murals.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

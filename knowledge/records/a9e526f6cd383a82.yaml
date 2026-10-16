@@ -1,0 +1,73 @@
+id: a9e526f6cd383a82
+title_zh: 老挝香通寺｜黑金壁画细节
+source:
+  original_path: 设计风格精选20260930/laos-interior.jpg
+original:
+  path: 设计风格精选20260930/laos-interior.jpg
+  sha256: a9e526f6cd383a8236fede6f873b1f67195baa20dc98f071a8f59cc8560d2a4f
+  bytes: 3681788
+  width: 3072
+  height: 2048
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a9e526f6cd383a82.jpg
+    sha256: 165ca91dd92736ea1ea14867890baa75dc13293b99056dff32074bafcc34d3fd
+    bytes: 949370
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/a9e526f6cd383a82.webp
+    sha256: bde50cfcf7ca38f216d07304ecc1617afeeb029a79445df193e838783d5f0342
+    bytes: 63880
+    width: 512
+    height: 341
+library_type: 空间展陈
+region: 南亚东南亚
+studio_roles:
+- 风格
+- 纹样
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 东南亚寺庙黑底描金壁画内景
+entity_type: 空间场景设计
+summary_zh: 这是老挝传统寺院大殿内部（门楣上方及内墙界面）的黑底金箔叙事壁画与红底金纹建筑内景。
+materials:
+- 黑漆墙面
+- 纯金箔模板壁画
+- 朱红漆木横楣
+- 古木门扇
+colors:
+- 漆黑色
+- 赤金色
+- 深朱红色
+style: 东南亚泰式老挝风 / 南传寺院壁画
+ai_design_usage: 东南亚风情佛堂/主题餐厅背景墙纹样生成 / 黑金大漆或黑色石材喷砂描金工艺参考 / 传统吉祥几何带状边饰提取
+prompt_zh: 老挝传统佛教寺庙室内壁画墙面场景，下半部为涂刷深邃黑漆的古老墙面，上面用纯金箔绘满精致的东南亚佛教本生经故事图卷，包含多层尖顶佛殿、盘腿说法的佛陀、众多身穿传统服饰的朝拜人物、热带棕榈树与多头那伽神蛇；上半部建筑横梁为深朱红色漆底，饰有连续的金色吉祥盘长结与莲花圆盘图案，底部露出黑色古木门局部，质感斑驳古朴，博物馆级高清文化摄影。
+tags:
+- 老挝黑金壁画
+- 本生经金箔画
+- 红底金纹横楣
+- 东南亚寺院内景
+- 石材蚀刻描金参考
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Luang_Prabang-Wat_Xieng_Thong-18-Sim_innen-gje.jpg
+  credit: Gerd Eichmann
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2048
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Interior photograph of a Lao Buddhist temple showing black-lacquered walls with gold-leaf narrative murals beneath
+    red-and-gold stenciled beams.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

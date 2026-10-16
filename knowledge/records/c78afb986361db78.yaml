@@ -1,0 +1,76 @@
+id: c78afb986361db78
+title_zh: 佛教室内展览空间设计
+source:
+  original_path: 佛教空间设计案例/佛教室内展览空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教室内展览空间设计.jpg
+  sha256: c78afb986361db78626f9e9ea7f45e2b4d76fd4cc39817f1cbe77ecffafe9969
+  bytes: 907390
+  width: 1686
+  height: 1264
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c78afb986361db78.jpg
+    sha256: 82c947fbd53cb21f3e0da98675d9b8878cb2426835a148ad17eb0ea6feb266d6
+    bytes: 256431
+    width: 1686
+    height: 1264
+  thumb512:
+    path: assets/thumb512/c78afb986361db78.webp
+    sha256: b07da74b5bff7ccb9d4bdedc47b02306cf627a1bd8b5164b04312564af42c6ad
+    bytes: 31350
+    width: 512
+    height: 384
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: 前景设深褐石雕须弥座护栏、中景左设汉白玉拱龛坐佛、远景设汉白玉御道丹墀与圆形放射状背光立佛及同款圆形藻井的奢石万佛堂。
+materials:
+- 深啡网高光大理石
+- 深褐石雕须弥座护栏
+- 汉白玉火焰拱龛
+- 汉白玉御道丹墀
+- 圆形放射状浮雕背光与藻井
+- 发光万佛墙
+colors:
+- 深咖啡色
+- 辉煌金
+- 汉白玉白
+- 暖黄色
+style: 现代奢石全定制多进万佛堂风
+ai_design_usage: 大型多进式现代奢石万佛堂空间规划、石雕须弥座矮墙分隔设计、第03号圆形放射状浮雕在背光与藻井中的双重应用
+prompt_zh: 大型多进深现代奢石佛教万佛堂室内展览空间设计，前景左右对称设置深褐色石雕仰覆莲须弥座护栏，地面满铺镜面深咖啡色高光大理石，中景左侧设一座精美的汉白玉火焰拱门雕花佛龛，内供金身坐佛，远景主殿设汉白玉台阶与雕花御道丹墀，上方供奉配巨大金色圆形放射状法轮背光的金身立佛，顶部对应镶嵌圆形放射状法轮浮雕穹顶藻井，四周环绕通顶金色发光万佛墙，富丽堂皇，8K建筑渲染
+tags:
+- 奢石万佛堂
+- 石雕须弥座护栏
+- 汉白玉拱龛
+- 放射状藻井
+- 御道丹墀
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1264
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a luxury stone 10,000-Buddha hall with dark brown carved stone balustrades in the foreground, a white
+    marble arched Buddha niche at left, and a standing Buddha with a radiating halo in the rear hall.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,31 @@
+schema: 1
+id: "3333333333333331"
+title_zh: 金镶玉奢石大板样板
+library_type: 材质纹理
+studio_roles:
+  - 材质
+  - 参考
+category_l1: 材质纹理
+materials:
+  - 金镶玉
+material_ids:
+  - gold-jade
+colors:
+  - 白
+  - 金
+style:
+  - 新中式
+tags:
+  - 玉石
+  - 台面
+  - 敦煌壁画感奢石
+summary_zh: 金镶玉石材样板，白底金丝纹理。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: approved

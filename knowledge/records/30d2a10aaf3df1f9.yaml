@@ -1,0 +1,73 @@
+id: 30d2a10aaf3df1f9
+title_zh: 观音殿室内供奉空间
+source:
+  original_path: 佛教空间设计案例/观音殿室内供奉空间.jpg
+original:
+  path: 佛教空间设计案例/观音殿室内供奉空间.jpg
+  sha256: 30d2a10aaf3df1f9d9d038939fcf819196aeb89801e3a17a5461f3bd357bef9a
+  bytes: 3346949
+  width: 3530
+  height: 2634
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/30d2a10aaf3df1f9.jpg
+    sha256: af04e645b5089b8717051aa4c58befb6210ec89bbeaf69cfc235bc2884668257
+    bytes: 414046
+    width: 2048
+    height: 1528
+  thumb512:
+    path: assets/thumb512/30d2a10aaf3df1f9.webp
+    sha256: 3d10d30bb741ee60c5d989be9ac38913cbe8935fa844e21643bea0f22edd7572
+    bytes: 33560
+    width: 512
+    height: 382
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 正中供奉汉白玉观音坐像、背后为海棠形发光《般若波罗蜜多心经》全文浮雕墙、供台两侧对称矗立铜鎏金六角重檐落地宫灯与博古架的中式观音殿。
+materials:
+- 汉白玉观音坐像
+- 海棠形发光《般若波罗蜜多心经》浮雕背板
+- 六角铜鎏金落地灯
+- 红木供桌与壁画
+colors:
+- 汉白玉白
+- 暖金红木
+style: 现代中式观音殿标准供奉风
+ai_design_usage: 现代中式观音殿标准供奉空间设计、汉白玉主尊配发光心经浮雕墙与金莲藻井方案参考
+prompt_zh: 超高清现代中式观音殿室内供奉空间设计效果图，广角中轴对称透视，正中央供奉一尊洁白的汉白玉观音菩萨坐像，背后为海棠花轮廓内嵌暖金色背光的《般若波罗蜜多心经》全文立体汉字浮雕背景墙；佛像前方摆放深色红木雕花供桌与三个明黄色圆形拜垫，供台左右两侧对称矗立一对汉白玉底座铜鎏金六角重檐宝塔落地宫灯与中式博古架；大殿两侧墙面对称悬挂八幅工笔重彩佛教菩萨立轴挂画，顶部为红木方格吊顶并在中心镶嵌圆形金色莲花发光藻井，高光灰褐色大理石地面倒影清晰，庄严殊胜，8K建筑渲染
+tags:
+- 观音殿设计
+- 心经背景墙
+- 汉白玉观音
+- 六角落地金灯
+- 金莲藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2634
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 现代新中式高挑佛殿渲染图（#262、#268、#278、#293的母图），右下角带有半透明白色莲花图形水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 右下角存在第三方半透明莲花图形水印

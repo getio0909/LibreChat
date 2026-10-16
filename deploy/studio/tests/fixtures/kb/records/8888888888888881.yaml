@@ -1,0 +1,26 @@
+schema: 1
+id: "8888888888888881"
+title_zh: 已驳回的莲花纹须弥座测试图
+library_type: 石刻纹样
+studio_roles:
+  - 纹样
+category_l1: 须弥座
+materials:
+  - 敦煌金
+colors:
+  - 金
+style:
+  - 传统
+tags:
+  - 须弥座
+  - 莲花纹
+summary_zh: 审核驳回的测试图。
+provenance:
+  license: customer-supplied-unverified
+  license_status: unconfirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: false
+review:
+  status: rejected

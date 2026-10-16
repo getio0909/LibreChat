@@ -1,0 +1,69 @@
+id: f2fd846b5a1ccd3c
+title_zh: 黄色大理石纹理石材
+source:
+  original_path: 天川金大板自家产品/黄色大理石纹理石材.jpg
+original:
+  path: 天川金大板自家产品/黄色大理石纹理石材.jpg
+  sha256: f2fd846b5a1ccd3c69232653e197645da8e53157012a8c2dffef9f9a7325d4e1
+  bytes: 1691231
+  width: 1018
+  height: 2036
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f2fd846b5a1ccd3c.jpg
+    sha256: 9d6fb30f2fe7897ec4fa52b1652cc4df36b4c05a6c2fb7fb06a2b5878bd4755d
+    bytes: 330005
+    width: 1018
+    height: 2036
+  thumb512:
+    path: assets/thumb512/f2fd846b5a1ccd3c.webp
+    sha256: 03fd2d244de62a16e9e70b6f8074454dc18a6da673846b6f2bd70b9f95ad65bf
+    bytes: 18638
+    width: 256
+    height: 512
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 纹样
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图为「天川金」大理石的高纯度正射微距纹理标准样本（Orthographic PBR Texture Swatch），专门截取了该品种明黄底色最为纯粹、金丝网纹最为典雅的局部区域，供 AI 材质渲染与设计深化直接调用。
+materials:
+- 天川金微距特写
+colors:
+- 纯正明黄
+- 藏红花金
+- 铁锈红细密裂隙脉
+style: 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 3D建模/渲染软件（3ds Max / SketchUp / Blender / D5）直接材质贴图 / ComfyUI 材质替换（Inpainting + IP-Adapter） / 佛龛背板与台面局部金石贴图
+prompt_zh: 天川金天然大理石高清正射微距纹理贴图，纯正浓郁的明黄色、藏红花金与蜜蜡黄基底，表面交织着细腻的琥珀褐、铁锈红丝状主脉与密集的蛛网微裂隙纹，局部点缀半透明白玉方解石微晶，质感如天然金珀般温润通透，无阴影平光无缝PBR石材贴图，8k高解析度。
+tags:
+- 天川金纹理
+- 黄色大理石贴图
+- PBR无缝材质
+- 金珀质感石材
+- 微距石材样本
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1018
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 自家产品“天川金”（dunhuang-gold）双拼对称（Bookmatch）纹理正射高清大图，无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

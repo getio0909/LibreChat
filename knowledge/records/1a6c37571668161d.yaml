@@ -1,0 +1,78 @@
+id: 1a6c37571668161d
+title_zh: 龙泉弦纹筒式三足香炉
+source:
+  original_path: 法器供器开放授权实物参考/中国南方-龙泉弦纹筒式三足香炉-aic195401.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/02-法器供器开放授权实物参考库/04-中国南方法器供器参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 法器供器开放授权实物参考/中国南方-龙泉弦纹筒式三足香炉-aic195401.jpg
+  sha256: 1a6c37571668161df51336b302c8a4f98e38d078b2b57d2a89d44b9a6a95f6b9
+  bytes: 351188
+  width: 2250
+  height: 2250
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1a6c37571668161d.jpg
+    sha256: 74f73c1900330800c5cd67b5a7c46941fbaf6a1a18b601933e30f90687c92f78
+    bytes: 290745
+    width: 2048
+    height: 2048
+  thumb512:
+    path: assets/thumb512/1a6c37571668161d.webp
+    sha256: 07809341166d33d5c66dc98fdcb71d098203544c3a2bbc81e5fb1b3efb106ee7
+    bytes: 6208
+    width: 512
+    height: 512
+library_type: 法器供器
+region: 中国南方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 法器供器
+category_l2: 龙泉弦纹筒式三足香炉
+entity_type: 实物对象写实
+summary_zh: 【图中可见】青绿色筒式炉外壁环绕多条凸弦纹，口沿内折，下部有三只卷曲短足。【来源著录】Cylindrical Tripod Censer (Incense Burner) with Cloud-Scroll Feet；文化或地点依据：来源明确著录龙泉窑；按龙泉窑传统归入中国南方，不补写具体出土地。
+materials:
+- 龙泉窑釉炻器
+colors:
+- 青绿色
+- 褐色
+style: 中国南方传统法器供器实物参考
+ai_design_usage: 供器器型、纹饰与陈设比例参考
+prompt_zh: 以所附实物照片作形态参考，青绿色筒式炉外壁环绕多条凸弦纹，口沿内折，下部有三只卷曲短足。重点保留可辨识的轮廓、纹样疏密与表面色差，用于供器器型、纹饰与陈设比例参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Cylindrical Tripod Censer (Incense Burner) with Cloud-Scroll
+  Feet. Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not
+  infer unseen construction or dimensions.
+tags:
+- 法器供器
+- 中国南方
+- 开放授权
+- 真实摄影
+- 龙泉弦纹筒式三足香炉
+- CC0
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.artic.edu/artworks/195401
+  download_url: https://www.artic.edu/iiif/2/cfeacd8d-6a1f-354a-8104-652d1f7c486f/full/2250,/0/default.jpg
+  credit: Gift of Dorothy Braude Edinburg to the Harry B. and Bessie K. Braude Memorial Collection
+  license: cc0
+  license_url: https://creativecommons.org/publicdomain/zero/1.0/
+  license_status: confirmed
+quality:
+  min_side_px: 2250
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

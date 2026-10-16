@@ -14,17 +14,18 @@ flock -w 300 9
 stage=$(mktemp -d "$deploy_root/.incoming.XXXXXX")
 had_previous=false
 activated=false
-config_files=(compose.yml librechat.yaml .env image.env design-admin.json design-user.json files-admin.yaml files-user.yaml)
 gate=/etc/nginx/librechat-dev.provisioning
+config_files=(compose.yml librechat.yaml .env image.env studio.json)
 compose=(docker compose -p librechat-dev --project-directory "$deploy_root" \
   --env-file "$deploy_root/.env" --env-file "$deploy_root/image.env" -f "$deploy_root/compose.yml")
+
+# 将 studio.json 归属权设为非特权容器用户 10001:10001，保持 0600 权限。
 own_service_configs() {
-  for file in design-admin.json design-user.json files-admin.yaml files-user.yaml; do
-    if [[ -f "$deploy_root/$file" ]]; then
-      chown 10001:10001 "$deploy_root/$file" || return 1
-    fi
-  done
+  if [[ -f "$deploy_root/studio.json" ]]; then
+    chown 10001:10001 "$deploy_root/studio.json"
+  fi
 }
+
 cleanup() {
   status=$?
   trap - EXIT
@@ -38,15 +39,17 @@ cleanup() {
           restored=false
         fi
       done
-      # 单文件挂载保留旧 inode；强制重建才能恢复已轮换的密钥和文件服务凭据。
+      # 单文件挂载保留旧 inode，强制重建容器以恢复上一版本的配置文件与密钥。
       if "$restored" && own_service_configs && "${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
         rm -f -- "$gate"
         echo 'The previous application deployment has been restored.' >&2
       else
         echo 'Restoring the previous application deployment failed.' >&2
       fi
-    elif "${compose[@]}" down; then
-      for file in "${config_files[@]}"; do rm -f -- "$deploy_root/$file"; done
+    elif "${compose[@]}" down --remove-orphans; then
+      for file in "${config_files[@]}" .file_signing_key; do
+        rm -f -- "$deploy_root/$file"
+      done
       echo 'The failed initial application deployment has been stopped.' >&2
     else
       echo 'Stopping the failed initial application deployment failed.' >&2
@@ -62,7 +65,7 @@ cat > "$stage/bundle.tgz"
 # 在解包之前限制归档成员，防止部署凭据被用于写入其他路径。
 while IFS= read -r member; do
   case "$member" in
-    ./|./compose.yml|./librechat.yaml|./.env|./image.env|./registry.token|./accounts.json|./design-admin.json|./design-user.json|./files-admin.yaml|./files-user.yaml) ;;
+    ./|./compose.yml|./librechat.yaml|./.env|./image.env|./registry.token|./accounts.json|./studio.json) ;;
     *) echo 'Unexpected deployment archive member.' >&2; exit 1 ;;
   esac
 done < <(tar -tzf "$stage/bundle.tgz")
@@ -73,18 +76,42 @@ for file in "${config_files[@]}" registry.token accounts.json; do
     exit 1
   fi
 done
-for account in admin user; do
-  previous_key="$deploy_root/design-$account.json"
-  if [[ -f "$previous_key" ]] && jq -e '.downloadSigningKey | strings | test("^[a-f0-9]{64}$")' "$previous_key" >/dev/null; then
-    # 沿用已有签名密钥，让聊天中的下载链接在正常重新部署后仍然有效。
-    jq --slurpfile previous "$previous_key" '.downloadSigningKey = $previous[0].downloadSigningKey' \
-      "$stage/design-$account.json" > "$stage/design-retained.json"
-    mv "$stage/design-retained.json" "$stage/design-$account.json"
-  fi
-done
-if ! grep -Eq '^LIBRECHAT_IMAGE=ghcr\.io/getio0909/librechat-dev@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
+if ! grep -Eq '^LIBRECHAT_IMAGE=ghcr\.io/getio0909/librechat-dev(:[A-Za-z0-9_.-]+)?@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
   echo 'The deployment must reference an immutable development image digest.' >&2
   exit 1
+fi
+if ! grep -Eq '^STUDIO_IMAGE=ghcr\.io/getio0909/librechat-studio(:[A-Za-z0-9_.-]+)?@sha256:[0-9a-f]{64}$' "$stage/image.env"; then
+  echo 'The deployment must reference an immutable studio image digest.' >&2
+  exit 1
+fi
+if ! jq -e '
+  (.shared_token | type == "string" and length >= 64)
+  and (.file_signing_key | type == "string" and test("^[0-9a-fA-F]{64}$"))
+  and (.gemini_api_key | type == "string" and length >= 1)
+  and (.ark_api_key | type == "string" and length >= 1)
+' "$stage/studio.json" >/dev/null; then
+  echo 'Studio configuration settings are invalid.' >&2
+  exit 1
+fi
+# 复用服务器上已持久化的文件签名密钥；仅在首次部署且密钥不存在时生成并持久化。
+persisted_signing_key=''
+if [[ -f "$deploy_root/.file_signing_key" ]]; then
+  candidate_key=$(tr -d '\r\n' < "$deploy_root/.file_signing_key")
+  if [[ "$candidate_key" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    persisted_signing_key=$candidate_key
+  fi
+fi
+if [[ -z "$persisted_signing_key" && -f "$deploy_root/studio.json" ]]; then
+  candidate_key=$(jq -r '.file_signing_key // empty' "$deploy_root/studio.json" 2>/dev/null || true)
+  if [[ "$candidate_key" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    persisted_signing_key=$candidate_key
+  fi
+fi
+if [[ -n "$persisted_signing_key" ]]; then
+  jq --arg key "$persisted_signing_key" '.file_signing_key = $key' "$stage/studio.json" > "$stage/studio.json.tmp"
+  mv "$stage/studio.json.tmp" "$stage/studio.json"
+else
+  persisted_signing_key=$(jq -r '.file_signing_key' "$stage/studio.json")
 fi
 if ! jq -e '
   [.admin, .user] | all(.
@@ -105,12 +132,11 @@ docker compose -p librechat-dev --project-directory "$stage" --env-file "$stage/
   --env-file "$stage/image.env" -f "$stage/compose.yml" pull
 
 if [[ -f "$deploy_root/image.env" ]]; then
+  rm -rf -- "$deploy_root/.previous"
   mkdir -p "$deploy_root/.previous"
   for file in "${config_files[@]}"; do
     if [[ -f "$deploy_root/$file" ]]; then
       cp "$deploy_root/$file" "$deploy_root/.previous/$file"
-    else
-      rm -f -- "$deploy_root/.previous/$file"
     fi
   done
   had_previous=true
@@ -121,6 +147,8 @@ activated=true
 for file in "${config_files[@]}"; do
   install -m 600 "$stage/$file" "$deploy_root/$file"
 done
+printf '%s\n' "$persisted_signing_key" > "$deploy_root/.file_signing_key"
+chmod 600 "$deploy_root/.file_signing_key"
 own_service_configs
 
 # 默认账户验证完成前关闭公开注册，避免首个管理员被抢先创建。
@@ -131,54 +159,13 @@ services:
       ALLOW_REGISTRATION: 'false'
 EOF
 closed_compose=("${compose[@]}" -f "$stage/accounts.yml")
-if ! "${closed_compose[@]}" up -d --remove-orphans --wait --wait-timeout 240; then
+if ! "${closed_compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240; then
   echo 'Deployment health checks failed.' >&2
   exit 1
 fi
 "${closed_compose[@]}" ps
 
-# 验证真实协议握手和工具发现，避免代理正常但 CAD 服务实际不可用。
-cat > "$stage/checks.js" <<'NODE'
-const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StreamableHTTPClientTransport } = require('@modelcontextprotocol/sdk/client/streamableHttp.js');
-(async () => {
-  const accounts = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));
-  for (const account of ['admin', 'user']) {
-   const id = process.env[`CAD_${account.toUpperCase()}_USER_ID`];
-   for (const [name, transport] of [
-    [`FreeCAD ${account}`, new StreamableHTTPClientTransport(new URL(`http://freecad-${account}:8000/mcp`))],
-    [`Blender ${account}`, new StreamableHTTPClientTransport(new URL(`http://blender-${account}:10101/`))],
-    [`Design ${account}`, new StreamableHTTPClientTransport(new URL(`http://design-${account}:8000/mcp`), { requestInit: { headers: { 'X-LibreChat-User-ID': id } } })],
-   ]) {
-    const client = new Client({ name: 'deployment-check', version: '1.0.0' });
-    try {
-      await client.connect(transport, { timeout: 120000 });
-      const result = await client.listTools();
-      if (result.tools.length === 0) throw new Error('The CAD server returned no tools.');
-      console.log(`${name} MCP is ready with ${result.tools.length} tools.`);
-    } finally {
-      await client.close();
-    }
-   }
-   const url = `http://files-${account}:5000/cad-files/${account}/?json`;
-   const credential = accounts[account];
-   const wrong = accounts[account === 'admin' ? 'user' : 'admin'];
-   const authorization = (value) => 'Basic ' + Buffer.from(`${value.username}:${value.password}`).toString('base64');
-   for (const [headers, status] of [
-     [{ Authorization: authorization(credential) }, 200], [{}, 401],
-     [{ Authorization: authorization(wrong) }, 401],
-   ]) {
-     const response = await fetch(url, { headers, signal: AbortSignal.timeout(10000) });
-     await response.body?.cancel();
-     if (response.status !== status) throw new Error('CAD file authentication verification failed.');
-   }
-   console.log(`Private CAD file access verified for ${account}.`);
-  }
-})().catch(() => { console.error('CAD MCP readiness verification failed.'); process.exit(1); });
-NODE
-
 # 按顺序创建首个管理员和普通用户，密码通过标准输入传递给现有账户工具。
-printf '{}\n' > "$stage/owners.json"
 for account in admin user; do
   email=$(jq -r --arg account "$account" '.[$account].email' "$stage/accounts.json")
   username=$(jq -r --arg account "$account" '.[$account].username' "$stage/accounts.json")
@@ -202,48 +189,6 @@ for account in admin user; do
   fi
   if ! jq -e --arg role "$expected_role" '.user.role == $role' "$stage/login.json" >/dev/null; then
     printf 'Default %s account role verification failed.\n' "$account" >&2
-    exit 1
-  fi
-  user_id=$(jq -r '.user.id // .user._id' "$stage/login.json")
-  if [[ ! "$user_id" =~ ^[0-9a-f]{24}$ ]]; then
-    echo 'The verified account has no valid user ID.' >&2
-    exit 1
-  fi
-  printf 'CAD_%s_USER_ID=%s\n' "${account^^}" "$user_id" >> "$deploy_root/.env"
-  jq --arg account "$account" --arg id "$user_id" '.[$account] = $id' \
-    "${stage}/owners.json" > "$stage/owners.next.json"
-  mv "$stage/owners.next.json" "$stage/owners.json"
-  jq --arg id "$user_id" '.userId = $id' "$stage/design-$account.json" > "$stage/design-bound.json"
-  install -m 600 "$stage/design-bound.json" "$deploy_root/design-$account.json"
-done
-own_service_configs
-# 在公开访问恢复前，将内部网络地址绑定到已验证的用户标识。
-"${closed_compose[@]}" exec -T api node -e '
-const fs = require("node:fs"), yaml = require("js-yaml");
-const owners = JSON.parse(fs.readFileSync(0, "utf8"));
-const config = yaml.load(fs.readFileSync("/app/librechat.yaml", "utf8"));
-config.mcpSettings.allowedAddresses = Object.values(owners).flatMap(id => ["freecad-" + id + ":8000", "blender-" + id + ":10101", "design-" + id + ":8000"]);
-process.stdout.write(yaml.dump(config));
-' \
-  < "$stage/owners.json" > "$stage/configured.yaml"
-install -m 600 "$stage/configured.yaml" "$deploy_root/librechat.yaml"
-"${closed_compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
-"${closed_compose[@]}" up -d --no-deps --force-recreate --wait --wait-timeout 240 files-admin files-user design-admin design-user api
-"${closed_compose[@]}" exec -T api node -e "$(cat "$stage/checks.js")" < "$stage/accounts.json"
-# 同时验证 Nginx 使用的主机端口，容器内部可达并不代表端口已发布。
-for account in admin user; do
-  port=5001
-  if [[ "$account" == user ]]; then port=5002; fi
-  jq -r --arg account "$account" '"Authorization: Basic " + (.[$account] | (.username + ":" + .password) | @base64)' \
-    "$stage/accounts.json" > "$stage/files-header"
-  curl --fail --silent --show-error -H "@$stage/files-header" -o /dev/null \
-    "http://127.0.0.1:$port/cad-files/$account/?json"
-  download_port=5003
-  if [[ "$account" == user ]]; then download_port=5004; fi
-  download_status=$(curl --silent --show-error -o /dev/null -w '%{http_code}' \
-    "http://127.0.0.1:$download_port/download/check.pdf")
-  if [[ "$download_status" != 403 ]]; then
-    echo 'The private download endpoint failed its access check.' >&2
     exit 1
   fi
 done

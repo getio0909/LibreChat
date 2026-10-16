@@ -1,0 +1,29 @@
+schema: 1
+id: "4444444444444442"
+title_zh: 灰色大理石纹理石材（低清局部样图）
+library_type: 材质纹理
+studio_roles:
+  - 材质
+  - 参考
+category_l1: 材质纹理
+materials:
+  - 蓝金灰
+material_ids:
+  - blue-gold-grey
+colors:
+  - 蓝灰
+  - 金丝
+style:
+  - 现代禅意
+tags:
+  - 蓝金灰局部
+summary_zh: 蓝金灰石材局部特写样图，原图分辨率低于1000像素。
+provenance:
+  license: proprietary-internal
+  license_status: confirmed
+quality:
+  ai_generated: false
+  third_party_watermark: false
+  low_res: true
+review:
+  status: draft

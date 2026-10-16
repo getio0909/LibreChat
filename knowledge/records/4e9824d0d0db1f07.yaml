@@ -1,0 +1,71 @@
+id: 4e9824d0d0db1f07
+title_zh: 佛教寺庙大殿内部展示场景-02
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部展示场景-02.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部展示场景-02.jpg
+  sha256: 4e9824d0d0db1f07522eb4f2e12ea9350004485383452b497215d73489b00d23
+  bytes: 4031110
+  width: 3774
+  height: 2640
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4e9824d0d0db1f07.jpg
+    sha256: afb9fba6bdfa6f0cf8517db483d6e948f1d6a7c3502f2d412e4b5ebb434b26da
+    bytes: 477783
+    width: 2048
+    height: 1433
+  thumb512:
+    path: assets/thumb512/4e9824d0d0db1f07.webp
+    sha256: 2d9aec6f989b818d4a06cf3fd4be3fc51a5deaf342029cf9e6f3030bea74a4f0
+    bytes: 37460
+    width: 512
+    height: 358
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 本图为传统大雄宝殿“五尊主像（三世佛+文殊普贤）+ 两侧十八罗汉廊”暖红棕拼花木地板版正面中轴全景场景（空间场景设计）。
+materials:
+- 暖红棕席纹拼花木地板
+- 五尊铜鎏金大佛菩萨配白色发光海棠石背板
+- 汉白玉须弥座柱础方木柱
+- 八角重檐贴金藻井
+colors:
+- 琥珀木棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 五尊主像大雄宝殿（拼花木地板版）正面中轴标准全景图、汉白玉方形须弥座柱础与八角藻井中轴对位参考
+prompt_zh: 传统佛教寺庙大雄宝殿正面中轴对称全景，地面满铺高光暖红棕色方形几何席纹拼花实木地板，前景左右对称耸立两根粗壮的竖向凹槽方形实木巨柱，下承洁白厚重的汉白玉精雕方形莲花须弥座柱础，正前方深色木雕须弥座主坛上并列供奉五尊巨型铜鎏金佛菩萨像（中央三世佛坐像与左右文殊骑狮、普贤骑象像，均带镂空火焰金背光），每尊造像背后均设有一扇洁白的石材雕花海棠框发光背景板，坛前整齐排列五张木雕供桌与五对米黄色方形拜垫，两侧回廊供奉铜鎏金十八罗汉，顶部为九宫格发光木天花与中央八角重檐贴金斗拱大藻井，8K超清渲染
+tags:
+- 五尊主像正视图
+- 汉白玉方形须弥础
+- 席纹拼花木地板
+- 白色海棠框石背板
+- 八角重檐金藻井
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2640
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统大雄宝殿五尊主像与两侧十八罗汉廊正面中轴全景三维效果图（席纹拼花木地板版），右下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,76 @@
+id: becd28c463a78bed
+title_zh: 佛教大殿佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教大殿佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿佛像展示场景.jpg
+  sha256: becd28c463a78bed81250ce5eb787649c2ec7f71a2138a97afc1c33ec9e356da
+  bytes: 3901048
+  width: 3922
+  height: 2522
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/becd28c463a78bed.jpg
+    sha256: 518f15831a1185bed97262a292f4d27e1946b6c50bcd32a32eeebc7fbd598e0a
+    bytes: 419444
+    width: 2048
+    height: 1317
+  thumb512:
+    path: assets/thumb512/becd28c463a78bed.webp
+    sha256: 97097d1af79ad3b7795f228019e8753b9cbe407c8019961741e5ea9eabfbd85b
+    bytes: 33034
+    width: 512
+    height: 329
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 设八角金莲蓝天主藻井与双圆副藻井、悬挑木雕华盖、三联白色海棠发光龛供奉三世佛二弟子及两壁十八罗汉金像的全木作大殿。
+materials:
+- 红木整装木作
+- 铜鎏金佛像与罗汉
+- 白色海棠拱形背板
+- 青白石莲花柱础
+- 深褐石材地面
+colors:
+- 红木棕
+- 辉煌金
+- 纯白色
+- 深褐色
+- 深空蓝
+style: 传统汉传名贵全木作大殿风
+ai_design_usage: 传统全木作大雄宝殿室内设计、八角金莲藻井与双圆穹顶天花方案、三联海棠拱形发光佛龛设计
+prompt_zh: 中式传统全木作大雄宝殿室内全景效果图，正面中轴对称视角，正中四根红木圆柱配鎏金莲瓣柱脚与青石莲花柱础，主佛坛上方悬挑精雕木质镂空华盖，下方三座白色海棠拱形发光石材壁龛内供奉三尊金身三世佛坐像与阿难迦叶二弟子立像，左右两侧实木护墙板壁龛内陈列金色十八罗汉雕像，顶部中央为巨大的八角形金色莲花蓝天藻井，两侧配两个圆形金色藻井，深褐色石材地面，前方三张红木供桌与六个黄色蒲团，庄严辉煌，8K建筑渲染
+tags:
+- 全木作大殿
+- 八角金莲藻井
+- 毗卢帽华盖
+- 十八罗汉堂
+- 海棠形佛龛
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2522
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a traditional all-wood Mahavira Hall featuring an octagonal golden lotus caisson, carved wooden canopy
+    over Three-Ages Buddhas and two disciples, and 18 Arhat niches along both walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

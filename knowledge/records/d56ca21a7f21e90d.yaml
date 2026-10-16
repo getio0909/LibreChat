@@ -1,0 +1,77 @@
+id: d56ca21a7f21e90d
+title_zh: 佛教大殿内部佛像与装饰布局
+source:
+  original_path: 佛教空间设计案例/佛教大殿内部佛像与装饰布局.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿内部佛像与装饰布局.jpg
+  sha256: d56ca21a7f21e90d304221baf58954532864061896ccf985c20fc1d445004ad2
+  bytes: 5204574
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d56ca21a7f21e90d.jpg
+    sha256: f97913a22c086c63c031ffbf1298de6e80ab918f3a5f0b7921c263145403fcbf
+    bytes: 989678
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/d56ca21a7f21e90d.webp
+    sha256: 0dd422aab38f8abf194686851199787bd4c26a89dc4261a644f0416e7940e58b
+    bytes: 65318
+    width: 512
+    height: 362
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 藏传与多民族融合佛殿
+entity_type: 空间场景设计
+summary_zh: 立四根贴金盘龙巨柱、悬三盏白莲吊灯、设彩绘斗拱坛城藻井与万佛墙，供奉三世佛、蓝色忿怒本尊与高耸法座的藏汉融合大殿。
+materials:
+- 贴金盘龙柱
+- 彩绘木斗拱
+- 棕红高光大理石
+- 铜鎏金佛像
+- 白玉兰玻璃吊灯
+- 万佛墙
+colors:
+- 辉煌金
+- 朱砂红
+- 群青蓝
+- 棕红色
+- 纯白色
+style: 藏汉融合皇家寺院风
+ai_design_usage: 藏汉融合大型大雄宝殿空间规划、盘龙金柱与彩绘斗拱藻井设计、万佛墙与法座复合礼佛大殿参考
+prompt_zh: 恢宏的藏汉融合佛教大雄宝殿内部空间，四根通顶贴金浮雕盘龙大柱，悬挂三盏大型多层白色莲花瓣玻璃枝形吊灯，顶部红蓝金彩绘斗拱与藏式坛城藻井天花，正中须弥座供奉三尊金身坐佛与两尊弟子像，主尊前立蓝色忿怒金刚本尊像与高耸红金法座，两侧通顶金色发光万佛墙，高光棕红色大理石地面倒映金柱，一位穿绛红僧袍的僧人走过，两侧排列藏式花纹方座垫，8K超清建筑效果图
+tags:
+- 盘龙金柱
+- 藏汉融合大殿
+- 坛城藻井
+- 大威德金刚
+- 万佛墙
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K 3D render of a Tibetan-Han fusion main hall with four gilded dragon columns, three glowing white lotus
+    chandeliers, Three-Ages Buddhas, a blue wrathful Yamantaka statue, and a high dharma throne.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

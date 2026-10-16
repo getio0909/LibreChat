@@ -1,0 +1,343 @@
+{
+  "schema": 1,
+  "verified": "2026-10-10",
+  "references": [
+    {
+      "key": "concept-ink-gold",
+      "file": "concept-ink-gold.png",
+      "title": "墨金石木｜原创空间概念",
+      "sha": "c2374528094286a310dedd582d358b136bf1875b219932449485763b2cf5ad8c",
+      "type": "ai_generated",
+      "license": "AI概念 · 非实景",
+      "credit": "庄严宝刹设计素材",
+      "description": "深色木作、古铜细节与透光石材组成安静的轴线空间。只参考材质搭配、光线和构图；不作为真实工程、石材品种或宗教细节的依据。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/concept-ink-gold.md"
+    },
+    {
+      "key": "concept-oak-stone",
+      "file": "concept-oak-stone.png",
+      "title": "浅木白石｜原创空间概念",
+      "sha": "d90b20033188072779fa277f96162ac93193c3b54365be372905e260a10d3a89",
+      "type": "ai_generated",
+      "license": "AI概念 · 非实景",
+      "credit": "庄严宝刹设计素材",
+      "description": "浅色木格栅、奶白石材和柔和侧光，结合抽象莲瓣浮雕。适合参考当代陈设空间的材质比例和氛围；图中构造、石材品种与可施工性均未确认。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/concept-oak-stone.md"
+    },
+    {
+      "key": "laos-door",
+      "file": "laos-door.jpg",
+      "title": "老挝香通寺｜金色门扇与木柱",
+      "sha": "4c8811a4aa3b9320be4113b92c64432ac74ad9c438399a989813d679d828d85b",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Gerd Eichmann",
+      "url": "https://commons.wikimedia.org/wiki/File:Luang_Prabang-Wat_Xieng_Thong-28-Sim-Tuer-gje.jpg",
+      "description": "香通寺实景摄影，门扇人物纹样与柱面细密金色装饰清晰可见。可研究装饰层次和金色与深木的关系；人物、宗教图案的移用须经专业复核。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/laos-door.md"
+    },
+    {
+      "key": "laos-interior",
+      "file": "laos-interior.jpg",
+      "title": "老挝香通寺｜黑金壁画细节",
+      "sha": "a9e526f6cd383a8236fede6f873b1f67195baa20dc98f071a8f59cc8560d2a4f",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Gerd Eichmann",
+      "url": "https://commons.wikimedia.org/wiki/File:Luang_Prabang-Wat_Xieng_Thong-18-Sim_innen-gje.jpg",
+      "description": "香通寺黑金壁画近景，上方为红金花卉边饰，下方为人物、建筑和植物叙事图案。适合研究金色图案的疏密与边饰分层；不是新产品的文化授权或工艺图。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/laos-interior.md"
+    },
+    {
+      "key": "thai-marble-hall",
+      "file": "thai-marble-hall.jpg",
+      "title": "泰国云石寺｜金红礼佛厅实景",
+      "sha": "2b9f7d804562a73a59e4538fe326f157d63a74fb03ba1e0f5ecd69d07f8c383e",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "credit": "Aimaimyi",
+      "url": "https://commons.wikimedia.org/wiki/File:Wat_Benchamabophit_Dusitvanaram_01.jpg",
+      "description": "礼佛活动中的厅堂实景，中央造像、金红装饰与高柱构成轴线。仅研究空间层次和色彩关系；不复制参拜者，不据此认定各部位的石材品种或仪轨要求。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/thai-marble-hall.md"
+    },
+    {
+      "key": "thai-kala-panel",
+      "file": "thai-kala-panel.jpg",
+      "title": "泰国建筑浮雕｜Kala 双头像残件",
+      "sha": "ec2c1caed9f4286b4972e2772e7052056df8d420af8b1629f91ee7bd31d27edd",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "credit": "The Metropolitan Museum of Art, 1986.506.14",
+      "url": "https://www.metmuseum.org/art/collection/search/38309",
+      "description": "大都会艺术博物馆公开藏品图像，泰国 Haripunjaya 建筑灰泥浮雕，馆方断代为11世纪。可研究浮雕层次；图像不是石雕材质样本，头像及其文化含义须专业复核。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/thai-kala-panel.md"
+    },
+    {
+      "key": "wood-inlay-panel",
+      "file": "wood-inlay-panel.jpg",
+      "title": "国际木作参考｜木与骨镶嵌面板",
+      "sha": "40f3282b9c3d58870c1e17822a21ce54c96b6f87238422142f8192eaad30500a",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "credit": "The Metropolitan Museum of Art, 37.103",
+      "url": "https://www.metmuseum.org/art/collection/search/449211",
+      "description": "馆藏镶嵌面板以木和骨构成细密几何边框，馆方材质记录为无花果木、骨和四种木材。可参考拼接节奏和材质对比；不把历史构件直接当作佛教纹样依据。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/wood-inlay-panel.md"
+    },
+    {
+      "key": "wood-carved-panel",
+      "file": "wood-carved-panel.jpg",
+      "title": "国际木作参考｜斜面雕刻松木面板",
+      "sha": "f1612c17b2a6a45b1ab7b29c05e8c4510894a73c3b4d7aa531263a23fa5990e7",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "credit": "The Metropolitan Museum of Art, 69.189",
+      "url": "https://www.metmuseum.org/art/collection/search/452060",
+      "description": "馆藏松木雕刻面板，晚9世纪，纹样由连续卷曲形状和斜面切削形成。适合研究木雕的起伏与重复节奏；历史构件的文化背景不等同于佛教使用依据。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/wood-carved-panel.md"
+    },
+    {
+      "key": "marble-jali",
+      "file": "marble-jali.jpg",
+      "title": "国际石作参考｜白色大理石镂空屏",
+      "sha": "84172b5ff89881f3eefcaa5ec3fe2af0870c8d850260dc679ae47f6ff1d5cd72",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "credit": "The Metropolitan Museum of Art, 1985.240.2",
+      "url": "https://www.metmuseum.org/art/collection/search/453261",
+      "description": "馆藏大理石镂空屏，几何网格与花卉边饰形成通透的石作层次。可研究透光与镂空比例；孔位、板厚和构件强度仍需重新设计，不据照片拆单。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/marble-jali.md"
+    },
+    {
+      "key": "sandstone-jali",
+      "file": "sandstone-jali.jpg",
+      "title": "国际石作参考｜红砂岩镂空屏",
+      "sha": "367c7ec67e072375f93924e2b2544927f5556c0deced57b4e241797b3f23e3ac",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "credit": "The Metropolitan Museum of Art, 1993.67.2",
+      "url": "https://www.metmuseum.org/art/collection/search/453344",
+      "description": "馆藏红砂岩屏风，星形几何网格和外缘花形孔构成多层边框。可参考几何节奏和光影，不直接沿用历史构件的宗教含义，也不从图像推算加工尺寸。",
+      "note": "40-外部参考/素材笔记/精选风格20260930/sandstone-jali.md"
+    },
+    {
+      "key": "chaozhou-gilded-openwork",
+      "file": "chaozhou-gilded-openwork.jpg",
+      "title": "潮州木雕｜金漆层叠透雕花板",
+      "sha": "48c69827fdb4bb811b7a6da531c8a45b26a86437d7607134b7afc9ff70d01f91",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "三猎",
+      "url": "https://commons.wikimedia.org/wiki/File:金漆木雕通雕鱼藻蓼花纹花板.jpg",
+      "description": "清代金漆透雕花板摄影，鱼、水草与花叶穿插成多层镂空，金色高点与深色衬底形成深浅对比。可借鉴雕刻密度、起伏和边框层次，题材按客户项目确定。",
+      "style_take": "按本次物件将层叠透雕用于龛楣、柜门或边框，保留金漆高点、深色衬底和雕刻深浅，让主装饰华丽、外围收敛；题材按本次设计确定，不复制展柜背景。",
+      "note": "40-外部参考/素材笔记/精选风格20261010/chaozhou-gilded-openwork.md"
+    },
+    {
+      "key": "chaozhou-jilue-beams",
+      "file": "chaozhou-jilue-beams.jpg",
+      "title": "潮州己略黄公祠｜梁枋漆金木雕",
+      "sha": "718c5e6e1704e289b217cf812ea800d254a4acc3f5422486c16f1a8fb3e083b2",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "三猎",
+      "url": "https://commons.wikimedia.org/wiki/File:己略黄公祠金漆木雕1.jpg",
+      "description": "己略黄公祠实景，梁枋金漆木雕、深木边饰和浅色柱形成多道装饰层次。该来源为祠堂，不是佛教造像或仪轨依据。",
+      "style_take": "参考梁枋连续分层、金漆雕花与深木框架的主次关系，用于本次木作的顶部和边饰；保持原空间布局，不复制祠堂人物故事、匾额或旧损外观。",
+      "note": "40-外部参考/素材笔记/精选风格20261010/chaozhou-jilue-beams.md"
+    },
+    {
+      "key": "quanzhou-kaiyuan-caisson",
+      "file": "quanzhou-kaiyuan-caisson.jpg",
+      "title": "泉州开元寺｜甘露戒坛梁架与藻井",
+      "sha": "f35077adc0428dea2ec4168ba5b9d62cf67ea8533b8479ce453712b615e825b0",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "AmbroseLim",
+      "url": "https://commons.wikimedia.org/wiki/File:泉州開元寺甘露戒壇.jpg",
+      "description": "泉州开元寺甘露戒坛内部梁架摄影，朱漆构件、雕刻承托和向内收拢的藻井构成有深度的顶部层次。用于研究框架、边饰与雕刻的关系，不作为新增天花开口或人物造型的依据。",
+      "style_take": "参考朱漆木框、雕刻承托与层层收拢的装饰层次，按本次空间或柜体尺度组织顶部边饰；保持原有顶面和布局，造像题材按客户项目确定，不照搬旧漆磨损。",
+      "note": "40-外部参考/素材笔记/精选风格20261010/quanzhou-kaiyuan-caisson.md"
+    },
+    {
+      "key": "xiamen-nanputuo-stone-wood",
+      "file": "xiamen-nanputuo-stone-wood.jpg",
+      "title": "厦门南普陀寺｜石柱与朱金木作",
+      "sha": "f27bcc6a252a2e2b1b75b5c15db52d21ce304583f4e75e07d7fb7db68dc6f375",
+      "license": "CC BY 3.0",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/",
+      "credit": "Gisling",
+      "url": "https://commons.wikimedia.org/wiki/File:Dabeidian.jpg",
+      "description": "南普陀寺大悲殿门前构件实景，浅色石柱、朱色匾框、金色边饰与彩绘木作形成材质对比。只研究石木搭配与边框细节，不把外部门头当作室内平面或石材品种证明。",
+      "style_take": "取浅色石材、朱色木框与细金边的材质比例，让石作稳重、木作精细；用于本次柱面、台基或边框，不复制匾额文字、屋顶、树叶或门头布局。",
+      "note": "40-外部参考/素材笔记/精选风格20261010/xiamen-nanputuo-stone-wood.md"
+    },
+    {
+      "key": "dongyang-luzhai-beams",
+      "file": "dongyang-luzhai-beams.jpg",
+      "title": "东阳卢宅｜肃雍堂梁枋木作",
+      "sha": "eafbc5e4007eb112b55a44f37f4b8bab8eba1ba640951b06b40ee36af1b093a6",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Windmemories",
+      "url": "https://commons.wikimedia.org/wiki/File:20260731_Residence_of_the_Lu_Family_in_Dongyang_09.jpg",
+      "description": "东阳卢宅肃雍堂实景，梁枋木雕、成列木构和细部边饰形成庄重层次。可参考精雕木作的构成与天然木纹，历史老化外观和祠堂陈设不作为新设计目标。",
+      "style_take": "参考梁枋木雕、分层框架与木纹质感，以精细雕刻和完整收口体现华贵，用本次指定木色呈现新作；不复制祖先匾额、古建布局、旧损或灯笼陈列。",
+      "note": "40-外部参考/素材笔记/精选风格20261010/dongyang-luzhai-beams.md"
+    },
+    {
+      "key": "dongyang-luzhai-lattice",
+      "file": "dongyang-luzhai-lattice.jpg",
+      "title": "东阳卢宅｜格扇与厅堂木作",
+      "sha": "f7437e88c869025e4abb578c74a91e577f8e2a3e012cde4e0c10129b31364927",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "credit": "Windmemories",
+      "url": "https://commons.wikimedia.org/wiki/File:20260731_Residence_of_the_Lu_Family_in_Dongyang_11.jpg",
+      "description": "东阳卢宅厅堂实景，两侧格扇、分层木框与木家具形成重复节奏。适合研究柜门、隔扇和背景木作的细密比例，不直接沿用厅堂布置、文字或灯笼数量。",
+      "style_take": "取格扇细密比例、木框分层和明暗虚实，用于本次柜门、隔扇或背景木作，以统一木色和精细收口呈现新作；保留原门窗位置，不增加成排灯笼或照搬厅堂布局。",
+      "note": "40-外部参考/素材笔记/精选风格20261010/dongyang-luzhai-lattice.md"
+    }
+  ],
+  "packs": [
+    {
+      "id": "chaozhou-gilded-carving",
+      "name": "潮汕漆金层雕",
+      "subtitle": "层叠透雕 · 漆金细节 · 深木衬底",
+      "description": "将华丽集中在龛楣、门板和边饰，以多层透雕、深浅起伏和金漆明暗形成工艺感；大面材质收敛，整体精致饱满而非满铺亮金。",
+      "colors": ["#c3a057", "#442d20", "#8c3528"],
+      "refs": ["chaozhou-gilded-openwork", "chaozhou-jilue-beams"],
+      "kind": "潮汕木雕实景与藏品摄影",
+      "use_case": "佛龛柜与寺院木作装饰",
+      "caution": "借鉴漆金与层雕工艺，祠堂故事和人物题材不直接沿用。"
+    },
+    {
+      "id": "minnan-stone-wood",
+      "name": "闽南石木殿堂",
+      "subtitle": "朱漆梁架 · 浅色石柱 · 分层边饰",
+      "description": "以浅色石作衬托朱漆木框，把雕刻承托、层叠顶部边饰和细金线组织成庄重而富丽的空间，石木各有分量，按本次布局安排装饰。",
+      "colors": ["#9d382d", "#d8c6a4", "#bb9658"],
+      "refs": ["quanzhou-kaiyuan-caisson", "xiamen-nanputuo-stone-wood"],
+      "kind": "闽南寺院构件实景",
+      "use_case": "寺院空间与石木佛龛陈设",
+      "caution": "分别取用梁架层次与石木材质，造像和仪轨内容按客户项目确定。"
+    },
+    {
+      "id": "jiangnan-carved-wood",
+      "name": "江南精雕木作",
+      "subtitle": "东阳梁枋 · 细密格扇 · 木纹质感",
+      "description": "以东阳卢宅木作为参考，用分层木雕、细密格扇与完整收口体现华贵；保留天然木纹，以新作质感呈现，不靠满铺金色或复制古建陈设。",
+      "colors": ["#68452d", "#af8857", "#e4d4b5"],
+      "refs": ["dongyang-luzhai-beams", "dongyang-luzhai-lattice"],
+      "kind": "江南历史木作实景",
+      "use_case": "精雕佛龛柜、木作背景与隔扇",
+      "caution": "取用木作构成与细部比例，不照搬祠堂布置、匾额和老化外观。"
+    },
+    {
+      "id": "ink-gold",
+      "name": "墨金石木",
+      "subtitle": "深木 · 透光石 · 古铜",
+      "description": "用明亮石材提起深木的层次，让雕花、灯光和大板各有位置。",
+      "colors": [
+        "#2e2620",
+        "#cba66a",
+        "#eee3ce"
+      ],
+      "refs": [
+        "concept-ink-gold"
+      ],
+      "kind": "原创概念",
+      "use_case": "石木陈设空间",
+      "caution": "透光性能、纹理拼接与结构做法需另行确认。"
+    },
+    {
+      "id": "oak-stone",
+      "name": "浅木白石",
+      "subtitle": "浅木 · 奶白石 · 自然光",
+      "description": "减少装饰密度，用曲面、浅浮雕和细木格栅组织安静的空间。",
+      "colors": [
+        "#bd9965",
+        "#eee4d3",
+        "#77776a"
+      ],
+      "refs": [
+        "concept-oak-stone"
+      ],
+      "kind": "原创概念",
+      "use_case": "当代陈设与会客空间",
+      "caution": "抽象莲瓣不代表特定宗派或仪轨。"
+    },
+    {
+      "id": "laos-gilded",
+      "name": "老挝黑金",
+      "subtitle": "实景木作 · 金色纹样",
+      "description": "近看门扇、柱面与壁画，研究黑金对比和细密装饰的分层。",
+      "colors": [
+        "#282722",
+        "#c5a654",
+        "#752922"
+      ],
+      "refs": [
+        "laos-door",
+        "laos-interior"
+      ],
+      "kind": "寺院实景",
+      "use_case": "木作装饰与空间色彩研究",
+      "caution": "人物及宗教图案不可未经复核直接移用；改编发布须遵守署名与相同方式共享条件。"
+    },
+    {
+      "id": "thai-gold-red",
+      "name": "泰式金红",
+      "subtitle": "礼佛厅实景 · 历史浮雕",
+      "description": "以厅堂轴线和装饰层次为参考，将空间摄影与浮雕细节分开使用。",
+      "colors": [
+        "#a51f22",
+        "#dab766",
+        "#ece4d2"
+      ],
+      "refs": [
+        "thai-marble-hall",
+        "thai-kala-panel"
+      ],
+      "kind": "实景与馆藏",
+      "use_case": "佛教空间构图与浮雕研究",
+      "caution": "灰泥残件不是石材样本；造像与文化细节须专业复核。"
+    },
+    {
+      "id": "wood-inlay",
+      "name": "几何木作",
+      "subtitle": "木骨镶嵌 · 斜面雕刻",
+      "description": "参考镶嵌比例与重复节奏，为展厅和家具提供不同于常见浮雕的细节方向。",
+      "colors": [
+        "#44372c",
+        "#d6c9a5",
+        "#986e46"
+      ],
+      "refs": [
+        "wood-inlay-panel",
+        "wood-carved-panel"
+      ],
+      "kind": "博物馆开放图像",
+      "use_case": "展陈、家具与几何木作",
+      "caution": "仅取材质关系与构成方法，不将异文化构件标作佛教纹样。"
+    },
+    {
+      "id": "stone-screen",
+      "name": "透光石屏",
+      "subtitle": "白大理石 · 红砂岩 · 镂空",
+      "description": "让石材承担光影与分隔，用几何网格和分层边框形成轻盈的石作。",
+      "colors": [
+        "#ded6c4",
+        "#aa7764",
+        "#554c42"
+      ],
+      "refs": [
+        "marble-jali",
+        "sandstone-jali"
+      ],
+      "kind": "博物馆开放图像",
+      "use_case": "石屏风与展陈隔断",
+      "caution": "板厚、孔位、支撑和安全性须重新核算，照片不作为加工依据。"
+    }
+  ]
+}

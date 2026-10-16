@@ -1,0 +1,79 @@
+id: fc2d7628b04494b6
+title_zh: 北京故宫太和殿龙纹宝座与雕花屏风
+source:
+  original_path: 家具木作开放授权实物参考/中国北方-北京故宫太和殿龙纹宝座与雕花屏风-commons32793535.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/03-中国北方家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国北方-北京故宫太和殿龙纹宝座与雕花屏风-commons32793535.jpg
+  sha256: fc2d7628b04494b61b0f67a10cbc616f0d436997890be10b296415981f70b73e
+  bytes: 1947291
+  width: 3840
+  height: 2880
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fc2d7628b04494b6.jpg
+    sha256: fb574d68665c7b0e9fc3cce8e4ce4b130c63f293f02c844c61ef467ad1ae39c4
+    bytes: 599860
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/fc2d7628b04494b6.webp
+    sha256: 9f03048a90560209bf01499365a8697fbdae1d87d1c6ae3f67f0175a0c49f858
+    bytes: 35910
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 中国北方
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 北京故宫太和殿龙纹宝座与雕花屏风
+entity_type: 实物对象写实
+summary_zh: 【图中可见】宝座的圆转靠背与扶手雕盘龙，座沿下为蓝地金色龙纹；后方立七扇高低错落屏风，各扇嵌满细密浮雕，顶缘卷曲。【来源著录】太和殿皇帝寶座.JPG；文化或地点依据：Commons 明确为北京故宫太和殿皇帝宝座；以殿内汉式宫廷家具与屏风组合归入中国北方。
+materials:
+- 木作（具体材种未注明）
+- 表面彩饰
+colors:
+- 金褐
+- 蓝色
+- 朱红
+style: 中国北方传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，宝座的圆转靠背与扶手雕盘龙，座沿下为蓝地金色龙纹；后方立七扇高低错落屏风，各扇嵌满细密浮雕，顶缘卷曲。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of 太和殿皇帝寶座.JPG. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国北方
+- 开放授权
+- 真实摄影
+- 北京故宫太和殿龙纹宝座与雕花屏风
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:%E5%A4%AA%E5%92%8C%E6%AE%BF%E7%9A%87%E5%B8%9D%E5%AF%B6%E5%BA%A7.JPG
+  download_url: https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/%E5%A4%AA%E5%92%8C%E6%AE%BF%E7%9A%87%E5%B8%9D%E5%AF%B6%E5%BA%A7.JPG/3840px-%E5%A4%AA%E5%92%8C%E6%AE%BF%E7%9A%87%E5%B8%9D%E5%AF%B6%E5%BA%A7.JPG
+  credit: 秋水平湖; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 2880
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

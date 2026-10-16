@@ -1,0 +1,82 @@
+id: d324b9ec2418931d
+title_zh: 古吉拉特或信德嵌牙翻门小柜
+source:
+  original_path: 家具木作开放授权实物参考/东南亚与南亚-古吉拉特或信德嵌牙翻门小柜-lacma134954.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/02-东南亚与南亚家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/东南亚与南亚-古吉拉特或信德嵌牙翻门小柜-lacma134954.jpg
+  sha256: d324b9ec2418931d8feb7c59fde84a594fd72e56e63c2a22d66cb11a28d6776e
+  bytes: 11853072
+  width: 6936
+  height: 5196
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d324b9ec2418931d.jpg
+    sha256: 82ea3ad096dec35a378349bf02c2ca2200be5b2ce5fced7bd3737592f79c2473
+    bytes: 567525
+    width: 2048
+    height: 1534
+  thumb512:
+    path: assets/thumb512/d324b9ec2418931d.webp
+    sha256: b7b1b516b54708ee573f9b32a1ea1cb0b3f2b825edd2d294cc304da8db19d856
+    bytes: 29324
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 南亚东南亚
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 古吉拉特或信德嵌牙翻门小柜
+entity_type: 实物对象写实
+summary_zh: 【图中可见】深褐色小柜前盖翻下，内侧排列多格抽屉与中央小门，浅色花卉嵌饰在深底上重复，侧面有提环。【来源著录】Fall-Front Cabinet；文化或地点依据：馆方著录为印度古吉拉特或巴基斯坦信德；保留地域不确定性，归入南亚传统家具。
+materials:
+- 蔷薇木
+- 象牙镶嵌与黄铜配件
+colors:
+- 深褐色
+- 象牙白色
+style: 东南亚/南亚传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，深褐色小柜前盖翻下，内侧排列多格抽屉与中央小门，浅色花卉嵌饰在深底上重复，侧面有提环。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Fall-Front Cabinet. Preserve the visible silhouette, ornament
+  spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 家具木作
+- 东南亚/南亚
+- 开放授权
+- 真实摄影
+- 古吉拉特或信德嵌牙翻门小柜
+- Public domain
+material_ids: []
+provenance:
+  source: museum
+  url: https://collections.lacma.org/object/134954
+  download_url: https://collections-images.lacma.org/images/134954/134954-1-print.tif
+  credit: Los Angeles County Museum of Art (www.lacma.org); Purchased with funds provided by Jane and Marc Nathanson, Bill
+    and Dee Grinnell, Greg and Mechas Grinnell, and Marilyn B. and Calvin B. Gross through the 2007 Collectors Committee;
+    Unknown, Fall-Front Cabinet , circa 1650-1670, Los Angeles County Museum of Art, Purchased with funds provided by Jane
+    and Marc Nathanson, Bill and Dee Grinnell, Greg and Mechas Grinnell, and Marilyn B. and Calvin B. Gross through the 2007
+    Collectors Committee, photo © Museum Associates/LACMA
+  license: public-domain
+  license_url: https://www.lacma.org/about/contact-us/terms-use
+  license_status: confirmed
+quality:
+  min_side_px: 5196
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

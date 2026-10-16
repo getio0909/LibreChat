@@ -1,0 +1,75 @@
+id: 966029906a9024de
+title_zh: 佛教主题室内展览空间-03
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-03.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-03.jpg
+  sha256: 966029906a9024de5be39da3e635d7e86bea2c6327a67af33dd5cc0af1c3b141
+  bytes: 1276109
+  width: 2204
+  height: 1237
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/966029906a9024de.jpg
+    sha256: 00954b9e4d319dcbf57ba3e6f6a533c7bbc42c5fd9317542a8fbc7decc694883
+    bytes: 313385
+    width: 2048
+    height: 1149
+  thumb512:
+    path: assets/thumb512/966029906a9024de.webp
+    sha256: 0cd72e5afdd965b37add2b727fcff24f873db12ec98f8fd147f2bd9686bb3bf7
+    bytes: 31430
+    width: 512
+    height: 287
+library_type: 空间展陈
+region: 未知
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: 现代原木风万佛墙祈福千佛殿室内场景，采用温润浅色桧木梁柱与回纹护墙板，四周高墙密布模块化发光小佛龛并嵌设两座大型主佛龛，地面铺设深灰黑带白筋高光大理石。
+materials:
+- 台湾桧木饰面
+- 贴金莲花雕花柱
+- 模块化发光万佛龛
+- 黑白根高光抛光大理石
+colors:
+- 桧木浅黄
+- 佛光暖金
+- 深炭黑
+- 闪电白筋
+style: 现代禅意
+ai_design_usage: 现代寺院万佛殿与千佛堂室内设计、高密度模块化发光佛龛墙及深色大理石地面搭配参考
+prompt_zh: 现代原木风格佛教寺院万佛殿千佛堂室内设计，广角对角线透视构图，空间梁柱与护墙板采用温润的浅黄色桧木打造，粗壮木柱上下两端雕刻贴金莲花纹，四周高墙密布成千上万个整齐排列的发光小佛龛，每个小龛内供奉一尊金色小坐佛，右侧墙面万佛阵列中嵌入两个大型方形主佛龛供奉彩绘金身释迦牟尼佛，顶部为原木井字梁配中式花格发光灯盘，地面铺设深灰黑色带白筋纹理的高光抛光大理石，倒影清晰，金碧辉煌而禅意井然，8K渲染。
+tags:
+- 佛教空间案例
+- 万佛殿
+- 千佛墙
+- 原木风佛堂
+- 黑白根大理石
+- 模块化佛龛
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1237
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior rendering of a light hinoki-wood Ten-Thousand-Buddha hall with modular glowing Buddha niches, two larger
+    main niches, and dark grey/black white-veined marble floor.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

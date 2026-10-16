@@ -1,0 +1,71 @@
+id: 46583597183609b8
+title_zh: 佛教龙纹雕刻香炉
+source:
+  original_path: 佛教家具与陈设素材/佛教龙纹雕刻香炉.jpg
+original:
+  path: 佛教家具与陈设素材/佛教龙纹雕刻香炉.jpg
+  sha256: 46583597183609b8012452572fb799f42e006da47d737a1f05f10753ec3b89d0
+  bytes: 418205
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/46583597183609b8.jpg
+    sha256: a803dceb052e082af3c5c518affe703a4598735386d6001edca1f9df8b0ea875
+    bytes: 451685
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/46583597183609b8.webp
+    sha256: f13c7a2a6baec3e3d3f124f540fbc9cc934ddc141fce50d3025fa71d70b0616b
+    bytes: 51270
+    width: 384
+    height: 512
+library_type: 法器供器
+region: 中国藏区
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: 与第 23、25 项为同一件展品的左前 45° 斜角仰视特写——大型藏传佛教双龙双凤耳斗式木雕彩绘香炉/供器。从这一角度观察，器物右侧的游龙耳柄处于前景视觉焦点，同时将顶部交叉的宝瓶如意杵与展厅天花的九宫格立体木雕藻井形成了绝佳的上下空间呼应。
+materials:
+- 红木圆雕
+- 浮雕彩绘
+- 彩宝镶嵌
+colors:
+- 枣红木配黑金彩绘
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 大型藏式龙纹供器/香炉3D重建（左前视角） / 器物与雕花藻井吊顶仰视构图参考
+prompt_zh: 室内展品特写摄影，左前45度微仰视角，一座威严华丽的藏式大型双龙耳斗式木雕彩绘香炉供器，右侧前景为立体盘曲的黑金游龙耳柄，左侧为立体瑞凤耳饰，顶部树立弧形雕花背板并交叉插立两支宝瓶如意杵，方斗侧壁深浮雕双狮护法轮与八吉祥，底座满雕彩色宝石莲瓣与金色护法兽面，上方天花板为带线性灯带的实木雕花九宫格藻井，8K超清实拍。
+tags:
+- 龙纹木雕香炉
+- 斗式供器左视图
+- 游龙耳柄圆雕
+- 雕花藻井天花
+- 藏传佛教法器
+- 3D重建多视角
+material_ids: []
+provenance:
+  source: unknown
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph (front-left angle) of a large Tibetan carved and painted wood斗-shaped offering vessel under
+    a polychrome coffered ceiling.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,71 @@
+id: 68d94ad9e998ccc2
+title_zh: 大型天然石材展示图
+source:
+  original_path: 蓝金灰大板自家产品/大型天然石材展示图.jpg
+original:
+  path: 蓝金灰大板自家产品/大型天然石材展示图.jpg
+  sha256: 68d94ad9e998ccc220e8c38c4f436a6b6fea36b8797566d9b42ceb77a24db656
+  bytes: 4991194
+  width: 3378
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/68d94ad9e998ccc2.jpg
+    sha256: 4923bb09c1dea349d068f0d7d647a7d7f157dae1f51ec1130d2ebc1e53e515c2
+    bytes: 673091
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/68d94ad9e998ccc2.webp
+    sha256: 0f5ee44657978719ab92ab871471483619468daaf63c89626ee2fa116ca77c62
+    bytes: 35320
+    width: 512
+    height: 341
+library_type: 材质纹理
+region: 未知
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: 本图展示了「蓝金灰」品种中极具代表性的「钢蓝角砾 + 黄金网脉」均质碎花型整块大板正视标准照。
+materials:
+- 蓝金灰大板
+colors:
+- 钢蓝灰角砾
+- 琥珀金网脉
+- 底部赤红细丝
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 大面积墙面/地面无缝延展贴图母本 / 奢石茶台/供桌台面材质替换 / 现代海派禅意空间主材参考
+prompt_zh: 正面超清写实摄影，一块宽幅蓝金灰天然奢石大板，呈现精密复杂的角砾状碎花构造，冷调的钢蓝灰、鸽羽蓝岩石碎块（部分带平行条纹）被温暖明亮的琥珀金、姜黄色与奶油白网状钙质脉络紧密包裹胶结，底部点缀纤细的赤红丝脉，高光镜面抛光，8k超高清石材细节。
+tags:
+- 蓝金灰
+- 角砾状奢石
+- 钢蓝琥珀金撞色
+- 均质碎花大理石
+- 百搭禅意石材
+- 整板标准照
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res front-on photograph of a brecciated Blue-Gold-Grey (蓝金灰) marble slab with steel-blue clasts and amber-gold
+    webbing.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

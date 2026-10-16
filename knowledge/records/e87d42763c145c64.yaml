@@ -1,0 +1,84 @@
+id: e87d42763c145c64
+title_zh: 西藏八吉祥经书架与箱柜
+source:
+  original_path: 家具木作开放授权实物参考/中国藏区·藏传佛教-西藏八吉祥经书架与箱柜-lacma151347.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/05-家具木作开放授权实物参考库/05-中国藏区·藏传佛教家具木作参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 家具木作开放授权实物参考/中国藏区·藏传佛教-西藏八吉祥经书架与箱柜-lacma151347.jpg
+  sha256: e87d42763c145c64403d495f6fae22b8ad609cf5fab7c7b6bd1f17f04b989f59
+  bytes: 7568452
+  width: 6034
+  height: 4560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e87d42763c145c64.jpg
+    sha256: 410a869467b9fc66229903230204c827b1b5a27ca431cb294a20d9e6b2fd3c14
+    bytes: 420466
+    width: 2048
+    height: 1548
+  thumb512:
+    path: assets/thumb512/e87d42763c145c64.webp
+    sha256: 4ab3d30bc2132ba96cb2392b10983fc9b028c5eb275d71357cecb65ca4d0c627
+    bytes: 20100
+    width: 512
+    height: 387
+library_type: 家具木作
+region: 中国藏区
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 家具木作
+category_l2: 西藏八吉祥经书架与箱柜
+entity_type: 实物对象写实
+summary_zh: 【图中可见】下部箱柜正面红底描金，中有环形锁饰，后部竖起弧形背板，四角柱端有尖顶饰件。【来源著录】Book Stand and Chest (Pegam) with Auspicious Symbols；文化或地点依据：馆方著录为Tibet；中国藏区·藏传佛教，单列藏传组，不计入中国北方。
+materials:
+- 木材
+- 矿物颜料
+- 贴金
+- 石膏底层与金属配件
+colors:
+- 红色
+- 黑褐色
+- 金色
+style: 中国藏区·藏传佛教传统家具木作实物参考
+ai_design_usage: 传统家具比例、木作雕饰与构件连接参考
+prompt_zh: 以所附实物照片作形态参考，下部箱柜正面红底描金，中有环形锁饰，后部竖起弧形背板，四角柱端有尖顶饰件。重点保留可辨识的轮廓、纹样疏密与表面色差，用于传统家具比例、木作雕饰与构件连接参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Book Stand and Chest (Pegam) with Auspicious Symbols.
+  Preserve the visible silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer
+  unseen construction or dimensions.
+tags:
+- 家具木作
+- 中国藏区·藏传佛教
+- 开放授权
+- 真实摄影
+- 西藏八吉祥经书架与箱柜
+- Public domain
+material_ids: []
+provenance:
+  source: museum
+  url: https://collections.lacma.org/object/151347
+  download_url: https://collections-images.lacma.org/images/151347/151347-1-print.tif
+  credit: Los Angeles County Museum of Art (www.lacma.org); Gift of the 2010 Collectors Committee; Unknown, Book Stand and
+    Chest (Pegam) with Auspicious Symbols , 16th-18th century, Los Angeles County Museum of Art, Gift of the 2010 Collectors
+    Committee, photo © Museum Associates/LACMA
+  license: public-domain
+  license_url: https://www.lacma.org/about/contact-us/terms-use
+  license_status: confirmed
+quality:
+  min_side_px: 4560
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

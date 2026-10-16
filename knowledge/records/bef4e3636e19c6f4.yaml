@@ -1,0 +1,75 @@
+id: bef4e3636e19c6f4
+title_zh: 佛教元素雕刻实木家具套装
+source:
+  original_path: 佛教家具与陈设素材/佛教元素雕刻实木家具套装.jpg
+original:
+  path: 佛教家具与陈设素材/佛教元素雕刻实木家具套装.jpg
+  sha256: bef4e3636e19c6f41622284c1779f1490558aa41cc77d5c4c9bd0543d78c25fa
+  bytes: 461870
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bef4e3636e19c6f4.jpg
+    sha256: 17e32ccec986cc55fa8e9ae781530c8ec97758f0b4a7bbb0a641f3be80f776c9
+    bytes: 499290
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/bef4e3636e19c6f4.webp
+    sha256: 121e752933301f5c9fb4488f5c4c04d7c5a72cbe2cfd3d242f265154d430461a
+    bytes: 52278
+    width: 512
+    height: 384
+library_type: 家具木作
+region: 未知
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: 纯白背景下以近景俯拍视角聚焦展示的中式佛教莲花主题实木沙发与嵌石镶宝茶几组合。镜头重点突出了中央大型方形茶几的台面石材镶嵌工艺与主沙发、单人椅的实木立体深浮雕细节，并省去了软包坐垫，直接展示实木座板的原木美学。
+materials:
+- 北美黑胡桃木
+- 墨绿蛇纹石
+- 彩宝镶嵌
+colors:
+- 深胡桃棕配墨绿
+style: 汉藏融合宫廷嵌石风
+ai_design_usage: 奢石台面中心嵌宝拼花设计 / 红木深浮雕莲花纹样生成 / 新中式禅茶桌材质细节增强
+prompt_zh: 近景商业家具特写，纯白背景，一套深胡桃木佛教莲花雕刻实木沙发与大茶几，无软垫原木坐面，靠背深浮雕盛开的立体莲花与卷草纹，中央方形茶几台面镶嵌抛光深墨绿色白根纹大理石，石面正中镶嵌一朵精美的鎏金重瓣莲花并嵌满红珊瑚、绿松石、黄蜜蜡与青金石圆珠，角几上摆放墨玉钵与圆形莲花木雕屏风，极佳木纹与石材反光质感，8K超清。
+tags:
+- 墨绿大理石茶几
+- 八宝莲花镶嵌
+- 黑胡桃木家具
+- 莲花高浮雕
+- 中式禅茶沙发
+- 木石嵌宝工艺
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of Tibetan/Chinese carved lotus wood sofa and dark green
+    serpentine/jadeite inlay coffee table on white background. Labeled entity_type as 实物对象写实 despite being AI-generated.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

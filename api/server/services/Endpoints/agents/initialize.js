@@ -170,6 +170,7 @@ function createToolLoader(
     codeExecutionContext,
     attachedEnvironmentOptOut,
     accessibleMcpServerNames,
+    mcpImageFiles,
   }) {
     const agent = { id: agentId, tools, provider, model, tool_options };
     try {
@@ -186,6 +187,7 @@ function createToolLoader(
         attachedEnvironmentOptOut,
         definitionsOnly,
         accessibleMcpServerNames,
+        mcpImageFiles,
         upstreamTokenProvider,
         upstreamTokenProviderResolver,
       });

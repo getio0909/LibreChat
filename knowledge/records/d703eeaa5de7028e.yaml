@@ -1,0 +1,78 @@
+id: d703eeaa5de7028e
+title_zh: 陕西西安大慈恩寺双龙云纹石浮雕
+source:
+  original_path: 石刻纹样开放授权实物参考/中国北方-陕西西安大慈恩寺双龙云纹石浮雕-commons97909877.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/03-石刻纹样开放授权实物参考库/03-中国北方石刻纹样参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 石刻纹样开放授权实物参考/中国北方-陕西西安大慈恩寺双龙云纹石浮雕-commons97909877.jpg
+  sha256: d703eeaa5de7028e7b43f1db4ba6635b76b85ca9974053d288d8115a215b4887
+  bytes: 3252930
+  width: 2816
+  height: 2013
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d703eeaa5de7028e.jpg
+    sha256: 5104e89ca39b1b6143df023d3eb0a2cf8f17a3590f0db1f1d01920b1a30e7aef
+    bytes: 1004984
+    width: 2048
+    height: 1464
+  thumb512:
+    path: assets/thumb512/d703eeaa5de7028e.webp
+    sha256: a01e65d3a6276ec12fe8b5b5e2163483fd925c58da29d60cd47d4f7f3ebda02b
+    bytes: 60128
+    width: 512
+    height: 366
+library_type: 石刻纹样
+region: 中国北方
+studio_roles:
+- 参考
+- 纹样
+- 造型
+category_l1: 石刻纹样
+category_l2: 陕西西安大慈恩寺双龙云纹石浮雕
+entity_type: 实物对象写实
+summary_zh: 【图中可见】双龙在密集云头间相对盘绕，长须横伸，龙身鳞片排列清楚，外围有卷叶边框；原照片为黑白影像。【来源著录】Dragon Carving, Xi'an (5199355936).jpg；文化或地点依据：Commons
+  标题注明西安，分类进一步明确为陕西大慈恩寺佛教艺术与龙陛石刻；具体制作年代未注明。
+materials:
+- 石材（具体岩种未注明）
+colors:
+- 黑白影调
+style: 中国北方传统石刻纹样实物参考
+ai_design_usage: 石雕纹样单元、边缘与层次构成参考
+prompt_zh: 以所附实物照片作形态参考，双龙在密集云头间相对盘绕，长须横伸，龙身鳞片排列清楚，外围有卷叶边框；原照片为黑白影像。重点保留可辨识的轮廓、纹样疏密与表面色差，用于石雕纹样单元、边缘与层次构成参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Dragon Carving, Xi'an (5199355936).jpg. Preserve the visible
+  silhouette, ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction
+  or dimensions.
+tags:
+- 石刻纹样
+- 中国北方
+- 开放授权
+- 真实摄影
+- 陕西西安大慈恩寺双龙云纹石浮雕
+- CC BY 2.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Dragon_Carving,_Xi'an_(5199355936).jpg
+  download_url: https://upload.wikimedia.org/wikipedia/commons/5/52/Dragon_Carving%2C_Xi%27an_%285199355936%29.jpg
+  credit: Will Clayton from Blackburn, UK; Here be dragons
+  license: cc-by-2.0
+  license_url: https://creativecommons.org/licenses/by/2.0
+  license_status: confirmed
+quality:
+  min_side_px: 2013
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review

@@ -1,0 +1,78 @@
+id: 2512fbf8c5eb73ea
+title_zh: 山西南禅寺大殿与宽檐台阶
+source:
+  original_path: 建筑景观开放授权实景参考/中国北方-山西南禅寺大殿与宽檐台阶-commons14715345.jpg
+  wiki_doc: text_wiki/09-开放授权补充参考库/04-建筑景观开放授权实景参考库/03-中国北方建筑景观参考全集.md
+  import_manifest: imports/1dc93516efbe683a.jsonl
+original:
+  path: 建筑景观开放授权实景参考/中国北方-山西南禅寺大殿与宽檐台阶-commons14715345.jpg
+  sha256: 2512fbf8c5eb73ea22eee7d2917ec487d95c7a7b40c9e30cf790f1241b68cbca
+  bytes: 2814292
+  width: 3648
+  height: 2736
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2512fbf8c5eb73ea.jpg
+    sha256: 109fcc30c1cbb64c18d116ed03288411f288f6aef735d4130d8601fb64546331
+    bytes: 628145
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/2512fbf8c5eb73ea.webp
+    sha256: a5de0b421082e84537561cfb1edc5577ba9bc3144c1a241d2ede9bfbc4be7662
+    bytes: 34858
+    width: 512
+    height: 384
+library_type: 建筑景观
+region: 中国北方
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 建筑景观
+category_l2: 山西南禅寺大殿与宽檐台阶
+entity_type: 空间场景设计
+summary_zh: 【图中可见】木构殿堂正面由中央门与两侧直棂窗组成，灰瓦屋面出檐深，脊上两端有上翘饰件，石阶与院内铺地居中相接。【来源著录】Nanchan Temple 1.JPG；文化或地点依据：Commons明确著录山西五台山附近南禅寺主殿。
+materials:
+- 木构件
+- 瓦与石铺地（按可见构件索引）
+colors:
+- 棕色
+- 灰色
+style: 中国北方传统建筑景观实物参考
+ai_design_usage: 宗教建筑屋面、立面与院落构图参考
+prompt_zh: 以所附实物照片作形态参考，木构殿堂正面由中央门与两侧直棂窗组成，灰瓦屋面出檐深，脊上两端有上翘饰件，石阶与院内铺地居中相接。重点保留可辨识的轮廓、纹样疏密与表面色差，用于宗教建筑屋面、立面与院落构图参考；此提示词为设计演绎，不作为年代、材质鉴定或工程尺寸依据。
+prompt_en: Design reference study based on the source photograph of Nanchan Temple 1.JPG. Preserve the visible silhouette,
+  ornament spacing and surface variation. Use the image as a visual reference; do not infer unseen construction or dimensions.
+tags:
+- 建筑景观
+- 中国北方
+- 开放授权
+- 真实摄影
+- 山西南禅寺大殿与宽檐台阶
+- CC BY-SA 3.0
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Nanchan_Temple_1.JPG
+  download_url: https://upload.wikimedia.org/wikipedia/commons/8/88/Nanchan_Temple_1.JPG
+  credit: Zeus1234; Own work
+  license: cc-by-sa-3.0
+  license_url: https://creativecommons.org/licenses/by-sa/3.0
+  license_status: confirmed
+quality:
+  min_side_px: 2736
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Resolution measured from original bytes. Other flags inherit the accepted real-photograph visual audit; no new automated
+    detection. Full-frame and native-crop evidence retained in the import manifest.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - pending_studio_review
