@@ -7,6 +7,7 @@ import os
 import random
 import re
 import shutil
+from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,8 @@ from deploy.studio.regions import (
     OnnxSamSegmenter,
     composite_local,
     count_outside_changes,
+    is_editor_token,
+    is_image_token,
     load_confirmed_selection,
     local_context,
     mask_for,
@@ -31,8 +34,10 @@ from deploy.studio.regions import (
     save_exact,
     selection_proof,
     selection_value,
+    sign_editor_token,
     sign_image_token,
     source_dimensions,
+    verify_editor_token,
     verify_onnx_model_dir,
 )
 from deploy.studio.store import list_user_images, resolve_image
@@ -521,17 +526,30 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             assert summary["image_id"] == upload_id
             assert summary["width"] == 320
             assert summary["height"] == 240
-            assert summary["editor_url"].startswith(
+            assert "editor_url" not in summary
+            assert summary["preview_url"].startswith(
                 "https://dev.xuqian.io/studio-files/"
             )
+            preview_token = summary["preview_url"].rsplit("/", 1)[-1]
+            assert is_image_token(preview_token) is True
+            assert is_editor_token(preview_token) is False
 
             ui_res = content[1]["resource"]
             assert ui_res["uri"] == f"ui://zyb_studio/selection/{upload_id}"
             assert ui_res["mimeType"] == "text/html"
             editor_html = ui_res["text"]
 
-            # 验证UI HTML仅包含签名URL，不含任何密钥、内部文件路径或模型厂商名
-            assert summary["editor_url"] in editor_html
+            # 验证TextContent中的preview_url不具备编辑器权限，而EmbeddedResource内嵌专用edt:令牌
+            assert summary["preview_url"] not in editor_html
+            url_match = re.search(
+                r"https://dev\.xuqian\.io/studio-files/([A-Za-z0-9_.-]+)",
+                editor_html,
+            )
+            assert url_match is not None
+            token = url_match.group(1)
+            assert is_editor_token(token) is True
+            assert is_image_token(token) is False
+            assert token not in content[0]["text"]
             assert "确认选区" in editor_html
             for secret_val in (
                 VALID_TOKEN,
@@ -545,7 +563,6 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             assert VENDOR_PATTERN.search(editor_html) is None
 
             # 2. 通过签名URL测试OPTIONS预检、GET底图读取与POST选区确认
-            token = summary["editor_url"].rsplit("/", 1)[-1]
             opt_res = await client.options(f"/files/{token}")
             assert opt_res.status_code == 204
             assert opt_res.headers.get("access-control-allow-origin") == "*"
@@ -763,7 +780,8 @@ def test_segmentation_adapter_mocked_and_endpoint(
     )
 
     async def _run_http() -> None:
-        token, _ = sign_image_token(studio_env, USER_A, upload_id)
+        img1_sha = hashlib.sha256(img1_path.read_bytes()).hexdigest()
+        token, _ = sign_editor_token(studio_env, USER_A, upload_id, img1_sha)
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app),
             base_url="http://studio:8000",
@@ -977,3 +995,211 @@ def test_object_placement_rejects_concave_or_holed_selection_clipping(
         match="Original object placement extends outside the confirmed selection",
     ):
         object_placement(base_path, l_shape_selection, ref_path)
+
+
+# 回归测试（Finding #2）：只读预览令牌（img:）与编辑器专用短效单次令牌（edt:）能力隔离，且confirm严禁重放覆盖@latest
+def test_token_capability_separation_and_single_use_editor_confirm(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "44444444-5555-6666-7777-888888888888"
+    base_file = user_a_lc / f"{upload_id}__altar_cap.png"
+    save_exact(Image.new("RGB", (240, 180), (140, 120, 100)), base_file)
+    base_sha = hashlib.sha256(base_file.read_bytes()).hexdigest()
+
+    # 1. 校验编辑器令牌TTL被强制限制在900秒以内并绑定user_id + image_id + image_sha256 + nonce
+    edt_token, edt_exp = sign_editor_token(
+        studio_env, USER_A, upload_id, base_sha, ttl_seconds=86400
+    )
+    claims = verify_editor_token(studio_env, edt_token)
+    assert claims["user_id"] == USER_A
+    assert claims["image_id"] == upload_id
+    assert claims["image_sha256"] == base_sha
+    assert edt_exp - int(os.path.getmtime(base_file)) <= 905
+
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        headers_a = {
+            "X-Studio-Token": VALID_TOKEN,
+            "X-LibreChat-User-ID": USER_A,
+        }
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            sel_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 21,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "select_region",
+                        "arguments": {"image_id": upload_id},
+                    },
+                },
+            )
+            assert sel_res.status_code == 200
+            sel_content = sel_res.json()["result"]["content"]
+            text_payload = json.loads(sel_content[0]["text"])
+            editor_html = sel_content[1]["resource"]["text"]
+
+            # 2. 工具文本中的preview_url只能携带只读img:令牌，绝不携带edt:写能力令牌
+            preview_tok = text_payload["preview_url"].rsplit("/", 1)[-1]
+            assert is_image_token(preview_tok) is True
+            assert is_editor_token(preview_tok) is False
+
+            # 用只读preview_url或before_url/after_url发起POST必须返回HTTP 403
+            sel_first = {
+                "version": 1,
+                "shapes": [
+                    {
+                        "type": "rect",
+                        "op": "add",
+                        "points": [{"x": 100, "y": 100}, {"x": 500, "y": 500}],
+                    }
+                ],
+            }
+            ro_post = await client.post(
+                f"/files/{preview_tok}",
+                json={"action": "confirm", "selection": sel_first},
+            )
+            assert ro_post.status_code == 403
+
+            before_tok, _ = sign_image_token(studio_env, USER_A, upload_id)
+            before_post = await client.post(
+                f"/files/{before_tok}",
+                json={"action": "confirm", "selection": sel_first},
+            )
+            assert before_post.status_code == 403
+
+            # 其他用户（USER_B）对 USER_A 的底图签发的 edt: 令牌在解析底图时因跨用户隔离返回404
+            cross_user_edt, _ = sign_editor_token(
+                studio_env, USER_B, upload_id, base_sha
+            )
+            cross_post = await client.post(
+                f"/files/{cross_user_edt}",
+                json={"action": "confirm", "selection": sel_first},
+            )
+            assert cross_post.status_code == 404
+
+            # 3. 提取EmbeddedResource内嵌的edt:令牌，首次confirm成功（200）
+            match = re.search(
+                r"https://dev\.xuqian\.io/studio-files/([A-Za-z0-9_.-]+)",
+                editor_html,
+            )
+            assert match is not None
+            embedded_edt_tok = match.group(1)
+            assert is_editor_token(embedded_edt_tok) is True
+            assert embedded_edt_tok not in sel_content[0]["text"]
+
+            first_confirm = await client.post(
+                f"/files/{embedded_edt_tok}",
+                json={"action": "confirm", "selection": sel_first},
+            )
+            assert first_confirm.status_code == 200
+            first_sel_id = first_confirm.json()["selection_id"]
+
+            # 4. 使用同一个edt:令牌重放第二次confirm必须返回409，且绝不覆盖@latest
+            sel_second = {
+                "version": 1,
+                "shapes": [
+                    {
+                        "type": "rect",
+                        "op": "add",
+                        "points": [{"x": 550, "y": 550}, {"x": 900, "y": 900}],
+                    }
+                ],
+            }
+            replay_confirm = await client.post(
+                f"/files/{embedded_edt_tok}",
+                json={"action": "confirm", "selection": sel_second},
+            )
+            assert replay_confirm.status_code == 409
+
+            latest_rec = load_confirmed_selection(
+                studio_env,
+                USER_A,
+                "@latest",
+                base_image_id=upload_id,
+                base_path=base_file,
+            )
+            assert latest_rec["selection_id"] == first_sel_id
+            assert latest_rec["selection"] == selection_value(sel_first)
+
+            # 5. 若底图文件在签发edt:令牌后被改动（SHA256变化），旧edt:令牌被409拒绝
+            fresh_edt_tok, _ = sign_editor_token(
+                studio_env, USER_A, upload_id, base_sha
+            )
+            save_exact(
+                Image.new("RGB", (240, 180), (141, 120, 100)), base_file
+            )
+            stale_sha_res = await client.post(
+                f"/files/{fresh_edt_tok}",
+                json={"action": "confirm", "selection": sel_second},
+            )
+            assert stale_sha_res.status_code == 409
+
+    asyncio.run(_run())
+
+
+# 回归测试（Finding #5）：/files/<token> POST流式请求体超过512KiB时立即中止流读取并返回413，不完整缓冲大请求体
+def test_post_files_stream_aborts_immediately_over_512kib(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "55555555-6666-7777-8888-999999999999"
+    base_file = user_a_lc / f"{upload_id}__stream_limit.png"
+    save_exact(Image.new("RGB", (160, 120), (100, 110, 120)), base_file)
+    base_sha = hashlib.sha256(base_file.read_bytes()).hexdigest()
+    edt_token, _ = sign_editor_token(studio_env, USER_A, upload_id, base_sha)
+
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        chunks_emitted = 0
+
+        async def _oversized_chunk_stream() -> AsyncIterator[bytes]:
+            nonlocal chunks_emitted
+            # 试图发送32个64KiB分块（共2MiB），服务端应在读到第9块（576KiB > 512KiB）时立即中断
+            for _ in range(32):
+                chunks_emitted += 1
+                yield b"a" * (64 * 1024)
+
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            res_stream = await client.post(
+                f"/files/{edt_token}",
+                content=_oversized_chunk_stream(),
+                headers={"Content-Type": "application/json"},
+            )
+            assert res_stream.status_code == 413
+            assert chunks_emitted == 9
+
+            # 若Content-Length本身超过512KiB，甚至不读取任何分块即直接返回413
+            cl_chunks = 0
+
+            async def _counted_stream() -> AsyncIterator[bytes]:
+                nonlocal cl_chunks
+                cl_chunks += 1
+                yield b"{}"
+
+            res_cl = await client.post(
+                f"/files/{edt_token}",
+                content=_counted_stream(),
+                headers={
+                    "Content-Type": "application/json",
+                    "Content-Length": str(600 * 1024),
+                },
+            )
+            assert res_cl.status_code == 413
+            assert cl_chunks == 0
+
+    asyncio.run(_run())
+

@@ -901,6 +901,16 @@ class OnnxSamSegmenter:
         }
 
 
+# 选区编辑器令牌最短/最大有效时长（秒）、单次确认随机数正则与重放异常类型
+EDITOR_TOKEN_MAX_TTL_SECONDS = 900
+EDITOR_NONCE_RE = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
+
+
+# 选区编辑器令牌已被消费后再次提交confirm时的重放拒绝异常
+class EditorTokenReplayError(ValueError):
+    pass
+
+
 # 校验选区编号格式（sel_<32位小写十六进制>）
 def validate_selection_id(selection_id: str | None) -> str:
     cleaned = selection_id.strip() if isinstance(selection_id, str) else ""
@@ -909,18 +919,28 @@ def validate_selection_id(selection_id: str | None) -> str:
     return cleaned
 
 
-# 在指定用户的专属目录下持久化已确认选区、掩码PNG与加密proof凭据
+# 在指定用户的专属目录下持久化已确认选区、掩码PNG与加密proof凭据（支持单次nonce消费防重放）
 def save_confirmed_selection(
     settings: StudioSettings,
     user_id: str,
     image_id: str,
     image_path: str | Path,
     selection: dict[str, Any],
+    *,
+    expected_image_sha256: str | None = None,
+    editor_nonce: str | None = None,
 ) -> dict[str, Any]:
     uid = validate_user_id(user_id)
     normalized_sel = selection_value(selection)
     resolved_image_path = Path(image_path)
     proof = selection_proof(resolved_image_path, normalized_sel)
+    if (
+        expected_image_sha256 is not None
+        and proof["image_sha256"] != expected_image_sha256
+    ):
+        raise ValueError(
+            "Base image content changed since selection editor token was issued"
+        )
     image = open_image(resolved_image_path)
     mask = mask_for(normalized_sel, image.size)
 
@@ -930,35 +950,59 @@ def save_confirmed_selection(
     if selections_root.is_symlink():
         raise ValueError("User selections directory must not be a symlink")
 
-    for _ in range(8):
-        sel_id = f"sel_{secrets.token_hex(16)}"
-        sel_dir = selections_root / sel_id
+    nonce_lock_path: Path | None = None
+    if editor_nonce is not None:
+        cleaned_nonce = editor_nonce.strip() if isinstance(editor_nonce, str) else ""
+        if not EDITOR_NONCE_RE.fullmatch(cleaned_nonce):
+            raise ValueError("Invalid editor token nonce")
+        nonces_dir = selections_root / "_used_nonces"
+        nonces_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
+        if nonces_dir.is_symlink():
+            raise ValueError("Editor nonce directory must not be a symlink")
+        nonce_lock_path = nonces_dir / f"{cleaned_nonce}.lock"
         try:
-            os.mkdir(sel_dir, 0o700)
-            break
-        except FileExistsError:
-            continue
-    else:
-        raise RuntimeError("Unable to allocate unique selection directory")
+            fd = os.open(nonce_lock_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            os.close(fd)
+        except FileExistsError as exc:
+            raise EditorTokenReplayError(
+                "Selection editor token has already been used to confirm a selection"
+            ) from exc
 
-    save_exact(mask, sel_dir / "mask.png")
-    record: dict[str, Any] = {
-        "selection_id": sel_id,
-        "user_id": uid,
-        "image_id": image_id,
-        "created": time.time(),
-        "selection": normalized_sel,
-        "proof": proof,
-    }
-    target = sel_dir / "selection.json"
-    temporary = sel_dir / "selection.tmp"
-    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-        json.dump(record, stream, ensure_ascii=False)
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temporary, target)
-    return record
+    try:
+        for _ in range(8):
+            sel_id = f"sel_{secrets.token_hex(16)}"
+            sel_dir = selections_root / sel_id
+            try:
+                os.mkdir(sel_dir, 0o700)
+                break
+            except FileExistsError:
+                continue
+        else:
+            raise RuntimeError("Unable to allocate unique selection directory")
+
+        save_exact(mask, sel_dir / "mask.png")
+        record: dict[str, Any] = {
+            "selection_id": sel_id,
+            "user_id": uid,
+            "image_id": image_id,
+            "created": time.time(),
+            "selection": normalized_sel,
+            "proof": proof,
+        }
+        target = sel_dir / "selection.json"
+        temporary = sel_dir / "selection.tmp"
+        descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(record, stream, ensure_ascii=False)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+        return record
+    except BaseException:
+        if nonce_lock_path is not None:
+            with contextlib.suppress(OSError):
+                nonce_lock_path.unlink(missing_ok=True)
+        raise
 
 
 # 读取并校验指定用户的已确认选区记录（若提供底图路径则强制核对底图与掩码SHA256凭据）
@@ -1048,7 +1092,23 @@ def load_confirmed_selection(
     return record
 
 
-# 使用HMAC-SHA256对用户编号、图片编号与过期时间生成签名访问令牌
+# 校验图片编号在签名令牌中的格式合法性
+def _validate_token_image_id(image_id: str | None) -> str:
+    cleaned_img = image_id.strip() if isinstance(image_id, str) else ""
+    if (
+        not cleaned_img
+        or len(cleaned_img) > 128
+        or ":" in cleaned_img
+        or "/" in cleaned_img
+        or "\\" in cleaned_img
+        or ".." in cleaned_img
+        or "\x00" in cleaned_img
+    ):
+        raise ValueError("Invalid image ID for signed token")
+    return cleaned_img
+
+
+# 使用HMAC-SHA256对用户编号、图片编号与过期时间生成只读图片预览签名访问令牌（img:前缀，禁止POST写操作）
 def sign_image_token(
     settings: StudioSettings,
     user_id: str,
@@ -1057,16 +1117,7 @@ def sign_image_token(
     expires_at: int | None = None,
 ) -> tuple[str, int]:
     uid = validate_user_id(user_id)
-    cleaned_img = image_id.strip() if isinstance(image_id, str) else ""
-    if (
-        not cleaned_img
-        or len(cleaned_img) > 128
-        or "/" in cleaned_img
-        or "\\" in cleaned_img
-        or ".." in cleaned_img
-        or "\x00" in cleaned_img
-    ):
-        raise ValueError("Invalid image ID for signed token")
+    cleaned_img = _validate_token_image_id(image_id)
     exp = (
         int(expires_at)
         if expires_at is not None
@@ -1081,7 +1132,7 @@ def sign_image_token(
     return f"{payload_b64}.{signature}", exp
 
 
-# 判断令牌载荷是否为图片与选区签名令牌（以img:前缀区分于三维模型令牌）
+# 判断令牌载荷是否为只读图片预览令牌（以img:前缀区分）
 def is_image_token(token: str) -> bool:
     if not isinstance(token, str):
         return False
@@ -1097,7 +1148,7 @@ def is_image_token(token: str) -> bool:
     return decoded.startswith("img:")
 
 
-# 校验HMAC-SHA256图片与选区签名令牌并返回（user_id, image_id, expires_at）
+# 校验HMAC-SHA256只读图片预览令牌并返回（user_id, image_id, expires_at）
 def verify_image_token(
     settings: StudioSettings,
     token: str,
@@ -1133,16 +1184,118 @@ def verify_image_token(
     current_ts = time.time() if now is None else float(now)
     if current_ts >= exp:
         raise ValueError("Image token has expired")
-    if (
-        not raw_image_id
-        or len(raw_image_id) > 128
-        or "/" in raw_image_id
-        or "\\" in raw_image_id
-        or ".." in raw_image_id
-        or "\x00" in raw_image_id
+    cleaned_img = _validate_token_image_id(raw_image_id)
+    return uid, cleaned_img, exp
+
+
+# 使用HMAC-SHA256签发专用、短效、绑定（user_id, image_id, image_sha256, nonce）的选区编辑器令牌（edt:前缀）
+def sign_editor_token(
+    settings: StudioSettings,
+    user_id: str,
+    image_id: str,
+    image_sha256: str,
+    *,
+    expires_at: int | None = None,
+    ttl_seconds: int | None = None,
+    nonce: str | None = None,
+) -> tuple[str, int]:
+    uid = validate_user_id(user_id)
+    cleaned_img = _validate_token_image_id(image_id)
+    cleaned_sha = (
+        image_sha256.strip().lower() if isinstance(image_sha256, str) else ""
+    )
+    if not SHA256_HEX_RE.fullmatch(cleaned_sha):
+        raise ValueError("Invalid base image SHA-256 for editor token")
+    token_nonce = (
+        nonce.strip()
+        if isinstance(nonce, str) and nonce.strip()
+        else secrets.token_urlsafe(16)
+    )
+    if not EDITOR_NONCE_RE.fullmatch(token_nonce):
+        raise ValueError("Invalid editor token nonce")
+    if expires_at is not None:
+        exp = int(expires_at)
+    else:
+        raw_ttl = (
+            int(ttl_seconds)
+            if ttl_seconds is not None
+            else int(settings.file_token_ttl_seconds)
+        )
+        effective_ttl = max(1, min(raw_ttl, EDITOR_TOKEN_MAX_TTL_SECONDS))
+        exp = int(time.time()) + effective_ttl
+    payload_raw = f"edt:{uid}:{exp}:{cleaned_sha}:{token_nonce}:{cleaned_img}".encode()
+    payload_b64 = base64.urlsafe_b64encode(payload_raw).decode("ascii").rstrip("=")
+    key_bytes = bytes.fromhex(settings.file_signing_key)
+    signature = hmac.new(
+        key_bytes, payload_b64.encode("ascii"), hashlib.sha256
+    ).hexdigest()
+    return f"{payload_b64}.{signature}", exp
+
+
+# 判断令牌载荷是否为专用选区编辑器令牌（以edt:前缀区分）
+def is_editor_token(token: str) -> bool:
+    if not isinstance(token, str):
+        return False
+    match = REGION_TOKEN_RE.fullmatch(token)
+    if match is None:
+        return False
+    payload_b64 = match.group(1)
+    padding = "=" * (-len(payload_b64) % 4)
+    try:
+        decoded = base64.urlsafe_b64decode(payload_b64 + padding).decode("utf-8")
+    except (ValueError, UnicodeDecodeError):
+        return False
+    return decoded.startswith("edt:")
+
+
+# 校验HMAC-SHA256选区编辑器令牌并返回绑定声明字典（user_id, image_id, image_sha256, nonce, expires_at）
+def verify_editor_token(
+    settings: StudioSettings,
+    token: str,
+    *,
+    now: float | None = None,
+) -> dict[str, Any]:
+    cleaned_token = token if isinstance(token, str) else ""
+    match = REGION_TOKEN_RE.fullmatch(cleaned_token)
+    if match is None:
+        raise ValueError("Malformed editor token")
+    payload_b64, provided_sig = match.groups()
+    key_bytes = bytes.fromhex(settings.file_signing_key)
+    expected_sig = hmac.new(
+        key_bytes, payload_b64.encode("ascii"), hashlib.sha256
+    ).hexdigest()
+    if not hmac.compare_digest(
+        provided_sig.encode("ascii"), expected_sig.encode("ascii")
     ):
-        raise ValueError("Invalid image ID in token")
-    return uid, raw_image_id, exp
+        raise ValueError("Editor token signature mismatch")
+    padding = "=" * (-len(payload_b64) % 4)
+    try:
+        decoded = base64.urlsafe_b64decode(payload_b64 + padding).decode("utf-8")
+    except Exception as exc:
+        raise ValueError("Invalid editor token payload encoding") from exc
+    parts = decoded.split(":", 5)
+    if len(parts) != 6 or parts[0] != "edt":
+        raise ValueError("Invalid editor token payload structure")
+    _, raw_uid, raw_exp, raw_sha, raw_nonce, raw_image_id = parts
+    uid = validate_user_id(raw_uid)
+    if not raw_exp.isdigit() or len(raw_exp) > 12:
+        raise ValueError("Invalid editor token expiration")
+    exp = int(raw_exp)
+    current_ts = time.time() if now is None else float(now)
+    if current_ts >= exp:
+        raise ValueError("Editor token has expired")
+    if not SHA256_HEX_RE.fullmatch(raw_sha):
+        raise ValueError("Invalid image SHA-256 in editor token")
+    if not EDITOR_NONCE_RE.fullmatch(raw_nonce):
+        raise ValueError("Invalid nonce in editor token")
+    cleaned_img = _validate_token_image_id(raw_image_id)
+    return {
+        "user_id": uid,
+        "image_id": cleaned_img,
+        "image_sha256": raw_sha,
+        "nonce": raw_nonce,
+        "expires_at": exp,
+    }
 
 
 # 生成内联于聊天窗口的局部选区编辑器HTML（支持点选分割、框选、多边形套索、画笔加减选、撤销、清空、适应窗口与缩放）

@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import contextlib
+import hashlib
 import hmac
 import json
 from collections.abc import AsyncIterator
@@ -60,15 +61,19 @@ from .models3d import (
 )
 from .planner import plan_concepts
 from .regions import (
+    EditorTokenReplayError,
     OnnxSamSegmenter,
     build_compare_viewer_html,
     build_selection_editor_html,
+    is_editor_token,
     is_image_token,
     load_confirmed_selection,
     local_context,
     object_placement,
     save_confirmed_selection,
+    sign_editor_token,
     sign_image_token,
+    verify_editor_token,
     verify_image_token,
 )
 from .store import (
@@ -1194,13 +1199,22 @@ def build_mcp_server(
                 resolved = resolve_image(
                     settings, user_id, image_id, kb_index=active_kb
                 )
-                token, exp_ts = sign_image_token(settings, user_id, resolved.id)
-                signed_url = build_signed_file_url(settings, token)
+                base_sha256 = hashlib.sha256(
+                    resolved.path.read_bytes()
+                ).hexdigest()
+                preview_token, _ = sign_image_token(
+                    settings, user_id, resolved.id
+                )
+                preview_url = build_signed_file_url(settings, preview_token)
+                editor_token, exp_ts = sign_editor_token(
+                    settings, user_id, resolved.id, base_sha256
+                )
+                editor_url = build_signed_file_url(settings, editor_token)
                 expires_at = format_utc_timestamp(exp_ts)
                 seg_ready = active_segmenter.ready()
                 editor_html = build_selection_editor_html(
                     image_id=resolved.id,
-                    signed_url=signed_url,
+                    signed_url=editor_url,
                     expires_at=expires_at,
                     width=resolved.width,
                     height=resolved.height,
@@ -1213,9 +1227,9 @@ def build_mcp_server(
                     "size": f"{resolved.width}x{resolved.height}",
                     "segment_ready": seg_ready,
                     "segmentation_mode": (
-                        "onnx_sam2_tiny" if seg_ready else "manual_tools_only"
+                        "sam2_hiera_tiny" if seg_ready else "manual_tools_only"
                     ),
-                    "editor_url": signed_url,
+                    "preview_url": preview_url,
                     "expires_at": expires_at,
                     "message": (
                         "Inline selection editor is ready. Draw or refine the selection in the UI "
@@ -1569,7 +1583,70 @@ def create_app(
             "Not Found", status_code=404, headers=_signed_file_cors_headers()
         )
 
-    # 校验HMAC签名令牌并提供3D模型GLB下载及局部选区图片预览、点选分割与选区确认服务
+    # 局部选区POST请求体最大允许字节数（512KiB）与超限异常类型
+    max_region_post_body_bytes = 512 * 1024
+
+    class _PayloadTooLargeError(Exception):
+        pass
+
+    # 先检查Content-Length再按流分块读取POST请求体，一旦超出512KiB立即中止读取并拒绝
+    async def _read_bounded_body(
+        request: Request, max_bytes: int = max_region_post_body_bytes
+    ) -> bytes:
+        raw_cl = request.headers.get("content-length")
+        if raw_cl is not None:
+            try:
+                parsed_cl = int(raw_cl.strip())
+            except ValueError as exc:
+                raise ValueError("Invalid Content-Length header") from exc
+            if parsed_cl < 0:
+                raise ValueError("Invalid Content-Length header")
+            if parsed_cl > max_bytes:
+                raise _PayloadTooLargeError()
+        chunks: list[bytes] = []
+        total = 0
+        async for chunk in request.stream():
+            total += len(chunk)
+            if total > max_bytes:
+                raise _PayloadTooLargeError()
+            chunks.append(chunk)
+        return b"".join(chunks)
+
+    # 读取经过白名单根目录校验的用户或知识库图片字节与MIME类型
+    def _load_safe_image_bytes(
+        user_id: str, resolved: ResolvedImage
+    ) -> tuple[bytes, str] | None:
+        allowed_roots = (
+            user_librechat_images_dir(active_settings, user_id),
+            user_studio_dir(active_settings, user_id, create=False),
+            Path(active_settings.kb_root),
+        )
+        matched_root: Path | None = None
+        for root in allowed_roots:
+            if not root.exists() or root.is_symlink():
+                continue
+            try:
+                ensure_safe_subpath(resolved.path, root)
+                matched_root = root
+                break
+            except (OSError, ValueError):
+                continue
+        if matched_root is None:
+            return None
+        try:
+            img_bytes = read_bytes_no_follow(resolved.path, matched_root)
+        except (OSError, ValueError):
+            return None
+        suffix = resolved.path.suffix.lower()
+        media_type = {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".webp": "image/webp",
+        }.get(suffix, "application/octet-stream")
+        return img_bytes, media_type
+
+    # 校验HMAC签名令牌并提供3D模型GLB下载、只读图片预览（img:）及选区编辑器交互（edt:）服务
     async def signed_file_endpoint(request: Request) -> Response:
         token = str(request.path_params.get("token") or "")
         if not token or "/" in token or "\\" in token or ".." in token:
@@ -1590,43 +1667,24 @@ def create_app(
                     "Not Found", status_code=404, headers=_signed_file_cors_headers()
                 )
 
-            if request.method in ("GET", "HEAD"):
-                allowed_roots = (
-                    user_librechat_images_dir(active_settings, user_id),
-                    user_studio_dir(active_settings, user_id, create=False),
-                    Path(active_settings.kb_root),
+            if request.method == "POST":
+                return JSONResponse(
+                    {
+                        "error": "Image preview token is read-only and does not permit POST operations"
+                    },
+                    status_code=403,
+                    headers=_signed_file_cors_headers(),
                 )
-                matched_root: Path | None = None
-                for root in allowed_roots:
-                    if not root.exists() or root.is_symlink():
-                        continue
-                    try:
-                        ensure_safe_subpath(resolved.path, root)
-                        matched_root = root
-                        break
-                    except (OSError, ValueError):
-                        continue
-                if matched_root is None:
+
+            if request.method in ("GET", "HEAD"):
+                loaded = _load_safe_image_bytes(user_id, resolved)
+                if loaded is None:
                     return PlainTextResponse(
                         "Not Found",
                         status_code=404,
                         headers=_signed_file_cors_headers(),
                     )
-                try:
-                    img_bytes = read_bytes_no_follow(resolved.path, matched_root)
-                except (OSError, ValueError):
-                    return PlainTextResponse(
-                        "Not Found",
-                        status_code=404,
-                        headers=_signed_file_cors_headers(),
-                    )
-                suffix = resolved.path.suffix.lower()
-                media_type = {
-                    ".png": "image/png",
-                    ".jpg": "image/jpeg",
-                    ".jpeg": "image/jpeg",
-                    ".webp": "image/webp",
-                }.get(suffix, "application/octet-stream")
+                img_bytes, media_type = loaded
                 img_headers = _signed_file_cors_headers(
                     {
                         "Cache-Control": "private, max-age=3600",
@@ -1640,12 +1698,73 @@ def create_app(
                     headers=img_headers,
                 )
 
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
+
+        if is_editor_token(token):
+            try:
+                claims = verify_editor_token(active_settings, token)
+                user_id = str(claims["user_id"])
+                image_id = str(claims["image_id"])
+                expected_sha = str(claims["image_sha256"])
+                editor_nonce = str(claims["nonce"])
+                resolved = resolve_image(
+                    active_settings, user_id, image_id, kb_index=kb_index
+                )
+            except (ValueError, RuntimeError, OSError):
+                return PlainTextResponse(
+                    "Not Found", status_code=404, headers=_signed_file_cors_headers()
+                )
+
+            loaded = _load_safe_image_bytes(user_id, resolved)
+            if loaded is None:
+                return PlainTextResponse(
+                    "Not Found",
+                    status_code=404,
+                    headers=_signed_file_cors_headers(),
+                )
+            img_bytes, media_type = loaded
+            if hashlib.sha256(img_bytes).hexdigest() != expected_sha:
+                return JSONResponse(
+                    {
+                        "error": "Base image content changed since selection editor token was issued"
+                    },
+                    status_code=409,
+                    headers=_signed_file_cors_headers(),
+                )
+
+            if request.method in ("GET", "HEAD"):
+                img_headers = _signed_file_cors_headers(
+                    {
+                        "Cache-Control": "private, no-store",
+                        "Content-Length": str(len(img_bytes)),
+                    }
+                )
+                return Response(
+                    b"" if request.method == "HEAD" else img_bytes,
+                    status_code=200,
+                    media_type=media_type,
+                    headers=img_headers,
+                )
+
             if request.method == "POST":
-                raw_body = await request.body()
-                if len(raw_body) > 512 * 1024:
+                try:
+                    raw_body = await _read_bounded_body(
+                        request, max_region_post_body_bytes
+                    )
+                except _PayloadTooLargeError:
                     return JSONResponse(
                         {"error": "Request body exceeds maximum allowed size"},
                         status_code=413,
+                        headers=_signed_file_cors_headers(),
+                    )
+                except ValueError as exc:
+                    return JSONResponse(
+                        {"error": str(exc)},
+                        status_code=400,
                         headers=_signed_file_cors_headers(),
                     )
                 try:
@@ -1689,6 +1808,8 @@ def create_app(
                             resolved.id,
                             resolved.path,
                             payload.get("selection"),
+                            expected_image_sha256=expected_sha,
+                            editor_nonce=editor_nonce,
                         )
                         return JSONResponse(
                             {
@@ -1697,6 +1818,12 @@ def create_app(
                                 "proof": rec["proof"],
                             },
                             status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except EditorTokenReplayError as exc:
+                        return JSONResponse(
+                            {"error": str(exc)},
+                            status_code=409,
                             headers=_signed_file_cors_headers(),
                         )
                     except (ValueError, RuntimeError, OSError) as exc:
