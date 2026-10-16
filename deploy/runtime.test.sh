@@ -19,7 +19,7 @@ cleanup() {
 trap cleanup EXIT
 
 cp "$source_dir/compose.yml" "$work/compose.yml"
-printf 'LIBRECHAT_IMAGE=unused\nSTUDIO_IMAGE=%s\nSTUDIO_PORT=0\nMEILI_MASTER_KEY=fixture\nRAG_DB_PASSWORD=fixture\n' \
+printf 'LIBRECHAT_IMAGE=unused\nSTUDIO_IMAGE=%s\nMEILI_MASTER_KEY=fixture\nRAG_DB_PASSWORD=fixture\n' \
   "${STUDIO_IMAGE:?Set STUDIO_IMAGE to the built studio image}" > "$work/.env"
 
 shared_token=$(printf 'a%.0s' {1..64})

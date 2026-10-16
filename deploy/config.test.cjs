@@ -272,7 +272,8 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.deepEqual(studio.cap_drop, ['ALL']);
   assert.deepEqual(studio.security_opt, ['no-new-privileges:true']);
   assert.equal(studio.mem_limit, '1g');
-  assert.deepEqual(studio.ports, ['127.0.0.1:${STUDIO_PORT:-8000}:8000']);
+  assert.deepEqual(studio.ports, ['127.0.0.1:8000:8000']);
+  assert.doesNotMatch(rawCompose, /STUDIO_PORT/);
   assert.ok(studio.volumes.includes('./studio.json:/run/secrets/studio.json:ro'));
   assert.ok(studio.volumes.includes('images:/librechat/images:ro'));
   assert.ok(studio.volumes.includes('studio-data:/data'));
@@ -284,11 +285,17 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
 
-test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding', () => {
+test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding and matches compose host port', () => {
   const rawNginx = fs.readFileSync('deploy/nginx.conf', 'utf8');
   assert.match(rawNginx, /location \/studio-files\/\s*\{/);
   assert.match(rawNginx, /proxy_pass http:\/\/127\.0\.0\.1:8000\/files\/;/);
   assert.match(rawNginx, /proxy_set_header Range \$http_range;/);
+
+  // 验证 compose.yml 绑定的宿主机回环地址与 nginx.conf 的反向代理上游地址完全一致且不可被环境变量偏移。
+  const composePortBinding = parsedCompose.services.studio.ports[0];
+  const nginxProxyMatch = rawNginx.match(/proxy_pass http:\/\/(127\.0\.0\.1:\d+)\/files\/;/);
+  assert.ok(nginxProxyMatch, 'nginx.conf must proxy /studio-files/ to 127.0.0.1:<port>/files/');
+  assert.equal(composePortBinding, `${nginxProxyMatch[1]}:8000`);
 });
 
 test('studio Dockerfile copies knowledge/ to /kb while LibreChat app image excludes knowledge/', () => {
