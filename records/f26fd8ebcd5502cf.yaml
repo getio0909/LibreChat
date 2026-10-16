@@ -1,0 +1,73 @@
+id: f26fd8ebcd5502cf
+title_zh: 悬浮式佛教雕像展览场景
+source:
+  original_path: 25年秋季佛事展设计方案/悬浮式佛教雕像展览场景.jpg
+original:
+  path: 25年秋季佛事展设计方案/悬浮式佛教雕像展览场景.jpg
+  sha256: f26fd8ebcd5502cff6b5101f2fd217232794399dab05119f4f5ab5ab0be07f03
+  bytes: 2207907
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f26fd8ebcd5502cf.jpg
+    sha256: a9476892bb90fddfa5dca05c1beefbb684bf2ade99036686998eb7171f358f1f
+    size: 395633
+    bytes: 395633
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f26fd8ebcd5502cf.webp
+    sha256: 7c1c6497c7cffb444f265092d16dbb00a7e2fe15ad9a4c613e4901c00ac2afde
+    size: 22754
+    bytes: 22754
+    width: 288
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-亚克力悬浮千佛灯箱
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 高透亚克力网格
+- 黄琉璃坐佛
+- LED背光
+colors:
+- 琥珀橙黄
+- 纯白漫射光
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 现代极简高透亚克力悬浮千佛发光墙阵列构造与仰视构图参考
+prompt_zh: 极具视觉冲击力的悬浮式佛教千佛展览墙垂直仰视特写，采用完全透明的水晶亚克力方格隔板配合纯白高均匀度漫射背光灯箱，使三列琥珀橙黄色磨砂琉璃坐佛宛如凌空漂浮在纯白净土光芒之中；近景佛像细节极其清晰，螺发肉髻，胸前刻有“卍”字标志，双手结说法印，盘坐于莲花座上，身后配有半透明浅黄色雕花大背光片，向下方无限阵列延伸，右下角可见金镶玉大理石边框与白色汉白玉微缩栏杆，现代禅意装置艺术感，8K创意摄影。
+tags:
+- 悬浮千佛墙
+- 透明亚克力展柜
+- 琉璃坐佛
+- 背光万佛墙
+- 现代佛教装置
+- 仰视阵列构图
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展透明亚克力背光千佛墙柜底大仰角实拍特写，展示琥珀色琉璃坐佛阵列。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

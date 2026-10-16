@@ -1,0 +1,74 @@
+id: c7faf0a960cd5c77
+title_zh: 佛教寺庙内佛像展览场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内佛像展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内佛像展览场景.jpg
+  sha256: c7faf0a960cd5c773a6a50281dbeca958b562a2b2c7f8460a768686d55badaf8
+  bytes: 785669
+  width: 1685
+  height: 1253
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c7faf0a960cd5c77.jpg
+    sha256: e1c1acf8b4130b177e254cfe50ce4460b1dcb797199af7a360ac8f349de1a4e6
+    size: 291641
+    bytes: 291641
+    width: 1685
+    height: 1253
+  thumb512:
+    path: assets/thumb512/c7faf0a960cd5c77.webp
+    sha256: 2f914dc5daabf2f27f10ff1bc78ded4a07a1721564e3264ca97b9fff50382266
+    size: 37576
+    bytes: 37576
+    width: 512
+    height: 381
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉雕花台阶与栏杆
+- 二十四辐金色放射状法轮背光
+- 汉白玉透光祥云拱券
+- 深绿黑镜面奢石
+- 发光万佛墙
+colors:
+- 辉煌金
+- 汉白玉白
+style: 现代奢石与传统佛殿融合风
+ai_design_usage: 现代奢石万佛堂主坛设计、汉白玉台阶栏杆与放射状法轮圆光背板结合参考
+prompt_zh: 现代佛教寺庙万佛堂主坛室内场景，正面中轴对称构图，前景为洁白的汉白玉精雕拾级台阶与祥云望柱栏杆，地面铺设高光深绿黑色镜面奢石大板，正中深色石雕须弥座上供奉铜鎏金释迦牟尼坐佛，佛像背后内圈为二十四道金色放射状法轮圆光浮雕，外圈为多层发光的汉白玉镂空祥云火焰拱券与两根白石立柱，左右两侧整面墙为金碧辉煌的方形发光万佛龛阵列，顶部为金色方格发光藻井吊顶，神圣庄严，8K建筑效果图
+tags:
+- 万佛堂主坛
+- 汉白玉栏杆台阶
+- 放射状法轮背光
+- 祥云拱券佛龛
+- 镜面奢石地面
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1253
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a luxury stone 10,000-Buddha hall looking across a carved white marble balustrade toward a golden seated
+    Buddha framed by a 24-spoke dharma-wheel halo and openwork white marble cloud arch.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

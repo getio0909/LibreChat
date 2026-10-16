@@ -1,0 +1,71 @@
+id: b8131f7294969218
+title_zh: 展厅灯位布局平面图
+source:
+  original_path: 26年春季佛事展设计方案/展厅灯位布局平面图.jpg
+original:
+  path: 26年春季佛事展设计方案/展厅灯位布局平面图.jpg
+  sha256: b8131f72949692184a589a7d225931adb35aac982791ce52a6b30a119c0ea5ba
+  bytes: 2158195
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/b8131f7294969218.jpg
+    sha256: 988ffb8a6d41f7637a8844ccec8f27e644c0127648ac68ed4111f8dbcb824b94
+    size: 259076
+    bytes: 259076
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/b8131f7294969218.webp
+    sha256: 119901218dc7a01f30d852eaa01f4580b031fba0e63918ccd5d4f1f19e24ffd1
+    size: 12756
+    bytes: 12756
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-04天花灯梁与灯具定位图
+entity_type: 工程设计图纸
+summary_zh: ''
+materials:
+- 11盏长臂铲灯
+- 11组三头轨道灯
+- 300mm顶梁
+colors:
+- 白底黑线红标
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 专业石材展厅“洗墙铲灯+重点轨道射灯”配光矩阵与顶梁网格参考
+prompt_zh: 展览工程CAD天花灯位布局施工图，“04灯位图”，展示10000mm×7500mm石材展厅的顶部300mm宽井字形横梁结构与专业照明灯具定位：包含“铲灯”（长臂金卤洗墙灯图例，共11盏，其中9盏沿左侧奢石大墙均匀排列）与“轨道灯”（三头导轨射灯图例，共11组33盏分布于井字横梁与底部佛龛供桌区）两种图例符号，四周带有精确的红色网格间距尺寸标注（纵向三跨各2800mm，横向1950/2000/1950mm，梁宽300mm），白底专业电气照明CAD施工图纸。
+tags:
+- 26年春季佛事展
+- 04灯位图
+- 展厅照明设计
+- 铲灯
+- 轨道灯
+- 天花结构图
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展04灯位图，标注井字形天花过梁网格尺寸及铲灯、轨道灯点位。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

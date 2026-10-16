@@ -1,0 +1,77 @@
+id: 1a303c39e984f758
+title_zh: 佛教佛堂室内石材装修设计
+source:
+  original_path: 佛教空间设计案例/佛教佛堂室内石材装修设计.jpg
+original:
+  path: 佛教空间设计案例/佛教佛堂室内石材装修设计.jpg
+  sha256: 1a303c39e984f7586c9bddf8cf9ecda439627d386d906be91d1dd8001f042298
+  bytes: 3856160
+  width: 3530
+  height: 2645
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1a303c39e984f758.jpg
+    sha256: 095a94e11c697ba359704229a79404b9a0148f8c11c286858405e6a8ce761f45
+    size: 515586
+    bytes: 515586
+    width: 2048
+    height: 1535
+  thumb512:
+    path: assets/thumb512/1a303c39e984f758.webp
+    sha256: 701ab3e3d77339085a999e272fba9c54ec917265139ba9e7c08d5c53597033c3
+    size: 43392
+    bytes: 43392
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 材质
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 翠绿奢石大理石
+- 红木雕花供桌
+- 鎏金铜佛像
+- 心经浮雕木背板
+- 重彩佛教壁画
+colors:
+- 翠绿色
+- 深红木色
+- 辉煌金
+- 纯白色
+- 明黄色
+style: 传统汉传佛堂与现代奢石融合风
+ai_design_usage: 高端佛堂地面奢石铺装效果图、心经背板三世佛供奉空间设计、中式藻井与壁画结合方案
+prompt_zh: 高端中式佛堂室内石材装修设计效果图，地面满铺高光镜面翠绿色奢石大理石大板，倒映清晰，正前方红木佛龛内供奉三尊金身坐佛，背后是海棠形发光金色《般若波罗蜜多心经》浮雕背景墙，两侧刻有“三宝常护念、六时恒吉祥”金色对联，前方并列三张中式雕花供桌与三个黄色圆蒲团，两侧立落地圆宫灯，右侧白墙悬挂巨幅重彩佛教说法图壁画，左侧设红木屏风，顶部红木方格藻井吊顶，富丽庄严，8K建筑渲染
+tags:
+- 翠绿奢石地面
+- 心经背景墙
+- 三世佛堂
+- 三宝常护念
+- 石材装修设计
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2645
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D interior render of a Buddhist shrine hall with a polished green luxury marble floor, golden Heart Sutra calligraphy
+    screen, Three-Ages Buddhas altar, and circular lotus caisson ceiling.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

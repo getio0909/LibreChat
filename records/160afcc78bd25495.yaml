@@ -1,0 +1,77 @@
+id: 160afcc78bd25495
+title_zh: 佛教寺庙主殿佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙主殿佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙主殿佛像展示场景.jpg
+  sha256: 160afcc78bd25495dc32d98f4e2fb14b207b0eb291837515ca0b644c18175828
+  bytes: 874848
+  width: 1797
+  height: 1169
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/160afcc78bd25495.jpg
+    sha256: 59b361e53ca61acb52084c42656ba1683d6c2da11fd241fdbbebdaf0cbc53f7a
+    size: 228686
+    bytes: 228686
+    width: 1797
+    height: 1169
+  thumb512:
+    path: assets/thumb512/160afcc78bd25495.webp
+    sha256: c1887f25bcb85f2d0df8d48b588a9c13ad426c8afc7e54377d8d220ab0e82a57
+    size: 24390
+    bytes: 24390
+    width: 512
+    height: 333
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 深红木雕须弥座
+- 拱形重彩壁画背板
+- 铜鎏金三世佛与二大士
+- 框装经变壁画
+- 高光灰褐大理石
+colors:
+- 深红木色
+- 辉煌金
+- 丹青重彩色
+- 灰褐色
+- 米白色
+style: 传统汉传大雄宝殿与重彩壁画风
+ai_design_usage: 传统寺院大雄宝殿三世佛与文殊普贤全堂供奉设计、重彩壁画背板与木雕须弥座佛坛比选方案参考
+prompt_zh: 传统佛教寺庙大雄宝殿主殿佛像陈设场景，中轴对称广角构图，正面通长深红色木雕束腰须弥座佛坛，中央供奉三尊金身三世佛坐像与两尊弟子立像，三尊主佛背后是三块圆拱形工笔重彩佛国净土壁画背板，两侧配有黑底金字楹联，外侧左右两个发光佛龛分别供奉骑青狮的文殊菩萨与骑白象的普贤菩萨，佛坛前居中设木雕供桌与三个方形蒲团，左右两侧墙面镶嵌巨幅框装重彩佛教经变壁画，高光灰褐大理石地面，8K建筑渲染
+tags:
+- 大雄宝殿
+- 重彩佛教壁画
+- 三世佛与二大士
+- 木雕须弥座
+- 方案比选
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1169
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a Mahavira Hall variant (#154) featuring three arched polychrome Buddhist murals behind the Three-Ages
+    Buddhas and two disciples on a continuous carved red-wood Sumeru altar.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,71 @@
+id: 9639b73dd76f5f08
+title_zh: 佛教石材纹理样本-03
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/佛教石材纹理样本-03.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/佛教石材纹理样本-03.jpg
+  sha256: 9639b73dd76f5f08386bfa7190b167dcb40e11b0422659110523ab379d621e77
+  bytes: 5647244
+  width: 1890
+  height: 3780
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9639b73dd76f5f08.jpg
+    sha256: d52dc712a462f2745cf5a773fc6fead598152dd21dd928dc3994dac4a640e7e7
+    size: 484328
+    bytes: 484328
+    width: 1024
+    height: 2048
+  thumb512:
+    path: assets/thumb512/9639b73dd76f5f08.webp
+    sha256: 32a2f9381b461b05e43a1e2bbe581c853734d35493b76ea021c3d556b6ad4ddf
+    size: 29978
+    bytes: 29978
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梵高皇超清特写
+colors:
+- 朱砂赤红
+- 橄榄灰绿
+- 赤金细线竖向交织
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: 现代艺术佛堂/藏传佛教护法殿/禅意美术馆主题景墙4K贴图 / ComfyUI Style Transfer 梵高油画风石材生成 / 奢石艺术屏风设计
+prompt_zh: 4K超高清天然“梵高皇”奢石竖向正射微距材质贴图，天然矿物结晶呈现出梵高厚涂油画般的狂野短促笔触感，深邃的橄榄灰绿、苍青与墨黑色基底上，纵向燃烧着炽烈的朱砂红与石榴红羽毛状色块，中心贯穿闪亮的赤金色细脉，充满宗教神秘感与艺术张力，无反光PBR贴图。
+tags:
+- 梵高皇奢石
+- 油画笔触石纹
+- 朱砂红橄榄绿撞色
+- 4K正射贴图
+- 藏传唐卡风石材
+- 艺术屏风材质
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1890
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res vertical 1:2 orthographic texture scan of Dunhuang Wall / Van Gogh Imperial (梵高皇/敦煌壁) showing impasto-like
+    red, olive-grey, and gold streaks.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

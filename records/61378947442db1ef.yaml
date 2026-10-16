@@ -1,0 +1,76 @@
+id: 61378947442db1ef
+title_zh: 佛教主题展览空间设计效果图
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计效果图.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计效果图.jpg
+  sha256: 61378947442db1ef6a5e8619c1c2a59c2fdff3bb31d8e7f5bea018ff865fc873
+  bytes: 3517496
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/61378947442db1ef.jpg
+    sha256: e59a19dfafa6471f727e6926d9c6e5bc496a23c865aea44af0cf56bf9bcf6c4a
+    size: 662667
+    bytes: 662667
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/61378947442db1ef.webp
+    sha256: 2587f25472d0fdd5898218b033c75b480d38bd66925d099af3bdc2d43c2967d7
+    size: 42984
+    bytes: 42984
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 8K超清金身财宝天王青玉莲座殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 羊脂青白玉巨型莲花座
+- 24K真金财宝天王与摇钱树
+- 八吉祥鎏金门套
+- 汉白玉浮雕圆盘
+- 深啡网高光大理石
+colors:
+- 璀璨真金
+- 温润青白玉
+- 深啡网褐
+- 暖金灯光
+style: 8K殿堂级奢华金身财宝天王圆殿风
+ai_design_usage: 8K超高清佛教财神殿/财宝天王殿全案设计 / 青白玉巨型莲花座材质贴图参考 / 弧形万佛墙嵌汉白玉圆盘立面节点
+prompt_zh: 8k超高清佛教金身财宝天王祈福大殿室内效果图，广角斜向透视，大殿正中央是一座温润剔透的巨型青白玉仰莲宝座，宝座上供奉金光璀璨的金身财宝天王坐像，怀抱聚宝盆、四周堆满金元宝，背后立有挂满元宝铜钱的金色摇钱树与巨型莲瓣背光，主尊两侧对称开设鎏金八吉祥雕花拱门，环抱式的弧形高墙密布暖金发光万佛小龛并镶嵌圆形汉白玉浮雕圆盘，顶部为圆角叠级金色藻井，深褐色镜面大理石地面带水波纹拼花，极致奢华庄严。
+tags:
+- 8K超清大图
+- 财宝天王殿
+- 青白玉莲花座
+- 摇钱树聚宝盆
+- 弧形万佛墙
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K frontal 3D render of the golden Vaiśravaṇa/Jambhala hall showing the deity seated on a celadon-white
+    jade lotus pedestal before a golden money-tree halo and backlit lotus dome.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

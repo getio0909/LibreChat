@@ -1,0 +1,73 @@
+id: 28f08b509367ab7f
+title_zh: 佛教经藏展示空间
+source:
+  original_path: 佛教空间设计案例/佛教经藏展示空间.jpg
+original:
+  path: 佛教空间设计案例/佛教经藏展示空间.jpg
+  sha256: 28f08b509367ab7f8ae3fb473f93e100641d70754f60a4c12cc2762638573174
+  bytes: 921007
+  width: 2200
+  height: 1246
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/28f08b509367ab7f.jpg
+    sha256: fb4d7f13f1a9b95f618a47d302dddbbe55f5228303b34235a4924c7faef990db
+    size: 239615
+    bytes: 239615
+    width: 2048
+    height: 1160
+  thumb512:
+    path: assets/thumb512/28f08b509367ab7f.webp
+    sha256: ffdd7aefde48fd32eb62d922782489a87eb616ae96f3b72a8826abe615b83c3f
+    size: 20164
+    bytes: 20164
+    width: 512
+    height: 290
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红木立柱与雕花栏杆
+- 八角发光转轮藏经塔
+- 高光米灰大理石
+- 发光圆形藻井
+colors:
+- 暖木金
+- 米灰色
+style: 现代新中式转轮藏展陈风
+ai_design_usage: 寺院转轮藏殿、藏经阁核心展厅、八角旋转经柜与拱门环廊空间设计参考
+prompt_zh: 现代中式佛教藏经阁与转轮藏展示空间室内设计，广角中轴对称构图，正中央矗立一座巨大的八角形红木雕花发光转轮藏经塔，塔身嵌入暖光透光格扇与鎏金小佛像壁龛，外围环绕传统中式雕花木栏杆，顶部为圆形发光藻井与金色盘龙浮雕，左右两侧为圆拱形门洞与发光藏经书架壁龛，地面铺设高光浅米灰色大理石并形成清晰倒影，庄严神圣，8K建筑渲染效果图
+tags:
+- 转轮藏
+- 藏经阁
+- 佛教经藏展示
+- 八角经塔
+- 现代佛教展厅
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1246
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 新中式佛堂全景渲染图。元数据描述存在多处幻觉：画面中并无“圆形盘龙藻井”（实为方形几何藻井与后室星空蓝顶），无“八角形多层发光红木雕花转轮藏经塔”（实为云头拱门内设八角形发光千佛壁龛室），地面为深灰黑色高光石材而非“高光米灰大理石”。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - summary_zh与materials存在幻觉（误称圆形盘龙藻井、转轮藏经塔及米灰大理石，实际为方形藻井、云头拱门内八角千佛龛室及深灰黑石材地面）

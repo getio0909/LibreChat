@@ -1,0 +1,78 @@
+id: 928e19f0f7ee006f
+title_zh: 佛教主题展览空间设计-02
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-02.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-02.jpg
+  sha256: 928e19f0f7ee006f73e5ffb495f9d568484f7bee26eb9fc35d98a90cfa3322f4
+  bytes: 1878393
+  width: 3406
+  height: 2568
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/928e19f0f7ee006f.jpg
+    sha256: 6f85fa348b1c698081e530a362044d2c6a32c1eaf99bab951d4bff6350765eb2
+    size: 213101
+    bytes: 213101
+    width: 2048
+    height: 1544
+  thumb512:
+    path: assets/thumb512/928e19f0f7ee006f.webp
+    sha256: e96c6a57d1c63ff3a41b689516edb766703fe93bd4f83eb6ff52db9e05d4c7ca
+    size: 15256
+    bytes: 15256
+    width: 512
+    height: 386
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 幽蓝冷光金刚护法万佛长廊
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 青黑石雕彩绘护法像
+- 深胡桃木壁龛
+- 460nm宝蓝背光灯膜
+- 青石浮雕护墙板
+- 深灰玄武岩
+colors:
+- 宝石幽蓝
+- 深炭灰
+- 暖白射灯光
+- 古铜彩绘色
+style: 东方琉璃世界幽蓝秘境展厅风
+ai_design_usage: 药师琉璃光冷调佛教展厅设计 / 护法天王雕塑长廊灯光洗墙参考 / 蓝金冷暖对比宗教空间氛围生成
+prompt_zh: 神秘庄严的佛教主题展览长廊室内设计，东方琉璃世界幽蓝色调，左侧深色木石大壁龛内依次陈列威猛的四大天王与金刚护法石雕立像，顶部暖光射灯照亮造像，下方是深色浮雕护墙板，走廊尽头与右侧高墙密布发着深邃宝蓝色光芒的万佛小拱龛阵列，深灰色哑光石板地面，天花暖光灯槽与冷蓝佛龛形成冷暖对比，8k超写实效果图。
+tags:
+- 幽蓝琉璃光
+- 护法天王廊
+- 冷暖光对比
+- 万佛壁龛
+- 暗调宗教空间
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2568
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 3K 3D interior rendering of a deep blue-lit corridor with stone-carved polychrome Four Heavenly Kings guardian statues
+    in left wall niches, carved stone dado panels, and blue-lit small niches on right and rear walls. Semi-transparent lotus
+    watermark in bottom-left corner.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark

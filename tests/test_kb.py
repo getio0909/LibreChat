@@ -11,6 +11,7 @@ import pytest
 import yaml
 from PIL import Image
 
+from tools.build import build_index_jsonl, build_markdown_views, load_all_records
 from tools.ingest import (
     GEMINI_RESPONSE_SCHEMA,
     create_draft_record,
@@ -211,3 +212,34 @@ def test_validator_catches_failure_cases(tmp_path: Path) -> None:
     assert "OpenAI/API secret key" in joined
     assert "sha256 mismatch" in joined
     assert "Orphan derivative file" in joined
+
+
+# 测试真实仓库的368条记录完整性以及索引与分类视图生成无重复和无绝对路径
+def test_build_views_and_live_repository(tmp_path: Path) -> None:
+    errors = validate_repository(REPO_ROOT, check_images=False)
+    assert errors == []
+
+    records = load_all_records(REPO_ROOT)
+    assert len(records) == 368
+
+    dist_out = tmp_path / "dist"
+    idx_path = build_index_jsonl(REPO_ROOT, records, dist_out)
+    idx_lines = idx_path.read_text(encoding="utf-8").strip().splitlines()
+    assert len(idx_lines) == 368
+
+    views = build_markdown_views(records, dist_out)
+    assert len(views) == 9
+
+    seen_in_views: list[str] = []
+    for v_path in views:
+        txt = v_path.read_text(encoding="utf-8")
+        assert "file://" not in txt
+        assert "/home/" not in txt
+        for line in txt.splitlines():
+            if line.startswith("## "):
+                aid = line.split(" — ")[0].replace("## ", "").strip()
+                seen_in_views.append(aid)
+
+    assert len(seen_in_views) == 368
+    assert len(set(seen_in_views)) == 368
+

@@ -1,0 +1,78 @@
+id: fb315c3752f1db15
+title_zh: 佛教室内禅修空间设计
+source:
+  original_path: 佛堂空间设计参考/佛教室内禅修空间设计.jpg
+original:
+  path: 佛堂空间设计参考/佛教室内禅修空间设计.jpg
+  sha256: fb315c3752f1db152c8db9086d2d9e27893c50523356618c14ea046e374b5177
+  bytes: 1202703
+  width: 1600
+  height: 1146
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fb315c3752f1db15.jpg
+    sha256: be16fe732a6cbb4956c18f5ee1c35993dddeddcaa6f5703951242151d134fe63
+    size: 336244
+    bytes: 336244
+    width: 1600
+    height: 1146
+  thumb512:
+    path: assets/thumb512/fb315c3752f1db15.webp
+    sha256: 14e26a20e8da3df3f213dcb5724466496fbb47ee0566d0dde7d25ba1664dd0c3
+    size: 15056
+    bytes: 15056
+    width: 512
+    height: 367
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 微水泥艺术肌理漆
+- 原木雕花佛龛
+- 汉白玉坐佛
+- 浅胡桃木地板
+- 线性LED灯带
+colors:
+- 暖米白
+- 原木黄
+- 羊脂白
+- 浅驼灰
+style: 现代禅意
+ai_design_usage: 现代极简侘寂风家宅佛堂设计、莲花尖拱形叠级发光背景墙造型、八角形折板发光吊顶设计参考
+prompt_zh: 现代极简侘寂风室内佛堂与冥想禅修空间设计，顶部为八角形五层阶梯式内收折板吊顶，每一层阶梯均暗藏暖白线性LED灯带，汇聚至中心明亮的八角形天窗，墙面为暖米白色微水泥艺术肌理漆，正中背景墙设计三层叠级莲花尖拱形内凹发光壁龛，龛内并排摆放两座原木雕花佛龛并供奉两尊白玉坐佛，前方置原木供桌与灰色圆蒲团，两侧对称摆放高脚木花架与迎客松盆景，左侧百叶窗透入绿树光影，纯净空灵，8K室内效果图
+tags:
+- 现代极简佛堂
+- 侘寂风禅修室
+- 莲花拱形壁龛
+- 八角天窗吊顶
+- 线性灯带设计
+- 双佛龛布局
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1146
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代极简八角天窗与莲花拱形发光壁龛禅修佛堂3D效果图，中下部遍布'知末'平台水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

@@ -1,0 +1,76 @@
+id: d2687237473d263a
+title_zh: 现代佛教石材大佛展示场景
+source:
+  original_path: 佛堂空间设计参考/现代佛教石材大佛展示场景.jpg
+original:
+  path: 佛堂空间设计参考/现代佛教石材大佛展示场景.jpg
+  sha256: d2687237473d263a27940fd950a13f8984809cc9d4fc417a8d79c42a211fbe01
+  bytes: 118338
+  width: 720
+  height: 823
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d2687237473d263a.jpg
+    sha256: c4772ed65d0f3ce2b6b2872d70c20e9c2c1f7e8786f06712f7acb5f46175c997
+    size: 126245
+    bytes: 126245
+    width: 720
+    height: 823
+  thumb512:
+    path: assets/thumb512/d2687237473d263a.webp
+    sha256: d65fa70bcb926bb88744dcded999363bd116299a4b2d3116a2d00f8866422c98
+    size: 36126
+    bytes: 36126
+    width: 448
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 放射状折板清水混凝土
+- 灰白花岗岩巨型大佛
+- 深灰安山岩地面与供案
+- 深红鲜花
+colors:
+- 混凝土冷灰
+- 苍穹天蓝
+- 深酒红
+- 青灰白
+style: 现代禅意
+ai_design_usage: 地标级现代佛殿/纪念堂穹顶天窗设计、放射状折板混凝土结构构图、人物背影衬托巨型石雕佛像尺度感(Scale Reference)
+prompt_zh: 安藤忠雄头大佛殿内部超广角低角度仰拍场景，四周高耸向内收分的锥形穹顶由数十道放射状折板清水混凝土条形肋板构成，顶部围合出一个锯齿状圆形露天洞口，露出纯净的湛蓝天空，一尊宏伟的灰白色花岗岩石雕大佛端坐于巨型石莲座上，湛蓝天空圆洞恰好成为大佛头部的神圣圆光，莲座前方石质供案两侧对称摆放两盆深红色鲜花，前景正中央一名身穿酒红色长裙头戴红帽的女子背对镜头走向大佛，冷灰混凝土与一抹惊艳深红对比，震撼人心的宗教建筑摄影，8K
+tags:
+- 头大佛殿
+- 苍穹圆光
+- 放射状混凝土穹顶
+- 巨型石雕大佛
+- 朝圣者背影
+- 极简宗教地标
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 720
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 安藤忠雄头大佛殿放射状清水混凝土穹顶圆光与石雕大佛超广角仰拍实景，短边分辨率偏低（720×823）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

@@ -1,0 +1,77 @@
+id: 0da42f89615c5dc7
+title_zh: 佛教风格装饰宝座
+source:
+  original_path: 佛教家具与陈设素材/佛教风格装饰宝座.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格装饰宝座.jpg
+  sha256: 0da42f89615c5dc714e1024ea5331fc3be77f3544a61c4872e08513261b9447a
+  bytes: 331931
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0da42f89615c5dc7.jpg
+    sha256: 98ab27bedb58f3dac2feaca00027fe1fc5fde47be68f066a3e3ae0601e7246bd
+    size: 358642
+    bytes: 358642
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/0da42f89615c5dc7.webp
+    sha256: 61d2b80b51f9848e058385dc98fb30fc88ee0d14588923e689ad7bb3dcbae648
+    size: 37518
+    bytes: 37518
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 法座宝座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 墨绿蛇纹玉石
+- 胡桃木
+- 黄铜法轮
+- 彩宝
+colors:
+- 墨绿配胡桃木色
+style: 藏汉融合须弥宝座风
+ai_design_usage: 高僧说法王座/法轮宝座建模参考 / 墨绿蛇纹大理石与古铜法轮结合设计 / 宗教权威座椅单品生成
+prompt_zh: 正面全身展品摄影，一座庄严霸气的佛教八辐法轮主题墨绿大理石与黑胡桃木扶手大宝座，靠背与坐面采用抛光深墨绿色白脉蛇纹大理石，靠背中心与顶部镶嵌精雕古铜鎏金八辐法轮，拱形背光与须弥座莲瓣密嵌红玛瑙、绿松石、黄蜜蜡彩宝，双扶手饰鎏金圆花，束腰雕刻双力士与十字金刚杵，下设双层墨绿石材阶梯底座，极简美术馆灯光背景，8K超清。
+tags:
+- 八辐法轮宝座
+- 墨绿蛇纹大理石
+- 黑胡桃木扶手椅
+- 彩宝满嵌
+- 转法轮王座
+- 石材木作复合座椅
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a dark green serpentine stone and walnut armchair dharma
+    wheel throne in a minimalist room. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

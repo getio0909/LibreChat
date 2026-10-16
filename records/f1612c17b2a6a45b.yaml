@@ -1,0 +1,73 @@
+id: f1612c17b2a6a45b
+title_zh: 国际木作参考｜斜面雕刻松木面板
+source:
+  original_path: 设计风格精选20260930/wood-carved-panel.jpg
+original:
+  path: 设计风格精选20260930/wood-carved-panel.jpg
+  sha256: f1612c17b2a6a45b1ab7b29c05e8c4510894a73c3b4d7aa531263a23fa5990e7
+  bytes: 12343564
+  width: 2672
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f1612c17b2a6a45b.jpg
+    sha256: 5ed0deab5acb1fb0f4fb5cd6c07380fd3a58cdc5128294739663dc85e2a4d965
+    size: 785500
+    bytes: 785500
+    width: 1368
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f1612c17b2a6a45b.webp
+    sha256: ec268a6687dc155dcf3a63f14e8c8b7d0e3824246b1479be1b49c418041c600b
+    size: 20124
+    bytes: 20124
+    width: 342
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 古典伊斯兰斜削式抽象木雕花板
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 千年风化古硬木
+- 柚木/雪松木斜削浮雕
+- 亚麻背景布
+colors:
+- 暖黄褐色
+- 古木棕色
+- 浅米色
+style: 跨文化古典伊斯兰风 / 萨马拉斜削木雕
+ai_design_usage: 石材/木作3D曲面CNC浮雕纹样研发 / 现代侘寂佛堂门扇或护墙板母题提取 / 抽象如意云纹转化设计
+prompt_zh: 博物馆收藏的9世纪萨马拉斜削风格（Beveled Style）古老木雕装饰板正视特写，固定在暖米色亚麻布背景上；竖向长方形木板内雕刻中轴对称的抽象流线型卷草与水滴宝瓶纹样，上下两端为饱满圆润的双涡卷如意头并嵌有圆珠，采用平滑过渡的斜面立体刀法，古老棕黄色硬木表面布满真实的纵向木纹管孔与岁月风化裂痕，柔和棚拍光影。
+tags:
+- 斜削式木雕板
+- 抽象卷草浮雕
+- 萨马拉风格木雕
+- 侘寂古木肌理
+- CNC曲面雕刻参考
+material_ids: []
+provenance:
+  source: museum
+  url: https://www.metmuseum.org/art/collection/search/452060
+  credit: The Metropolitan Museum of Art, 69.189
+  license: cc0
+  license_status: confirmed
+quality:
+  min_side_px: 2672
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Museum photograph of an Abbasid Samarra beveled-style carved wooden panel with abstract scrolling motifs on a linen
+    backing.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

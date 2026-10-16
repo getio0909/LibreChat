@@ -1,0 +1,80 @@
+id: 680b0adb90270bb5
+title_zh: 佛教主题室内展览空间设计
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间设计.jpg
+  sha256: 680b0adb90270bb548d6bb1bafb39ad7e8a7bffb08b9aef67fe3174dbf9a1101
+  bytes: 1956716
+  width: 2914
+  height: 1626
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/680b0adb90270bb5.jpg
+    sha256: 732ea1f853efcb4553a2cb53d0df744fed932d7df485c4d2def865d5bec16aa1
+    size: 328257
+    bytes: 328257
+    width: 2048
+    height: 1143
+  thumb512:
+    path: assets/thumb512/680b0adb90270bb5.webp
+    sha256: 3a0556cdc8d1c468bc337d44b71df64a1299d2150d6906a22d0088e0d0188836
+    size: 28224
+    bytes: 28224
+    width: 512
+    height: 286
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统藻井星空顶礼佛大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 深色胡桃木
+- 暖黄软膜背光
+- 透光亚克力经文
+- 铜铸坐佛
+- 水磨石地面
+colors:
+- 暖琥珀金
+- 深胡桃木褐
+- 米灰
+- 暗金
+style: 现代极简数字光影禅堂风
+ai_design_usage: 绿色奢石地面空间应用参考 / 古建垂莲柱藻井与星空顶融合设计 / 佛教壁画灯箱长廊构图
+prompt_zh: 新中式佛教大殿与壁画展厅室内设计，地面满铺高光镜面墨绿色纹理奢石大理石，顶部为传统深木色井字梁架配金色垂莲柱，格栅内嵌璀璨蓝色星空顶，正面木墙镶嵌八幅发光的工笔重彩护法神像壁画，右侧设有实木雕花供桌与黄色拜垫，光影倒影清晰，恢弘庄严，8k建筑渲染。
+tags:
+- 绿色奢石地面
+- 垂莲柱藻井
+- 星空顶大殿
+- 护法壁画灯箱
+- 石木结合
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1626
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: High-res 3D interior rendering (wide view of 8f647ace1d167f30) showing dark walnut starry-sky coffered ceiling with
+    hanging lotus pendants, glowing guardian deity murals, and green luxury marble floor. Semi-transparent lotus watermark
+    in bottom-right. Metadata materials/style fields are misaligned (claiming 透光亚克力经文/水磨石地面).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - 'hallucination: materials/colors/style fields claim 透光亚克力经文 and 水磨石地面 instead of green luxury marble floor and guardian
+    murals'

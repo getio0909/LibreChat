@@ -1,0 +1,71 @@
+id: 7baa28b9f6df4827
+title_zh: 大型石材加工车间内部场景
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/大型石材加工车间内部场景.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/大型石材加工车间内部场景.jpg
+  sha256: 7baa28b9f6df4827d436bb9d57097093970557a2f11941f56d7e4241919d417b
+  bytes: 4461561
+  width: 4160
+  height: 3120
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7baa28b9f6df4827.jpg
+    sha256: 0e24dccc9830d0fd772c6aa2fe6179f92a72d38874c97f256f892617c5d63c3b
+    size: 590955
+    bytes: 590955
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/7baa28b9f6df4827.webp
+    sha256: 5670eb818ca13f884a937063dfe6c177d5ba4c2e8976c88500ece115e9039909
+    size: 30762
+    bytes: 30762
+    width: 512
+    height: 384
+library_type: 矿山车间
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 矿山与车间场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 抛光大理石规格板
+- 天车车间
+colors:
+- 暖金琥珀色与灰绿云纹
+style: 现代工业车间与奢石排版
+ai_design_usage: 石材车间纪实场景生成参考 / 暖金色系殿堂地面大面积铺贴光影参考 / 品牌宣传册源头工厂场景配图
+prompt_zh: 大型石材精加工车间内部全景，单点透视构图，地面纵深铺满数百平米暖香槟金与橘粉云纹交织的梦幻庄园抛光大理石板，板面如镜面般倒映厂房顶部条形采光带，上方横跨橙红色5t重型行车大梁，中景有工人正在进行石材排版检验，左侧摆放同色系大理石大板架，真实工业摄影，细节丰富。
+tags:
+- 石材加工车间
+- 梦幻庄园
+- 金镶玉
+- 工程排版检验
+- 暖金色大理石
+- 源头工厂场景
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3120
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K interior view of a stone processing workshop with a 5t overhead crane and workers inspecting dry-laid Gold-Jade
+    floor tiles.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,77 @@
+id: cfa5560c74124d1b
+title_zh: 佛教风格实木家具套装
+source:
+  original_path: 佛教家具与陈设素材/佛教风格实木家具套装.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格实木家具套装.jpg
+  sha256: cfa5560c74124d1bb3c038cd12456ea546bc16ff23c03e5d901e2a322e8e117d
+  bytes: 318722
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/cfa5560c74124d1b.jpg
+    sha256: 77eaebaaaea738303f256cb093af2c97d9fca6ef42c21537d46370ac5537fc35
+    size: 337571
+    bytes: 337571
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/cfa5560c74124d1b.webp
+    sha256: 8734befb10fc2c967ae7e0330d08a5c5addb9e52534c0c06b55329b11e6000f6
+    size: 32688
+    bytes: 32688
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 黄花梨木
+- 金丝楠木
+- 黄白玉石
+- 描金
+colors:
+- 暖金黄配米白
+style: 汉藏融合宫廷嵌石风
+ai_design_usage: 金丝楠/黄花梨暖色系佛教家具渲染 / 透光黄白玉石茶几搭配参考 / 展厅亮色调中式家具植入
+prompt_zh: 纯白背景产品图，一套富丽堂皇的琥珀金黄色黄花梨与金丝楠木佛教雕花沙发茶几套装，木框雕刻描金莲花与八吉祥团花，铺设天青色中式织锦坐垫与米金抱枕，中央方形茶几台面镶嵌温润的松香黄白玉石大板并围绕红黄宝石金边，沙发两侧角几对称摆放圆形金色莲花木雕座屏，极致光影质感，8K高清。
+tags:
+- 黄花梨家具
+- 金丝楠木色
+- 黄白玉石茶几
+- 描金莲花座屏
+- 天青织锦坐垫
+- 佛教会客家具
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a warm golden huanghuali/nanmu sofa and white-yellow jade
+    coffee table set on white background. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

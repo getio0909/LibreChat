@@ -1,0 +1,73 @@
+id: e86d11bda1184f22
+title_zh: 佛教寺庙大殿内部展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部展示场景.jpg
+  sha256: e86d11bda1184f22207bd54baa5ba86c44275735e43537603c38e548349ace0a
+  bytes: 1077320
+  width: 1983
+  height: 1366
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e86d11bda1184f22.jpg
+    sha256: 32b6b010eea2590b2c624e062950b1321e242663c844ad2def85cb1ddd51d785
+    size: 299382
+    bytes: 299382
+    width: 1983
+    height: 1366
+  thumb512:
+    path: assets/thumb512/e86d11bda1184f22.webp
+    sha256: baa280c00ac959cb46895f5015548046a02b4f52573fb30704b6a813498a9600
+    size: 29984
+    bytes: 29984
+    width: 512
+    height: 353
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 五开间重檐红木透雕天宫佛龛近景
+- 鎏金荷花浮雕护栏
+- 五供桌陈设
+- 鎏金莲瓣柱箍配青石莲花柱础木柱
+- 发光千佛墙
+colors:
+- 深红木色
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 五开间重檐木雕大佛龛左前近景仰视构图、传统大型木作佛龛飞檐斗拱与毗卢帽龛楣细部雕刻参考
+prompt_zh: 传统佛教寺庙大殿内部五开间重檐木雕大佛龛左前斜视近景，深红棕色高光实木地板，画面左侧至中央为高耸宏伟的五开间重檐红木透雕天宫楼阁式大佛龛，飞檐斗拱层层挑出，饰有精湛的贴金双龙戏珠额枋、毗卢帽花罩与镶嵌鎏金荷花浮雕的木雕护栏，龛前并列摆放五张红木雕花供桌与五对米色方形拜垫，画面右侧矗立两根粗壮的红木大圆柱（柱脚包镶鎏金仰覆莲瓣束腰铜箍并立于青石双层莲花柱础之上），远端右侧墙面内嵌暗红色发光千佛墙，顶部为传统方格木藻井，8K建筑渲染
+tags:
+- 重檐木雕佛龛
+- 毗卢帽花罩
+- 鎏金荷花护栏
+- 青石莲花柱础
+- 大殿左前斜视
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1366
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 五开间重檐红木透雕天宫楼阁佛龛大殿左前近景仰视三维效果图，清晰展现木雕帐龛与青石莲花柱础。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

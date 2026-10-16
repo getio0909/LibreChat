@@ -1,0 +1,75 @@
+id: 4c8811a4aa3b9320
+title_zh: 老挝香通寺｜金色门扇与木柱
+source:
+  original_path: 设计风格精选20260930/laos-door.jpg
+original:
+  path: 设计风格精选20260930/laos-door.jpg
+  sha256: 4c8811a4aa3b9320be4113b92c64432ac74ad9c438399a989813d679d828d85b
+  bytes: 2676399
+  width: 2016
+  height: 2560
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4c8811a4aa3b9320.jpg
+    sha256: fda4ad03fa58a7aac1a0d6f96f74e7578b67d5c55dc736c4fcdd40f5e6c401da
+    size: 861358
+    bytes: 861358
+    width: 1613
+    height: 2048
+  thumb512:
+    path: assets/thumb512/4c8811a4aa3b9320.webp
+    sha256: 152cd01123b491798366f92ed29163fe7b492a986d32816584da7b0e103f2e5d
+    size: 57286
+    bytes: 57286
+    width: 403
+    height: 512
+library_type: 建筑景观
+studio_roles:
+- 风格
+- 纹样
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 东南亚南传佛教寺庙门廊场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 高浮雕贴金柚木门
+- 黑漆描金方柱
+- 水磨石地面
+- 传统红木屋架
+colors:
+- 赤金色
+- 大漆黑
+- 朱红色
+- 暖灰白
+style: 东南亚泰式老挝风 / 兰沧佛教建筑
+ai_design_usage: 东南亚风格寺院/会所门廊空间参考 / 金漆木雕门扇构件设计 / 框景透视构图参考 / 黑金纹样立柱装饰迁移
+prompt_zh: 老挝琅勃拉邦传统佛教寺庙大殿门廊室内外过渡场景，从幽暗的大殿内部向外拍摄敞开的双扇金色高浮雕木门，木门上精雕头戴尖冠的东南亚护法天神与卷草瑞兽纹，门框与门外高大的方形廊柱均涂刷黑漆并绘有密集的金色菱形几何与佛塔模板画纹样，上方可见传统红木屋架，阳光照亮门外光滑的灰白色石地面，强烈的明暗光影对比，纪实建筑摄影。
+tags:
+- 老挝寺庙场景
+- 金漆木雕大门
+- 黑底描金廊柱
+- 南传佛教建筑
+- 框景空间构图
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:Luang_Prabang-Wat_Xieng_Thong-28-Sim-Tuer-gje.jpg
+  credit: Gerd Eichmann
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 2016
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Photograph of open gilded relief-carved wooden doors and black-and-gold stenciled porch columns at a traditional
+    Lao Buddhist temple.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

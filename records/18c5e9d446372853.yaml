@@ -1,0 +1,73 @@
+id: 18c5e9d446372853
+title_zh: 佛教寺庙大殿佛像展览场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿佛像展览场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿佛像展览场景.jpg
+  sha256: 18c5e9d4463728531cfa8aa6a3fe9be9beccef2ec48e4425ea5d979f2abe615f
+  bytes: 2819796
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/18c5e9d446372853.jpg
+    sha256: 500aff05cc0ccce3a7db62b6b329988b203e349ad534717c578c2adb54a85325
+    size: 492913
+    bytes: 492913
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/18c5e9d446372853.webp
+    sha256: 27c6df2fdfddb30f343a50d722dbfe1915309abd91287f915a8242dc3ba347b7
+    size: 29290
+    bytes: 29290
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 跨两层巨型古铜鎏金大佛与胁侍菩萨
+- 彩绘石雕莲花须弥座
+- 二层挑空巨幅壁画廊
+- 底层对称千佛室
+- 露明木椽坡屋顶
+colors:
+- 古铜金
+- 深木棕
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 大型双层挑空大佛殿建筑剖面透视全景设计、跨层巨佛与一二层复合交通动线及巨幅壁画尺度关系参考
+prompt_zh: 大型佛教寺庙双层挑空大殿建筑剖面透视全景图，黑色背景衬托室内立体结构，正中央多层青绿彩绘石雕莲花须弥座上供奉一尊跨两层通高的巨型古铜鎏金释迦牟尼佛坐像（带镂空火焰大背光），两侧分立胁侍菩萨立像，一层深灰黑色镜面石材地面，底层左右两侧剖面可见室内楼梯与白色发光千佛龛小室，二层为挑空木结构回廊与木雕栏杆，二层两侧高墙悬挂巨幅中国传统青绿重彩佛教经变图壁画，顶部为挑高坡屋顶密集露明木椽与斗拱结构，宏伟史诗感，8K超高清建筑渲染
+tags:
+- 剖面透视全景
+- 双层挑空大佛殿
+- 跨层巨型佛像
+- 彩绘石雕须弥座
+- 敦煌经变壁画
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大型双层挑空大佛殿建筑横剖面透视超清三维效果图，展现跨层巨佛、底层千佛室与二层巨幅壁画廊。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

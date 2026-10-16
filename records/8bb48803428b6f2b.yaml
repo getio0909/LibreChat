@@ -1,0 +1,72 @@
+id: 8bb48803428b6f2b
+title_zh: 展厅内黄色石材样品展示
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/展厅内黄色石材样品展示.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/展厅内黄色石材样品展示.jpg
+  sha256: 8bb48803428b6f2b2c9877929b9b6271f4ae3ecb45c0c8d64846745b0fcab2ca
+  bytes: 371458
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8bb48803428b6f2b.jpg
+    sha256: e8caa583362187f470260828f8f676e396e13cdf3f879e4c8380f6fa7e2a4a07
+    size: 389181
+    bytes: 389181
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/8bb48803428b6f2b.webp
+    sha256: 77c9322eca7e68c2ada55232599e56d174b3c122de65ae736b85ed60f941ab69
+    size: 38876
+    bytes: 38876
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梵高皇
+colors:
+- 暖琥珀金
+- 右上朱砂红脉网
+- 左下蓝灰角砾
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: 品牌展厅立体大板展陈构图参考 / 佛事展展位奢石选材区设计参考 / 金红蓝三色复合奢石材质样本
+prompt_zh: 阿利坦石材（ALITAN STONE B7区）旗舰展厅实景，微侧角展示一整扎带白色包边的“梵高皇/敦煌壁”天然奢石大板，首片板面以明黄琥珀金为主调，右半部绽放鲜艳的朱砂红珊瑚网脉，左下角嵌入深邃的烟灰蓝角砾色块，架设在黑色重型钢架上，背景可见“阿利坦石材”导视牌与红色品牌立柱，高清商业摄影。
+tags:
+- 阿利坦石材B7区
+- 梵高皇展板
+- 敦煌壁展板
+- 金红蓝三色奢石
+- 整扎精装大板
+- ALITAN_STONE
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Slightly angled showroom view of a white-framed Dunhuang Wall / Van Gogh Imperial slab bundle in the Alitan Stone
+    B7 showroom.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

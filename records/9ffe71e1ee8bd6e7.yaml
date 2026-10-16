@@ -1,0 +1,76 @@
+id: 9ffe71e1ee8bd6e7
+title_zh: 佛教石材供桌雕刻
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材供桌雕刻.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材供桌雕刻.jpg
+  sha256: 9ffe71e1ee8bd6e785be22bec15dd691b2f7d2ca848ace62d731d96b55874967
+  bytes: 6368679
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9ffe71e1ee8bd6e7.jpg
+    sha256: 000ad53ce285cd6946181d0a25d1babf139ac8397993a2abc61a55b42023e1bd
+    size: 1240373
+    bytes: 1240373
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/9ffe71e1ee8bd6e7.webp
+    sha256: 2eb0bf84bd8678dbaa718bd27579f3296daed4361a2eadf2d6e96ca2c20b0eaa
+    size: 70234
+    bytes: 70234
+    width: 512
+    height: 384
+library_type: 法器供器
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-敦煌金五层高浮雕须弥座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然玉石敦煌金
+- 禅境灰蓝地面
+colors:
+- 蜜蜡黄
+- 琥珀金
+- 烟灰蓝
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 五层传统规制玉石高浮雕须弥座供桌（佛台）全身建模与纹理参考
+prompt_zh: 博物馆级佛教石雕艺术品全身特写，一座采用“敦煌金”天然黄玉石整料精雕的大型传统五层须弥座供桌（佛台），45度斜向全身视角，顶部檐口浮雕如意卷草纹，上层为肥厚饱满的立体仰莲花瓣，中间束腰部分在回纹边框内高浮雕宝瓶、盛开的牡丹花与缠枝莲纹，下层为立体覆莲花瓣，底部基座雕刻中式几何回纹，天然黄玉石质地如蜜蜡琥珀般温润通透并带有天然红棕色矿物脉络，摆放在高光灰蓝色金纹大理石地面上，右侧有一张明黄色莲花锦缎坐垫的实木拜凳，8K超高清写实摄影。
+tags:
+- 26年春季佛事展
+- 敦煌金须弥座
+- 石雕供桌
+- 佛台雕刻
+- 五层须弥座
+- 宝瓶牡丹浮雕
+- 天然玉石家具
+material_ids:
+- dunhuang-gold
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展敦煌金五层高浮雕须弥座大供桌45度斜向全身实景，地面铺设禅境灰蓝大理石。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh串入CAD图纸中的''总长 3310mm''尺寸数据，本图实景无尺寸标注'

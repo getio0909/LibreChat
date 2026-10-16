@@ -1,0 +1,79 @@
+id: 749cc3b797a3ea13
+title_zh: 传统佛教建筑红木大门
+source:
+  original_path: 佛堂空间设计参考/传统佛教建筑红木大门.jpg
+original:
+  path: 佛堂空间设计参考/传统佛教建筑红木大门.jpg
+  sha256: 749cc3b797a3ea1335320b9e10e51e387f90dae5e056dac1335ad639d3c70961
+  bytes: 261375
+  width: 541
+  height: 800
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/749cc3b797a3ea13.jpg
+    sha256: d464d4bae3222b1f8bccb22faea39b3bbf4fe9d6917834db1044152c6f0e43eb
+    size: 89446
+    bytes: 89446
+    width: 541
+    height: 800
+  thumb512:
+    path: assets/thumb512/749cc3b797a3ea13.webp
+    sha256: b96a185831ac1d9e98b71c1732a457a5b60caa223c3eaef5b78bc21aac4cd135
+    size: 23274
+    bytes: 23274
+    width: 346
+    height: 512
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 建筑木石构件
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 红木/花梨木
+- 鎏金铜雕护板
+- 朱漆圆木柱
+- 青白石须弥柱础
+- 乌木斗拱
+colors:
+- 朱砂红
+- 鎏金
+- 青白
+- 玄黑
+style: 传统汉传宫殿式
+ai_design_usage: 古建寺院/高端佛堂入口大门单体建模参考、红木万字纹浮雕贴图提取、石质柱础与朱漆木柱搭配参考
+prompt_zh: 中国传统佛教寺院红木大门正立面特写，对称双开朱红色红木大门，门扇上部为繁复精密的万字纹浮雕花格，下部为三段式素面裙板，门框两侧镶嵌竖向鎏金浮雕护板，左右两根粗壮的朱漆大圆柱立于青白石覆盆柱础之上，上方为黑金浮雕额枋与重重出跳的深色斗拱，前方为青石台阶与紫红方砖地面，侧逆光投射戏剧性明暗阴影，超写实古建筑摄影，8K
+tags:
+- 实物对象写实
+- 寺院大门
+- 红木格扇门
+- 朱漆圆柱
+- 石雕柱础
+- 古建筑构件
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 541
+  low_res: true
+  ai_generated: true
+  third_party_watermark: false
+  text_overlay: false
+  notes: AI生成的朱红寺院双开格扇大门与红柱立面图，分辨率偏低（541×800），斗拱与雕花粘连失真，被误标为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - ai_generated
+  - subject_mismatch

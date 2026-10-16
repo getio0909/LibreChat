@@ -1,0 +1,71 @@
+id: 872a3477bb376a98
+title_zh: 展厅中的天然石材样品
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/展厅中的天然石材样品.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/展厅中的天然石材样品.jpg
+  sha256: 872a3477bb376a9833c64f059468ad95cd05cfde8a415f4e4e1732044b4c6a35
+  bytes: 652981
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/872a3477bb376a98.jpg
+    sha256: 1af02b82b4f56e338f95dc20e00a18f7e086dcf1eea1f7a6a45e7b6531ff0c65
+    size: 409827
+    bytes: 409827
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/872a3477bb376a98.webp
+    sha256: 78f6d673fc1ddce7d82defb33d2cb6be7bb44dee0aa1b05212c7d06d96819e5d
+    size: 42044
+    bytes: 42044
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梵高皇
+colors:
+- 璀璨藤黄金河
+- 雪白晶团
+- 胭脂红与烟灰云
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: 阿利坦石材旗舰展厅实景素材 / 佛事展展位独立式奢石屏风展架设计参考 / 金白红多色山水奢石墙面参考
+prompt_zh: 阿利坦石材（B10-B7第一大道）现代化展厅实景摄影，黑色重型方钢展示架上竖立着一块带白色精致包边的“梵高皇/敦煌壁”天然奢石大板，板面呈现璀璨的明黄、琥珀金主脉如黄金江河般环绕着洁白的方解石雪山团块、胭脂红斑与右上角烟灰蓝云纹，高光镜面抛光，商业展陈空间摄影。
+tags:
+- 阿利坦石材B10-B7
+- 梵高皇大板
+- 敦煌壁大板
+- 金河绕雪山纹理
+- 独立屏风展架
+- 白色包边精装大板
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Angled showroom view of a white-framed Dunhuang Wall / Van Gogh Imperial slab under the Alitan Stone B10-B7 sign.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

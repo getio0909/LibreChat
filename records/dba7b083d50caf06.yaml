@@ -1,0 +1,72 @@
+id: dba7b083d50caf06
+title_zh: 藏传佛教双鱼纹圆形浮雕
+source:
+  original_path: 佛教家具与陈设素材/藏传佛教双鱼纹圆形浮雕.jpg
+original:
+  path: 佛教家具与陈设素材/藏传佛教双鱼纹圆形浮雕.jpg
+  sha256: dba7b083d50caf06b8e485cc7d7104923709df5b1168339b19498fee707ce558
+  bytes: 578115
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/dba7b083d50caf06.jpg
+    sha256: d7fd613181349ac27765b705736a944bc12c55cff899b1174b4fa1c2145996cb
+    size: 624566
+    bytes: 624566
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/dba7b083d50caf06.webp
+    sha256: 768f6e8548b86fc4c4625b33ce374c7196e7df489b60bb1d4148535177b4801e
+    size: 70370
+    bytes: 70370
+    width: 384
+    height: 512
+library_type: 法器供器
+studio_roles:
+- 物件
+- 纹样
+- 造型
+category_l1: 佛教家具与陈设
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 实木深浮雕
+- 贴金彩绘
+- 连珠彩宝圈
+colors:
+- 贴金黄配朱红石绿
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 藏传八吉祥（双鱼/法轮/宝伞/吉祥结）标准立体纹样提取 / 佛龛前排八吉祥圆牌陈设参考
+prompt_zh: 近景微距实拍，一座华丽的藏传佛教八吉祥之“双鱼拱法轮”圆形木雕贴金彩绘座屏，外圈围绕红绿金三色立体莲珠框，圆心雕刻一枚镶嵌红绿宝石的金色八辐法轮，左右两条鳞片分明的金色鲤鱼呈弧形跃起对视拱护法轮，上方悬青红莲花宝盖，下方托金色吉祥结与红蓝双层莲花座，底部为镂空描金祥云底座，后方背景隐现释迦牟尼佛木雕圆屏，8K超清。
+tags:
+- 藏传双鱼纹
+- 八吉祥浮雕
+- 双鱼拱法轮
+- 圆形木雕座屏
+- 金漆木雕
+- 佛教吉祥摆件
+material_ids: []
+provenance:
+  source: own_product
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a circular carved and polychrome gilt wooden table screen featuring Tibetan twin golden
+    fish flanking a dharma wheel on a lotus base.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

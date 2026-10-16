@@ -1,0 +1,70 @@
+id: 5f023f3ec11f9b37
+title_zh: 大型石材仓库内部场景
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/大型石材仓库内部场景.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/大型石材仓库内部场景.jpg
+  sha256: 5f023f3ec11f9b37db910376a3019d2f7243f2ddb47097719e122fc858006621
+  bytes: 5606224
+  width: 4160
+  height: 3120
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/5f023f3ec11f9b37.jpg
+    sha256: f8aeee69b269d4a9eec401753b6712e39c52bf696ffcf7a44813827a502f1a83
+    size: 830919
+    bytes: 830919
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/5f023f3ec11f9b37.webp
+    sha256: f5e329b0cb8277ba876053de21031a7dead4f06a2cb26779d826885cc33296c0
+    size: 42524
+    bytes: 42524
+    width: 512
+    height: 384
+library_type: 矿山车间
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 矿山与车间场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 抛光大理石大板
+- 钢构厂房
+colors:
+- 暖金橙棕与烟灰绿交织
+style: 现代工业车间与奢石排版
+ai_design_usage: 大型宗教殿堂/佛堂地面大面积铺装效果参考 / 企业工厂实力展板素材 / ControlNet Depth 大尺度地面透视参考
+prompt_zh: 广角低机位实景摄影，大型现代化石材加工仓库内部场景，地面超大面积整齐预铺满暖金橙棕色与浅灰绿交织的梦幻庄园天然大理石抛光规格板，形成连绵起伏的金色大地流云纹理，高光板面反射厂房天窗柔光，背景可见重型钢结构厂房、天车吊钩与石材大板堆放架，空间宏大，工业纪实与奢石美学结合，4K超清。
+tags:
+- 梦幻庄园
+- 金镶玉
+- 石材仓库场景
+- 地面排版预铺
+- 大面积铺装效果
+- 工厂实力展示
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3120
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Wide 4K view inside a stone processing warehouse showing a large-scale vein-matched dry-lay of Gold-Jade floor tiles.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

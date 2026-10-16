@@ -1,0 +1,74 @@
+id: 37c80663c70b8670
+title_zh: 佛教展厅三尊佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教展厅三尊佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教展厅三尊佛像展示场景.jpg
+  sha256: 37c80663c70b867091bef04413ce0cb4490e2a6533421a8ea018c9d4039374fb
+  bytes: 3803412
+  width: 4437
+  height: 2559
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/37c80663c70b8670.jpg
+    sha256: 82d9776afca8a06d15014b09eb99c2166364845f8d1f663d9412d52277e96a65
+    size: 372239
+    bytes: 372239
+    width: 2048
+    height: 1181
+  thumb512:
+    path: assets/thumb512/37c80663c70b8670.webp
+    sha256: 8841fdc5f3d8ec6f41b9747a6f6c9c32529d6473a87d5c20ca6a9441d3f8c961
+    size: 28514
+    bytes: 28514
+    width: 512
+    height: 295
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代新中式三世佛白玉造像展厅场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉佛像
+- 米黄砂岩
+- 大理石
+- 金色金属网格
+colors:
+- 温润米黄
+- 纯白汉白玉
+- 深紫褐地面
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：现代新中式三世佛佛堂正面立面设计 / 汉白玉佛像与米黄莱姆石须弥座搭配参考 / 现代金属网格艺术吊顶与传统石雕融合设计；推荐搭配：汉白玉三世佛坐像 + 葡萄牙米黄莱姆石浮雕须弥座与壁龛 + 灰白石雕海浪纹背景板
+  + 拉丝黄铜立体网格艺术吊顶 + 深紫褐暗纹石材地面
+prompt_zh: 现代新中式三世佛展厅正面场景，严格对称构图，中央长条形米黄色石材雕花须弥座上并列供奉三尊洁白的汉白玉结跏趺坐佛像（释迦牟尼佛、药师佛、阿弥陀佛），每尊佛像背后为带回纹边框的圆拱形暖白发光壁龛；两侧对称矗立米黄色石材方柱，黑色柱础向上投射洗墙灯光，柱旁镶嵌灰色海浪纹浮雕石板与圆形鎏金瑞兽铜盘；天花为原木发光格栅，并悬挂两组极具现代艺术感的多层立体交错金色金属网格吊饰，深紫褐色哑光石材地面，禅意高雅，8K超高清室内设计效果图。
+tags:
+- 三世佛展厅
+- 汉白玉坐佛
+- 米黄石材须弥座
+- 金属网格吊顶
+- 海浪纹石雕板
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2559
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代新中式三世佛汉白玉坐像与米黄石材须弥座展厅正面超宽三维效果图，顶部设多层金色金属网格吊顶。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

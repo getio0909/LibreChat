@@ -1,0 +1,77 @@
+id: d837a8554982400f
+title_zh: 藏传佛教风格石质装饰座椅
+source:
+  original_path: 佛教家具与陈设素材/藏传佛教风格石质装饰座椅.jpg
+original:
+  path: 佛教家具与陈设素材/藏传佛教风格石质装饰座椅.jpg
+  sha256: d837a8554982400f2c0ffc31ee5ebd2d750394b7f1a11c18882f156daf4e0396
+  bytes: 312705
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d837a8554982400f.jpg
+    sha256: 9c1d49a8d8b36b931871114525de3e7b759fb88fb3e6652a4a397d9ba9fa238c
+    size: 332598
+    bytes: 332598
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/d837a8554982400f.webp
+    sha256: 6ad98a2dbc6a5c36552dd88cc935b2a0b33743678c4a22499d2f0007de5483ee
+    size: 35842
+    bytes: 35842
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 法座宝座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 墨绿蛇纹石
+- 深胡桃木
+- 古铜
+- 彩石
+colors:
+- 墨绿配深棕护墙
+style: 藏汉融合须弥宝座风
+ai_design_usage: 同一家具单品在不同室内背景下的光影融合参考 / 暗调木饰面佛堂软装搭配演示
+prompt_zh: 室内家具实景摄影，一座威严华贵的藏传佛教墨绿大理石与胡桃木八辐法轮扶手宝座，陈设在深色胡桃木护墙板与实木地板的古典室内空间中，靠背与座面镶嵌深绿色白纹大理石，正中饰立体古铜鎏金八辐法轮，外圈环绕红玛瑙、绿松石与黄蜜蜡宝石，须弥座雕刻双力士与十字金刚杵，柔和的室内侧光与顶部射灯营造出沉稳奢华的宗教美学氛围，8K写实。
+tags:
+- 藏传佛教宝座
+- 墨绿大理石座椅
+- 深色木饰面搭配
+- 法轮浮雕
+- 暗调奢华佛堂
+- 石质装饰座椅
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a dark green serpentine and walnut dharma-wheel throne
+    against dark wood wainscoting. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

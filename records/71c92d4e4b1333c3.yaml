@@ -1,0 +1,71 @@
+id: 71c92d4e4b1333c3
+title_zh: 红黄纹石材展览样品
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/红黄纹石材展览样品.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/红黄纹石材展览样品.jpg
+  sha256: 71c92d4e4b1333c3041fb420e705dae0baf133cddd2123b3141e8b274292ea6d
+  bytes: 6034094
+  width: 4096
+  height: 3072
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/71c92d4e4b1333c3.jpg
+    sha256: 0fdd53f8a9f0f2fcbd35789dcf3a346a0314746231a7140418d6ae7712d566ca
+    size: 891389
+    bytes: 891389
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/71c92d4e4b1333c3.webp
+    sha256: 0e710488e08483641f7be561d5023f991416eebe3770e39c30e405a25e32e78c
+    size: 53552
+    bytes: 53552
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梵高皇
+colors:
+- 炽烈朱砂红与帝王明黄交融
+- 浅青白斜脉
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: 阿弥陀佛西方极乐世界/药师琉璃光如来殿堂主背景墙4K母本 / 佛事展主形象墙（Hero Wall）视觉焦点贴图 / 顶级红金奢石背光设计
+prompt_zh: 阿利坦石材A1区旗舰展厅4K正面标准摄影，一块近正方形的极品“梵高皇/敦煌壁”红金奢石大板竖立在白色鹅卵石发光展床上，全板充满炽烈辉煌的朱砂红、珊瑚红与帝王明黄、琥珀金交融翻涌的云霞纹理，数道浅青白色斜脉如流星般从左上划向右下，底部摆放阿利坦橙色品牌展台，宛如盛唐重彩佛光壁画，8k超高清。
+tags:
+- 梵高皇极品红金
+- 敦煌壁红金大板
+- 条码0199240521064
+- 阿利坦镇店奢石
+- 佛光瑞相背景墙
+- A1区展厅标板
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K front-on showroom photograph of a vibrant red-and-gold Dunhuang Wall / Van Gogh Imperial slab on an orange Alitan
+    Stone display base.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

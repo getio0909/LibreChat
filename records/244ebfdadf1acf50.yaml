@@ -1,0 +1,70 @@
+id: 244ebfdadf1acf50
+title_zh: 石材展厅中的天然大理石板展示
+source:
+  original_path: 蓝金灰大板自家产品/石材展厅中的天然大理石板展示.jpg
+original:
+  path: 蓝金灰大板自家产品/石材展厅中的天然大理石板展示.jpg
+  sha256: 244ebfdadf1acf5038c57ed8424045a9de5badc4bd5af910d910eeaa0894a9d3
+  bytes: 2876276
+  width: 4000
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/244ebfdadf1acf50.jpg
+    sha256: 93f27c2fab0b163908295eaaafef6685c133e540ee165cb5fd5f78d373893e8c
+    size: 586921
+    bytes: 586921
+    width: 2048
+    height: 1153
+  thumb512:
+    path: assets/thumb512/244ebfdadf1acf50.webp
+    sha256: 286ff4e0f46d7f8d5fbae8b08e2bb99020459539fc6280f985d94fa54b310f79
+    size: 28962
+    bytes: 28962
+    width: 512
+    height: 288
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 蓝金灰整扎大板
+colors:
+- 烟灰蓝与琥珀金陡斜条带
+- 横向红丝脉
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 方形佛堂/茶室整板背景墙贴图母本（可结合编号05无反光微距图共同使用） / 奢石库存实力展示素材 / 竖向流瀑感背景墙设计
+prompt_zh: 4K正面中轴对称写实摄影，现代化石材大板展厅中央竖立着一整扎近正方形的蓝金灰天然奢石大板，表面呈现70度陡斜向倾泻的深烟灰蓝与琥珀金、米黄色宽幅流云条带，中段被数条纤细鲜明的朱砂红与铁锈红水平细脉横向穿过，顶部覆有透明保护膜，两侧排列着整齐的蓝色封边大板阵列，气势恢宏。
+tags:
+- 蓝金灰整扎大板
+- 方形背景墙母本
+- 陡斜流云赤脉
+- 大板库存实景
+- 冷暖交融奢石
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K front-on showroom photograph of a plastic-wrapped Blue-Gold-Grey slab bundle with diagonal blue-gold bands and
+    horizontal red veins.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

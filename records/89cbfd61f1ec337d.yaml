@@ -1,0 +1,76 @@
+id: 89cbfd61f1ec337d
+title_zh: 佛教主题展览空间设计-05
+source:
+  original_path: 佛教空间设计案例/佛教主题展览空间设计-05.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展览空间设计-05.jpg
+  sha256: 89cbfd61f1ec337d01c5b77503f0c2bc911fec106b747dea4320d12e2d6d74cb
+  bytes: 2280643
+  width: 3742
+  height: 2561
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/89cbfd61f1ec337d.jpg
+    sha256: 8e7493bb181bc70449bb936de191fc9e8b95ebbba5006ab743a541feab154408
+    size: 246100
+    bytes: 246100
+    width: 2048
+    height: 1402
+  thumb512:
+    path: assets/thumb512/89cbfd61f1ec337d.webp
+    sha256: 3315e72ec900923e935e615a0a40998adddef818ac9e4b3aa1ac1296264ef7c3
+    size: 19026
+    bytes: 19026
+    width: 512
+    height: 350
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 药师经发光斜梁与立佛回廊
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 深黑哑光钢结构斜梁
+- 内透金光书法镂空板
+- 重彩观音壁画
+- 金色琉璃格灯柱
+- 深褐青石板
+colors:
+- 琥珀金
+- 深黑褐
+- 朱红石绿
+- 暖黄
+style: 建筑结构美学与佛教大愿结合风
+ai_design_usage: 建筑斜梁结构美学改造参考 / 药师经十二大愿书法镂空发光设计 / 佛教文化长廊序列空间构图
+prompt_zh: 极具空间张力的佛教药师经主题展览回廊，暗调暖金光环境，前景右侧一根粗壮的深色倾斜结构巨梁斜跨空间，梁身表面镂空发出耀眼金光展示《药师经》第三大愿繁体书法经文，左侧墙面是一座绘有重彩观音菩萨像的拱形壁龛配金色方格灯柱，走廊深处两侧对称排列着经文斜梁与暖光万佛格，尽头是三层金色发光壶门轮廓环绕的立佛造像，8k写实渲染。
+tags:
+- 药师经第三大愿
+- 斜梁发光字
+- 观音壁画龛
+- 金色壶门背光
+- 万佛长廊
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2561
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D upward architectural detail render of a sloped beam inscribed with backlit calligraphy from the Medicine Buddha
+    Sutra (Third Great Vow) alongside blue liuli Buddha niches.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

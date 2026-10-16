@@ -1,0 +1,74 @@
+id: 142e6dc146e5cf09
+title_zh: 石雕佛像与松树盆栽场景
+source:
+  original_path: 佛教空间设计案例/石雕佛像与松树盆栽场景.jpg
+original:
+  path: 佛教空间设计案例/石雕佛像与松树盆栽场景.jpg
+  sha256: 142e6dc146e5cf09e5dd149b031bcdcbc4d4b9ff46598cfffb3306815abf2f3d
+  bytes: 100899
+  width: 377
+  height: 383
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/142e6dc146e5cf09.jpg
+    sha256: b710c52a92eb429f0490903adb7fa6f956822f263af773ed8b2ed8af5cae7f6d
+    size: 27935
+    bytes: 27935
+    width: 377
+    height: 383
+  thumb512:
+    path: assets/thumb512/142e6dc146e5cf09.webp
+    sha256: 2a161b4b05d28ca07dddf43fb5419bab6095e1bb39cc34362a400c9fe1fb0646
+    size: 17504
+    bytes: 17504
+    width: 377
+    height: 383
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 青灰石雕禅定释迦坐像
+- 苍劲迎客松盆景
+- 粗陶花器
+- 暖光投射佛影背景墙
+colors:
+- 青灰色
+- 暖金色
+style: 东方禅宗虚实光影微景观风
+ai_design_usage: 佛堂玄关端景、茶室微缩禅意造景、“松风佛影”光影投射艺术装置设计参考
+prompt_zh: 极具东方禅意美学的石雕佛像与松树盆景光影端景设计，方形构图，左前景安放一尊古朴的深青灰色石雕释迦牟尼佛禅定坐像，右侧陈列两盆枝干苍劲虬曲的迎客松盆景，松枝向佛像上方舒展；在暖金黄色的肌理背景墙上，由前下方隐藏光源投射出一尊巨大而柔和虚化的佛陀打坐剪影，实像与虚影相互呼应，一花一世界禅宗意境，大师级静物空间摄影，8K超清质感
+tags:
+- 石雕佛像
+- 松树盆景
+- 佛影投射
+- 禅意端景设计
+- 虚实光影美学
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 377
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代极简弧形发光万佛墙、白色主佛坐像与水景反射倒影局部小图，原图尺寸377x383分辨率过低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 377x383 (<800px short side)'
+  - 分辨率过低（377x383，最短边<768px）

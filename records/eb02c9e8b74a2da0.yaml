@@ -1,0 +1,73 @@
+id: eb02c9e8b74a2da0
+title_zh: 金色佛像坐像及背光装饰
+source:
+  original_path: 佛教空间设计案例/金色佛像坐像及背光装饰.jpg
+original:
+  path: 佛教空间设计案例/金色佛像坐像及背光装饰.jpg
+  sha256: eb02c9e8b74a2da00d1c89c1071b9bf9966159aa53cb01e01fb9507d5aa03128
+  bytes: 2194212
+  width: 1587
+  height: 2572
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/eb02c9e8b74a2da0.jpg
+    sha256: f939a937b90f7da96ca5249a426861a2691ced1e056a00b3125bddd0b007ad27
+    size: 427953
+    bytes: 427953
+    width: 1264
+    height: 2048
+  thumb512:
+    path: assets/thumb512/eb02c9e8b74a2da0.webp
+    sha256: 626ad62c287284697de0c02433f3a4ac296450ff9086f30afc1c1b0f5347085c
+    size: 32956
+    bytes: 32956
+    width: 316
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 佛像造像
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 铜鎏金五佛宝冠毗卢遮那佛/宝冠释迦坐像
+- 火珠双龙戏珠大背光
+- 金色莲花华盖与流苏幡幢
+colors:
+- 辉煌金
+- 深空黑
+style: 传统大乘与密宗铜鎏金报身佛造像工艺
+ai_design_usage: 密宗/大乘佛殿宝冠佛主尊造像与繁复金属镂空背光华盖设计、高反差黑底鎏金质感参考
+prompt_zh: 铜鎏金五佛宝冠毗卢遮那佛坐像与繁复镂空背光华盖正面特写，高分竖幅构图，纯黑深邃背景，大佛头戴精美五佛高宝冠，胸前佩戴华丽珠串璎珞，面相慈悲威严，结跏趺坐于多层鎏金仰莲宝座上；身后矗立巨大的尖拱形镂空透雕黄金大背光，精细雕刻放射光芒、盘龙戏珠、卷草宝相花与火焰纹；正上方悬挂圆形鎏金莲花华盖并对称垂挂金属雕花幡幢，亚光金与高光金层次分明，极致金铜佛像工艺，8K超高清写实摄影
+tags:
+- 金色佛像
+- 毗卢遮那佛
+- 宝冠释迦佛
+- 火焰龙纹背光
+- 铜鎏金造像
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1587
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 释迦牟尼金身坐像与火焰背光、贴金须弥座局部竖图（源自#290中央主尊裁切）。summary_zh与materials存在幻觉：画面上方实为木作斗拱承托井字天花而非“圆形莲花宝盖”，两侧为壁面金色飞天浮雕与千佛龛而非“垂挂经幡”，且因局部裁切放大略模糊。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - summary_zh与materials存在幻觉（误称上悬圆形莲花宝盖与垂挂经幡，实际为斗拱平棊天花与壁面飞天浮雕）
+  - 局部放大裁切导致画质偏模糊

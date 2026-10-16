@@ -1,0 +1,72 @@
+id: 1116e7e915164f9b
+title_zh: 佛教寺庙室内佛像供奉场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙室内佛像供奉场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙室内佛像供奉场景.jpg
+  sha256: 1116e7e915164f9b29108d3d4a164b1966f35c5ae47ec793e0a545fb97b1d656
+  bytes: 2938727
+  width: 4048
+  height: 2622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1116e7e915164f9b.jpg
+    sha256: fb101b17418621533ca599b4254974da9f9d6edf4a429faf450ab339b4cfd2a3
+    size: 350883
+    bytes: 350883
+    width: 2048
+    height: 1327
+  thumb512:
+    path: assets/thumb512/1116e7e915164f9b.webp
+    sha256: 7242509f64c621ba00ab9212a857b094cf0b91af69af9517ba81eb7b34165929
+    size: 26304
+    bytes: 26304
+    width: 512
+    height: 332
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 铜鎏金大肚弥勒佛坐像配双圈白色发光圆光
+- 木雕须弥座与缠枝莲供桌
+- 青白石须弥座柱础凹槽木方柱
+- 右侧木雕护法壁画与花窗
+colors:
+- 暖木棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 寺院天王殿/弥勒佛殿室内空间设计、大肚弥勒金像配极简白色圆形发光背板方案、凹槽木方柱配高石础节点参考
+prompt_zh: 新中式佛教寺庙天王殿（弥勒殿）室内供奉场景，广角斜向透视构图，浅灰褐色高光大理石地面，画面左侧为暖棕色竖向凹槽实木方柱，下承高大的青白石精雕仰覆莲方形须弥座柱础，正面木框白墙中央的深色木雕须弥座上供奉一尊笑口常开、坦胸露腹的大型铜鎏金大肚布袋弥勒佛坐像，佛像背后是一轮洁白柔和的双圈圆形发光满月背光，佛座前设一张精雕缠枝莲纹的中式实木供桌（摆放香炉、红烛与鲜果）及两个米黄色方形拜垫，右侧木墙镶嵌深浮雕护法神像木雕壁画与中式海棠木花窗，顶部为叠级发光木藻井，温馨庄严，8K建筑渲染
+tags:
+- 弥勒佛殿
+- 天王殿内景
+- 满月发光圆光
+- 青白石须弥柱础
+- 木雕护法壁画
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2622
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 寺院布袋弥勒佛殿室内供奉三维效果图，配极简双圈发光圆光、青白石高束腰须弥柱础与木雕供桌，左下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

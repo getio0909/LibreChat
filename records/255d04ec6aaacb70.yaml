@@ -1,0 +1,73 @@
+id: 255d04ec6aaacb70
+title_zh: 佛教文化园区鸟瞰效果图
+source:
+  original_path: 佛教空间设计案例/佛教文化园区鸟瞰效果图.jpg
+original:
+  path: 佛教空间设计案例/佛教文化园区鸟瞰效果图.jpg
+  sha256: 255d04ec6aaacb706bd102522bd6e838607ef390178da40bd90b301a3814e0b5
+  bytes: 3043035
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/255d04ec6aaacb70.jpg
+    sha256: 36bc1d9ec08d4a0752b5f9a47fcec23ff9c9fc516b3499c3b3c9f7766acf6044
+    size: 606758
+    bytes: 606758
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/255d04ec6aaacb70.webp
+    sha256: 8dd71b16912f53e619739116b0448a9927898b5bae6cc87fae1532f475457023
+    size: 39942
+    bytes: 39942
+    width: 512
+    height: 362
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 大型山地佛教文化旅游园区与摩崖大佛总体规划鸟瞰场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 花岗岩建筑群
+- 露天金佛
+- 生态景观
+colors:
+- 苍翠山林
+- 鎏金大佛
+- 米白坛城
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：大型佛教文化旅游景区总体规划鸟瞰设计 / 山地摩崖大佛与金刚宝座塔建筑群布局参考 / 莲花形大地艺术生态陵园规划生成；推荐搭配：米黄麻/白麻花岗岩大型宗教建筑群 + 露天锻铜贴金大佛 + 青石摩崖造像崖壁
+  + 莲花几何图腾生态景观步道
+prompt_zh: 超大型山地佛教文化旅游园区总体规划高空鸟瞰效果图，云雾缭绕的翠绿群山与湖泊之间，沿山势中轴线依次布局：前区为传统中式青瓦寺院山门与大殿院落；中区为宏伟的米黄色石材阶梯金字塔形金刚宝座塔大殿；山腰平台耸立一尊巨型露天金身结跏趺坐大佛，大佛下方山体开凿弧形摩崖石窟造像壁、阿育王柱与八瓣莲花喷泉广场；后方山坡顺势建造扇形梯田剧场与巨大的五叶莲花瓣形生态佛教塔林陵园（节点处矗立六座金顶白塔）；右侧湖心有一座纯白石材建造的水上圆形多塔坛城岛，白鸽飞翔，气势恢宏，8K超高清建筑规划渲染。
+tags:
+- 佛教文化园鸟瞰
+- 金刚宝座塔殿
+- 露天金身大佛
+- 摩崖石窟造像
+- 莲花形生态陵园
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 超大型山地佛教文化旅游园区、金刚宝座大殿、露天大佛与莲花形生态塔林总体规划8K鸟瞰效果图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

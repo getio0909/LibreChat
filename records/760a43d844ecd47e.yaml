@@ -1,0 +1,77 @@
+id: 760a43d844ecd47e
+title_zh: 佛教风格石材宝座展品
+source:
+  original_path: 佛教家具与陈设素材/佛教风格石材宝座展品.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格石材宝座展品.jpg
+  sha256: 760a43d844ecd47eddebd4368ab15b89f2fac343e4ed7be30b437789d22b359f
+  bytes: 233494
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/760a43d844ecd47e.jpg
+    sha256: a8070c2f198a6a6b87d50bdc6edeb59484204ed4a1100582c81a75deb2dcf786
+    size: 251836
+    bytes: 251836
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/760a43d844ecd47e.webp
+    sha256: 0b3bc75e0510c47e599b29e9294690243f3972072e9e1b2a8a61b983054c1a7e
+    size: 24304
+    bytes: 24304
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 法座宝座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 青白玉
+- 胡桃木
+- 红玛瑙
+- 微水泥
+colors:
+- 晴水绿配微水泥灰
+style: 藏汉融合须弥宝座风
+ai_design_usage: 传统佛教器物现代美术馆化展陈转换（Background Replacement） / 佛事展核心展品独立灯光渲染参考
+prompt_zh: 博物馆展品摄影，一座精美的晴水绿青玉与黄花梨木镶嵌佛教须弥宝座独立陈设在极简现代美术馆展厅中央，半透明翠绿玉石靠背带金色天然脉纹，镶嵌南红玛瑙宝珠，须弥座雕刻青玉力士与金色十字金刚杵，背景为纯净的暖灰色微水泥墙面与顶部暖光暗藏洗墙灯带，浅灰石材地面，极致玉石通透感与极简空间对比，8K商业摄影。
+tags:
+- 美术馆展品陈列
+- 晴水绿玉宝座
+- 极简背景对比
+- 洗墙灯带照明
+- 佛事展展品效果
+- 玉石木作法座
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of a celadon-green jade and wood dharma throne in a minimalist
+    gallery. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

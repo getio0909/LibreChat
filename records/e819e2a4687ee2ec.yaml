@@ -1,0 +1,76 @@
+id: e819e2a4687ee2ec
+title_zh: 佛教文化主题展厅
+source:
+  original_path: 佛堂空间设计参考/佛教文化主题展厅.jpg
+original:
+  path: 佛堂空间设计参考/佛教文化主题展厅.jpg
+  sha256: e819e2a4687ee2ecace69e4b7d92537b663259af6eeb9ce42f162f8f8f901304
+  bytes: 940463
+  width: 2500
+  height: 1750
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e819e2a4687ee2ec.jpg
+    sha256: d4c709e887f8cc74792c6a2f343615d5a0d60d679507c854f171e5066dae3111
+    size: 791564
+    bytes: 791564
+    width: 2048
+    height: 1434
+  thumb512:
+    path: assets/thumb512/e819e2a4687ee2ec.webp
+    sha256: 73c3c551b77fe1c80e031089f903803497a2019e04cd69a8f5947cc98c6b3715
+    size: 48916
+    bytes: 48916
+    width: 512
+    height: 358
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红玛瑙纹天然奢石背板
+- 超白透光云石圆光
+- 24K鎏金浮雕藻井
+- 黑金花大理石柱础
+- 实木通高藏经书架
+colors:
+- 璀璨金
+- 酒红/玛瑙红
+- 深胡桃木色
+- 藏蓝点缀
+style: 藏传佛教风
+ai_design_usage: 汉藏融合奢华佛堂/藏经阁全景设计、红宝石色奢石背板+满月背光佛龛设计、鎏金井字藻井与坛城吊顶参考
+prompt_zh: 汉藏融合风格奢华佛教文化主题展厅与双层藏经阁室内设计，一点透视中轴对称构图，天花板为满铺鎏金浮雕的井字格藻井并暗藏暖光，正中镶嵌圆形藏传佛教彩绘坛城曼荼罗，前景耸立两根带蓝金藏式纹样柱头与黑金大理石柱础的朱褐色大圆柱，正后方飞檐木雕主佛龛内采用深红玛瑙奢石背景板与正中纯白发光满月圆盘，供奉白玉坐佛与三尊金身立佛，前方置大型鎏金雕花供桌与三个蓝边刺绣蒲团，左右两侧为双层挑高大藏经书架墙与发光佛像壁龛，金碧辉煌，8K超高清3D效果图
+tags:
+- 汉藏融合佛堂
+- 藏经阁设计
+- 坛城藻井
+- 红奢石背板
+- 满月背光
+- 鎏金井字顶
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1750
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 汉藏融合双层挑高藏经阁与主殿3D渲染效果图，含鎏金井字坛城藻井、红玛瑙奢石背板佛龛与通高书架。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

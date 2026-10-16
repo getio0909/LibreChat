@@ -1,0 +1,74 @@
+id: ef437670268492a2
+title_zh: 透明展柜中的佛教雕像陈列
+source:
+  original_path: 25年秋季佛事展设计方案/透明展柜中的佛教雕像陈列.jpg
+original:
+  path: 25年秋季佛事展设计方案/透明展柜中的佛教雕像陈列.jpg
+  sha256: ef437670268492a2e8f49c5c0db92a41a07bbd92037b3423998853a4798dc0cf
+  bytes: 2142842
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ef437670268492a2.jpg
+    sha256: e678d96b781a8014cad61edabce54ea66cacbb5ad1f0aa3c3bd9a667f5034ab0
+    size: 293925
+    bytes: 293925
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/ef437670268492a2.webp
+    sha256: e0e39cea12a8ffd9bc6a77486de220dc8d94bd3685589d0c3510648d5e075fb3
+    size: 19812
+    bytes: 19812
+    width: 288
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 物件
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-透明格栅万佛陈列墙
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 琉璃/树脂禅定佛像
+- 亚克力格栅
+- 汉白玉
+colors:
+- 琥珀金
+- 纯白
+- 雪花白
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 现代佛堂/展馆透明亚克力多宝格千佛墙与背光照明设计参考
+prompt_zh: 现代佛教展厅透明亚克力千佛陈列墙斜侧透视特写，三层高透水晶亚克力方格展架整齐排列，后方为纯白柔和的漫射背光灯箱；每个透明方格内供奉一尊温润通透的琥珀橙黄色磨砂琉璃坐佛，佛像分别结禅定印与说法印，身后配有浅金色半透明浮雕大背光；展墙外框采用天然金镶玉大理石包边，左下角台沿安装精致的纯白汉白玉微缩栏杆，光影晶莹纯净，极具现代禅意美学，8K室内陈设摄影。
+tags:
+- 透明千佛墙
+- 亚克力多宝格
+- 万佛墙设计
+- 琉璃佛像陈列
+- 汉白玉微缩栏杆
+- 现代功德堂设计
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展三层透明亚克力格栅背光千佛陈列墙斜侧45度实景特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,73 @@
+id: a88794cbc840dfdb
+title_zh: 佛教寺庙大殿内部场景-06
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-06.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-06.jpg
+  sha256: a88794cbc840dfdbcd9e2cc9365f5163ecfb48ad36305e8d414615c5e7206f51
+  bytes: 4113830
+  width: 3414
+  height: 2652
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a88794cbc840dfdb.jpg
+    sha256: cbe2adef714640ca7090d54052396c7fbb8a9e27fcbf4b3c4c6c1b03bbd2c0c1
+    size: 560977
+    bytes: 560977
+    width: 2048
+    height: 1591
+  thumb512:
+    path: assets/thumb512/a88794cbc840dfdb.webp
+    sha256: 4d0436b1233bac19cb547c81fabc80d4c108c9965abdad29b0015257d275d226
+    size: 48130
+    bytes: 48130
+    width: 512
+    height: 398
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 暖红棕几何席纹拼花木地板
+- 五尊铜鎏金主像配白色发光石背板
+- 十八罗汉木龛廊
+- 汉白玉须弥柱础
+- 八角贴金藻井
+colors:
+- 琥珀木棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 大雄宝殿暖色拼花木地板替换比选方案（右斜视图）、全暖调木石空间色彩搭配与五尊主像陈设参考
+prompt_zh: 传统佛教寺庙大雄宝殿室内右前斜向广角场景，地面满铺高光暖红棕色方形几何席纹拼花实木地板，正左方深色木雕须弥座主坛上并列供奉五尊巨型铜鎏金佛菩萨像（三世佛与文殊普贤，带镂空火焰大背光），每尊造像背后均设有洁白的石材雕花海棠框发光背景板，佛坛前整齐摆放五张雕花供桌与五对米黄色方形拜垫，右侧耸立粗壮的竖向凹槽方形木柱并承以洁白的汉白玉精雕方形须弥座柱础，后方为铜鎏金十八罗汉壁龛长廊，顶部为九宫格发光木天花与中央八角重檐贴金斗拱大藻井，温暖庄严，8K建筑渲染
+tags:
+- 拼花木地板大殿
+- 汉白玉方形柱础
+- 五尊大佛主坛
+- 地面材质比选
+- 八角贴金藻井
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2652
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统大雄宝殿五尊主像与十八罗汉廊右前斜视三维效果图（席纹拼花木地板配方形汉白玉柱础比选版），右下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

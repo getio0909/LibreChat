@@ -1,0 +1,73 @@
+id: 54da392bd8c0f70f
+title_zh: 佛教铜铃法器特写
+source:
+  original_path: 佛教空间设计案例/佛教铜铃法器特写.jpg
+original:
+  path: 佛教空间设计案例/佛教铜铃法器特写.jpg
+  sha256: 54da392bd8c0f70fe58b86facfacfd680a35d05585ae8735706bc3cce8c4700f
+  bytes: 79337
+  width: 265
+  height: 378
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/54da392bd8c0f70f.jpg
+    sha256: b64e526942e86d54b87a7476292811b71a5e4c6a297207090266fb8975d60f93
+    size: 18128
+    bytes: 18128
+    width: 265
+    height: 378
+  thumb512:
+    path: assets/thumb512/54da392bd8c0f70f.webp
+    sha256: 7f9ef5463187252839f5926187c75458d0f9fe58bbd61ea177f829ab4eaf0f8e
+    size: 9132
+    bytes: 9132
+    width: 265
+    height: 378
+library_type: 法器供器
+studio_roles:
+- 物件
+- 材质
+- 参考
+category_l1: 佛教空间案例
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 仿古青铜梵钟/风铎
+- 蒲牢龙钮吊环
+- 青绿铜锈与岁月包浆肌理
+colors:
+- 古青铜色
+- 苍绿色
+style: 古寺侘寂金石青铜风
+ai_design_usage: 古建檐角惊鸟铃/风铎特写素材、做旧青铜法器质感迁移与禅意局部构图
+prompt_zh: 中国传统古寺青铜梵钟与风铎法器微距特写，悬挂在粗铁链下，顶部为古朴的蒲牢龙形钟纽，钟身呈传统弧形喇嘛口造型，表面布满沧桑的青绿色铜锈与深褐色古董包浆，铸有凸起的横弦纹、乳丁纹与古拙铭文印记，浅灰白干净背景，博物馆文物级微距摄影，侘寂禅意美学，高细节纹理
+tags:
+- 佛教铜铃
+- 古铜梵钟
+- 风铎法器
+- 青铜包浆
+- 侘寂禅意
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 265
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 古铜四足双耳方鼎香炉户外局部实拍，原图尺寸265x378分辨率过低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 265x378 (<800px short side)'
+  - 分辨率过低（265x378，最短边<768px）

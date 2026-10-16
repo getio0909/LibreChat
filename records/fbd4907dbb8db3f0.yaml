@@ -1,0 +1,71 @@
+id: fbd4907dbb8db3f0
+title_zh: 佛教石材栏杆细节展示
+source:
+  original_path: 25年秋季佛事展设计方案/佛教石材栏杆细节展示.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教石材栏杆细节展示.jpg
+  sha256: fbd4907dbb8db3f046ccca1b9b010d65bb4a7d96ea4c9eca41db9ce7fa6ee1a1
+  bytes: 2046183
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fbd4907dbb8db3f0.jpg
+    sha256: 82e85b8759356e895c5ae280c47876b312721ac661b35ba43b19028bc35c8fdb
+    size: 267743
+    bytes: 267743
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/fbd4907dbb8db3f0.webp
+    sha256: 891f85296517ac9904f95f5b3e4715672e9f7d3ff54e84a2bbd4d54a59650d24
+    size: 14876
+    bytes: 14876
+    width: 288
+    height: 512
+library_type: 石刻纹样
+studio_roles:
+- 造型
+- 纹样
+- 材质
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-汉白玉微缩栏杆与须弥座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然汉白玉
+- 天然玉石敦煌金
+colors:
+- 羊脂白
+- 蜜蜡黄
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 汉白玉微缩望柱栏板与暖黄玉石浮雕基座冷暖材质碰撞参考
+prompt_zh: 佛教须弥座佛台前沿的天然汉白玉微缩栏杆微距特写，浅景深摄影，洁白温润的汉白玉栏杆由方形盝顶望柱、上下横梁与镂空双海棠如意孔栏板组成，石质细腻如脂；栏杆稳固安装在天然玉石敦煌金高浮雕基座的压顶石上，下方基座呈现出金黄与琥珀棕交织的天然网格石纹，并雕刻着立体的卷草如意浮雕，一白一金冷暖石材碰撞对比强烈，工艺精湛，背景柔和虚化，8K产品微距摄影。
+tags:
+- 汉白玉栏杆
+- 微缩石雕护栏
+- 敦煌金须弥座
+- 海棠孔栏板
+- 冷暖石材搭配
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展敦煌金须弥座上沿与天然汉白玉微缩海棠孔护栏交接处微距特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

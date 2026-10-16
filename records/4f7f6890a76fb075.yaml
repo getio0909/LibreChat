@@ -1,0 +1,73 @@
+id: 4f7f6890a76fb075
+title_zh: 佛教圆形放射状浮雕装饰
+source:
+  original_path: 佛教空间设计案例/佛教圆形放射状浮雕装饰.jpg
+original:
+  path: 佛教空间设计案例/佛教圆形放射状浮雕装饰.jpg
+  sha256: 4f7f6890a76fb0753976e3b931bf21dd6e9d9a3b065fa192bf713e6a5db03387
+  bytes: 2265891
+  width: 1974
+  height: 2650
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4f7f6890a76fb075.jpg
+    sha256: 4f413b08e2e08480fee3dbbbd55240865fee88d7f867120e7a75e77196bbf77a
+    size: 393576
+    bytes: 393576
+    width: 1526
+    height: 2048
+  thumb512:
+    path: assets/thumb512/4f7f6890a76fb075.webp
+    sha256: 2f941d51bc71f713246637d7b2bfed933e12648b39a00d7f52081d0c14fb19d0
+    size: 24078
+    bytes: 24078
+    width: 381
+    height: 512
+library_type: 石刻纹样
+studio_roles:
+- 纹样
+- 造型
+- 材质
+category_l1: 佛教空间案例
+category_l2: 建筑木石构件
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 透光云石
+- 鎏金浮雕
+- 黄玉石材
+colors:
+- 辉煌金
+- 奶白色
+- 暖黄色
+style: 传统佛教法轮与背光纹样工艺
+ai_design_usage: 佛殿穹顶藻井中心构件、佛像身光/头光圆光背板、法轮纹透光云石浮雕单品提取与材质贴图
+prompt_zh: 佛教圆形放射状浮雕装饰构件微距特写，同心圆法轮结构，中心是一朵立体的八瓣莲花浮雕，周围环绕繁复的如意卷草宝相花纹并由金色圆环围绕，外圈是二十四道向外发散的金色立体放射状光芒辐条，底层为奶白色半透明透光云石材质，内部暖金色背光透射，金碧辉煌，雕工精湛，正面特写，高细节材质贴图
+tags:
+- 放射状浮雕
+- 法轮背光
+- 藻井构件
+- 透光云石浮雕
+- 八瓣莲花纹
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1974
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Close-up detail image of a circular 24-spoke radiating lotus and dharma-wheel relief combining backlit amber onyx
+    and gilded carvings.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,72 @@
+id: 438d235d60e4cf97
+title_zh: 藏式佛教室内供奉空间
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教室内供奉空间.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教室内供奉空间.jpg
+  sha256: 438d235d60e4cf973402ee7b8f940e2c8228a5aedb9fbf1b7e698fee0dbb11e7
+  bytes: 201054
+  width: 940
+  height: 940
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/438d235d60e4cf97.jpg
+    sha256: 66dc13d85c5eeed8b5f6e07fb0bee9462fce7d383ad3aa5b7b9689556804096c
+    size: 219284
+    bytes: 219284
+    width: 940
+    height: 940
+  thumb512:
+    path: assets/thumb512/438d235d60e4cf97.webp
+    sha256: 534b8c3c5ed0523aa76965b26f7dc0925decf415f672cca6e94d4f391c29ad6c
+    size: 69292
+    bytes: 69292
+    width: 512
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教家具与陈设
+category_l2: 传统与现代融合佛堂
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 坛城藻井
+- 金铜华盖吊灯
+- 蓝底佛龛
+colors:
+- 金黄配宝石蓝与深棕
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 殿堂级私人佛堂室内设计全景参考（ControlNet Depth/Lineart） / 坛城藻井+华盖吊灯+蓝底佛龛色彩搭配模板
+prompt_zh: 室内建筑设计摄影，1:1正方形中轴对称一点透视构图，一座奢华庄严的藏传佛教室内佛堂供奉空间，天花板为深色实木雕花井字梁与中央巨型圆形彩绘曼陀罗坛城藻井，四周带暖黄暗藏灯槽，正中垂挂一盏华丽的三层金铜宝伞华盖大吊灯，正面整墙为五开间深胡桃木贴金雕花大佛龛，佛龛内部采用深邃的宝石蓝色背板，主龛供奉披黄色哈达的佛像与圆形木雕屏，正前方居中摆放一张长方形五格雕花实木主供桌，金蓝棕三色辉映，8K超清室内效果图。
+tags:
+- 藏式佛堂空间
+- 坛城藻井吊顶
+- 金铜华盖吊灯
+- 宝石蓝背板佛龛
+- 中轴对称佛堂
+- 室内供奉空间
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 940
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real interior photograph of a symmetrical Tibetan Buddhist shrine room with circular mandala coffered ceiling, gilt
+    canopy chandelier, 5-bay blue-backed shrine, and offering table.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

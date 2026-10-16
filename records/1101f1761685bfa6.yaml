@@ -1,0 +1,76 @@
+id: 1101f1761685bfa6
+title_zh: 浅米色天然石材样品
+source:
+  original_path: 常用石材大板/浅米色天然石材样品.jpg
+original:
+  path: 常用石材大板/浅米色天然石材样品.jpg
+  sha256: 1101f1761685bfa64346962f9c1cb052ff38aaebe58774516236bce44a87ade6
+  bytes: 534937
+  width: 1493
+  height: 999
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1101f1761685bfa6.jpg
+    sha256: c9bea4f993ba0a5e30a5ee76fe3ff04fd79836934276db2fbd062804f2fea884
+    size: 243848
+    bytes: 243848
+    width: 1493
+    height: 999
+  thumb512:
+    path: assets/thumb512/1101f1761685bfa6.webp
+    sha256: 974d743d1f8b0226d1599d4e21b28c828e151282d5230c2032b91a10b9d9bb06
+    size: 11506
+    bytes: 11506
+    width: 512
+    height: 343
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石样本-带标尺暖米黄系
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然米黄大理石
+- 白玉兰石材
+- 生物碎屑大理岩
+colors:
+- 暖米黄色
+- 浅卡其米色
+- 奶油杏色
+style: 现代奢石展陈 / 传统与现代通用
+ai_design_usage: 直接裁切作为3D/AI无缝材质贴图（Albedo Texture） / 佛堂大面积墙地面材质替换 / 精准比例石材排版设计
+prompt_zh: 正交平面扫描的天然暖米黄色大理石大板高清纹理贴图，带厘米与英寸工业测量标尺，尺寸约290x175厘米，温暖均匀的奶油米黄色基底，布满细腻的椭圆形古生物沉积斑点与云雾状微晶肌理，中央有一道极细的天然白色方解石竖向细线，无畸变均匀光照，8K
+  PBR无缝石材材质。
+tags:
+- 米黄大理石样本
+- 带标尺大板扫描图
+- PBR石材贴图
+- 白玉兰米黄
+- 无畸变纹理母板
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 999
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 黑白金狂草交织纹奢石大板扫描图（1493x999），左侧与底部带有0-310cm工业标尺刻度边框，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 右下角存在第三方“STM石猫”水印
+  - 左侧及底部带有数字标尺刻度边框叠加

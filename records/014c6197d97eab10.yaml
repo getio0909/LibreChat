@@ -1,0 +1,77 @@
+id: 014c6197d97eab10
+title_zh: 佛教主题大型佛像及建筑群场景
+source:
+  original_path: 佛教空间设计案例/佛教主题大型佛像及建筑群场景.jpg
+original:
+  path: 佛教空间设计案例/佛教主题大型佛像及建筑群场景.jpg
+  sha256: 014c6197d97eab101dc566f65a1d9c57d785b8e3a772ff26d30784623761fbb0
+  bytes: 94864
+  width: 400
+  height: 240
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/014c6197d97eab10.jpg
+    sha256: 96eefc045189a6481e04d3a39482c97d25d190b58f2b06c9f46860c28694a6c2
+    size: 24114
+    bytes: 24114
+    width: 400
+    height: 240
+  thumb512:
+    path: assets/thumb512/014c6197d97eab10.webp
+    sha256: d938f9b0c07f2cbbe08c7ffcd994d60c023b62dc06558a3634ee3768ff73cd95
+    size: 14902
+    bytes: 14902
+    width: 400
+    height: 240
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 贴金锻铜大佛
+- 米白花岗岩地宫外墙
+- 白色石雕覆钵塔
+- 深浅灰花岗岩广场地砖
+colors:
+- 佛像金
+- 暖米白
+- 苍翠绿
+- 青瓦灰
+style: 传统汉传宫殿式
+ai_design_usage: 大型佛教文化景区中轴线总体规划、山顶露天大佛与金刚宝座式阶梯地宫建筑群合成
+prompt_zh: 大型佛教文化景区中轴线建筑群全景规划效果图，宏伟对称构图，远景翠绿山巅矗立一尊巨型露天金身释迦牟尼佛坐像，大佛前方为巨型米白色石材阶梯金字塔式地宫建筑，地宫顶部中央设白色覆钵式佛塔、四角立小型方塔，底部为三拱门殿堂与金色万佛长廊，前景为宽阔的花岗岩拼花朝圣广场，两侧对称耸立三层唐风重檐楼阁与大型石雕四大天王护法像，蓝天白云，气势磅礴，8K建筑景观渲染。
+tags:
+- 佛教空间案例
+- 佛教文化景区
+- 露天金身大佛
+- 覆钵式地宫
+- 中轴对称建筑群
+- 朝圣广场
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 240
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D architectural rendering (400x240) of a large Buddhist cultural park axial plaza with a giant outdoor golden
+    seated Buddha, stepped stone underground palace base, white stupa, and flanking 3-story Tang-style pavilions.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

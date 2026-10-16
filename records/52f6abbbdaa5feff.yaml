@@ -1,0 +1,72 @@
+id: 52f6abbbdaa5feff
+title_zh: 佛教寺庙建筑与庭院景观
+source:
+  original_path: 佛教空间设计案例/佛教寺庙建筑与庭院景观.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙建筑与庭院景观.jpg
+  sha256: 52f6abbbdaa5feffb9cd33ec4342e033e10134dd0f9e9d20047ffcc1e73665fd
+  bytes: 120197
+  width: 349
+  height: 383
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/52f6abbbdaa5feff.jpg
+    sha256: ecd2de425865cb719ec338ef9b944bedc4e6af41053796046228998d733745e9
+    size: 31877
+    bytes: 31877
+    width: 349
+    height: 383
+  thumb512:
+    path: assets/thumb512/52f6abbbdaa5feff.webp
+    sha256: a77dccf2fedaab36cba4e17f2539c25d12011053ee8c5a5bd4595d6a72d2a76e
+    size: 19022
+    bytes: 19022
+    width: 349
+    height: 383
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院红木重檐建筑与禅意罗汉松庭院景观
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红木古建
+- 罗汉松
+- 汉白玉栏杆
+colors:
+- 赭红木色
+- 苍翠松绿
+- 青绿彩绘
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统中式寺院庭院景观节点设计 / 古建红木格栅花窗与造型罗汉松构图参考 / 禅意园林局部氛围渲染；推荐搭配：红棕柚木/菠萝格古建木作 + 造型云片罗汉松/黑松 + 芝麻白花岗岩条石台基 + 汉白玉莲花望柱栏杆
+prompt_zh: 中国传统佛教寺庙庭院景观局部特写，前景为一株枝干苍劲、修剪成水平层云状的翠绿罗汉松，右下角有汉白玉莲花柱头栏杆；背景左侧为传统红木古建筑立面，带有精细的方格木棂花窗、粗壮红木圆柱、深挑檐斗拱与青石条石台基；右侧为相连的传统游廊，檐下饰有青绿描金彩绘额枋与雀替，阳光洒在松枝与木窗上，光影层次分明，宁静古朴的禅意庭院实景感。
+tags:
+- 寺院庭院景观
+- 造型罗汉松
+- 传统红木古建
+- 中式方格花窗
+- 游廊彩绘檐口
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 349
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统寺院内院红木建筑花窗、彩绘游廊檐口与造型罗汉松庭院局部图，原图分辨率极低（349x383）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 349x383 (<800px short side)'

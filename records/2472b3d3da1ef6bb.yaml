@@ -1,0 +1,73 @@
+id: 2472b3d3da1ef6bb
+title_zh: 佛教石材拼花展览图
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/佛教石材拼花展览图.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/佛教石材拼花展览图.jpg
+  sha256: 2472b3d3da1ef6bb8ce33c18e326f26e513a963cee3752b37e39bc921030a3bf
+  bytes: 393596
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2472b3d3da1ef6bb.jpg
+    sha256: 009b5cfc3f763875fe925a84eed1690bd8d9fe6c33475cc215f0337647741863
+    size: 423896
+    bytes: 423896
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/2472b3d3da1ef6bb.webp
+    sha256: 5c05b8d34faef721fab0d48cdd89fb9c996cb97e694dde9cc6320620c98ce0c2
+    size: 39796
+    bytes: 39796
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 纹样
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然大理石
+colors:
+- 暖金灰绿底
+- 赤金脉
+- 黑白根波打线
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 佛堂/大殿地面拼花分格参考 / 展位地面波打线收边设计 / ControlNet Lineart 地面铺装结构提取
+prompt_zh: 俯视斜角特写，高档佛教空间地面大理石拼花模组，中心为2x3排列的梦幻庄园奢石规格砖，灰绿与暖金橘棕色交织的天然云雾纹理，外围镶嵌一圈深黑色白纹黑白根大理石窄条波打线，最外圈环绕同色系暖金灰绿石材边砖，高光镜面抛光质感，反射顶部天窗光影，红色检验地毯背景，超高清写实摄影。
+tags:
+- 梦幻庄园
+- 金镶玉
+- 地面拼花
+- 波打线设计
+- 佛教地面铺装
+- 规格板预铺
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Factory dry-lay floor arrangement of Gold-Jade (梦幻庄园/金镶玉) cut-to-size tiles framed by black-and-white border strips
+    on red inspection carpet.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,71 @@
+id: 7926520acaffbc48
+title_zh: 天然石材纹理特写-02
+source:
+  original_path: 蓝金灰大板自家产品/天然石材纹理特写-02.jpg
+original:
+  path: 蓝金灰大板自家产品/天然石材纹理特写-02.jpg
+  sha256: 7926520acaffbc487c2aa75b4519229cd78fc889e9e4ef231e890af20d1b1547
+  bytes: 771733
+  width: 722
+  height: 1445
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7926520acaffbc48.jpg
+    sha256: df5e94683482a1d5dd4f161345371d9452db2136b7d485b371a14b2a0a38ad87
+    size: 213952
+    bytes: 213952
+    width: 722
+    height: 1445
+  thumb512:
+    path: assets/thumb512/7926520acaffbc48.webp
+    sha256: 9c79d3eeed9a4fdb1cb1b2fd4393150ad0e9841eb2c5147d3322932fc29db890
+    size: 30132
+    bytes: 30132
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 蓝金灰微距特写
+colors:
+- 钢蓝碎斑
+- 香槟金胶结网脉
+- 斑马纹岩屑
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 3D渲染/ComfyUI 直接PBR材质贴图 / 家具台面、香炉底座、茶盘石材材质生成 / IP-Adapter 纹理特征注入
+prompt_zh: 蓝金灰天然奢石微距正射PBR材质贴图，细腻的钢蓝灰鹅卵石状微晶角砾与数块带有黑白平行斑马条纹的蓝灰岩块共生，周围被温暖的香槟金、浅蜜黄与米白色钙质网状脉络紧密包裹胶结，右下角略带暖粉晕染，平光无阴影，8k超高清石材肌理。
+tags:
+- 蓝金灰微距特写
+- PBR材质贴图
+- 斑马纹角砾
+- 钢蓝香槟金
+- 无缝石材样本
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 722
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 'Vertical 1:2 orthographic texture crop from #343 showing brecciated steel-blue clasts and champagne-gold veins of
+    Blue-Gold-Grey marble.'
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

@@ -1,0 +1,75 @@
+id: bc3f205e9f31f836
+title_zh: 禅意长廊景观设计
+source:
+  original_path: 佛教空间设计案例/禅意长廊景观设计.jpg
+original:
+  path: 佛教空间设计案例/禅意长廊景观设计.jpg
+  sha256: bc3f205e9f31f836a1f07fb094a54f9404bf214d279e4f24105388036b6013e2
+  bytes: 2674395
+  width: 3432
+  height: 2569
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/bc3f205e9f31f836.jpg
+    sha256: 83c81e4e65b92d00faad707aa6dc764f9662d1e9eabef231110d3e32617863e0
+    size: 382099
+    bytes: 382099
+    width: 2048
+    height: 1533
+  thumb512:
+    path: assets/thumb512/bc3f205e9f31f836.webp
+    sha256: b081eaf33712f59b854d5c7795e5bcf95e0d084720fe9e85dedcfadd0b2f8d60
+    size: 27612
+    bytes: 27612
+    width: 512
+    height: 383
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 原木列柱与竖格栅外廊
+- 下沉式白砂枯山水庭院
+- 翠竹青苔景石
+- 木纹砖走道
+colors:
+- 原木色
+- 白砂翠竹
+style: 现代中式回廊与日式枯山水融合风
+ai_design_usage: 寺院禅房外廊、禅意会所室内外过渡灰空间、中式枯山水竹石内庭院景观设计参考
+prompt_zh: 超高清现代中式禅意长廊与下沉式枯山水内庭院景观设计，横幅一点透视对称构图，中央为一方精致的下沉式矩形枯山水庭院，铺满洁白砂石并耙出细腻水波纹，中间点缀翠绿青苔微地形、黑色泰山景石、挺拔翠竹与右侧的迎客松盆景；庭院四周环绕温暖的原木方柱回廊与通高竖向木格栅隔断，地面铺设木纹砖并以深灰青石条收边，顶部为木梁格栅采光天棚，自然天光倾泻而下，静谧空灵，8K园林建筑渲染
+tags:
+- 禅意长廊
+- 枯山水庭院
+- 室内竹石造景
+- 寺院回廊设计
+- 木格栅灰空间
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2569
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 新中式合院连廊竹林庭院雪景/白砂景渲染图，左下角带有半透明“一圆居空间设计”印章水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 左下角存在第三方“一圆居空间设计”印章水印

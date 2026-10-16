@@ -1,0 +1,69 @@
+id: a4ec9572b74af603
+title_zh: 大理石瓷砖排列展示
+source:
+  original_path: 蓝金灰大板自家产品/大理石瓷砖排列展示.jpg
+original:
+  path: 蓝金灰大板自家产品/大理石瓷砖排列展示.jpg
+  sha256: a4ec9572b74af60319ed37b3254924af8512b4bbc692ed69129a4655c1dde7f0
+  bytes: 4725856
+  width: 4096
+  height: 3072
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a4ec9572b74af603.jpg
+    sha256: b5897b9b3f355863a7d8da7565875ac6481b05ccb1b0cc9fb95455dd97f9f10a
+    size: 680834
+    bytes: 680834
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/a4ec9572b74af603.webp
+    sha256: 88dcf92a1e524c5c3841a3aad93f0ff667581d3b735cdfa079e881b329ca1577
+    size: 42134
+    bytes: 42134
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 蓝金灰定制规格板
+colors:
+- 深烟灰蓝与浅金白斜向条带
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 一楼大堂/佛堂主背景墙分块连纹安装效果参考 / 深灰蓝流云纹大理石贴图 / 工程石材编号排版管理示例
+prompt_zh: 4K俯视特写摄影，地面预排版检验中的蓝金灰天然大理石背景墙定制规格板，深邃的炭灰蓝、烟灰与象牙白、浅香槟金色带呈斜向层理流云状跨砖连续延伸，板面贴有印着“订单号QT2411-181 部位1F背景墙”的白色工程定位标签，高光镜面抛光，严丝合缝的连纹石材工艺。
+tags:
+- 蓝金灰规格板
+- 1F背景墙定制
+- 订单号QT2411-181
+- 跨砖连纹排版
+- 斜向流云纹大理石
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K close-up of vein-matched Blue-Gold-Grey cut-to-size background wall tiles dry-laid on the floor with physical
+    order stickers.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,72 @@
+id: f239d2b5a8e358ed
+title_zh: 暖色调天然石材展示板
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/暖色调天然石材展示板.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/暖色调天然石材展示板.jpg
+  sha256: f239d2b5a8e358edef287cec60f289e8b394887f2319554b3f79b3a85d92fe2b
+  bytes: 5225693
+  width: 3378
+  height: 2252
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f239d2b5a8e358ed.jpg
+    sha256: e934577dc81228448815e9b5583af3779c4b4716c1097a5313623a9bebde6d64
+    size: 715255
+    bytes: 715255
+    width: 2048
+    height: 1365
+  thumb512:
+    path: assets/thumb512/f239d2b5a8e358ed.webp
+    sha256: 62f858411916e78e41ca9ed3e25812394a597a6f167d680e34e3daf27beae9d3
+    size: 34866
+    bytes: 34866
+    width: 512
+    height: 341
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 金镶玉大板
+colors:
+- 暖琥珀金
+- 橘粉底
+- 双道斜向白玉脉
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 「金镶玉」奢石核心母本贴图（裁剪去除绿带后可用于无缝延展） / 高端佛堂正中背光屏风设计 / 吉祥寓意奢石推荐标准图
+prompt_zh: 正面超清特写，一整块近正方形的“金镶玉”天然奢石大板，温暖华贵的琥珀金、暖杏黄与胭脂橘粉底色上，有两条温润如白玉的方解石结晶主脉从右上向左下平行斜向贯穿，周围密布细致的赤金色网纹，真正呈现金玉交辉的天然宝石质感，镜面高光抛光，石材展厅背景，8k超高清。
+tags:
+- 金镶玉
+- 梦幻庄园
+- 白玉方解石脉
+- 琥珀金奢石
+- 佛堂核心背景墙
+- 金玉满堂吉祥石材
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res front-on photo of a Gold-Jade (金镶玉/梦幻庄园) slab with two diagonal white calcite veins and green strapping
+    bands.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

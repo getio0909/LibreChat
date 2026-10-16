@@ -1,0 +1,78 @@
+id: 1e244f82172fdec5
+title_zh: 佛教室内佛龛展示空间
+source:
+  original_path: 佛教空间设计案例/佛教室内佛龛展示空间.jpg
+original:
+  path: 佛教空间设计案例/佛教室内佛龛展示空间.jpg
+  sha256: 1e244f82172fdec585c2a87b5bcc0a633a4eb86d2b5435210cec249b3f7ce968
+  bytes: 3333468
+  width: 3701
+  height: 2579
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1e244f82172fdec5.jpg
+    sha256: 88e433c721d0bd321ac83f3806ba1d5b6d693565608b56f826715b69b1bd8452
+    size: 392941
+    bytes: 392941
+    width: 2048
+    height: 1427
+  thumb512:
+    path: assets/thumb512/1e244f82172fdec5.webp
+    sha256: ff9301fbadf29d3b711a7d293808c5457cde755e72e41b6d2a7e52cbc89c244d
+    size: 32172
+    bytes: 32172
+    width: 512
+    height: 357
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 地藏殿与功德堂
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 水刀拼花大理石
+- 汉白玉雕花柱础
+- 鎏金地藏菩萨像
+- 发光功德莲位格
+- 实木圆柱与挂落
+- 重彩菩萨立轴
+colors:
+- 深木棕
+- 灰褐色
+- 辉煌金
+- 柔白色
+- 汉白玉白
+style: 传统汉传地藏殿与现代功德堂融合风
+ai_design_usage: 寺院地藏殿/功德堂/往生莲位堂室内空间设计、框景式柱廊与水刀拼花地面搭配参考
+prompt_zh: 中式佛教地藏殿与功德堂室内佛龛展示空间，对称框景构图，前景两根深棕色实木圆柱配精雕汉白玉回纹莲花鼓形柱础，柱间上方设镂空木雕挂落门楣，内室正中央为圆拱形柔白发光佛龛，供奉头戴五佛冠的地藏王菩萨金身坐像，前设木雕供桌与两个黄色圆蒲团，主龛两侧及侧墙镶嵌发光金色万佛功德格，左右两侧墙面对称悬挂两幅巨型工笔重彩立姿菩萨画像，顶部圆形发光藻井，高光深灰褐大理石地面镶嵌白色与红色几何水刀拼花，8K建筑渲染
+tags:
+- 地藏殿
+- 功德堂佛龛
+- 汉白玉柱础
+- 水刀拼花地面
+- 框景构图
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2579
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a Ksitigarbha merit hall framed by timber columns on carved white marble bases, featuring a central
+    golden Ksitigarbha niche flanked by illuminated merit registers and bodhisattva paintings.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

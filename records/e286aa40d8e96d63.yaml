@@ -1,0 +1,71 @@
+id: e286aa40d8e96d63
+title_zh: 佛教主题圆形雕刻艺术品
+source:
+  original_path: 佛教家具与陈设素材/佛教主题圆形雕刻艺术品.jpg
+original:
+  path: 佛教家具与陈设素材/佛教主题圆形雕刻艺术品.jpg
+  sha256: e286aa40d8e96d63cc4731e7404e7936077af1a798a495ce769ca121891d0b8c
+  bytes: 589860
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e286aa40d8e96d63.jpg
+    sha256: 804fc95196cd790bc7cb0e63482610f668502737e2d7ef593f26efe5a62bb10e
+    size: 637053
+    bytes: 637053
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/e286aa40d8e96d63.webp
+    sha256: 0ebea8a390c2095f8392260f89783490d46413f3f0b3592eaca0cdd9918a4619
+    size: 68550
+    bytes: 68550
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 纹样
+- 造型
+category_l1: 佛教家具与陈设
+category_l2: 法器供具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 实木高浮雕
+- 矿物彩绘
+- 描金
+colors:
+- 暖棕木配象牙白彩绘
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 佛堂案头中小型圆屏摆件植入 / 藏传“和气四瑞”传统吉祥图像生成参考 / 深浮雕木雕彩绘质感学习
+prompt_zh: 近景微距艺术品摄影，一座精美的藏传佛教“和气四瑞图”圆形实木深浮雕彩绘座屏摆件，圆形外框雕刻一圈红、绿、黄三色交替的立体莲瓣宝珠，圆盘内部多层镂空深浮雕一头粉耳象牙白大象，象背骑着金色猕猴，猴肩立白兔，兔顶展翅翠鸟，背景为结满粉红果实的绿叶古树与金色镂空祥云，下方承接描金卷云木雕底座，古朴矿物彩绘包浆质感，8K超高清。
+tags:
+- 和气四瑞图
+- 圆形木雕座屏
+- 白象猕猴瑞兽
+- 藏传吉祥艺术品
+- 深浮雕彩绘
+- 案头陈设摆件
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 展厅实拍藏传佛教《和气四瑞图》圆形实木高浮雕彩绘座屏摆件。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

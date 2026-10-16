@@ -1,0 +1,73 @@
+id: 343ced7238bf60dd
+title_zh: 佛教雕像展览墙设计
+source:
+  original_path: 佛教空间设计案例/佛教雕像展览墙设计.jpg
+original:
+  path: 佛教空间设计案例/佛教雕像展览墙设计.jpg
+  sha256: 343ced7238bf60dd686297dab75e29947e3ded628ae7aca29805d5de7242a2c0
+  bytes: 149781
+  width: 434
+  height: 381
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/343ced7238bf60dd.jpg
+    sha256: f067dbd917154dcf31f9f564b6d1a527b0e81e2437eff630be6ee23534d4ccd1
+    size: 38156
+    bytes: 38156
+    width: 434
+    height: 381
+  thumb512:
+    path: assets/thumb512/343ced7238bf60dd.webp
+    sha256: 208d6cbb333bd69da406af697e223ed2d8e2a8a4f7a4375cc6f5b347bd426ab1
+    size: 22628
+    bytes: 22628
+    width: 434
+    height: 381
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 造型
+- 纹样
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉罗汉高浮雕台基景墙
+- 连续圆拱形坐佛石龛长廊
+- 深色挑檐
+colors:
+- 汉白玉白
+- 浅灰白
+style: 现代新唐风与石窟艺术融合风
+ai_design_usage: 寺院建筑基座外立面设计、上层拱龛坐佛与下层罗汉浮雕墙双层石雕立面参考
+prompt_zh: 现代佛教建筑双层汉白玉石雕展览外墙设计，分为上下两层结构：上层为连续的石窟式火焰圆拱形石门长廊，每个拱形壁龛内供奉一尊石雕坐佛，外设汉白玉栏杆与深色现代挑檐；下层建筑台基外墙镶嵌巨幅汉白玉高浮雕十八罗汉与祥云人物长卷壁画，石质洁白细腻，现代新唐风宗教建筑立面局部，光影立体，高细节建筑渲染
+tags:
+- 石雕展览墙
+- 汉白玉浮雕墙
+- 石窟拱龛长廊
+- 十八罗汉浮雕
+- 寺院台基设计
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 381
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 石雕须弥座台基与镂空莲花石栏杆转角局部图，原图尺寸434x381分辨率过低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 434x381 (<800px short side)'
+  - 分辨率过低（434x381，最短边<768px）

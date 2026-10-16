@@ -1,0 +1,76 @@
+id: 90c0316795a809c7
+title_zh: 佛教石材展览设计材质图
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材展览设计材质图.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材展览设计材质图.jpg
+  sha256: 90c0316795a809c7c71fe03a7e9e8b9361fbf6ccacda44c73dc758a62ecd7d37
+  bytes: 1158459
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/90c0316795a809c7.jpg
+    sha256: 074204e5a4dc23c05afb7ec4d7cc509b16f4823560dd7052635a069c103b6d79
+    size: 306789
+    bytes: 306789
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/90c0316795a809c7.webp
+    sha256: 6968687b187224d9da2e173a0388775b0640366ad039f16d983c0394c2de5ade
+    size: 20326
+    bytes: 20326
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-01展位3D轴测材质索引图
+entity_type: 工程设计图纸
+summary_zh: ''
+materials:
+- 木结构
+- 大理石
+- 铲灯
+- 轨道灯
+colors:
+- 暖米白(C13M9Y19K0)
+- 金棕
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 商业展位3D轴测全要素材质与灯光工程标注汇报图模板参考
+prompt_zh: 展览工程设计汇报总图“01 材质图”，3D等轴测45度鸟瞰渲染图配中文工程材质引线标注，展示10m×7.5m两面开口的新中式“莊嚴寶刹”佛教石材展位：顶部标注“整体木结构贴纸饰面 C:13 M:9 Y:19 K:0”，地面满铺大理石带不锈钢条收边，右侧为“天然美石·佛國畫卷”巨幅石材背景墙配9盏长臂金卤灯，左侧为侧面内凹藏黄色灯带的折角佛龛背景墙与石雕供桌，中央设两张白色洽谈圆桌与右上角中式实木茶桌、接待台，四周带有“轨道灯、发光字（背发光）、PVC雕刻字、大理石产品”等清晰引线标签，白底专业设计图。
+tags:
+- 26年春季佛事展
+- 01材质图
+- 3D轴测图
+- 展位材质说明
+- 不锈钢条收边
+- 长臂金卤灯
+material_ids:
+- dunhuang-gold
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展01材质图，以3D轴测视角标注展位八处材质、灯具与收边工艺。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

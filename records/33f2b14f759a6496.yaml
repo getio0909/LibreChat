@@ -1,0 +1,74 @@
+id: 33f2b14f759a6496
+title_zh: 佛教观音雕像室内展示
+source:
+  original_path: 25年秋季佛事展设计方案/佛教观音雕像室内展示.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教观音雕像室内展示.jpg
+  sha256: 33f2b14f759a6496d6dfebd3f9289222e21c52353f1ca90f61556fe4a7e394d9
+  bytes: 4029920
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/33f2b14f759a6496.jpg
+    sha256: 7cbfbbd4e3b550e4477bea7916c168f66443dce82e72226e61240474daa364c5
+    size: 836308
+    bytes: 836308
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/33f2b14f759a6496.webp
+    sha256: 87063c19def2d7e9742567fcdb2855cce201a8bc4744392d09647f93f2add204
+    size: 51896
+    bytes: 51896
+    width: 288
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛事展展位方案
+category_l2: 佛像造像-彩绘观世音菩萨立像
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 贴金彩绘造像
+- 镂空莲花背光
+colors:
+- 石绿
+- 黛蓝
+- 藕荷粉
+- 纯金
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 汉传佛教观音菩萨庄严法相、云水团花衣纹与青绿背光生图参考
+prompt_zh: 汉传佛教极彩描金观世音菩萨立像近景仰拍特写，菩萨面如满月，慈悲庄严，头戴贴金化佛宝冠，胸佩华丽金璎珞，双手于胸腹前结优雅说法手印；肩披浅藕粉描金披肩，身着松石绿底满绘金线祥云水波纹与五彩宝相团花纹的锦绣天衣，内衬朱红织金长裙；身后环绕圆形金色头光与舟形全镂空石绿色卷草紫金莲花大背光，背景为高挑的暖金棕色金镶玉天然大理石大板墙面与透光石莲花藻井天花，色彩典雅瑰丽，8K佛教艺术微距摄影。
+tags:
+- 观世音菩萨立像
+- 极彩描金造像
+- 青绿云水衣纹
+- 化佛宝冠
+- 镂空莲花背光
+- 金镶玉背景墙
+material_ids:
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展金镶玉奢石背景墙前的极彩描金观世音菩萨立像近景特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

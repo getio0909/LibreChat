@@ -1,0 +1,71 @@
+id: 4160a59fa255db3e
+title_zh: 灰色大理石纹理石材
+source:
+  original_path: 蓝金灰大板自家产品/灰色大理石纹理石材.jpg
+original:
+  path: 蓝金灰大板自家产品/灰色大理石纹理石材.jpg
+  sha256: 4160a59fa255db3e4f15e34d3fcf7edcccf17182b6c10542f365d7581e7a6066
+  bytes: 724652
+  width: 707
+  height: 1413
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4160a59fa255db3e.jpg
+    sha256: 5940643d7dd4a03b7346b239a2a294d82037d39058c9dfe6079dbd32b14cbb0f
+    size: 218769
+    bytes: 218769
+    width: 707
+    height: 1413
+  thumb512:
+    path: assets/thumb512/4160a59fa255db3e.webp
+    sha256: c76d751c39899f6355fa8a0a4985692eaec2874578773b90804c04649601e6fc
+    size: 32276
+    bytes: 32276
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 蓝金灰微距特写
+colors:
+- 深黛蓝灰
+- 暖沙金斜云
+- 纵向赤铜红脉
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 稳重型现代禅堂/茶室深色背景墙贴图 / 佛像须弥座基座或展台包覆石材贴图 / 深色金属感奢石材质参考
+prompt_zh: 深色系蓝金灰天然大理石竖向正射微距贴图，深沉冷峻的黛蓝灰与钢青色基底，中部斜穿一道温暖的沙金色云带，一条色泽如赤铜般鲜明的铁锈红曲折主脉自右上向左下贯穿全图，伴随垂直的纯白细丝线与碎裂网纹，高清PBR石材贴图质感。
+tags:
+- 深色蓝金灰
+- 黛蓝赤铜脉
+- PBR竖向贴图
+- 稳重禅意石材
+- 须弥座基座材质
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 707
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 'Vertical 1:2 orthographic texture crop from #350 showing deep slate-blue tones, warm sand-gold bands, and copper-red
+    veins of Blue-Gold-Grey marble.'
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

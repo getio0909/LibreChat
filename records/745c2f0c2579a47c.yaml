@@ -1,0 +1,73 @@
+id: 745c2f0c2579a47c
+title_zh: 灰色大理石石材展示图
+source:
+  original_path: 常用石材大板/灰色大理石石材展示图.jpg
+original:
+  path: 常用石材大板/灰色大理石石材展示图.jpg
+  sha256: 745c2f0c2579a47c120da66a551f1873d223b4d9c4595adf4314625b2123bc43
+  bytes: 1020467
+  width: 2032
+  height: 1524
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/745c2f0c2579a47c.jpg
+    sha256: 8c304ae4fac24682aeb97f0f723f6d7d57ae3af22ee8b528ba830245488c54a4
+    size: 614540
+    bytes: 614540
+    width: 2032
+    height: 1524
+  thumb512:
+    path: assets/thumb512/745c2f0c2579a47c.webp
+    sha256: ba7a3a96d3f532a4c1ae227064a5bbe8556992efd7f0ab20ced87f239888a8e7
+    size: 37474
+    bytes: 37474
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用大理石大板-浅暖灰细密冰裂系
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然浅灰大理石
+- 冰裂网纹灰大理石
+colors:
+- 浅暖灰色
+- 米灰色
+- 银白色
+- 乳白色
+style: 现代奢石展陈 / 新中式雅致灰调
+ai_design_usage: 新中式禅茶室/书房整墙铺贴 / 现代寺院讲堂与走廊地面通铺 / 佛像展陈底座包覆材质
+prompt_zh: 超高清浅暖灰色冰裂网纹天然大理石大板正面展示，温和的浅米灰色基底，全板均匀交织着细密如蛛网与碎冰般的银白色、乳白色斜向细脉纹理，高光镜面抛光反射厂房顶部条形天窗，细腻高雅的现代东方空间装饰石材，8K画质。
+tags:
+- 浅灰冰裂纹
+- 蛛网灰大理石
+- 鑫盛隆矿业
+- 米灰大板
+- 新中式墙地面石材
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1524
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: Light warm grey spiderweb-veined marble slab in factory with tiled '鑫盛隆矿业' watermarks and bottom-right STM石猫 watermark.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

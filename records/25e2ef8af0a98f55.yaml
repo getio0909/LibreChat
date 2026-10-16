@@ -1,0 +1,77 @@
+id: 25e2ef8af0a98f55
+title_zh: 佛教雕像展览空间设计
+source:
+  original_path: 佛堂空间设计参考/佛教雕像展览空间设计.jpg
+original:
+  path: 佛堂空间设计参考/佛教雕像展览空间设计.jpg
+  sha256: 25e2ef8af0a98f551744e40d033193e53ef6ac6895bf2236e8e61252246e686f
+  bytes: 111780
+  width: 720
+  height: 960
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/25e2ef8af0a98f55.jpg
+    sha256: de1cde821ef52895fe37bf0e68d03f6fd25809bed66e2424a7409e3018a92275
+    size: 121207
+    bytes: 121207
+    width: 720
+    height: 960
+  thumb512:
+    path: assets/thumb512/25e2ef8af0a98f55.webp
+    sha256: e490c985aadc7bd9601c65cc5456e7413f82a2c65d107ff9a44bf55f940a4819
+    size: 33456
+    bytes: 33456
+    width: 384
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉/缅甸白玉坐佛
+- 朱砂红火焰形佛龛背板
+- 深红木通高书架
+- 精装烫金大藏经
+- 高光大理石地面
+colors:
+- 纯白
+- 朱砂红
+- 深红棕
+- 明黄与宝蓝点缀
+style: 东南亚泰式老挝风
+ai_design_usage: 佛教图书馆/藏经阁主视觉墙设计、汉白玉南传坐佛与朱红火焰龛撞色搭配、博物馆级佛像主展台构图
+prompt_zh: 东南亚泰式佛教藏经阁与白玉佛像展览空间设计，竖幅低角度中轴对称构图，正中央白色多层须弥台基上供奉一尊通体洁白温润的汉白玉南传偏袒右肩禅定坐佛，佛像背后为泰式传统火焰尖拱形朱红色内凹大佛龛，佛龛后方与左右两侧是顶天立地的五跨深红木大藏经书架墙，密集陈列数千册红色、黄色与蓝色烫金精装佛经，前景为黑色石材供桌与高光浅灰大理石地面，顶部重点射灯照亮纯白佛身，庄严神圣，8K室内实景摄影
+tags:
+- 泰式藏经阁
+- 汉白玉坐佛
+- 火焰拱形佛龛
+- 红白撞色设计
+- 通高书架墙
+- 佛教博物馆
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 720
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 南传佛教通高经书架与朱红火焰形佛龛白玉坐佛展厅实景，分辨率偏低（720×960）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

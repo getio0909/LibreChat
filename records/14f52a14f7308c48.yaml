@@ -1,0 +1,77 @@
+id: 14f52a14f7308c48
+title_zh: 禅意木质室内设计案例
+source:
+  original_path: 佛教空间设计案例/禅意木质室内设计案例.jpg
+original:
+  path: 佛教空间设计案例/禅意木质室内设计案例.jpg
+  sha256: 14f52a14f7308c48121ed9a16f0ec932f2f7d43f05022deb078acf6320b2e189
+  bytes: 2358804
+  width: 3433
+  height: 2584
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/14f52a14f7308c48.jpg
+    sha256: 471e268cea19395dec184318b07ec7f83bb265608a198e543e2e59301fd14693
+    size: 327023
+    bytes: 327023
+    width: 2048
+    height: 1542
+  thumb512:
+    path: assets/thumb512/14f52a14f7308c48.webp
+    sha256: ec27b031fa3062ce6477033d22a74796df5a70f69cbee63b68912c997089d8c6
+    size: 22650
+    bytes: 22650
+    width: 512
+    height: 385
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 原木圆柱配白色石雕柱础
+- 发光金箔山水竖屏
+- 老榆木长茶桌
+- 黑皮禅椅
+- 方形坐垫
+colors:
+- 原木暖色
+- 鎏金米白
+style: 现代新中式原木石础禅茶风
+ai_design_usage: 现代高端禅茶馆/寺院客厅室内设计、原木立柱配汉白玉柱础与发光金箔山水屏风参考
+prompt_zh: 超高清现代禅意木质茶室与会所室内设计案例，横幅广角透视，右侧前景矗立一根粗壮的天然原木大圆柱，底部承托精美的白色汉白玉石雕鼓形柱础，柱旁摆放一张厚重的老榆木长条茶桌与黑色皮垫中式禅椅，桌上布置茶席与红叶盆景；画面左侧地面并排放置两个米色方形打坐蒲团，正后方原木护墙板上镶嵌四幅竖向长条形内发光金箔水墨山水屏风，左侧为通高竖向木格栅移门，浅米灰哑光石材地面，原木平顶嵌几何线性灯槽，雅致禅意，8K室内效果图
+tags:
+- 禅意木质室内
+- 汉白玉柱础
+- 原木茶室
+- 发光山水屏风
+- 寺院客堂设计
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2584
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 新中式禅意茶室夜景渲染图。左下角带有半透明“一圆居空间设计”印章水印；summary_zh与materials存在多处幻觉：左侧木柱柱础实为深灰黑色石鼓墩而非“白色汉白玉石雕鼓形柱础”，左墙实为半降白色卷帘的玻璃窗（窗外为夜景翠竹）而非“四幅内发光金箔水墨山水竖屏”，茶桌配椅为白垫木方凳而非“黑皮禅椅”。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 左下角存在第三方“一圆居空间设计”印章水印
+  - summary_zh与materials存在明显幻觉（误称白色汉白玉柱础、四幅金箔水墨山水竖屏及黑皮禅椅，实际为深灰黑石础、卷帘竹景窗及白垫木方凳）

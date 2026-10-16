@@ -1,0 +1,71 @@
+id: 841ae5f19a2d85c0
+title_zh: 佛教石材浮雕细节图
+source:
+  original_path: 佛教空间设计案例/佛教石材浮雕细节图.jpg
+original:
+  path: 佛教空间设计案例/佛教石材浮雕细节图.jpg
+  sha256: 841ae5f19a2d85c053a5183cd5c11fb18aeb47ad969b9da4668b3fc059cb168e
+  bytes: 84581
+  width: 261
+  height: 381
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/841ae5f19a2d85c0.jpg
+    sha256: 6bbca237d57f03b6fbd33f80d045e7076c5557dca1432feb989d5c3fb2c97c05
+    size: 22735
+    bytes: 22735
+    width: 261
+    height: 381
+  thumb512:
+    path: assets/thumb512/841ae5f19a2d85c0.webp
+    sha256: c93e782671cc4246f7deab2af0e994283ad760f399018f81a6269b57cff82fb4
+    size: 13820
+    bytes: 13820
+    width: 261
+    height: 381
+library_type: 石刻纹样
+studio_roles:
+- 纹样
+- 造型
+- 参考
+category_l1: 佛教空间案例
+category_l2: 传统青石深浮雕天宫楼阁与卷草莲花纹石刻板构件
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 青石深浮雕与透雕
+colors:
+- 冷调蓝灰青石
+- 顶部暖黄洗墙光
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统寺院青石影壁/门楼深浮雕花板设计 / 极乐天宫楼阁与缠枝卷草纹石雕图案生成 / 古建青石雕刻材质细节参考；推荐搭配：嘉祥青石/茶园青石五轴深浮雕 + 边框原木或青石线脚收口 + 顶部暗藏2700K洗墙微光灯条
+prompt_zh: 中国传统佛教寺院青石深浮雕装饰花板细节特写，冷调蓝灰色青石材质，画面正中央深浮雕一座精致的重檐歇山顶天宫楼阁古建筑，飞檐翘角与瓦垄清晰立体；天宫四周被层层叠叠、繁复交织的缠枝卷草纹、西番莲纹与如意祥云纹紧密环绕，底部由盛开的仰莲花瓣托起；雕刻刀法深峻细腻，立体感极强，石板顶部边缘有一抹温暖的黄色洗墙灯光，传统古建青石雕工艺写实。
+tags:
+- 青石深浮雕
+- 天宫楼阁石雕
+- 缠枝卷草纹
+- 寺院影壁浮雕
+- 传统石刻花板
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 261
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 汉白玉飞天反弹琵琶局部浮雕，与#249同源局部裁剪，原图尺寸261x381分辨率偏低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 261x381 (<800px short side)'
+  - 分辨率过低（261x381，最短边<768px）

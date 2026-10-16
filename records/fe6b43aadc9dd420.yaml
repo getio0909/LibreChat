@@ -1,0 +1,71 @@
+id: fe6b43aadc9dd420
+title_zh: 佛教风格石材天花板与墙面装饰
+source:
+  original_path: 25年秋季佛事展设计方案/佛教风格石材天花板与墙面装饰.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教风格石材天花板与墙面装饰.jpg
+  sha256: fe6b43aadc9dd4200e432c15568cea39429dd9ddbfcf4ebb0e90b714abe261b8
+  bytes: 4272505
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fe6b43aadc9dd420.jpg
+    sha256: baa0d3ac6183f28690dd8727d015039c4c55ad6ddfd6dfa8ca4ed704460f9640
+    size: 837878
+    bytes: 837878
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/fe6b43aadc9dd420.webp
+    sha256: d9521fc1a7168a72cf5000ed9429c1f9b480d4cc479ea25011a7ef3298599c5e
+    size: 45674
+    bytes: 45674
+    width: 288
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 材质
+- 纹样
+- 参考
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-天地墙石材交接构造
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 金镶玉透光石藻井
+- 金镶玉竖向墙板
+colors:
+- 琥珀暖金
+- 深胡桃木色
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 顶面透光云石金色宝相花藻井与墙面奢石无缝衔接节点参考
+prompt_zh: 佛教奢石空间天花板与墙面交接节点仰视特写，顶部为深胡桃木井字格栅构成的藻井吊顶，每个方格内嵌背光发光的天然金镶玉透光石板，石材透出琥珀金与白色冰裂纹理，正中印有精致的金色八瓣宝相莲花曼荼罗纹；下方垂直衔接同款天然金镶玉大理石高光大板墙面，采用黑色金属竖条等距分缝，右侧为三层退台式深木色挑檐梁结构，完美展现同一种奢石在透光吊顶与高光墙面上的双重美学质感，8K建筑细部摄影。
+tags:
+- 金镶玉透光石
+- 莲花藻井天花
+- 石材天地墙一体化
+- 黑钛分缝背景墙
+- 建筑节点细部
+material_ids:
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展顶面金镶玉透光石宝相莲花藻井与立面金镶玉竖向分缝背景墙转角交接仰视特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

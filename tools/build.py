@@ -269,7 +269,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--wiki-root",
-        default="/home/wangtinghu/workspace/zybc/wiki",
+        default=str(Path(__file__).resolve().parent.parent.parent / "wiki"),
         help="Read-only path to the original wiki directory for packaging originals.",
     )
     parser.add_argument(

@@ -1,0 +1,76 @@
+id: 63046abfa229875d
+title_zh: 佛教殿堂内双佛雕像与装饰设计
+source:
+  original_path: 佛教空间设计案例/佛教殿堂内双佛雕像与装饰设计.jpg
+original:
+  path: 佛教空间设计案例/佛教殿堂内双佛雕像与装饰设计.jpg
+  sha256: 63046abfa229875d443f4602844390021b8a5e7f0c2f60584cfb38dc416484fa
+  bytes: 4776003
+  width: 3387
+  height: 2549
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/63046abfa229875d.jpg
+    sha256: 9dbef5c690ddbdcf217c8d7317b458ad1c913e6e7718aadd10933c1237d23f4e
+    size: 624682
+    bytes: 624682
+    width: 2048
+    height: 1541
+  thumb512:
+    path: assets/thumb512/63046abfa229875d.webp
+    sha256: 7e307090a1644b8b8577d9d06d57c76194ecde8dd7e26847165cde304a60b39d
+    size: 58586
+    bytes: 58586
+    width: 512
+    height: 385
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代绚彩琉璃万佛墙与双身背靠背金佛圆殿场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 蓝
+- 青
+- 红）
+- 暖橙莲座
+- 鎏金铜佛
+- 琉璃背光万佛墙
+- 高光大理石
+colors:
+- 鎏金铜色
+- 炫彩霓虹（紫
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：现代沉浸式琉璃光影万佛殿空间设计 / 中心绕佛式双身/四面金佛坛城参考 / 发光琉璃莲花座与多彩LED万佛柱生成；推荐搭配：锻铜鎏金大型立佛 + 暖橙透光琉璃发光莲花座 + 透光云石/琉璃RGB背光万佛墙面与圆柱
+  + 高光镜面红褐大理石地面
+prompt_zh: 现代沉浸式圆形佛教万佛宝殿室内场景，低角度广角仰视，殿堂正中央铜雕须弥座与橙黄色透光琉璃盛开莲花宝座上，矗立两尊背靠背的高大鎏金立佛雕像；正上方为同心圆层叠贴金与发光云石穹顶藻井；四周环绕弧形万佛墙与四根粗壮的万佛圆柱，墙面与柱身密布方格小佛龛，并发出青蓝、紫红、品红、金黄与纯白交织的绚丽琉璃背光；高光浅褐红色镜面大理石地面清晰倒映出五彩万佛墙与金色佛像，宛如东方琉璃世界，8K超高清渲染。
+tags:
+- 琉璃万佛宝殿
+- 双身鎏金立佛
+- 发光琉璃莲花座
+- 多彩LED万佛柱
+- 中心坛城设计
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2549
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代圆形万佛宝殿中央双身鎏金立佛、橙黄透光琉璃莲座与四周炫彩LED发光万佛墙柱三维效果图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

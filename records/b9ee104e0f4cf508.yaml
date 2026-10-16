@@ -1,0 +1,74 @@
+id: b9ee104e0f4cf508
+title_zh: 佛教寺庙大殿内部展示场景-03
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部展示场景-03.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部展示场景-03.jpg
+  sha256: b9ee104e0f4cf508efd59ef2cae0c8cff3444358bdfd041c206c3b797ac916c5
+  bytes: 4768914
+  width: 4543
+  height: 2553
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b9ee104e0f4cf508.jpg
+    sha256: 12107ea91e4982696c4490eaa21307b597d91f27ad692fd8e8d5a219045ce558
+    size: 416594
+    bytes: 416594
+    width: 2048
+    height: 1151
+  thumb512:
+    path: assets/thumb512/b9ee104e0f4cf508.webp
+    sha256: ef4b6bd6b313cfac429b0cb6edbbed8568bf85efed6ba94cd243e5001151d006
+    size: 32744
+    bytes: 32744
+    width: 512
+    height: 288
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 双层挑空千手观音主尊
+- 通体贴金浮雕巨柱
+- 二层汉白玉栏杆挑台
+- 四壁万佛墙与壁画
+- 橘红宫灯阵列
+- 高光黑石地面
+colors:
+- 辉煌金
+- 玄黑镜面
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 大型双层挑空千手观音阁（圆通宝殿）金殿设计、通体贴金雕花圆柱与高光黑石地面镜面倒影营造参考
+prompt_zh: 金碧辉煌的双层挑空佛教寺庙千手观音大殿（圆通宝殿）正面中轴对称全景，地面满铺高光深灰黑色镜面大理石，倒映出璀璨金光与红灯笼，大殿内矗立四根顶天立地的通体贴金浮雕大圆柱（柱身雕刻缠枝莲与如意云纹，配深色石雕莲花柱础），正中央双层须弥座与雕花护栏主坛上供奉高大的铜鎏金千手千眼观音立像（带巨型镂空火焰背光），上方悬挑圆形蓝底星空贴金藻井，主坛前设三张供桌与两排共八个黄色方形拜垫，一二层挑空回廊（配白色汉白玉雕花栏杆）四壁满布发光万佛墙与佛教壁画，一层廊下悬挂一排橘红色传统宫灯，8K超清渲染
+tags:
+- 千手观音殿
+- 双层挑空金殿
+- 贴金浮雕巨柱
+- 汉白玉挑台栏杆
+- 圆通宝殿
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 双层挑空千手观音圆通宝殿正面中轴超宽全景三维效果图，配通体贴金浮雕巨柱与二层汉白玉栏杆挑台。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

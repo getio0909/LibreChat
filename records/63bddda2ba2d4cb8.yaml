@@ -1,0 +1,75 @@
+id: 63bddda2ba2d4cb8
+title_zh: 传统雕花家具套装含石材装饰
+source:
+  original_path: 佛教家具与陈设素材/传统雕花家具套装含石材装饰.jpg
+original:
+  path: 佛教家具与陈设素材/传统雕花家具套装含石材装饰.jpg
+  sha256: 63bddda2ba2d4cb8baaae2b8c15e0fcb0217020d19e2482e08b4c249660adb10
+  bytes: 329034
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/63bddda2ba2d4cb8.jpg
+    sha256: 2256cf22f6566b02b619ad535b15ae127127df7c799498b92dba83339981ab88
+    size: 348597
+    bytes: 348597
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/63bddda2ba2d4cb8.webp
+    sha256: cb9805183c94c98a19924f8c5e8a5f7b01d58233409d1d76a4f706177c41d1f0
+    size: 32798
+    bytes: 32798
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 乌木黑檀
+- 孔雀石绿玉
+- 螺钿绿松石
+colors:
+- 玄黑配翠绿
+style: 汉藏融合宫廷嵌石风
+ai_design_usage: 木石结合家具材质替换（ControlNet Depth） / 奢石茶几与沙发软装单品生成 / 孔雀翎与莲花螺钿镶嵌纹理参考
+prompt_zh: 纯白背景产品摄影，一套奢华新中式佛教主题乌木雕花实木沙发与茶几组合，深黑色乌木框架，坐面与方形大茶几台面镶嵌整块抛光帝王绿翡翠大理石，沙发靠背高浮雕翠绿孔雀羽毛与盛开莲花，扶手外侧雕刻孔雀翎羽，茶几束腰镶嵌绿松石与幻彩螺钿，虎爪兽腿，台面摆放实木茶盘与青花茶具，俯视45度角，极致材质细节，8K商业家具渲染。
+tags:
+- 嵌石实木家具
+- 乌木黑檀
+- 翠绿大理石
+- 孔雀翎莲花雕花
+- 螺钿绿松石镶嵌
+- 中式佛堂会客沙发
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: 豆包AI生成的白底乌木雕花嵌翠绿石材中式沙发茶几组合，右下角带'豆包AI生成'水印，被误标为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

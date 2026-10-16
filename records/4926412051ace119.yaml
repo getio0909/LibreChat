@@ -1,0 +1,77 @@
+id: 4926412051ace119
+title_zh: 传统中式室内展览空间
+source:
+  original_path: 佛教空间设计案例/传统中式室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/传统中式室内展览空间.jpg
+  sha256: 4926412051ace119df8b1f4c8b8bea5e1ac9ca4b157e23961e348cb7544f8b13
+  bytes: 162376
+  width: 486
+  height: 321
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4926412051ace119.jpg
+    sha256: 57343c7e6c451a17dccb86e5b953b6adf814e570135c14b4eb7903999297a537
+    size: 46614
+    bytes: 46614
+    width: 486
+    height: 321
+  thumb512:
+    path: assets/thumb512/4926412051ace119.webp
+    sha256: 22a892d6257d9e8f2d79971f6db8a8d61708940a057e7a524de74b0d59bc624e
+    size: 30958
+    bytes: 30958
+    width: 486
+    height: 321
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 乌木黑漆描金木柱
+- 汉白玉仰覆莲柱础
+- 墨绿抛光大理石
+- 透光宣纸隔扇
+colors:
+- 乌木黑
+- 赤金色
+- 深墨绿
+- 米白色
+style: 传统汉传宫殿式
+ai_design_usage: 高端黑金宫殿风佛教博物馆、罗汉书画展陈长廊与传统木构藻井展厅空间生成
+prompt_zh: 传统中式黑金宫殿风格佛教文化艺术展厅室内设计，一点透视纵深构图，成排高耸的乌木黑漆大圆柱，柱头与柱脚饰有华丽的鎏金卷草莲花纹，底部为汉白玉雕刻莲花柱础，顶部为黑金彩绘月梁斗拱与几何纹藻井天花，左侧为黑漆描金花格门与透光宣纸屏风，远端米白背景墙绘有金色云海并悬挂四幅罗汉高僧古画立轴，底部暗藏暖光洗墙灯带，地面铺设深墨绿色抛光大理石，尊贵庄严，8K室内效果图。
+tags:
+- 佛教空间案例
+- 黑金宫殿风
+- 佛教艺术展厅
+- 描金木柱
+- 莲花柱础
+- 罗汉画轴
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 321
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D interior rendering (486x321) of a black-and-gold palace-style exhibition hall with black lacquer columns,
+    gilt collars, white marble lotus bases, and 4 Arhat hanging scrolls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

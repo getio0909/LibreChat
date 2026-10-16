@@ -1,0 +1,73 @@
+id: 494ef286d4b787b4
+title_zh: 佛教殿堂内部石材装饰场景
+source:
+  original_path: 佛教空间设计案例/佛教殿堂内部石材装饰场景.jpg
+original:
+  path: 佛教空间设计案例/佛教殿堂内部石材装饰场景.jpg
+  sha256: 494ef286d4b787b49357d213af6a27d0ba43f316c205517cf77acef4ae11d009
+  bytes: 939061
+  width: 1685
+  height: 1261
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/494ef286d4b787b4.jpg
+    sha256: 6077273efe1f64ff63f2bfebb47cbd202ddcb0c8e95c7726f73a4b761ea90531
+    size: 263361
+    bytes: 263361
+    width: 1685
+    height: 1261
+  thumb512:
+    path: assets/thumb512/494ef286d4b787b4.webp
+    sha256: 13f6b26fa5c98b10a7cfedc40f309d6663657be716a943b7dbd23066f3c4da09
+    size: 33156
+    bytes: 33156
+    width: 512
+    height: 383
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统金碧八角宝盖藻井与白玉须弥坛城大殿场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉须弥座
+- 镜面大理石
+- 贴金八角宝盖
+colors:
+- 璀璨金色
+- 纯白汉白玉
+- 深咖镜面石
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：奢华寺院主殿广角中轴对称空间设计 / 高光深色镜面大理石倒影效果参考 / 八角贴金垂悬宝盖藻井与汉白玉坛城组合生成；推荐搭配：房山汉白玉雕花须弥座坛城 + 黑白根/深啡网高光镜面大理石地面 + 24K贴金八角垂悬宝盖藻井
+  + 暖黄背光万佛墙
+prompt_zh: 奢华庄严的佛教寺院大殿内部广角对称场景，前景左右对称矗立两根粗壮的米白色大理石方柱，下部为深灰黑色高浮雕莲花须弥柱础；大殿地面铺设光洁如镜的深咖色带白纹高光大理石，完美倒映整个大殿；中央为一座洁白的汉白玉雕花栏杆围绕的须弥座坛城，前端有汉白玉台阶，两侧伫立金色护法神像，坛城中央金色高台上供奉金身坐佛与蓝金大背光；正上方八角形金碧藻井中心垂挂一座巨大的多层贴金华盖宝盖，四周墙面满布暖黄色发光的方格万佛墙，气势恢宏，高清建筑渲染。
+tags:
+- 八角宝盖藻井
+- 汉白玉须弥坛城
+- 镜面大理石地面
+- 奢华佛殿设计
+- 发光万佛墙
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1261
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 中心坛城式奢石大殿广角三维效果图（与#190同景），深咖黑底白金纹镜面大理石地面配汉白玉须弥月台与八角垂悬宝盖。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

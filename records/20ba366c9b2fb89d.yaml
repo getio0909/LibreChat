@@ -1,0 +1,78 @@
+id: 20ba366c9b2fb89d
+title_zh: 佛教主题室内展览场景-03
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览场景-03.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览场景-03.jpg
+  sha256: 20ba366c9b2fb89d985a7303e6fb8cbe738bfd819b254617b2eeb07ad42443ec
+  bytes: 180277
+  width: 570
+  height: 320
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/20ba366c9b2fb89d.jpg
+    sha256: e25327a2a6b0b74839f283d13246841c98d71c24d990da07e530e9bbf986fcae
+    size: 52368
+    bytes: 52368
+    width: 570
+    height: 320
+  thumb512:
+    path: assets/thumb512/20ba366c9b2fb89d.webp
+    sha256: 76a13c52c1c4555f4cd0be7d1474221066237687a9d3b5169f3c4ce288c12dc6
+    size: 28884
+    bytes: 28884
+    width: 512
+    height: 287
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 乌木黑漆描金圆柱
+- 汉白玉莲花柱础与须弥座
+- 贴金大佛
+- 青白玉透光奢石屏风
+- 墨绿高光大理石
+colors:
+- 乌木黑
+- 赤金色
+- 青白玉色
+- 深墨绿
+style: 传统汉传宫殿式
+ai_design_usage: 黑金宫殿风大佛供奉展厅设计、佛像背光弧形奢石屏风生成与多跨木构藻井空间参考
+prompt_zh: 传统黑金宫殿风格大型佛教文化艺术展厅室内全景，广角透视构图，成排高耸的乌木黑漆大圆柱，上下两端饰有华丽的鎏金卷草莲花纹柱套，立于汉白玉莲花柱础上，顶部为黑金斗拱与井字格栅藻井天花，右侧白色石雕须弥座上供奉一尊大型金身释迦牟尼坐佛，带有火焰形雕花金背光，佛像背后竖立三扇高耸的圆弧顶青白玉山水纹发光奢石屏风，远端展墙悬挂罗汉水墨立轴，深墨绿色高光大理石地面倒影清晰，恢宏庄严，8K建筑渲染。
+tags:
+- 佛教空间案例
+- 黑金宫殿风
+- 金身大佛
+- 奢石发光屏风
+- 藻井天花
+- 莲花柱础
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 320
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res 3D interior rendering (570x320) of a black-and-gold palace-style Buddhist hall with a golden seated Buddha
+    in front of 3 arched translucent jade/marble screens.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

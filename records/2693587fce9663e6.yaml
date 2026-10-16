@@ -1,0 +1,78 @@
+id: 2693587fce9663e6
+title_zh: 佛教主题展厅空间设计
+source:
+  original_path: 佛教空间设计案例/佛教主题展厅空间设计.jpg
+original:
+  path: 佛教空间设计案例/佛教主题展厅空间设计.jpg
+  sha256: 2693587fce9663e6e933fb7dc60d9f0bf16b8721d82960a4ace609edf5dc7a72
+  bytes: 2500554
+  width: 3436
+  height: 2562
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2693587fce9663e6.jpg
+    sha256: fbdd6bc74732bcd3ed9a957854b91ef7c03ddf900e2864668429c84a86f0e64a
+    size: 366563
+    bytes: 366563
+    width: 2048
+    height: 1527
+  thumb512:
+    path: assets/thumb512/2693587fce9663e6.webp
+    sha256: 8501fe4ec59c9ce0886c251648bc1e8097b5e38ea1f3b1d963bde0bb3b5bdbf2
+    size: 31200
+    bytes: 31200
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 佛经壁画与藏经文化展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 原木实木格栅
+- 素面清水混凝土
+- 定制彩绘壁画壁纸
+- 白纱帘
+- 绿植苔藓
+colors:
+- 原木暖黄
+- 水泥浅灰
+- 壁画青绿朱红
+- 素白
+style: 现代东方禅意茶室与书院风
+ai_design_usage: 佛教博物馆序厅设计 / 汉白玉云纹栏杆与橙玉发光莲花植入 / 藏经书架背景墙构图
+prompt_zh: 中国佛教文化博物馆展厅室内设计，前景是洁白的汉白玉卷云纹雕花栏杆与望柱，左侧陈列一朵巨大的橙黄色透光玉石发光莲花雕件，正面主墙是通顶深色实木藏经书柜，正中央镶嵌巨幅仿古佛陀说法壁画并由顶部射灯照亮，左侧设有发光轮廓的传统壶门拱门与坡屋顶木椽结构，古朴典雅，8k效果图。
+tags:
+- 佛教博物馆
+- 汉白玉栏杆
+- 透光黄玉莲花
+- 藏经书柜
+- 说法图壁画
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2562
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering of a traditional dark redwood sutra library and mural hall with a large central Buddhist
+    preaching mural, carved white marble balustrade in right foreground, and glowing orange jade lotus pedestal on left. Metadata
+    materials/colors fields are misaligned (claiming 素面清水混凝土/白纱帘/绿植苔藓).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: materials/colors/style fields claim 素面清水混凝土/白纱帘/绿植苔藓 which are completely absent'

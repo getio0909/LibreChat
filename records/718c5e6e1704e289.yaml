@@ -1,0 +1,75 @@
+id: 718c5e6e1704e289
+title_zh: 潮州己略黄公祠｜梁枋漆金木雕
+source:
+  original_path: 设计风格精选20261010/chaozhou-jilue-beams.jpg
+original:
+  path: 设计风格精选20261010/chaozhou-jilue-beams.jpg
+  sha256: 718c5e6e1704e289b217cf812ea800d254a4acc3f5422486c16f1a8fb3e083b2
+  bytes: 10476647
+  width: 5456
+  height: 3632
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/718c5e6e1704e289.jpg
+    sha256: fed528a89aeef3bcd6b682b3323919198972d8536424da6ece9247fe115463d8
+    size: 640667
+    bytes: 640667
+    width: 2048
+    height: 1363
+  thumb512:
+    path: assets/thumb512/718c5e6e1704e289.webp
+    sha256: d7bfb63b508df0bd0b1cb23d3a646baeb6e5269addefad3039d8aa7fdf1a3d5b
+    size: 45550
+    bytes: 45550
+    width: 512
+    height: 341
+library_type: 建筑景观
+studio_roles:
+- 风格
+- 纹样
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 潮州传统祠堂金漆木雕梁架场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 潮州金漆木雕梁架
+- 浅灰白花岗岩方柱
+- 黑漆描金横梁
+- 朱红圆木椽子
+colors:
+- 赤金色
+- 麻石浅灰白
+- 黑金
+- 朱红色
+style: 闽南潮州传统工艺 / 传统祠堂佛殿建筑
+ai_design_usage: 潮汕/闽南风格祠堂与寺院檐廊空间设计 / 花岗岩石柱与金漆木雕梁架材质碰撞参考 / 古建屋架仰视构图生成
+prompt_zh: 广东潮州己略黄公祠传统建筑檐廊梁架仰视实景，前景与中景为坚实的浅灰白色花岗岩方形石柱，石柱上方托起极其华丽繁复的清代潮州金漆木雕多层梁架结构；朱红色的圆木屋面椽子下方，层层叠叠的金色镂空木雕驼峰、瑞兽斗拱、凤凰托木、黑漆描金山水画横梁以及满雕数十个戏曲人物故事的通雕随梁花板交相辉映，右侧可见庭院绿植与传统灰瓦屋檐，超高清建筑人文摄影。
+tags:
+- 潮州己略黄公祠
+- 金漆木雕梁架
+- 石柱木梁结构
+- 黑漆描金横梁
+- 传统祠堂佛殿空间
+material_ids: []
+provenance:
+  source: web
+  url: https://commons.wikimedia.org/wiki/File:己略黄公祠金漆木雕1.jpg
+  credit: 三猎
+  license: cc-by-sa-4.0
+  license_status: confirmed
+quality:
+  min_side_px: 3632
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res photograph of the ornate Chaozhou gilded wood-carved roof beams and granite columns at the Jilue Huang Ancestral
+    Hall.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

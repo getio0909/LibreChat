@@ -1,0 +1,75 @@
+id: b655bafe26cde807
+title_zh: 大型卧佛石雕展示场景
+source:
+  original_path: 佛教空间设计案例/大型卧佛石雕展示场景.jpg
+original:
+  path: 佛教空间设计案例/大型卧佛石雕展示场景.jpg
+  sha256: b655bafe26cde807d168098d1b9ad244181d28ffdb7540eb1756f5b0841a1a40
+  bytes: 3537105
+  width: 3982
+  height: 2520
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b655bafe26cde807.jpg
+    sha256: 5bdef5aa45a340f1eed17b654ac2abb59966310013e5ad0063112f358d8de0ab
+    size: 340385
+    bytes: 340385
+    width: 2048
+    height: 1296
+  thumb512:
+    path: assets/thumb512/b655bafe26cde807.webp
+    sha256: cafa6ac8058521a211afd4b2edcaf0096676752aab8b53229f4a8cae7af3ee01
+    size: 27058
+    bytes: 27058
+    width: 512
+    height: 324
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 物件
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 巨型整雕汉白玉/米白石释迦涅槃卧佛
+- 黄绸须弥长坛
+- 暖黄浮雕背光墙
+- 深黑星空顶
+colors:
+- 象牙白
+- 金黄色
+style: 现代博物馆式涅槃堂星空意境风
+ai_design_usage: 寺院卧佛殿/涅槃堂室内空间设计、大型石雕卧佛展陈照明与光纤星空顶搭配参考
+prompt_zh: 大型室内佛教涅槃堂与汉白玉石雕卧佛展示空间，横幅广角构图，正中央长条形黄色锦缎须弥佛坛上安奉一尊巨大的白色大理石/汉白玉释迦牟尼佛右胁吉祥卧像，右手支头，神态慈祥安宁，足踏石雕莲花；背后为暖金黄色肌理浮雕背景墙，并设有弧形阶梯状暗藏暖光背光带；天花板为深邃的黑色夜空光纤满天星吊顶，数束精准暖光射灯照亮洁白的卧佛，佛坛前摆放百合鲜花与供果，静谧神圣，8K超清空间摄影
+tags:
+- 大型卧佛
+- 汉白玉石雕
+- 涅槃堂设计
+- 星空顶佛殿
+- 佛教空间案例
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2520
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: false
+  notes: 现代极简巨型发光莲瓣禅堂全景渲染图。右下角带有半透明白色莲花图形水印；此外summary_zh与materials称佛像安奉于“黄色锦缎/黄绸须弥长坛”且供桌陈列“鲜花果品”，实际画面为白石覆莲须弥座底部暖黄LED灯带洗墙，前景长条供案完全空置无鲜花果品。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 右下角存在第三方半透明莲花图形水印
+  - summary_zh与materials存在幻觉（将石座底部暖黄灯带误作黄色锦缎须弥长坛，且虚构鲜花果品供奉）

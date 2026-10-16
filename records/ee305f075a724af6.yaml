@@ -1,0 +1,77 @@
+id: ee305f075a724af6
+title_zh: 佛教主题建筑群鸟瞰图
+source:
+  original_path: 佛教空间设计案例/佛教主题建筑群鸟瞰图.jpg
+original:
+  path: 佛教空间设计案例/佛教主题建筑群鸟瞰图.jpg
+  sha256: ee305f075a724af64961de45d2a05890571b536d15cb9936ce16d8ae42e9b553
+  bytes: 4115371
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ee305f075a724af6.jpg
+    sha256: 7f0b2f8c889eb168a5906d7f0f50b4bb6883ecdbf11c1a40803aa53666d96f5d
+    size: 780601
+    bytes: 780601
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/ee305f075a724af6.webp
+    sha256: 0c7f31d9268325415376c17d51bded2c8fd8bb24aac2e1ec8139a422ef645848
+    size: 51982
+    bytes: 51982
+    width: 512
+    height: 362
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 8K超清寺院文化园与湖心金莲鸟瞰
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉八瓣莲花湖心岛
+- 24K贴金盛世金莲佛坛
+- 青灰瓦重檐木构殿堂群
+- 八角七层木塔
+- 生态景观林木
+colors:
+- 碧水青绿
+- 汉白玉白
+- 鎏金黄
+- 青瓦灰
+- 森林翠绿
+style: 8K皇家伽蓝规制佛教文化园鸟瞰风
+ai_design_usage: 8K大型佛教文化景区/寺院总体规划鸟瞰设计 / 湖心八瓣白玉莲花岛与金莲佛坛地标设计 / 多进院落式传统伽蓝轴线布局参考
+prompt_zh: 8k超高清大型佛教文化旅游景区与森林寺院建筑群鸟瞰规划效果图，高空中轴对称视角，前景清澈湖泊中央是一座由白玉石桥连接的巨型纯白汉白玉八瓣盛开莲花岛，岛心耸立一座金光闪耀的金色莲花佛像坛城，跨过滨水林荫大道与停车场，中景是气势恢宏的多进院落式传统灰瓦木构寺院建筑群，包含弧形回廊广场、山门、钟鼓楼、重檐大雄宝殿，右上方耸立一座七层八角古塔，后方山林间分布着整齐的塔林，四周青山绿水环绕，大师级规划渲染。
+tags:
+- 8K鸟瞰规划图
+- 佛教文化景区
+- 湖心白玉莲花岛
+- 寺院总图规划
+- 七层佛塔
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 8K aerial masterplan render of a lakeside Buddhist cultural park featuring a white marble lotus island altar,
+    nine-arch bridge, pagoda, and traditional timber courtyard halls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

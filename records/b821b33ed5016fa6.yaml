@@ -1,0 +1,71 @@
+id: b821b33ed5016fa6
+title_zh: 佛教主题多层木质展台
+source:
+  original_path: 佛教家具与陈设素材/佛教主题多层木质展台.jpg
+original:
+  path: 佛教家具与陈设素材/佛教主题多层木质展台.jpg
+  sha256: b821b33ed5016fa647c72449d662c8e5f6d5b8f698f4792b19aa6a35b4cc7c6d
+  bytes: 314940
+  width: 1706
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/b821b33ed5016fa6.jpg
+    sha256: 05dd2fa0af8392d885d69c34aa00c3c697ffedaa042e2c0b889e217e959b1c8d
+    size: 340587
+    bytes: 340587
+    width: 1706
+    height: 1279
+  thumb512:
+    path: assets/thumb512/b821b33ed5016fa6.webp
+    sha256: 5ef031725ebd40ff763962717751dd6df18dac15589acd157c8e082e5c728b92
+    size: 38722
+    bytes: 38722
+    width: 512
+    height: 384
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 核桃实木
+- 矿物彩绘
+- 黄铜拉手
+colors:
+- 暖胡桃木本色配彩绘
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: ControlNet三层阶梯式供台结构母本 / 藏式八吉祥与飞天木雕纹样提取 / 坛城与舍利塔专用底座设计
+prompt_zh: 展厅实景摄影，一座大型藏传佛教三层阶梯式核桃木雕花须弥座展台，金字塔式层层内收结构，温暖的原木色实木材质配古朴淡彩描金浮雕，顶层束腰雕刻护法力士与十字金刚杵，中层束腰高浮雕彩色八吉祥纹样，底层双开门柜体中央为四瓣海棠形开光，内雕精美的飞天伎乐菩萨，陈设在彩色几何图案藏式地毯上，45度角透视，8K超清细节。
+tags:
+- 三层木质展台
+- 坛城底座
+- 八吉祥浮雕
+- 飞天伎乐开光
+- 核桃木雕花柜
+- ControlNet实景母本
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 展厅现场实拍三层阶梯式藏式核桃木高浮雕彩绘八吉祥须弥座坛城底柜。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

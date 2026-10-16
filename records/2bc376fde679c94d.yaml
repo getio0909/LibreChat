@@ -1,0 +1,74 @@
+id: 2bc376fde679c94d
+title_zh: 佛教殿堂石材与装饰设计场景
+source:
+  original_path: 佛教空间设计案例/佛教殿堂石材与装饰设计场景.jpg
+original:
+  path: 佛教空间设计案例/佛教殿堂石材与装饰设计场景.jpg
+  sha256: 2bc376fde679c94d782539da6d9fe7f63f8d36bc9843c84b577f2d938e27d1b8
+  bytes: 1086882
+  width: 1681
+  height: 1255
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2bc376fde679c94d.jpg
+    sha256: 82009bd7967cbb4a3ae2ffac0493f9a5fa279aea288f256d1e0c6c3aafa37255
+    size: 300935
+    bytes: 300935
+    width: 1681
+    height: 1255
+  thumb512:
+    path: assets/thumb512/2bc376fde679c94d.webp
+    sha256: 245df2333cdc7ccbc1aae7585d74a40e41fab768879d0c0a394b07b5f2b0f142
+    size: 39002
+    bytes: 39002
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 材质
+category_l1: 佛教空间案例
+category_l2: 金碧宝盖藻井与汉白玉须弥座佛坛近景场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉栏杆
+- 镜面啡网石
+- 贴金造像与藻井
+colors:
+- 辉煌赤金
+- 汉白玉白
+- 深咖镜面
+- 翠绿荷叶
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：大殿中央汉白玉须弥座坛城细部设计 / 佛坛前立体荷花池与护法金刚立像陈设参考 / 贴金覆斗形佛座与垂悬宝盖组合生成；推荐搭配：一级汉白玉精雕台阶与栏板 + 翠绿玉石/彩石立体荷叶莲花池 + 锻铜贴金护法神将与覆斗佛座
+  + 深啡网镜面大理石地面
+prompt_zh: 佛教寺院大殿中央汉白玉须弥座佛坛近景正面特写，严格对称构图，前景为高光深咖色带白纹的镜面大理石地面；中央为五级汉白玉雕花踏步与栏杆，台阶左右两侧设有立体翠绿荷叶与粉色莲花装饰的莲池台基，其上对称伫立两尊威武的贴金护法金刚神将雕像；坛城中央为金碧辉煌的覆斗形高台，下层壶门龛内供奉金色千手观音，上层供奉金身坐佛与蓝金彩绘背光；正上方自八角金碧藻井垂下一座巨大的多层圆锥形贴金华盖，四壁环绕暖黄发光万佛墙，雕工精湛，富丽庄严。
+tags:
+- 汉白玉须弥座
+- 贴金护法神将
+- 立体荷花池台基
+- 垂悬贴金宝盖
+- 镜面奢石地面
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1255
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 中心坛城式大殿汉白玉须弥月台、青绿石雕荷花池底座、贴金护法像与垂悬宝盖中近景三维效果图（#190/#239推进视角）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,74 @@
+id: cd6be3681bfa2aa7
+title_zh: 佛教寺庙内雕像与石材基座展示
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内雕像与石材基座展示.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内雕像与石材基座展示.jpg
+  sha256: cd6be3681bfa2aa732dc4b0d8896e7fca1cf55c525f300f169f0760cb70ce89b
+  bytes: 4066320
+  width: 3071
+  height: 2436
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/cd6be3681bfa2aa7.jpg
+    sha256: cb49208e585f95c6babf45d9b1e99f2661901bf1c5fac5f393f4ccb1f2259e00
+    size: 606307
+    bytes: 606307
+    width: 2048
+    height: 1625
+  thumb512:
+    path: assets/thumb512/cd6be3681bfa2aa7.webp
+    sha256: c137b3e64117d60ea187c7c38ad2b39e9ac09b63c132c176dfc04ce9d3e2eb34
+    size: 50286
+    bytes: 50286
+    width: 512
+    height: 406
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 双层汉白玉精雕仰覆莲须弥座
+- 铜鎏金药师佛与日光菩萨
+- 药叉护法金像
+- “慧日照天”金字楹联
+- 橙红发光万佛墙
+colors:
+- 汉白玉白
+- 辉煌金
+style: 现代奢石与传统佛殿融合风
+ai_design_usage: 药师殿汉白玉精雕须弥座主坛近景深化、汉白玉双层束腰莲瓣雕刻工艺参考、主坛与护法像高低错落布局
+prompt_zh: 佛教寺庙药师殿内雕像与汉白玉石材基座近景特写展示，画面右前方为一座极其精美的双层汉白玉高浮雕束腰须弥座佛坛，细腻雕刻仰覆莲瓣、缠枝宝相花、卷草纹与回纹边框，台座上方供奉巨大的铜鎏金药师佛坐像与手持莲花的日光菩萨鎏金立像，佛像背景左侧竖刻“慧日照天”金色书法大字，画面左侧木雕基座上并列站立两尊披甲威武的铜鎏金护法天王雕像，背后是整面橙红色发光方格万佛墙，石雕工艺精湛，金碧辉煌，8K超清细节
+tags:
+- 汉白玉须弥座
+- 石材基座特写
+- 药师三尊
+- 护法天王立像
+- 慧日照天
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2436
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 药师佛殿主坛双层汉白玉精雕须弥座与护法金像近景三维效果图，左侧楹联实为“智慧照耀天地”。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: 左侧竖排金字楹联实为“智慧照耀天地”，原标注误作“慧日照天”'

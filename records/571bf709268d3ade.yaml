@@ -1,0 +1,77 @@
+id: 571bf709268d3ade
+title_zh: 佛教主题室内展览空间-07
+source:
+  original_path: 佛教空间设计案例/佛教主题室内展览空间-07.jpg
+original:
+  path: 佛教空间设计案例/佛教主题室内展览空间-07.jpg
+  sha256: 571bf709268d3adebe848efdbab717298ab8af82a06029fe70fa1eeee5444557
+  bytes: 3020271
+  width: 3646
+  height: 2551
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/571bf709268d3ade.jpg
+    sha256: 2aa0645d988b31dfe9e71ce57c3e2e68eb94b3f833c216fef1c9646b2a6d63d0
+    size: 369810
+    bytes: 369810
+    width: 2048
+    height: 1433
+  thumb512:
+    path: assets/thumb512/571bf709268d3ade.webp
+    sha256: abf7e6f77253580f5853aa9647d67f2836cd21be78e6e3103619907167f87125
+    size: 29812
+    bytes: 29812
+    width: 512
+    height: 358
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 暖原木大圆柱与拱形格栅天花
+- 鎏金回纹铜柱套
+- 汉白玉覆盆柱础
+- 实木抄经长矮桌
+- 仿古青石方砖
+colors:
+- 暖原木棕
+- 青石深灰
+- 佛画暖金
+- 坐垫素白
+style: 现代禅意
+ai_design_usage: 大型禅修讲堂与后殿功德牌位堂二进式复合空间规划、三跨拱形木格栅穹顶天花结构生成
+prompt_zh: 新中式大型佛教禅修讲堂与后殿功德堂二进式复合空间全景设计，深远的中轴对称一点透视构图，前景两侧耸立粗壮的暖色原木大圆柱，底部包镶鎏金回纹铜圈并立于浅灰汉白玉覆盆柱础上，顶部为极具韵律感的三跨弧形拱顶木条格栅天花配传统斗拱，左右两翼高墙镶嵌巨幅发光水墨罗汉与山水国画，深灰黑色青石板地面中央整齐排列多排新中式实木抄经长矮桌与白色方形坐垫，远端后殿正中悬挂巨幅暖金色佛教壁画，两侧对称排布通高发光木质祈福牌位架，禅意庄严，8K超高清渲染。
+tags:
+- 佛教空间案例
+- 禅修讲堂
+- 抄经堂
+- 功德牌位堂
+- 拱形木格栅天花
+- 二进式空间
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2551
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: High-res 3D interior rendering of a two-section sutra-copying and lecture hall with arched wooden louver ceiling,
+    large wood columns with gilt bronze collars, low sutra tables, ink Arhat murals, and rear merit tablet hall.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

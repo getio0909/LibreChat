@@ -1,0 +1,72 @@
+id: dccf671fae000a63
+title_zh: 天然石材纹理特写-04
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/天然石材纹理特写-04.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/天然石材纹理特写-04.jpg
+  sha256: dccf671fae000a63779d94c1944344012f818f877485d41057b6396e17fe417a
+  bytes: 500401
+  width: 564
+  height: 1129
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/dccf671fae000a63.jpg
+    sha256: cef3511e9ae5ca85d7e024507c4a5e9c0bda83cf8b9d6a171bb4a9b281cf6bcd
+    size: 133740
+    bytes: 133740
+    width: 564
+    height: 1129
+  thumb512:
+    path: assets/thumb512/dccf671fae000a63.webp
+    sha256: 987aa442412607185a75c628da727a80333a76ae92ef0e71836a3cf15d00f901
+    size: 23990
+    bytes: 23990
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梦幻庄园大理石
+colors:
+- 暖褐粉棕
+- 冷烟灰蓝
+- 墨灰斜脉
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 3D渲染/ComfyUI 直接材质贴图（Albedo/Diffuse Map） / 家具台面或佛龛局部嵌石贴图 / IP-Adapter 材质风格提取
+prompt_zh: 天然梦幻庄园奢石微距正射纹理贴图，冷调烟灰蓝与暖调赤陶粉棕色块自然交融的角砾状大理石肌理，一条深墨灰色伴生铁锈金边的天然矿物主脉沿对角线斜向贯穿，周围遍布细腻的暗红与赤金色蛛网状细脉，高清无缝石材表面材质，高解析度PBR贴图质感。
+tags:
+- 梦幻庄园
+- 石材纹理特写
+- PBR材质贴图
+- 冷暖撞色奢石
+- 角砾状大理石
+- 无缝贴图样本
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 564
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Vertical orthographic close-up swatch of Gold-Jade (梦幻庄园) marble showing warm pinkish-brown and cool grey-blue breccia
+    with dark veins.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

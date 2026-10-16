@@ -1,0 +1,71 @@
+id: 189d4b2b51c85453
+title_zh: 灰色石材拼贴材料展示
+source:
+  original_path: 蓝金灰大板自家产品/灰色石材拼贴材料展示.jpg
+original:
+  path: 蓝金灰大板自家产品/灰色石材拼贴材料展示.jpg
+  sha256: 189d4b2b51c85453bcd1c90f0c39c60af7abdfd7850d2abd31cd3ac6098616ac
+  bytes: 4048466
+  width: 3072
+  height: 4096
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/189d4b2b51c85453.jpg
+    sha256: e5c371115d30960b825d3c422188127777c985d63a0c53a89f95cff42c989528
+    size: 615578
+    bytes: 615578
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/189d4b2b51c85453.webp
+    sha256: 73145c857901268ec81dcb3dee268d8462bc972fccda2b9b7506915339fd361d
+    size: 39652
+    bytes: 39652
+    width: 384
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 纹样
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然大理石组合
+colors:
+- 蓝金灰主砖
+- 蓝金灰夹汉白玉三线波打
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: 现代佛堂/佛事展展位地面高级灰波打线收边设计参考 / 复合三线波打线构造详图参考 / 冷调奢石地面铺装效果图生成
+prompt_zh: 竖幅4K高角度俯视实景，石材检验垫上整齐预拼贴着高级现代禅意地面石材模组，右侧为大尺寸蓝金灰天然奢石主砖（深浅烟灰蓝、暖米金云纹配赤红细丝脉），左侧边缘设计有精致的三重复合波打线（两条蓝金灰窄条中间夹一条纯白汉白玉细线），高光镜面抛光反射条形顶灯，精湛石材地面拼花工艺。
+tags:
+- 蓝金灰拼花
+- 复合三线波打线
+- 现代禅意地面
+- 灰白撞色镶边
+- 地面排版预铺
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3072
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K vertical shot of dry-laid Blue-Gold-Grey floor tiles paired with a three-strip grey-and-white border inlay on
+    a workshop mat.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

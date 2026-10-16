@@ -1,0 +1,78 @@
+id: 8cd7d875b0fdf558
+title_zh: 佛教寺庙佛坛室内场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙佛坛室内场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙佛坛室内场景.jpg
+  sha256: 8cd7d875b0fdf558c873f7f4c542fdeb06d829fef23fc593a25738131076ba55
+  bytes: 1249914
+  width: 2215
+  height: 1248
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/8cd7d875b0fdf558.jpg
+    sha256: e0c79243645b495863c43f7f1955f3f39390109511be759971e6114119bfb9e0
+    size: 303513
+    bytes: 303513
+    width: 2048
+    height: 1154
+  thumb512:
+    path: assets/thumb512/8cd7d875b0fdf558.webp
+    sha256: 2a7cc52ef6b244166e2e45a8ddeaa7a7bfd6144b0813b8c4f5f1295b7309e3a9
+    size: 28794
+    bytes: 28794
+    width: 512
+    height: 288
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 青蓝透光琉璃砖
+- 原木方格万佛龛
+- 铜鎏金坐佛
+- 深色红木供桌
+- 深灰青石砖地面
+- 明黄方蒲团
+colors:
+- 青蓝琉璃色
+- 原木暖黄
+- 辉煌金
+- 纯白色
+- 深灰黑色
+style: 现代新中式琉璃光影与原木万佛堂风
+ai_design_usage: 现代寺院精舍万佛堂/药师佛坛设计、青蓝色透光琉璃砖拱龛与温暖原木万佛格冷暖对比参考
+prompt_zh: 现代创意佛教寺庙万佛坛室内场景，宽幅中轴对称构图，正中央供奉一尊金身坐佛，脑后有一轮纯白色发光圆光，佛龛外围拱门由一格格散发清澈青蓝色光芒的半透明透光琉璃砖镶嵌而成，左右两侧墙面是整齐排列的原木色方格发光万佛龛阵列，内置数百尊小金佛，冷暖光影对比鲜明，前方居中摆放一张深色红木雕花供桌与两个明黄色方形蒲团，深灰黑色青石砖地面带白色砖缝，8K室内效果图
+tags:
+- 透光琉璃砖
+- 蓝光佛龛
+- 原木万佛墙
+- 冷暖光对比
+- 现代佛坛
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1248
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a modern Buddhist hall contrasting a central cyan-blue translucent glass-brick arch and glowing white
+    halo behind a golden seated Buddha with warm natural-wood grid 10,000-Buddha walls.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,71 @@
+id: ffc8820e3d69674a
+title_zh: 观音像室内宗教展示场景
+source:
+  original_path: 佛教空间设计案例/观音像室内宗教展示场景.jpg
+original:
+  path: 佛教空间设计案例/观音像室内宗教展示场景.jpg
+  sha256: ffc8820e3d69674a9a3df9a44427f233c751da9788654e255c4c22608f7cb4fd
+  bytes: 4585624
+  width: 3415
+  height: 2564
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ffc8820e3d69674a.jpg
+    sha256: ed424b6f960368f5b37300699948f944c8fbd390d39bf8fc13bb5a7c93221db0
+    size: 607294
+    bytes: 607294
+    width: 2048
+    height: 1538
+  thumb512:
+    path: assets/thumb512/ffc8820e3d69674a.webp
+    sha256: d472292efc903755a160ced91700df01b755ca739478ab419806ce54812ff819
+    size: 60808
+    bytes: 60808
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 巨型汉白玉观音菩萨坐像
+- 八角千瓣金莲穹顶藻井
+- 八面通高发光万佛墙
+colors:
+- 汉白玉白
+- 辉煌金
+style: 现代大型寺院八角金莲万佛殿风
+ai_design_usage: 大型八角观音宝殿/圆通殿仰视空间设计（与图33同殿不同视角）、万佛墙环绕汉白玉主尊构图
+prompt_zh: 超高清大型佛教八角观音宝殿室内广角仰视效果图，中轴对称构图，殿堂正中央高大的米黄石雕莲花须弥座上供奉一尊圣洁宏伟的纯白汉白玉观音菩萨结跏趺坐像，头戴宝冠，法相慈悲；大殿四周八面高墙满布通顶发光的金色万佛墙小佛龛，转角立柱悬挂庄严佛幡；正上方顶部为一朵无比壮观的巨型八角形千瓣金莲花穹顶藻井，层层金色立体莲花瓣向中心汇聚并散发璀璨暖金光芒，白玉与黄金交相辉映，神圣震撼，8K建筑室内渲染
+tags:
+- 观音宝殿
+- 汉白玉观音
+- 八角金莲藻井
+- 万佛墙大殿
+- 仰视穹顶构图
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2564
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代中式大雄宝殿室内设计渲染图（与#291、#294同场景，本图为裁去底部水印的横幅全景），展示雕花贴金藻井、三世佛大龛与发光千佛格栅墙，画面无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

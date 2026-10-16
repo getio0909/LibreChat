@@ -1,0 +1,74 @@
+id: d452595172feee2f
+title_zh: 木雕菩萨坐像
+source:
+  original_path: 佛教空间设计案例/木雕菩萨坐像.jpg
+original:
+  path: 佛教空间设计案例/木雕菩萨坐像.jpg
+  sha256: d452595172feee2f5e7fba5a31b06883f740c6982cb32ac6b298e89fe232921b
+  bytes: 124883
+  width: 346
+  height: 800
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d452595172feee2f.jpg
+    sha256: 1d3c75ca14777aa6006872989e9a83a0bc805bd049c37fe0ae6f6d82db810560
+    size: 34239
+    bytes: 34239
+    width: 346
+    height: 800
+  thumb512:
+    path: assets/thumb512/d452595172feee2f.webp
+    sha256: c87e7b7f38568592d489909ada96730021ee1f7952662aea5a81c0b9c4d40302
+    size: 9108
+    bytes: 9108
+    width: 221
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 佛像造像
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 整木精雕手持如意观音菩萨坐像
+- 镂空卷草圆背光
+- 岩石禅座
+- 戏剧性顶光照明
+colors:
+- 沉香木棕
+- 暖琥珀色
+style: 明清精细原木圆雕与现代美术馆光影风
+ai_design_usage: 佛教艺术馆木雕造像独立展柜照明设计、原木雕刻刀法衣纹与光影明暗对比参考
+prompt_zh: 名贵檀香木整木精雕如意观音菩萨坐像特写，修长竖幅构图，深邃暗黑背景，一束戏剧性的暖色聚光灯从正上方垂直照亮佛像，观音菩萨面容清雅慈悲，双手于胸前执持一柄吉祥如意，衣纹流畅飘逸，背后矗立一轮精巧绝伦的圆形镂空透雕卷草火焰纹木背光，下方端坐于立体雕刻的山石禅座与方形木底座之上，原木琥珀色温润包浆，8K大师级木雕艺术摄影
+tags:
+- 木雕菩萨
+- 如意观音
+- 檀香木雕
+- 镂空木背光
+- 戏剧性光影
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 346
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 朱红金漆彩绘木雕八角七层宝塔模型，原图尺寸346x800分辨率偏低。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 346x800 (<800px short side)'
+  - 分辨率过低（346x800，最短边<768px）

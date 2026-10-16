@@ -1,0 +1,76 @@
+id: 4996a8f02d109e8c
+title_zh: 佛教大殿三尊金佛展示场景
+source:
+  original_path: 佛教空间设计案例/佛教大殿三尊金佛展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教大殿三尊金佛展示场景.jpg
+  sha256: 4996a8f02d109e8c46af6cc6c692e4dd04cea6f071a21350984f20c844e5ff19
+  bytes: 9240772
+  width: 7937
+  height: 3055
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4996a8f02d109e8c.jpg
+    sha256: f3a8bd3a45208a936217fbb64b665d4c43a7c71ae66d8a923a484420a5d50f2c
+    size: 435672
+    bytes: 435672
+    width: 2048
+    height: 788
+  thumb512:
+    path: assets/thumb512/4996a8f02d109e8c.webp
+    sha256: 81903292926e4135972dd7b51b93c5b668dbe071263b5ac957ac03ade88b0ba2
+    size: 29608
+    bytes: 29608
+    width: 512
+    height: 197
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 铜鎏金大佛
+- 汉白玉须弥座
+- 朱红木构斗拱
+- 重彩佛教壁画
+- 暗红锦缎背景
+colors:
+- 辉煌金
+- 朱红色
+- 汉白玉白
+- 暗绯红
+style: 传统汉传皇家宫殿式大殿
+ai_design_usage: 大型寺院大雄宝殿全景空间规划、三世佛与十八罗汉堂标准陈设范式、古建斗拱藻井与壁画结合参考
+prompt_zh: 超宽全景大雄宝殿室内设计效果图，正中供奉三尊巨型鎏金三世佛坐像，精雕火焰纹大背光，下承汉白玉多层雕花须弥座，暗红色锦缎背景墙，大殿东西两侧下层为朱红木雕飞檐长龛供奉十八罗汉与护法菩萨金像，上层为巨幅中国传统工笔重彩佛教说法图壁画与高窗，顶部为朱红斗拱梁架与三座八角形发光金色藻井，红棕色石材地面排列整齐的米色拜垫蒲团，恢弘庄严，皇家寺院气派，8K超高清全景渲染
+tags:
+- 大雄宝殿
+- 三世佛
+- 汉白玉须弥座
+- 十八罗汉
+- 八角藻井
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 3055
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Ultra-wide 8K panoramic 3D render of a grand Mahavira Hall featuring Three-Ages golden Buddhas on white marble Sumeru
+    pedestals, 18 Arhat statues, polychrome murals, and three lotus caissons.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

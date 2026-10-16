@@ -1,0 +1,72 @@
+id: f2471d77387927f8
+title_zh: 佛教寺庙石材雕刻细节
+source:
+  original_path: 25年秋季佛事展设计方案/佛教寺庙石材雕刻细节.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教寺庙石材雕刻细节.jpg
+  sha256: f2471d77387927f8d353f09796599d75b048b7f80da7f214d4d9b0a82575c800
+  bytes: 2267151
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f2471d77387927f8.jpg
+    sha256: 2e71c6095206fb00bd7090599e76d5e89c1d37276c0dd1f4ad41cfad00127d6e
+    size: 344357
+    bytes: 344357
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f2471d77387927f8.webp
+    sha256: 05b91289911dc3a929bc73933bff81dcee236a915db395a40e34dcbdee034c4f
+    size: 27326
+    bytes: 27326
+    width: 288
+    height: 512
+library_type: 石刻纹样
+studio_roles:
+- 纹样
+- 材质
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-玉石仰莲供坛局部
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然玉石（敦煌金/五彩玉）高浮雕
+colors:
+- 青灰
+- 暖黄
+- 铁锈红
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 石雕须弥座肥厚双层仰莲瓣刀工肌理与景深特写生图参考
+prompt_zh: 天然五彩玉石雕刻莲花须弥供坛侧面微距特写，浅景深摄影，前景聚焦一排饱满肥厚的双层仰莲花瓣高浮雕，莲瓣弧度浑圆立体，瓣尖微翘，石材表面高光水磨抛光，展现出青灰、蜜蜡黄、铁锈红交织的天然玉石肌理与温润油脂光泽；下层束腰与底座雕刻卷云纹与覆莲瓣，左侧边缘可见贴金宝座与蓝宝石镶嵌细节，背景柔和虚化出彩绘佛像、青绿背光与敦煌金石雕基座，地面为镜面黑白金大理石拼花，光影细腻，8K大师级微距摄影。
+tags:
+- 石雕莲花座
+- 仰覆莲瓣浮雕
+- 敦煌金玉石
+- 佛教石雕工艺
+- 须弥供坛细节
+material_ids:
+- dunhuang-gold
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展敦煌金莲花供坛侧面双层仰覆莲瓣高浮雕微距特写，背景虚化处为金镶玉墙面与阿弥陀佛像。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

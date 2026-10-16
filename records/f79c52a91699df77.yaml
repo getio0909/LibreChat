@@ -1,0 +1,73 @@
+id: f79c52a91699df77
+title_zh: 佛圖畫石材墙面装饰
+source:
+  original_path: 26年春季佛事展设计方案/佛圖畫石材墙面装饰.jpg
+original:
+  path: 26年春季佛事展设计方案/佛圖畫石材墙面装饰.jpg
+  sha256: f79c52a91699df77be29c138caf082c86ea2ef28daa78a976d88c4d70f0f3453
+  bytes: 5134387
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/f79c52a91699df77.jpg
+    sha256: c04cf49ca2c471aa1c88f9b749bf5e085720191ce70d19003621ba9cf1392602
+    size: 944404
+    bytes: 944404
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/f79c52a91699df77.webp
+    sha256: b598c1833c3878363f94860e98eaf50e3d5c5ca1988ae8713d4e44eb0167c966
+    size: 47998
+    bytes: 47998
+    width: 384
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 材质
+- 参考
+- 纹样
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-对纹奢石背景墙局部
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 佛国画卷(敦煌金大理石)
+- 雕花木线
+colors:
+- 琥珀金
+- 深紫褐
+- 米白
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 四联对称“天然佛塔”奢石纹理与中式雕花木框节点生成参考
+prompt_zh: 新中式佛教艺术展厅墙面特写，天然“佛国画卷”敦煌金奢石大理石背景墙，镜像对称对纹拼接，石材天然纹理在中央接缝处自然形成一座庄严的深紫色佛塔剪影，周围环绕璀璨的琥珀金、古铜金与流云白矿物脉络，高光抛光镜面质感，四周镶嵌精细雕刻的莲花瓣实木边框，底部为深胡桃木中式回纹护墙板，顶部米白色墙面安装黑色立体书法字“佛國畫卷”，博物馆级洗墙射灯照明，8K超高清建筑室内实景摄影。
+tags:
+- 26年春季佛事展
+- 佛国画卷
+- 敦煌金大理石系列
+- 对纹奢石背景墙
+- 石蕴佛塔
+- 莲瓣木线条
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展C立面佛国画卷（敦煌金系列）对纹奢石背景墙中段实景特写，右上角见左半部四列光学投影禅诗。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

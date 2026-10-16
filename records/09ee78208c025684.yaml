@@ -1,0 +1,71 @@
+id: 09ee78208c025684
+title_zh: 室内笑佛石雕像
+source:
+  original_path: 佛教空间设计案例/室内笑佛石雕像.jpg
+original:
+  path: 佛教空间设计案例/室内笑佛石雕像.jpg
+  sha256: 09ee78208c02568490ba866d8526ead1505b2929b7a71f9cdd3ca90d6684aa0c
+  bytes: 1389502
+  width: 1580
+  height: 2622
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/09ee78208c025684.jpg
+    sha256: 636a02eaacd478440053ed04a03eef84218c76600ae0e085bbf995fa50f8bfd5
+    size: 255217
+    bytes: 255217
+    width: 1234
+    height: 2048
+  thumb512:
+    path: assets/thumb512/09ee78208c025684.webp
+    sha256: 6da941c0311ab640e57550df8c91339638510c569f7e70dff87318ab7c54b437
+    size: 18820
+    bytes: 18820
+    width: 309
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 佛像造像
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然暖黄玉石/米黄大理石精雕布袋弥勒坐像
+- 双层石雕莲座
+- 暖白背光木框壁龛
+colors:
+- 暖米黄
+- 胡桃木色
+style: 传统汉传玉石圆雕造像工艺
+ai_design_usage: 寺院天王殿/居家迎宾玄关笑佛石雕造像参考、暖黄石材温润抛光质感与背光壁龛设计
+prompt_zh: 室内发光木框壁龛中供奉的天然暖米黄玉石精雕大肚弥勒笑佛坐像特写，竖构图，弥勒佛面容慈祥喜悦，开口大笑，双耳垂肩，袒胸露腹，左手托举一枚硕大的石雕元宝，右手持乾坤布袋，端坐于精致的双层石雕仰覆莲花宝座上，石质温润细腻如暖玉，背后为柔和的暖白色发光背板，两侧为深胡桃木装饰框，前景点缀粉荷花苞，喜庆庄严，8K石雕写实摄影
+tags:
+- 笑佛石雕
+- 布袋弥勒佛
+- 玉石佛像
+- 佛教造像
+- 发光佛龛
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1580
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 八角多层木雕万佛宝塔与雕花须弥供桌局部图（#257的中上部裁切，避开了左下角水印），画面无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

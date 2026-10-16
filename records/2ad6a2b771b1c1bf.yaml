@@ -1,0 +1,74 @@
+id: 2ad6a2b771b1c1bf
+title_zh: 佛教寺庙祭坛陈设
+source:
+  original_path: 佛教空间设计案例/佛教寺庙祭坛陈设.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙祭坛陈设.jpg
+  sha256: 2ad6a2b771b1c1bf895518642e15538fa66d70663486c3074158fb140823991f
+  bytes: 5773966
+  width: 4900
+  height: 2649
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2ad6a2b771b1c1bf.jpg
+    sha256: 284db578990f4867a19fa02a5a3df508a4150b558a628da538e24fdc4b9cbdc8
+    size: 479979
+    bytes: 479979
+    width: 2048
+    height: 1107
+  thumb512:
+    path: assets/thumb512/2ad6a2b771b1c1bf.webp
+    sha256: 5935530ce88ed128052113955c77aa16cd7f056582f810ad12d7ff254273ffc5
+    size: 36108
+    bytes: 36108
+    width: 512
+    height: 277
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛教空间案例
+category_l2: 传统寺院五开间木雕贴金牌位祖堂/功德堂祭坛场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 雕花红木
+- 金箔
+- 白瓷供果
+- 青铜香炉
+colors:
+- 深棕红木
+- 尊贵贴金
+- 中国红
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：寺院功德堂/祖师堂/往生堂正面立面设计 / 传统五开间木雕贴金神龛与五供陈设参考 / 中轴对称礼拜空间构图控制；推荐搭配：深色缅甸花梨/酸枝木贴金大龛 + 浅胡桃木雕花供桌 + 青铜香炉与高足白瓷供盘
+  + 深棕实木地板
+prompt_zh: 中国传统佛教寺庙五开间木雕贴金功德堂祭坛正面全景，严格中轴对称构图，后方由六根深红木贴金圆柱分隔出五个神龛开间，每间顶部饰有贴金双龙戏珠透雕花板与金色垂珠帘，龛内供奉牌位，两侧背景墙为密集排列的三角形暖光小佛龛；祭坛前方一字排开五张中式雕花实木供桌，每张供桌上对称摆放青铜三足香炉、一对红烛和两盘红苹果，每桌前各置一对米黄色方形拜垫，深棕色木地板，庄严肃穆，8K超高清室内效果图。
+tags:
+- 寺院功德堂
+- 五开间贴金神龛
+- 中式雕花供桌
+- 传统五供陈设
+- 祖师堂空间设计
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2649
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 寺院五开间木雕贴金功德堂/祖师堂祭坛与五供桌陈设正面超宽全景三维效果图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

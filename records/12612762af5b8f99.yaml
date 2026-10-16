@@ -1,0 +1,74 @@
+id: 12612762af5b8f99
+title_zh: 观音雕像木质龛
+source:
+  original_path: 佛教空间设计案例/观音雕像木质龛.jpg
+original:
+  path: 佛教空间设计案例/观音雕像木质龛.jpg
+  sha256: 12612762af5b8f990e6d37b50f461da6809a8afa1c124b1c25888946e5b06e06
+  bytes: 779696
+  width: 669
+  height: 2566
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/12612762af5b8f99.jpg
+    sha256: d6ea8861e1fc32bb020b9b0f42ea4bf58c2e1da166207301d280ac1baa49ba95
+    size: 151610
+    bytes: 151610
+    width: 534
+    height: 2048
+  thumb512:
+    path: assets/thumb512/12612762af5b8f99.webp
+    sha256: a6ef35326e7bdf10dda543012f73fdf8b400ac06a39c4dfe2700d0899ff863b5
+    size: 10116
+    bytes: 10116
+    width: 133
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 汉式嵌石家具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 传统深色红木透雕卷草莲花高立式佛龛
+- 金色重檐宝顶
+- 朱红衣贴金观音坐像
+colors:
+- 深红木色
+- 朱红鎏金
+style: 明清传统红木透雕金漆佛龛工艺
+ai_design_usage: 传统中式红木独立立柜式佛龛单品设计、繁复镂空木雕券门与彩绘贴金观音造像搭配参考
+prompt_zh: 中国传统深色红木精雕高立式观音佛龛全身特写，修长竖幅构图，纯黑背景，佛龛顶部为金碧辉煌的贴金重檐攒尖宝塔顶与如意斗拱，中部佛龛正面装饰极其繁复细腻的深红木镂空透雕缠枝莲花与卷草纹拱形花罩，龛内金色圆形背光前供奉一尊身披朱砂红贴金锦袍的彩绘观音菩萨坐像，下部为高挑的多层束腰浮雕卷草纹红木须弥底座，明清宫廷木雕工艺，8K器物写实摄影
+tags:
+- 木质佛龛
+- 红木雕花佛龛
+- 观音佛龛
+- 中式佛教家具
+- 透雕木作
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 669
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 黑胡桃木长条禅修桌局部狭长裁切图（源自#289右侧边缘局部放大），原图宽仅669px（669x2566），且像素化模糊明显。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 669x2566 (<800px short side)'
+  - 分辨率过低（669x2566，最短边<768px）
+  - 局部小图放大导致严重像素化模糊

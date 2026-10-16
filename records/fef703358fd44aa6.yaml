@@ -1,0 +1,77 @@
+id: fef703358fd44aa6
+title_zh: 展厅内蓝色大理石展板
+source:
+  original_path: 常用石材大板/展厅内蓝色大理石展板.jpg
+original:
+  path: 常用石材大板/展厅内蓝色大理石展板.jpg
+  sha256: fef703358fd44aa6be009cd55c2af4cf7a44396a76390f1d7c465a59960bf47f
+  bytes: 256118
+  width: 834
+  height: 626
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/fef703358fd44aa6.jpg
+    sha256: 369da01d51fd853688962d9eef05f8110b8885379ef38e2b70cca38c2ef32875
+    size: 132512
+    bytes: 132512
+    width: 834
+    height: 626
+  thumb512:
+    path: assets/thumb512/fef703358fd44aa6.webp
+    sha256: 62a237e9ec8afbfe45da672334cc24869d301c06af837401540f08ef4a2e3f4f
+    size: 39678
+    bytes: 39678
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 常用石材大板
+category_l2: 常用奢石大板-浅蓝紫冰晶斜纹系
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然蓝色大理石
+- 蓝天白云奢石
+- 蓝水晶结晶大理石
+colors:
+- 雾霾蓝
+- 矢车菊蓝
+- 冰晶白
+- 淡紫灰
+style: 现代奢石展陈 / 药师琉璃净土风
+ai_design_usage: 药师佛“东方净琉璃世界”主题背景墙设计 / 现代高奢禅茶空间视觉焦点墙 / 佛事展特色奢石展位主视觉
+prompt_zh: 石材展厅内展示的大型天然蓝色大理石奢石大板，蓝天白云与蓝水晶石材纹理，梦幻的雾霾蓝、天青蓝与冰晶白45度斜向层叠条纹，内部具有细腻闪耀的冰晶颗粒质感，高光抛光表面，底部配有白色LED发光灯槽底座，高端奢石市场实拍，空灵澄澈的琉璃质感。
+tags:
+- 蓝色大理石
+- 蓝天白云奢石
+- 蓝水晶大板
+- 琉璃净土背景墙
+- 展厅大板实拍
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 626
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 金棕碎裂纹黑金奢石大板实拍，原图834x626分辨率偏低，右下角有“STM石猫”水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 834x626 (<800px short side)'
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 分辨率过低（834x626，最短边<768px）
+  - 右下角存在第三方“STM石猫”水印

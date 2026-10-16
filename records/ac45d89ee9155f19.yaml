@@ -1,0 +1,73 @@
+id: ac45d89ee9155f19
+title_zh: 佛教寺庙大殿内部场景-07
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-07.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-07.jpg
+  sha256: ac45d89ee9155f1910fcd560232be58bb887e3da28acc59c84038d6f6173e9c7
+  bytes: 1088184
+  width: 1860
+  height: 1365
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ac45d89ee9155f19.jpg
+    sha256: 0f7e01a27eb368a0651212f34d9a48f8b55db03b1803b45db3c7aad5c08f5cd4
+    size: 310192
+    bytes: 310192
+    width: 1860
+    height: 1365
+  thumb512:
+    path: assets/thumb512/ac45d89ee9155f19.webp
+    sha256: 09576781af5440421d96be226fbb9ec20e32332a053c7a454ca5f3e0e0158081
+    size: 32738
+    bytes: 32738
+    width: 512
+    height: 376
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 孔雀明王主龛
+- 多进嵌鎏金盘龙板方木柱配汉白玉须弥座柱础
+- 平棊白底飞天彩绘藻井
+- 弧形竹木格栅吊顶
+- 白玉璧条案
+colors:
+- 暖红棕
+- 辉煌金
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 孔雀明王殿完整纵深全景空间规划、天花白底敦煌飞天彩绘平棊与弧形木格栅结合、两侧玉璧条案陈设参考
+prompt_zh: 传统佛教寺庙孔雀明王殿室内完整全景，正面中轴对称纵深构图，高光暖红棕色几何拼花实木地板，前景与中景对称耸立多对粗壮的深色方形木柱，柱身正面镶嵌古铜鎏金盘龙浮雕长板，下承高大的汉白玉精雕方形莲花须弥座柱础，中轴远端为金碧辉煌的唐破风贴金斗拱佛龛，供奉骑孔雀的四臂孔雀明王彩绘金像，龛前设红木供桌与三个彩绘圆蒲团，两侧窗下对称陈设红木条案与汉白玉圆璧摆件，顶部中央天花绘有白底敦煌飞天散花彩绘壁画，两侧为弧形竹木格栅吊顶与雕龙梁架，8K建筑渲染
+tags:
+- 孔雀明王殿全景
+- 飞天彩绘天花
+- 汉白玉方形须弥础
+- 盘龙鎏金木柱
+- 弧形木格栅轩顶
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1365
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 寺院孔雀明王殿完整纵深全景三维效果图，展现多进盘龙方木柱、汉白玉须弥柱础及飞天彩绘平棊天花。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

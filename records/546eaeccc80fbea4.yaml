@@ -1,0 +1,78 @@
+id: 546eaeccc80fbea4
+title_zh: 佛教坐佛与圆形砖结构展览场景
+source:
+  original_path: 佛堂空间设计参考/佛教坐佛与圆形砖结构展览场景.jpg
+original:
+  path: 佛堂空间设计参考/佛教坐佛与圆形砖结构展览场景.jpg
+  sha256: 546eaeccc80fbea44598b917dfc189e90c92ecb691a4a717f3f326e111f38901
+  bytes: 397277
+  width: 1250
+  height: 1875
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/546eaeccc80fbea4.jpg
+    sha256: 74f8d063bb30dfc15a39056e3b52f836a5cfc6392a12935c1fb695ab7f40bf09
+    size: 430232
+    bytes: 430232
+    width: 1250
+    height: 1875
+  thumb512:
+    path: assets/thumb512/546eaeccc80fbea4.webp
+    sha256: e5b267c334731d23de954e9bc6c98553eb6b805ca5c5099656fb1b11846ec614
+    size: 33344
+    bytes: 33344
+    width: 341
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 造型
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 手工青红砖
+- 黑色青铜那伽坐佛
+- 汉白玉折角须弥座
+- 拼花大理石地面
+- 白色织物华盖
+colors:
+- 赭石红
+- 玄黑
+- 汉白玉白
+- 鎏金
+style: 东南亚泰式老挝风
+ai_design_usage: 圆形佛塔内部空间设计、汉白玉多层折角须弥座石雕造型参考、粗犷红砖与精雕白石材质碰撞参考
+prompt_zh: 东南亚高棉风格圆形红砖穹顶佛殿内部场景，竖幅对称仰拍构图，正中央为多层折角白色大理石雕刻的须弥座台基，上方供奉一尊黑色青铜七头那伽蛇神护法禅定坐佛，环绕四周的是高耸向内收分的古旧红砖弧形墙面，向上连接八根白底金边结构肋梁，穹顶正中悬挂白色圆形透光华盖伞并垂落金色流苏，浅色大理石拼花地面与金色浮雕踢脚线，神圣静谧的自然顶光，超高清建筑摄影，8K
+tags:
+- 圆形砖砌佛殿
+- 那伽护法佛
+- 汉白玉须弥座
+- 东南亚佛殿
+- 锥形穹顶
+- 石雕台基
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1250
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 东南亚圆形红砖穹顶佛殿内景与汉白玉须弥座那伽护法坐佛，底部带'WWW.AEY.ME | COPYRIGHT 2019'水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - third_party_watermark
+  - text_overlay

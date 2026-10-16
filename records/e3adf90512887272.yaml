@@ -1,0 +1,77 @@
+id: e3adf90512887272
+title_zh: 传统佛教石狮与古建筑场景
+source:
+  original_path: 佛教空间设计案例/传统佛教石狮与古建筑场景.jpg
+original:
+  path: 佛教空间设计案例/传统佛教石狮与古建筑场景.jpg
+  sha256: e3adf90512887272aed8c463fea1355514d59fe371491e9d92139a184306a940
+  bytes: 101815
+  width: 348
+  height: 381
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/e3adf90512887272.jpg
+    sha256: 0f9cb34fe3fc8b0a295193915628f24d008b1de3cf41ba300a6b94ae6aec31a2
+    size: 28387
+    bytes: 28387
+    width: 348
+    height: 381
+  thumb512:
+    path: assets/thumb512/e3adf90512887272.webp
+    sha256: 8bfcb32efbc78358195bf40d526742b1246f398ffbcbe160b719df41c8215ced
+    size: 15586
+    bytes: 15586
+    width: 348
+    height: 381
+library_type: 建筑景观
+studio_roles:
+- 参考
+- 造型
+- 物件
+category_l1: 佛教空间案例
+category_l2: 寺院建筑园林
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉石狮
+- 青白石卍字栏杆
+- 朱红大漆木柱
+- 沥粉贴金彩画额枋
+colors:
+- 汉白玉白
+- 朱红色
+- 青白色
+- 鎏金色
+style: 传统汉传宫殿式
+ai_design_usage: 寺院入口护法石狮近景构图、古建彩画廊柱与青白石卍字纹护栏细节搭配参考
+prompt_zh: 传统中国佛教寺院大殿前局部写实场景，中近景特写一尊高大威严的汉白玉雕刻石狮，螺发卷曲、张口含珠、爪抚幼狮，坐落于雕花须弥座上，石狮后方为青白石镂空雕刻卍字纹护栏，背景为传统大殿高大的朱红色与深褐色木圆柱、沥粉贴金彩画额枋以及细密的木质方格隔扇门窗，明媚斜射阳光投下清晰光影，古朴庄严，写实摄影质感。
+tags:
+- 佛教空间案例
+- 汉白玉石狮
+- 卍字纹石栏杆
+- 古建木构廊庑
+- 寺院局部场景
+- 传统石雕
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 348
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Low-res cropped photograph/composite (348x381) of a white stone guardian lion with cub, swastika stone balustrade,
+    and red temple columns with a visitor taking a photo in the foreground.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

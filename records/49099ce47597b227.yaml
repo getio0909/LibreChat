@@ -1,0 +1,71 @@
+id: 49099ce47597b227
+title_zh: 橙红纹理天然石材板
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/橙红纹理天然石材板.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/橙红纹理天然石材板.jpg
+  sha256: 49099ce47597b22797c5961a764b158ef37157f1f7320c31814c746626644c6d
+  bytes: 1903099
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/49099ce47597b227.jpg
+    sha256: 6c6af26cfc49dee981ede304c98e4a8d5110072a2bb1e44662641783488fa8e1
+    size: 769879
+    bytes: 769879
+    width: 2048
+    height: 1536
+  thumb512:
+    path: assets/thumb512/49099ce47597b227.webp
+    sha256: 953853cc7b8703bb8f73a0102e4a59b9239fe2b93029f3dac10d99c022d123fd
+    size: 41918
+    bytes: 41918
+    width: 512
+    height: 384
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梵高皇
+colors:
+- 暖金黄主导
+- 右半朱红血脉
+- 左下烟灰蓝三角
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: 4K整面背景墙直接裁切贴图母本 / 左右双拼（Bookmatch）或上下四拼（Quad-match）连纹背景墙生成 / 佛堂主尊造像背光景墙设计
+prompt_zh: 4K超清正面平视标准照，一整块带白色窄边框的“梵高皇/敦煌壁”天然奢石大板，呈现震撼的金、红、蓝灰三色交响纹理：左上至中下为浓郁的琥珀金与藤黄色流云带，右半部绽放着鲜艳密集的朱砂红与石榴红网状血脉，左下角为深邃的钢蓝灰角砾色块，高光镜面抛光，阿利坦石材展厅实景，8k超高清母本。
+tags:
+- 梵高皇母本
+- 敦煌壁母本
+- 4K整板标准照
+- 金红蓝三色奢石
+- 佛光背光墙设计
+- 对开连纹源图
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K front-on master photograph of the white-framed Dunhuang Wall / Van Gogh Imperial slab in the Alitan Stone showroom.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,71 @@
+id: db8c9deb470a3da2
+title_zh: 佛教建筑石材浮雕装饰
+source:
+  original_path: 25年秋季佛事展设计方案/佛教建筑石材浮雕装饰.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教建筑石材浮雕装饰.jpg
+  sha256: db8c9deb470a3da247a856650293eabac35ff2db7d77b14ecafa9e4f021f58fd
+  bytes: 2565780
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/db8c9deb470a3da2.jpg
+    sha256: 2edb5d4b679682c34a5513bcfd8901ebbc06ac06716970e82ed71ce2bd2df365
+    size: 423533
+    bytes: 423533
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/db8c9deb470a3da2.webp
+    sha256: 0d8a64d1685e1e8b0e976352179cb0806e7c43238f91559e961f95961a34b897
+    size: 34984
+    bytes: 34984
+    width: 288
+    height: 512
+library_type: 石刻纹样
+studio_roles:
+- 造型
+- 纹样
+- 材质
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-敦煌金石雕须弥座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然玉石敦煌金（五层规制高浮雕）
+colors:
+- 蜜蜡黄
+- 琥珀棕
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 传统佛教石雕须弥座五段式比例结构与缠枝莲浮雕纹样参考
+prompt_zh: 天然玉石敦煌金高浮雕佛教须弥座长廊透视特写，浅景深微距摄影，金黄色与琥珀棕交织的天然玉石材质，高光水磨抛光；须弥座严格遵循传统五层结构：顶层雕刻卷草如意纹并安装纯白汉白玉栏杆，第二层为饱满的覆莲瓣，中间束腰部位雕刻回纹拐子框与繁复立体的宝瓶缠枝牡丹莲花高浮雕，下层为浑圆肥厚的仰覆莲瓣，底层圭角雕刻回字几何纹，底部衔接黑白金棋盘格大理石地面，刀工精湛立体，光影质感温润尊贵，8K石雕艺术摄影。
+tags:
+- 敦煌金须弥座
+- 石雕须弥座规制
+- 缠枝莲高浮雕
+- 佛教建筑基座
+- 3980元每米
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展敦煌金五层规制高浮雕须弥座顺延透视特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: summary_zh与tags串入同展位其他照片的价格''3980元/米''，本图未见价格标牌'

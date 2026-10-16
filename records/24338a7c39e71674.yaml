@@ -1,0 +1,72 @@
+id: 24338a7c39e71674
+title_zh: 佛教风格木雕柜与装饰器皿
+source:
+  original_path: 佛教家具与陈设素材/佛教风格木雕柜与装饰器皿.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格木雕柜与装饰器皿.jpg
+  sha256: 24338a7c39e71674bdef09cf7dadf9ba13753ec4df1a818906102e28219eb80e
+  bytes: 658534
+  width: 1279
+  height: 2089
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/24338a7c39e71674.jpg
+    sha256: fff9d91df19c210d24324096510f893f94552e53d1f6b3fc20c5343ca585ac21
+    size: 743302
+    bytes: 743302
+    width: 1254
+    height: 2048
+  thumb512:
+    path: assets/thumb512/24338a7c39e71674.webp
+    sha256: c4d3d0cb46e058cec550ef3abb09ff81139fa5ba4b6114811ce758315512f1d0
+    size: 53546
+    bytes: 53546
+    width: 313
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 核桃木彩绘描金
+- 木雕花器
+- 仿真花
+colors:
+- 暖琥珀棕配粉白花艺
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 佛堂/禅意会所玄关端景柜软装搭配参考 / 藏式对狮献瑞柜门纹样提取 / 传统法器花器化软装改造
+prompt_zh: 室内软装端景竖幅摄影，一组精美的藏式木雕双门供柜与大型双龙耳木雕花器组合，下方为温暖琥珀色核桃木双抽双门供柜，两侧为金漆叠涩立柱，两扇柜门高浮雕对称蹲坐于莲台之上的白身绿鬃藏式瑞狮与彩色祥云，柜顶正中摆放一座金色双龙耳斗式木雕大花器，斗腹雕双狮护法轮，花器内插满盛开的粉色与白色玫瑰花束，背景为深胡桃木雕花护墙板，8K超清实拍。
+tags:
+- 藏式对狮木柜
+- 双龙耳花器
+- 玄关端景组合
+- 瑞狮献花浮雕
+- 佛教软装陈设
+- 木雕柜配插花
+material_ids: []
+provenance:
+  source: own_product
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a Tibetan snow-lion cabinet topped with a carved dragon-handled wooden flower vessel
+    and pink artificial roses.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

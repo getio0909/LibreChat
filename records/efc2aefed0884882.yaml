@@ -1,0 +1,78 @@
+id: efc2aefed0884882
+title_zh: 佛教寺庙佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙佛像展示场景.jpg
+  sha256: efc2aefed0884882925581bccd055d61ace8cc179c378e3c99c2aeb04676e5b8
+  bytes: 2622863
+  width: 3011
+  height: 2538
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/efc2aefed0884882.jpg
+    sha256: 1c9dadb646ea94441c8808d202caea21ec4df1779f7c2cdec3d2d50d3c7a64dc
+    size: 411751
+    bytes: 411751
+    width: 2048
+    height: 1726
+  thumb512:
+    path: assets/thumb512/efc2aefed0884882.webp
+    sha256: 92fea36a92bdc93773487169a63ff0e644bdff10157a867f030911b998300b99
+    size: 35714
+    bytes: 35714
+    width: 512
+    height: 432
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 深蓝琉璃药师佛像
+- 琥珀金菩萨立像
+- 发光云海山水壁画
+- 青石雕花柱础
+- 深棕高光大理石
+- 米黄方蒲团
+colors:
+- 宝蓝琉璃色
+- 暖米金色
+- 琥珀金
+- 深木棕
+- 青石灰绿
+style: 东方净琉璃世界药师殿与现代光影艺术风
+ai_design_usage: 寺院药师殿（东方净琉璃世界）主题空间设计、大型蓝色古法琉璃佛像展示、发光云海山水背景墙参考
+prompt_zh: 极具意境的佛教药师殿室内佛像展示场景，正中央供奉一尊通体深宝蓝色的半透明琉璃药师佛坐像与蓝色琉璃莲花座，左右两侧对称站立两尊琥珀金色日光遍照与月光遍照菩萨立像，背后是一整面宽阔的巨幅发光金色云海仙山与飞鹤背景壁画，前景矗立深棕色实木大圆柱配青石雕花鼓形柱础，中央摆放木雕供桌与两排共十二个米黄色方形蒲团，高光深棕色大理石地面清晰倒映出蓝色药师佛身影，8K超清渲染
+tags:
+- 药师殿
+- 蓝琉璃佛像
+- 药师三尊
+- 云海山水背景
+- 青石柱础
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2538
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 3D render of a Medicine Buddha hall enshrining a deep cobalt-blue liuli seated Buddha flanked by two amber-gold standing
+    bodhisattvas before a backlit cloud-and-crane mountain mural.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,76 @@
+id: 22e8b8411bea1339
+title_zh: 佛教风格木质佛龛展览装置
+source:
+  original_path: 佛教家具与陈设素材/佛教风格木质佛龛展览装置.jpg
+original:
+  path: 佛教家具与陈设素材/佛教风格木质佛龛展览装置.jpg
+  sha256: 22e8b8411bea13398587f4dc262b9b7d0012309af08a423b0594cc624822bc9b
+  bytes: 243772
+  width: 1279
+  height: 1358
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/22e8b8411bea1339.jpg
+    sha256: 5a17fafc22e025594a8204196c9510b9ffea317e4cf0d6b018b27fd332ba0fa1
+    size: 262695
+    bytes: 262695
+    width: 1279
+    height: 1358
+  thumb512:
+    path: assets/thumb512/22e8b8411bea1339.webp
+    sha256: 86530b102cc9c71f29934b9a215a5bc53288aee5295d71c112f4c334871d97ba
+    size: 39198
+    bytes: 39198
+    width: 482
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 纹样
+category_l1: 佛教家具与陈设
+category_l2: 藏式雕花家具
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 紫檀色实木
+- 鎏金佛像
+- 彩绘白象纹
+colors:
+- 深紫檀配暖金佛光
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 独立岛台式/亭阁式四面佛龛设计 / 现代美术馆中心宗教装置艺术生成 / 内置暖光照明佛龛渲染参考
+prompt_zh: 现代美术馆展品摄影，一座庄严华美的藏汉融合四角攒尖亭阁式独立木雕佛龛装置，深紫檀色与琥珀木色结合，屋顶四角挑出鎏金摩羯龙首飞檐与多层金色斗拱，四面通透的火焰拱门内供奉一尊璀璨的鎏金释迦牟尼佛坐像，龛内隐藏式暖金灯光照亮佛身，立柱镶嵌绿松石宝珠，下方宽大的须弥底柜四面高浮雕彩绘白象驮宝瓶图案，极简灰白展厅背景，8K超清渲染。
+tags:
+- 亭阁式木佛龛
+- 四面观瞻佛龛
+- 内置灯光佛龛
+- 太平有象浮雕
+- 摩羯飞檐顶
+- 独立展览装置
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated image (豆包AI生成 watermark in bottom-right) of a freestanding pavilion-style wooden Buddhist shrine in
+    a minimalist gallery. Labeled entity_type as 实物对象写实.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

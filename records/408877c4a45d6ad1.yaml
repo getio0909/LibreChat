@@ -1,0 +1,74 @@
+id: 408877c4a45d6ad1
+title_zh: 佛教石材护祠展示场景
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材护祠展示场景.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材护祠展示场景.jpg
+  sha256: 408877c4a45d6ad1880c7a4ed347df7dc3b2ef7c28697d63068de8c9e7bb46d1
+  bytes: 4761928
+  width: 4000
+  height: 3000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/408877c4a45d6ad1.jpg
+    sha256: e6998bf6cba6dd8bc8dbb6bc33bf83dff531f472e34b87070711e698e4d728e0
+    size: 813168
+    bytes: 813168
+    width: 1536
+    height: 2048
+  thumb512:
+    path: assets/thumb512/408877c4a45d6ad1.webp
+    sha256: 12920c8490e53f8c20d09f2fe6e5083a9ad98e4c457964ace74dd012d1261a19
+    size: 40424
+    bytes: 40424
+    width: 384
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 材质
+- 风格
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-佛龛中轴对称与地面倒影
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 禅境灰蓝大理石
+- 敦煌金供桌
+colors:
+- 暖黄佛光
+- 烟灰蓝
+- 蜜蜡黄
+style: 新中式禅意奢石展厅与石雕艺术
+ai_design_usage: 极致中轴对称佛龛构图与高光大理石地面完整金色光环倒影参考
+prompt_zh: 极致中轴对称构图的现代新中式佛教佛堂实景摄影，竖画幅，正面平视双层内凹亚字形倒圆角折角佛龛背景墙，凹槽隐藏暖黄色LED灯带形成两圈璀璨的金色佛光光环，龛内镶嵌对称V形金纹的“禅境灰蓝”天然大理石，中央摆放敦煌金天然黄玉石高浮雕须弥座大供桌、鎏金伽蓝菩萨坐像与两侧对称鲜花花篮，正前方为明黄色莲花织锦坐垫的实木拜凳，高光抛光的灰蓝色金纹大理石地面如琉璃镜面般清晰完整地倒映出上方金色的折角佛龛光环，天地镜像，庄严神圣，8K超高清建筑室内摄影。
+tags:
+- 26年春季佛事展
+- 中轴对称佛堂
+- 天地镜像倒影
+- 禅境灰蓝
+- 敦煌金供桌
+- 藏光佛龛
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3000
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 26年春季佛事展D立面双层折角藏光佛龛、敦煌金供桌与禅境灰蓝大理石地面镜像倒影竖幅正视实景。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

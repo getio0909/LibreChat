@@ -1,0 +1,75 @@
+id: 376b18423c9637d5
+title_zh: 佛教寺院装饰设计案例
+source:
+  original_path: 25年秋季佛事展设计方案/佛教寺院装饰设计案例.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教寺院装饰设计案例.jpg
+  sha256: 376b18423c9637d5430add1c3d0a5112b7f295cf3d7897844658ab2145247bb4
+  bytes: 2751496
+  width: 2245
+  height: 3366
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/376b18423c9637d5.jpg
+    sha256: f33caf71a328a620b276690f82e66b1e94a054dc1191d3eb686c8f41b90589ea
+    size: 814487
+    bytes: 814487
+    width: 1366
+    height: 2048
+  thumb512:
+    path: assets/thumb512/376b18423c9637d5.webp
+    sha256: 1cd81d4b574cf82d3f63ad32575e1d7c2eb91c2a03c134fdc37d72d749697000
+    size: 57092
+    bytes: 57092
+    width: 341
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 材质
+- 纹样
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-透光石莲花藻井吊顶
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 金镶玉透光石
+- 实木格栅
+- 亚克力字
+colors:
+- 暖金黄
+- 冰蓝发光字
+- 深棕
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 佛教殿堂/展位顶部透光云石藻井天花与发光门头设计参考
+prompt_zh: 佛教殿堂与展厅顶部透光石藻井吊顶仰拍特写，深胡桃木色阶梯式井字格栅梁架，每个方格内嵌天然金镶玉透光云石薄板，背光点亮后呈现出温暖通透的琥珀金色天然石材纹理，每块石板正中饰有精致的金色八瓣宝相莲花曼荼罗图案；顶部上方安装“莊嚴寶刹”冰蓝色发光书法大字与红色篆书印章，下方衔接金镶玉大理石竖向拼接墙面，右侧延伸深木色挑檐梁与白色格栅吊顶，光影温暖神圣，8K室内建筑摄影。
+tags:
+- 透光石藻井
+- 金镶玉透光石吊顶
+- 598元每平米
+- 宝相莲花天花
+- 莊嚴寶刹门头
+- 佛教吊顶设计
+material_ids:
+- gold-jade
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2245
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展莊嚴寶刹门头与金镶玉透光石宝相莲花藻井吊顶仰视实景特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'hallucination: tags串入同展位其他照片的价格''598元每平米''，本图画面无价格标牌'

@@ -1,0 +1,72 @@
+id: a1c29a0cf5306184
+title_zh: 石材仓库内的大理石拼贴展示
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/石材仓库内的大理石拼贴展示.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/石材仓库内的大理石拼贴展示.jpg
+  sha256: a1c29a0cf530618444cf35dc997949687eb882ad8d56e4fcd0b0279f7a28a1a6
+  bytes: 419252
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/a1c29a0cf5306184.jpg
+    sha256: 267270af55d3aaee4fdd6d08a4ff813f5941c7a2a3d21cb9a45c88a6af314887
+    size: 451716
+    bytes: 451716
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/a1c29a0cf5306184.webp
+    sha256: 4227af5b1f9047365eba76ebbeed8934df732eb1fd580ede853f2cfe92b46ffb
+    size: 41418
+    bytes: 41418
+    width: 384
+    height: 512
+library_type: 矿山车间
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 矿山与车间场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 梦幻庄园规格板
+- 仓库空间
+colors:
+- 暖黄绿灰底
+- 斜向橘金云带
+style: 现代工业车间与奢石排版
+ai_design_usage: 佛堂/门厅地面 4x3 阵列追纹铺贴参考 / 石材企业工程定制排版宣传图 / 竖屏移动端工厂实景展示素材
+prompt_zh: 竖幅高角度俯视实景，现代化石材加工车间地面防滑垫上，整齐预拼贴着4x3阵列的梦幻庄园天然奢石大规格地砖，橄榄灰绿与暖黄褐底色上流淌着连续跨越砖缝的珊瑚橘红与白玉色斜向云带，板面高光如镜倒映厂房采光窗，背景可见石材铁架与“安全生产一流”标语，真实工业品质检验场景。
+tags:
+- 梦幻庄园
+- 金镶玉
+- 4x3阵列排版
+- 地面追纹铺贴
+- 车间预铺场景
+- 大规格地砖
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Vertical shot of 12 vein-matched Gold-Jade cut-to-size floor tiles dry-laid on a dark brown mat in a stone processing
+    workshop.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

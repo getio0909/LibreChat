@@ -1,0 +1,72 @@
+id: 2d0c019cbe2ca6fe
+title_zh: 露天石材矿场航拍图
+source:
+  original_path: 常用石材大板/露天石材矿场航拍图.jpg
+original:
+  path: 常用石材大板/露天石材矿场航拍图.jpg
+  sha256: 2d0c019cbe2ca6fe4023f0faba2d626dbc56c524fcd3daab22fe3da3859e408c
+  bytes: 1330039
+  width: 1920
+  height: 860
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2d0c019cbe2ca6fe.jpg
+    sha256: 6729cd37dd6dfb5443277407c2d8ea75dc9f82602d86a4c02c8c67f89e080ead
+    size: 404079
+    bytes: 404079
+    width: 1920
+    height: 860
+  thumb512:
+    path: assets/thumb512/2d0c019cbe2ca6fe.webp
+    sha256: ca598d8365f8774d998f9fc1f922d12f3d49e0f5c9bf89d91638e0547239d762
+    size: 27760
+    bytes: 27760
+    width: 512
+    height: 229
+library_type: 矿山车间
+studio_roles:
+- 参考
+category_l1: 常用石材大板
+category_l2: 石材矿山与源头基地-露天白石矿场
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 天然白色大理石矿山
+- 汉白玉荒料原石
+- 山体岩层
+colors:
+- 纯白色
+- 天蓝色
+- 黄土褐色
+- 松林深绿
+style: 矿山工业纪实 / 品牌源头实力展示
+ai_design_usage: 佛事展展位源头实力展示灯箱/背板设计 / 企业画册与官网Banner图生成 / 矿山开采与荒料堆场宏大场景参考
+prompt_zh: 超宽幅无人机航拍大型露天白色大理石矿山全景图，湛蓝无云的晴空下，右侧山体切开巨大的阶梯状纯白色大理石采矿平台，山脚左下角开阔场地上整齐排列着数百块洁白的立方体石材荒料，中景有一片深绿色松林与盘山公路，远景为辽阔苍茫的北方丘陵梯田地貌，阳光明媚，展现雄厚的矿产储量与工业规模，8K航拍写实摄影。
+tags:
+- 露天石材矿山
+- 白色大理石矿场
+- 荒料堆场航拍
+- 矿产储量实力
+- 展会宣传背板
+material_ids: []
+provenance:
+  source: own_product
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 860
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: Wide aerial promotional banner of an open-pit white marble quarry with overlaid bilingual headline '矿产储量丰富确保供货稳定'.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

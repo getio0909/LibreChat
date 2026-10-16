@@ -1,0 +1,69 @@
+id: ef16cb8b465a142c
+title_zh: 天然石材纹理特写-03
+source:
+  original_path: 蓝金灰大板自家产品/天然石材纹理特写-03.jpg
+original:
+  path: 蓝金灰大板自家产品/天然石材纹理特写-03.jpg
+  sha256: ef16cb8b465a142c6e6a2b9b595483ed8f29e7da099e0bc2497a7ed26c4055e0
+  bytes: 986318
+  width: 822
+  height: 1645
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ef16cb8b465a142c.jpg
+    sha256: 7fa6ac7fd9a088dde1b81d311a6a23379d5139a475af85fec56b83049b1a674a
+    size: 279018
+    bytes: 279018
+    width: 822
+    height: 1645
+  thumb512:
+    path: assets/thumb512/ef16cb8b465a142c.webp
+    sha256: be3c106b0963e0ff8cced6b40dd54b0f392dfe440e22ba52222dab2b822ebd7f
+    size: 31514
+    bytes: 31514
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 蓝金灰微距特写
+colors:
+- 烟灰蓝与暖米金斜带
+- 横向赤红铁丝脉
+style: 现代禅意 / 现代奢石展陈
+ai_design_usage: ComfyUI / Midjourney 竖向奢石条屏与背景墙材质参考 / 3D渲染无缝贴图 / 现代新中式空间冷暖平衡配饰设计
+prompt_zh: 蓝金灰天然大理石竖向正射微距纹理贴图，深邃的烟灰蓝、墨灰与温暖的米金、浅驼色呈70度陡斜角交替形成壮丽的流云条带，数条纤细鲜明的铁锈红与朱砂红矿物细脉水平横穿整个画面，形成经纬交织的天然冷暖撞色肌理，高清无反光PBR贴图。
+tags:
+- 蓝金灰纹理
+- 横向赤红细脉
+- 斜向流云大理石
+- 经纬交织石纹
+- PBR竖向贴图
+material_ids:
+- blue-gold-grey
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 822
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 'Vertical 1:2 orthographic texture crop from #352 showing steep diagonal blue-gold bands crossed by horizontal red
+    veins in Blue-Gold-Grey marble.'
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

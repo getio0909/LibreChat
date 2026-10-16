@@ -1,0 +1,73 @@
+id: 2352822c6b0d2625
+title_zh: 佛教石材佛像墙展览设计
+source:
+  original_path: 佛教空间设计案例/佛教石材佛像墙展览设计.jpg
+original:
+  path: 佛教空间设计案例/佛教石材佛像墙展览设计.jpg
+  sha256: 2352822c6b0d2625fa3baac66e8aff0a4b78acf283f54fa861e6ce4b1d9d5812
+  bytes: 3219213
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/2352822c6b0d2625.jpg
+    sha256: 6f09b59daf1d90cd39583b1e812b2048e9b7aa19b626b5bb97f4168a479e5908
+    size: 627043
+    bytes: 627043
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/2352822c6b0d2625.webp
+    sha256: 41374687c683b39e0ecc2e08309a8c58753ce0c461d272505ec639963f5b858c
+    size: 40168
+    bytes: 40168
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代自然劈裂面灰麻石摩崖千佛墙与大悲咒光幕展厅场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 自然面灰麻花岗岩
+- 鎏金佛像
+- 高光云纹大理石
+colors:
+- 粗犷深灰石
+- 澄明赤金佛
+- 暖白光龛
+style: 现代当代佛教艺术与禅修空间风格
+ai_design_usage: 适用场景：摩崖石窟风粗犷自然面石材背景墙设计 / 自然劈裂灰麻石嵌发光金佛龛反差美学参考 / 现代高端佛教艺术馆与石材展厅空间生成；推荐搭配：深灰自然劈裂面（蘑菇石）花岗岩背景墙 + 白色圆拱内发光壁龛配锻铜贴金坐佛
+  + 爱马仕灰高光镜面大理石地面 + 透光大悲咒经文玻璃屏风
+prompt_zh: 极具艺术感的现代佛教石材佛像墙展厅室内全景，正面中轴构图，主背景墙采用深灰色粗犷自然劈裂面（蘑菇石）花岗岩砌筑，模拟摩崖石窟肌理；粗糙灰石墙面上错落开凿出数十个圆拱形暖白内发光小佛龛及四个大型圆拱主佛龛，每个龛内均供奉一尊璀璨的纯金结跏趺坐佛像，粗砺灰石与耀眼金佛形成强烈对比；石墙下部为墨绿色大理石台基，两侧对称摆放白色镂空石墩与金色圆柱网罩落地灯；地面铺设光洁如镜的深灰褐色云纹大理石，清晰倒映整面发光佛龛墙；左侧门洞通往白色莲花宝座厅，右侧门洞可见发光的《大悲咒》汉字经文光幕与黄色蒲团，8K超高清建筑渲染图。
+tags:
+- 摩崖石窟背景墙
+- 自然面花岗岩
+- 石材佛像墙
+- 大悲咒发光屏风
+- 粗犷石材与金佛反差
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 现代自然劈裂面灰麻石摩崖千佛龛背景墙与镜面奢石地面展厅8K超清三维效果图，右侧偏厅见发光大悲咒屏风。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

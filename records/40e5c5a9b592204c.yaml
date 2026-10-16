@@ -1,0 +1,72 @@
+id: 40e5c5a9b592204c
+title_zh: 展览中的多色石材样品
+source:
+  original_path: 梦幻庄园金镶玉大板自家产品/展览中的多色石材样品.jpg
+original:
+  path: 梦幻庄园金镶玉大板自家产品/展览中的多色石材样品.jpg
+  sha256: 40e5c5a9b592204c5886d4c5f19413bd47e72906eaf10f4af3d62eab55c24d8d
+  bytes: 696461
+  width: 2273
+  height: 1279
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/40e5c5a9b592204c.jpg
+    sha256: 195cd8d791c6e6b730c1bc61ab665dccd0169169ea699eda80b7dbfc7d1662d4
+    size: 499462
+    bytes: 499462
+    width: 2048
+    height: 1152
+  thumb512:
+    path: assets/thumb512/40e5c5a9b592204c.webp
+    sha256: 656c0873080ecf8caa55b27c5830e9d353d556e54a222f6f705bc106bd6326a2
+    size: 31444
+    bytes: 31444
+    width: 512
+    height: 288
+library_type: 材质纹理
+studio_roles:
+- 材质
+- 参考
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 梦幻庄园大板
+colors:
+- 橙红金棕流云纹
+- 烟灰底
+- 白粉笔选材框
+style: 现代禅意 / 传统汉传宫殿式 / 现代奢石展陈
+ai_design_usage: 石材挑纹裁切工艺参考 / 暖橙红流云纹背景墙贴图 / 供桌桌面/茶台面板局部奢石选材参考
+prompt_zh: 石材展厅内正面展示的梦幻庄园天然大理石大板，板面呈现壮丽的赤橙色、暖金棕与深青灰色竖向斜流云纹理，犹如泼彩山水与敦煌壁画肌理，板面右上方绘有白色选材定位线框，底座铺满白色鹅卵石，左侧可见蓝色封边大板与手写荒料编号，高清写实摄影。
+tags:
+- 梦幻庄园
+- 挑纹下料
+- 流云纹奢石
+- 家具嵌石选材
+- 暖橙棕大理石
+- 荒料编号24-28255
+material_ids:
+- gold-jade
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Full Gold-Jade (梦幻庄园) slab in the Alitan Stone showroom with a white rectangular selection outline marked on the
+    upper right surface.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

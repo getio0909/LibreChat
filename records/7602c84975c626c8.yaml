@@ -1,0 +1,74 @@
+id: 7602c84975c626c8
+title_zh: 佛教石刻佛像供奉场景
+source:
+  original_path: 佛教空间设计案例/佛教石刻佛像供奉场景.jpg
+original:
+  path: 佛教空间设计案例/佛教石刻佛像供奉场景.jpg
+  sha256: 7602c84975c626c809d7c09f9c23a4277790e2fbdf7b81c2dddf19c3701b477e
+  bytes: 1357678
+  width: 1091
+  height: 2656
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/7602c84975c626c8.jpg
+    sha256: 3b1d726a929aafbc5d0882dffb71dd50a9849e24baa58e6c2279c9ecab2c4c41
+    size: 272248
+    bytes: 272248
+    width: 841
+    height: 2048
+  thumb512:
+    path: assets/thumb512/7602c84975c626c8.webp
+    sha256: b523d242caad447443b9b2ee39fbe1d8e83d13e1789c6a0095232938c04a058a
+    size: 20638
+    bytes: 20638
+    width: 210
+    height: 512
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 传统木石佛龛内米黄石雕水月观音/菩萨坐像单品写实
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 米黄玉石
+- 砂岩圆雕
+- 红木壁龛
+- 铜香炉
+colors:
+- 温润米黄
+- 深棕木框
+- 暖白背光
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：单尊石雕/玉雕自在观音坐像造型生成 / 镂空火焰纹大背光与山石海浪座设计参考 / 中式佛堂壶门背光佛龛单品植入；推荐搭配：米黄玉/汉白玉/黄砂岩整料精雕菩萨像 + 深胡桃木壶门形贴金角花壁龛 + 龛内水墨淡彩背板配3000K隐藏背光灯带
+prompt_zh: 供奉于中式红木雕花壶门壁龛内的米黄色石雕自在观音菩萨坐像正面特写，菩萨头戴宝冠，面相慈悲温润，身披天衣璎珞，呈右腿曲起、左腿下垂踏莲台的半跏趺自在坐姿，左手当胸结说法印；身后为精雕细琢的双层镂空火焰纹与卷草纹舟形大背光，身下为翻涌的海浪山石与仰莲宝座；壁龛外框为深棕色红木配贴金角花，龛内水墨背景板边缘散发温暖柔和的白色背光，前方实木供桌上摆放红烛与青瓷三足香炉，细节精湛，高清写实。
+tags:
+- 石刻观音坐像
+- 自在观音造像
+- 镂空火焰背光
+- 壶门背光佛龛
+- 米黄石雕佛像
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1091
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 红木壶门壁龛内米黄石雕自在观音半跏趺坐像局部三维渲染图（左下角带莲花角标），原标注误定为实物对象写实。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'subject_mismatch: 图像实为三维CG渲染局部图（左下角带相同莲花角标），而非entity_type所标的“实物对象写实”'

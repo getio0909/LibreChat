@@ -1,0 +1,75 @@
+id: c05db55f9494c121
+title_zh: 佛教经堂室内空间
+source:
+  original_path: 佛教空间设计案例/佛教经堂室内空间.jpg
+original:
+  path: 佛教空间设计案例/佛教经堂室内空间.jpg
+  sha256: c05db55f9494c12195f0b28acc3a4e788d40c5ca30636f944b5bfc16496d9ab7
+  bytes: 1219059
+  width: 1248
+  height: 2572
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c05db55f9494c121.jpg
+    sha256: a9a0f94098459b30da3594c4b6a3e20bdc404d65a23f7e950890cca002e498a4
+    size: 231967
+    bytes: 231967
+    width: 994
+    height: 2048
+  thumb512:
+    path: assets/thumb512/c05db55f9494c121.webp
+    sha256: 815a291fb91e4de920e7fa3c69b917290d36467f223800fa74279eaff1198132
+    size: 21014
+    bytes: 21014
+    width: 248
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院星空天窗回廊与发光万佛经变壁长廊场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红木巨柱
+- 汉白玉莲花柱础
+- 灰绿大理石
+- 星空灯箱
+colors:
+- 深棕红木
+- 暖金万佛壁
+- 深蓝星云
+- 灰绿石地
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统寺院经堂/万佛回廊纵深空间设计 / 木格栅银河星空发光天窗植入参考 / 发光万佛墙下部立体仰莲瓣洗墙灯带设计；推荐搭配：深红木方柱配汉白玉覆盆式多层莲瓣柱础 + 贴金镂空木雕大雀替 + 矩阵背光万佛格龛配底部立体莲瓣灯带
+  + 木格栅星空软膜天花 + 深灰绿高光大理石地面
+prompt_zh: 中国传统佛教寺院经堂室内纵深回廊空间，竖幅单点透视构图，左侧依次排列粗壮的深红木方柱，柱底承托洁白的汉白玉多层覆盆莲花须弥柱础，横梁交接处饰有精美的贴金镂空木雕雀替；右侧整面长墙上部为矩阵式排列的暖黄色发光万佛小格龛，下部为深木色雕花须弥座，并内嵌一整排由暖光打亮的立体仰莲花瓣浮雕灯带；顶部天花镶嵌田字格与多格木框天窗，天窗内呈现深邃璀璨的蓝色银河星云夜空画面；地面铺设高光深灰绿色云纹大理石，倒映出万佛金光与白玉柱础，神秘庄严，高清建筑效果图。
+tags:
+- 佛教经堂空间
+- 星空天窗吊顶
+- 汉白玉莲花柱础
+- 发光万佛长墙
+- 贴金木雕雀替
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1248
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 新中式佛堂侧景竖构图（#259的右侧局部裁切，展示千佛龛与木格栅门），画面干净无水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

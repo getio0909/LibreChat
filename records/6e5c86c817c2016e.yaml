@@ -1,0 +1,76 @@
+id: 6e5c86c817c2016e
+title_zh: 现代禅修室室内设计
+source:
+  original_path: 佛教空间设计案例/现代禅修室室内设计.jpg
+original:
+  path: 佛教空间设计案例/现代禅修室室内设计.jpg
+  sha256: 6e5c86c817c2016eb9a94f4facf5bdb9342cfaeb7ef0695a8c27abd9c7d2297d
+  bytes: 2730604
+  width: 3432
+  height: 2577
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/6e5c86c817c2016e.jpg
+    sha256: 08dec29eaf89cbb8a622fb825bcd6f2c36f2a6f3962002df70f7bc7db479abb7
+    size: 399114
+    bytes: 399114
+    width: 2048
+    height: 1538
+  thumb512:
+    path: assets/thumb512/6e5c86c817c2016e.webp
+    sha256: da3b6c3e3fb24d5aaedc6b81655d3f08683fb8d5f0cb3b7abfdcaae593b85901
+    size: 27490
+    bytes: 27490
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛教空间案例
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 榻榻米席地铺装
+- 米白圆形蒲团阵列
+- 通顶藏经书柜
+- 木格栅窗
+- 茶室抬高地台
+colors:
+- 蔺草米黄
+- 原木色
+style: 现代都市榻榻米禅修道场风
+ai_design_usage: 现代居士禅修室、寺院抄经打坐堂与茶室复合空间设计、榻榻米与通顶经书架结合参考
+prompt_zh: 超高清现代禅修室与居士打坐堂室内设计效果图，横幅广角透视，地面中央铺设浅米黄色天然榻榻米席面，整齐排列三列三排米白色圆形禅修打坐蒲团；正前方设一张低矮的原木导师讲经案几，背后为竖向原木格栅与极简留白墙面；画面左侧为整面通顶的原木藏经书架，摆满佛学典籍；画面右侧为抬高的实木茶席地台、背光紫砂壶展示格与透景木格栅玻璃窗，窗外可见翠绿庭院，自然光充沛，宁静祥和，8K室内表现渲染
+tags:
+- 现代禅修室
+- 榻榻米禅堂
+- 打坐蒲团阵列
+- 藏经书架
+- 茶禅一味空间
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2577
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代禅意大堂坡屋顶沙发会客区渲染图。左下角带有半透明“一圆居空间设计”印章水印；且summary_zh与materials误称“白色圆蒲团”，画面实际为米白色方形坐垫（方蒲团）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 左下角存在第三方“一圆居空间设计”印章水印
+  - summary_zh与materials细节偏差（将方形坐垫误称为圆蒲团）

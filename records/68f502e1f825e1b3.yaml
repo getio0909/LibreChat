@@ -1,0 +1,71 @@
+id: 68f502e1f825e1b3
+title_zh: 佛教石材纹理样本-02
+source:
+  original_path: 梵高皇敦煌壁大板自家产品/佛教石材纹理样本-02.jpg
+original:
+  path: 梵高皇敦煌壁大板自家产品/佛教石材纹理样本-02.jpg
+  sha256: 68f502e1f825e1b3775945d9a38bf7c776f4f24e7c86bac258ced0a71d954e1a
+  bytes: 5445171
+  width: 2115
+  height: 4231
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/68f502e1f825e1b3.jpg
+    sha256: df2243861bab66d6224c6aa26b0b61a27398e6c48e75b01b75b78bfcfb00090d
+    size: 384791
+    bytes: 384791
+    width: 1024
+    height: 2048
+  thumb512:
+    path: assets/thumb512/68f502e1f825e1b3.webp
+    sha256: 89653aba1f9c20f7a8b4be088015e7ecd85b75a654980be0a58870e3eeae3757
+    size: 23648
+    bytes: 23648
+    width: 256
+    height: 512
+library_type: 材质纹理
+studio_roles:
+- 材质
+category_l1: 自家核心石材大板
+category_l2: 奢石大板样本
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 敦煌壁超清特写
+colors:
+- 赭石金
+- 胭脂紫红
+- 米白流云横向层叠
+style: 敦煌重彩壁画风 / 藏传唐卡风 / 现代奢石展陈
+ai_design_usage: ComfyUI / 3ds Max / Blender 4K超清无缝墙面材质贴图 / 敦煌国风佛堂主背景墙生成 / 佛像背光与藻井局部贴图
+prompt_zh: 4K超高清天然“敦煌壁”奢石竖向正射微距材质贴图，天然形成莫高窟盛唐壁画般的五彩祥云肌理，上部为醇厚的赭石金与古铜褐，中部舒展着温润的胭脂紫红与蛤粉白流云团块，下部为赤金横脉与暖象牙白丝绸细纹，无反光平光扫描，工业级PBR无缝石材贴图，8k细节。
+tags:
+- 敦煌壁奢石
+- 4K石材贴图
+- 盛唐壁画肌理
+- 胭脂紫红赭石金
+- PBR无缝材质
+- 佛教艺术石材
+material_ids:
+- dunhuang-wall
+provenance:
+  source: own_product
+  url: null
+  credit: 庄严宝刹 / 阿利坦石材
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 2115
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 4K vertical 1:2 orthographic texture scan of Dunhuang Wall (敦煌壁) marble with layered ochre gold, purplish-red, and
+    creamy white bands.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

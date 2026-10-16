@@ -1,0 +1,76 @@
+id: c2e67f92dd230fc9
+title_zh: 佛教风格室内展览空间
+source:
+  original_path: 佛教空间设计案例/佛教风格室内展览空间.jpg
+original:
+  path: 佛教空间设计案例/佛教风格室内展览空间.jpg
+  sha256: c2e67f92dd230fc9959fe9025b589fe4b22e17b491fa2fc260e24902879df1f5
+  bytes: 2353052
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/c2e67f92dd230fc9.jpg
+    sha256: aec46b110ebd65a0c359f4eb197dd05e7293d4ac10e0eb29124aa536a9ae695b
+    size: 476324
+    bytes: 476324
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/c2e67f92dd230fc9.webp
+    sha256: 7a4745e3dab4d5b2285ffc92b6c3d5b595985567ea4cb3927eb3abd846d186aa
+    size: 31858
+    bytes: 31858
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红棕实木圆柱
+- 弧形木格栅八角藻井
+- 发光博古藏经架
+- 水墨山水巨制
+- 青石板地面
+colors:
+- 朱红木色
+- 暖金色
+style: 现代新中式禅学讲堂与书院风
+ai_design_usage: 大型禅学讲堂与佛教书画文献展厅设计、中轴藏经阁配山水画轴端景构图参考
+prompt_zh: 超高清大型新中式佛教文化讲堂与藏经展览空间室内效果图，广角中轴对称透视，四根粗壮的红褐色实木大圆柱配青石鼓形柱础，正后方为通顶内嵌暖光灯带的中式博古藏经书架，书架正中悬挂巨幅暖金色水墨山水立轴，前方设深色实木讲经长桌与整齐排列的方形禅修蒲团阵列，左右两侧白墙对称装饰木框水墨山水画与草书书法条幅，顶部为宏大的弧形木格栅吊顶并内嵌八角形木雕藻井，深灰色青石板地面，庄重儒雅，8K建筑渲染
+tags:
+- 佛教展览空间
+- 禅学讲堂
+- 博古藏经架
+- 八角木藻井
+- 新中式禅堂
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 现代东方禅意茶室高挑空木构渲染图，带有“一圆居空间设计”圆形印章水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'third_party_watermark: visible third-party watermark'
+  - 'text_overlay: visible burned-in text or catalog overlay'
+  - 画面角落存在第三方“一圆居空间设计”印章水印

@@ -1,0 +1,72 @@
+id: 4485754c17fe88d8
+title_zh: 藏式佛教佛堂展柜陈设
+source:
+  original_path: 佛教家具与陈设素材/藏式佛教佛堂展柜陈设.jpg
+original:
+  path: 佛教家具与陈设素材/藏式佛教佛堂展柜陈设.jpg
+  sha256: 4485754c17fe88d8d339af0d0e6debf046bcc976eee2b87c4cee528ebdc9447d
+  bytes: 422097
+  width: 1440
+  height: 1080
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/4485754c17fe88d8.jpg
+    sha256: f7a0fe89214d0865bb45e3384068b3882e48036a28d577da738258da6c5c8542
+    size: 455774
+    bytes: 455774
+    width: 1440
+    height: 1080
+  thumb512:
+    path: assets/thumb512/4485754c17fe88d8.webp
+    sha256: 9a00ee4b128e2f6fef6541e7fce6ebdc0342297032ac1c69f5dc4a362787a35a
+    size: 61596
+    bytes: 61596
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 物件
+- 风格
+category_l1: 佛教家具与陈设
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 藏式大佛柜
+- 铜供水碗
+- 唐卡锦缎门芯
+colors:
+- 深棕金配明黄背光
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 标准藏传佛堂“藻井+大佛柜+双排供水碗”整体空间生成 / 木框嵌织锦锦地柜门材质创新参考
+prompt_zh: 室内全景实景摄影，一座庄严华丽的藏传佛教佛堂展柜陈设空间，天花板为实木梁架与金色圆形曼陀罗藻井吊顶，正面整墙为十一佛冠顶三联木雕大佛龛，明黄色内龛正中供奉释迦牟尼金佛，两侧分龛供奉度母与护法像，双层阶梯供台上整齐排列十六枚黑底彩绘八吉祥圆牌、绿松石高足供杯与一排黄铜净水碗，下部八扇柜门内嵌浅金色几何万字纹织锦底板与圆形五欲妙供木雕徽章，浅色人字拼木地板，8K超清。
+tags:
+- 藏式佛堂陈设
+- 十一佛冠佛龛
+- 织锦门芯供柜
+- 铜供水碗阵列
+- 五欲妙供圆章
+- 藻井与佛柜空间
+material_ids: []
+provenance:
+  source: own_product
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1080
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real showroom photograph of a Tibetan Buddhist shrine room featuring an 11-Buddha-crown large altar cabinet, offering
+    bowls, brocade doors, and mandala ceiling.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

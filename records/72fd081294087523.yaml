@@ -1,0 +1,79 @@
+id: 72fd081294087523
+title_zh: 中式佛教供桌室内场景
+source:
+  original_path: 佛堂空间设计参考/中式佛教供桌室内场景.jpg
+original:
+  path: 佛堂空间设计参考/中式佛教供桌室内场景.jpg
+  sha256: 72fd0812940875236be735ec1a7f61de9ad282f0c47126460fe6fd0c52523198
+  bytes: 98037
+  width: 600
+  height: 750
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/72fd081294087523.jpg
+    sha256: 1bda2690bb53681fd4327adf53bf9f173c63a75df24d7a99e2069db3f6eb39ff
+    size: 105193
+    bytes: 105193
+    width: 600
+    height: 750
+  thumb512:
+    path: assets/thumb512/72fd081294087523.webp
+    sha256: 02bcd87ae347784a204efb35e180cf9479c699e4c8d723e2af2e50da39681004
+    size: 38422
+    bytes: 38422
+    width: 410
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛堂空间参考
+category_l2: 现代禅修茶室
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 水磨石台基
+- 深胡桃木
+- 微水泥弧形造型板
+- 铜铸佛像与香炉
+- 蔺草榻榻米
+colors:
+- 暖米黄
+- 深胡桃木色
+- 浅灰白
+- 暖金
+style: 现代禅意
+ai_design_usage: 家宅佛堂与茶室一体化空间构图参考(ControlNet Depth)、弧形隐藏灯带背景墙设计、子母翘头供桌陈设搭配
+prompt_zh: 新中式别墅家宅佛堂与茶禅空间室内设计，抬高的浅灰水磨石台基上摆放前后高低两张深胡桃木翘头供桌，背景墙为对称弧形内凹造型并暗藏暖光灯带，顶部悬挑木托架供奉铜佛与金色莲花背光，两侧对称瓶插粉荷，上方为弧形木条轩顶与中式云头门罩，前景蔺草地席上摆放深木色矮茶几、黑陶茶具、枯荷花瓶与编织蒲团，柔和暖调光影，建筑室内摄影质感，8K超高清
+tags:
+- 新中式佛堂
+- 家宅佛堂
+- 子母供桌
+- 茶禅空间
+- 弧形发光背景墙
+- 水磨石台基
+material_ids: []
+provenance:
+  source: web
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 600
+  low_res: true
+  ai_generated: false
+  third_party_watermark: true
+  text_overlay: true
+  notes: 新中式家宅佛堂与茶室3D效果图，分辨率偏低（600×750）且底部居中带第三方设计机构Logo水印。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res
+  - third_party_watermark
+  - text_overlay

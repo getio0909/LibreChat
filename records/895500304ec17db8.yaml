@@ -1,0 +1,76 @@
+id: 895500304ec17db8
+title_zh: 室内艺术装置展览空间
+source:
+  original_path: 佛堂空间设计参考/室内艺术装置展览空间.jpg
+original:
+  path: 佛堂空间设计参考/室内艺术装置展览空间.jpg
+  sha256: 895500304ec17db8ed70296d78cbff9a0bb944262a8beec7b7b67be7c022991f
+  bytes: 175131
+  width: 1024
+  height: 1024
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/895500304ec17db8.jpg
+    sha256: 1dcedd6f34b39aa5d7d4430585b78bf1d307ba13721e526e3abeff07af31debe
+    size: 187519
+    bytes: 187519
+    width: 1024
+    height: 1024
+  thumb512:
+    path: assets/thumb512/895500304ec17db8.webp
+    sha256: 948bcf27207f1b4ceec6835c566a8e58f1531b63b04e12eaca8dad3a0a91aa3d
+    size: 34462
+    bytes: 34462
+    width: 512
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+category_l1: 佛堂空间参考
+category_l2: 现代佛教展厅
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红棕色陶粒/火山砂砾
+- 清水混凝土顶板
+- 浅米色无缝微水泥地面
+- 磨砂玻璃幕墙
+colors:
+- 赤土红棕
+- 素白
+- 清水混凝土灰
+- 暖米色
+style: 现代禅意
+ai_design_usage: 当代禅意艺术馆/佛事展先锋概念展位地面地形设计、枯山水微地形与极简现代建筑结合、互动式冥想公共空间构图
+prompt_zh: 当代美术馆大地艺术与禅修冥想装置展览空间设计，粗犷的清水混凝土平顶与极简白色方柱阵列，左侧落地磨砂玻璃幕墙透入柔和自然天光与树影，浅米色无缝地面上开凿多个不规则曲线形下沉池坑，内部填满温暖的红棕色陶粒与火山砂砾并塑造出起伏柔美的波浪状微地形沙丘，人们席地坐卧在起伏的砂石沙丘凹槽中冥想放空与低语交流，侘寂极简与自然大地融合的先锋空间美学，8K建筑渲染
+tags:
+- 大地艺术装置
+- 当代冥想空间
+- 枯山水微地形
+- 禅意美术馆
+- 清水混凝土与砂石
+- 先锋展陈设计
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1024
+  low_res: false
+  ai_generated: true
+  third_party_watermark: false
+  text_overlay: false
+  notes: AI生成的当代美术馆下沉式陶粒砂石微地形展览空间图，人物面目肢体严重畸变且无佛教元素，与现代佛教展厅主题不符。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - subject_mismatch

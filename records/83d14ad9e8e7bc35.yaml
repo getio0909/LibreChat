@@ -1,0 +1,73 @@
+id: 83d14ad9e8e7bc35
+title_zh: 佛教寺庙大殿佛像陈列场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿佛像陈列场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿佛像陈列场景.jpg
+  sha256: 83d14ad9e8e7bc35c4cc4307f96aa808cf86e97c9a359697ea413c0841768230
+  bytes: 2903406
+  width: 2859
+  height: 2618
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/83d14ad9e8e7bc35.jpg
+    sha256: 8434387268b71ee4a125632ca3599cb277d4294f320e6210de9aaaa4f7853809
+    size: 477425
+    bytes: 477425
+    width: 2048
+    height: 1875
+  thumb512:
+    path: assets/thumb512/83d14ad9e8e7bc35.webp
+    sha256: 9e720a64ff0caf0c7baffb0100365c9a67196e666dd567b1584d777a6e3449d5
+    size: 43608
+    bytes: 43608
+    width: 512
+    height: 469
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 铜鎏金三世佛与二弟子像
+- 高耸鱼肚白大理石背景屏风墙
+- 红木雕花供桌群
+- 发光千佛墙
+- 蓝色星空圆藻井
+colors:
+- 辉煌金
+- 鱼肚白
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 大雄宝殿三世佛背后增设鱼肚白大理石屏风墙比选方案、金色造像与白色大理石背景高反差衬托手法参考
+prompt_zh: 传统佛教寺庙大雄宝殿佛像陈列场景，左前斜向广角透视，深棕色木雕须弥座主坛上并列供奉三尊巨型铜鎏金三世佛坐像（带镂空火焰背光）与两尊弟子立像，佛像背后竖立一道高大洁白的鱼肚白天然大理石背景屏风墙，将金色佛像衬托得格外醒目，佛坛前并列摆放三张红木雕花供桌与三对米黄色方形拜垫，左侧可见骑白象的普贤菩萨金像与后方发光千佛墙，四周立有包镶鎏金云纹铜箍的深色木柱，顶部为九宫格木藻井与中央圆形蓝底金星斗拱大藻井，8K建筑渲染
+tags:
+- 鱼肚白大理石背景墙
+- 三世佛屏风
+- 大雄宝殿比选方案
+- 金白对比设计
+- 圆形星空藻井
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2618
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统大雄宝殿三世佛增设鱼肚白大理石背景屏风墙比选方案三维效果图，右下角带半透明莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

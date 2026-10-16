@@ -1,0 +1,72 @@
+id: 9fca98f313ee62f2
+title_zh: 佛教寺庙大殿内部场景-04
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿内部场景-04.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿内部场景-04.jpg
+  sha256: 9fca98f313ee62f2cb4e0679c0f4abf6fc08c7621667fbbc3b6c372ab9e1cd72
+  bytes: 3165766
+  width: 3372
+  height: 2535
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9fca98f313ee62f2.jpg
+    sha256: 9a51899a1e1ed9850b36df37f4e00f5ee43abf4e37da9d43092edeb884549011
+    size: 418714
+    bytes: 418714
+    width: 2048
+    height: 1540
+  thumb512:
+    path: assets/thumb512/9fca98f313ee62f2.webp
+    sha256: 28bc403c3d7036be7120772b10126e6fec89ba8917b37aa79516b24c7b88e6de
+    size: 34788
+    bytes: 34788
+    width: 512
+    height: 385
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 五尊铜鎏金主像配白色海棠框发光石背板
+- 右侧铜鎏金十八罗汉木龛廊
+- 深灰黑高光石砖
+- 八角重檐贴金斗拱大藻井
+colors:
+- 辉煌金
+- 深灰黑色
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 传统大雄宝殿（三世佛+文殊普贤+十八罗汉）深灰石砖地面方案左斜视图、白色海棠框发光石材背板设计参考
+prompt_zh: 传统佛教寺庙大雄宝殿室内左前斜向广角场景，地面满铺深灰黑色高光镜面石材地砖，前景耸立粗壮的原木色大圆柱（柱脚包镶鎏金莲瓣铜箍并承以汉白玉多层柱础），正前方深色木雕须弥座长坛上并列供奉五尊巨型铜鎏金佛菩萨像（三世佛与文殊普贤，带镂空金背光），每尊造像背后均设有一扇洁白的石材雕花海棠框发光背景板，佛坛前设木雕供桌与拜垫，右侧墙面为通长的木雕壁龛长廊供奉铜鎏金十八罗汉坐像，顶部为九宫格发光木天花与中央八角重檐贴金斗拱大藻井，8K建筑渲染
+tags:
+- 五尊主像并列
+- 白色海棠框背板
+- 十八罗汉壁龛
+- 八角重檐藻井
+- 深灰石砖地面
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2535
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统大雄宝殿五尊主像配白色海棠框石背板及十八罗汉廊左前斜视三维效果图（深灰石砖地面版），左下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

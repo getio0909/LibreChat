@@ -181,7 +181,8 @@ def validate_repository(repo_root: Path | str, check_images: bool = True) -> lis
             errors.append(f"{rel_rec}: schema error at {loc}: {v_err.message}")
 
         for field_path, str_val in _iter_strings(data):
-            if str_val.startswith("wiki/") or "/wiki/" in str_val:
+            is_web_url = field_path == "provenance.url" and str_val.startswith(("https://", "http://"))
+            if str_val.startswith("wiki/") or (not is_web_url and "/wiki/" in str_val):
                 errors.append(f"{rel_rec}: forbidden 'wiki/' prefix in {field_path}: {str_val}")
             if field_path in (
                 "source.original_path",

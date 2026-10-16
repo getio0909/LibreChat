@@ -1,0 +1,76 @@
+id: 52f415c457e7c9dd
+title_zh: 佛教石材雕刻座椅
+source:
+  original_path: 佛教家具与陈设素材/佛教石材雕刻座椅.jpg
+original:
+  path: 佛教家具与陈设素材/佛教石材雕刻座椅.jpg
+  sha256: 52f415c457e7c9ddb9477144fbc3635bb6f2d6430372783c7c335c029c625c18
+  bytes: 436939
+  width: 1279
+  height: 1706
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/52f415c457e7c9dd.jpg
+    sha256: 80807c8210ee630e9828ce958d2553691a5d6c1391fc5397f292f01343f42608
+    size: 472756
+    bytes: 472756
+    width: 1279
+    height: 1706
+  thumb512:
+    path: assets/thumb512/52f415c457e7c9dd.webp
+    sha256: 464af9610e51dad89ce7d792d8a7c774e9e95267f65cfd8c46cad8d6813bf83c
+    size: 56590
+    bytes: 56590
+    width: 384
+    height: 512
+library_type: 家具木作
+studio_roles:
+- 物件
+- 造型
+- 材质
+category_l1: 佛教家具与陈设
+category_l2: 法座宝座
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 和田青白玉
+- 黄花梨
+- 南红玛瑙
+colors:
+- 晴水豆绿配暖黄木
+style: 藏汉融合须弥宝座风
+ai_design_usage: CMF材质配色变体对比（青玉+黄花梨+南红） / 天然玉石沁色纹理合成 / 高端玉石佛座定制方案演示
+prompt_zh: 正面近景特写，一座温润奢华的晴水绿和田青玉与黄花梨木镶嵌佛教须弥宝座，靠背镶嵌带天然金丝沁纹的半透明翠绿青玉大板，顶部嵌球形青玉头光，边缘雕刻青玉卷云纹并镶嵌饱满的南红玛瑙圆珠，黄花梨木框架包边，须弥座束腰雕刻两尊青玉力士与金色十字金刚杵，下承青玉包木边覆莲座，背景为传统木雕护墙板，8K超清质感。
+tags:
+- 晴水绿青玉
+- 南红玛瑙镶嵌
+- 黄花梨包边
+- 玉石须弥座
+- CMF材质变体
+- 佛教石材宝座
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: null
+  license: ai_generated
+  license_status: unconfirmed
+quality:
+  min_side_px: 1279
+  low_res: false
+  ai_generated: true
+  third_party_watermark: true
+  text_overlay: true
+  notes: AI-generated variant (豆包AI生成 watermark in bottom-right) of light celadon-green jade and huanghuali wood Buddhist
+    throne in showroom. Labeled entity_type as 实物对象写实 despite being AI-generated.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated
+  - third_party_watermark
+  - text_overlay
+  - subject_mismatch

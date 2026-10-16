@@ -1,0 +1,72 @@
+id: 6ab6165b2a3b0048
+title_zh: 佛教接待台设计图
+source:
+  original_path: 26年春季佛事展设计方案/佛教接待台设计图.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教接待台设计图.jpg
+  sha256: 6ab6165b2a3b0048c6c8d507b2e22b404a4dddbfbc89f911b066fda2858b9e89
+  bytes: 1690488
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/6ab6165b2a3b0048.jpg
+    sha256: 0ea46f51de20faa3b3ab96396606cd566e1c4615baa2819c52e9d0835ed61fd5
+    size: 144572
+    bytes: 144572
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/6ab6165b2a3b0048.webp
+    sha256: 7cbd2c444cd45fbd20ac894773d9c217688433928555dc533e24f3c29e217c88
+    size: 6950
+    bytes: 6950
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+- 物件
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-迎宾接待台正背面施工图
+entity_type: 工程设计图纸
+summary_zh: ''
+materials:
+- 木结构贴纸
+- PVC字
+- 带锁柜
+colors:
+- 暖米白(C13M9Y19K0)
+- 玄黑字
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 新中式展会迎宾接待台（1200×1000×500mm）木作家具施工参考
+prompt_zh: 展览家具工程设计图“接待台”，包含正面与背面两个3D等轴测视图，浅米白色木结构贴纸饰面（CMYK色值C13 M9 Y19 K0），新中式几何折角边框造型，正面居中装饰黑色“莊嚴寶刹”竖排书法PVC字与红印章，背面展示内部上方左右两个敞开储物格（各宽525mm、高200mm）与下方带锁双开门储物柜（标注“开门带锁”），四周带有精确的红色工程尺寸标注（高1000mm，宽1200mm，深500mm），白底专业CAD家具施工图风格。
+tags:
+- 26年春季佛事展
+- 接待台设计图
+- 展会服务台尺寸
+- 家具工程图纸
+- 莊嚴寶刹
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展迎宾接待台正背面3D轴测施工尺寸与材质标注图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

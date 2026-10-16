@@ -1,0 +1,70 @@
+id: 1c4b7f9762932f1e
+title_zh: 佛教石材浮雕装饰细节
+source:
+  original_path: 25年秋季佛事展设计方案/佛教石材浮雕装饰细节.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教石材浮雕装饰细节.jpg
+  sha256: 1c4b7f9762932f1e44942abc0c3a905761ac1d4ce670c3d93ef50d445e0ab970
+  bytes: 2723565
+  width: 1994
+  height: 3541
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1c4b7f9762932f1e.jpg
+    sha256: 8bc03198c0d76413a7668071b827c656a18231e1ec2c975a0896d4a4ca7d30ed
+    size: 683346
+    bytes: 683346
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/1c4b7f9762932f1e.webp
+    sha256: 301ec61eeebb3e984770d9a07e971ba2702ff0a5f1956a8f26eec5ce5d910401
+    size: 39254
+    bytes: 39254
+    width: 288
+    height: 512
+library_type: 石刻纹样
+studio_roles:
+- 纹样
+- 材质
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 建筑木石构件-敦煌金束腰浮雕特写
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 天然玉石敦煌金高光抛光浮雕
+colors:
+- 暖金黄
+- 铁锈红丝纹
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 天然玉石拐子纹边框、宝瓶牡丹高浮雕与红金石筋微距参考
+prompt_zh: 天然玉石敦煌金须弥座束腰浮雕与覆莲底座超近距微距特写，蜜蜡黄色与橄榄黄色的天然玉石表面如镜面般温润油亮，内部贯穿细密的朱砂红与铁锈红天然石筋；束腰矩形框内雕刻回纹拐子边框、卷草角花以及繁复立体的宝瓶缠枝牡丹高浮雕，立柱饰有海棠线框；下方为一排浑圆饱满、弧度优美的覆莲花瓣与几何回纹底座，刀工深邃细腻，玉石质感极其逼真，8K微距摄影。
+tags:
+- 敦煌金浮雕
+- 束腰花板
+- 拐子纹石雕
+- 宝瓶缠枝莲
+- 天然玉石肌理
+material_ids:
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 1994
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展敦煌金须弥座束腰拐子纹宝瓶缠枝莲花板与覆莲瓣超近距微距特写。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

@@ -1,0 +1,73 @@
+id: ef1c6fd7d0eb9536
+title_zh: 佛教寺庙大殿佛像展示场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿佛像展示场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿佛像展示场景.jpg
+  sha256: ef1c6fd7d0eb9536edf9550be5869d02b070933c817f5c06dd342e26a1765d6a
+  bytes: 3741091
+  width: 3526
+  height: 2634
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/ef1c6fd7d0eb9536.jpg
+    sha256: 858e501df9c665b04f449c542c5e5c71c1d576077f015135d0daf5c5f24ffe41
+    size: 450835
+    bytes: 450835
+    width: 2048
+    height: 1530
+  thumb512:
+    path: assets/thumb512/ef1c6fd7d0eb9536.webp
+    sha256: 0ff7ad7a1f4896f7239896df7358e9df217eb8485e6d1064e9ea9e71ae9e91fc
+    size: 38540
+    bytes: 38540
+    width: 512
+    height: 382
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 铜鎏金三世佛与二弟子像
+- 两侧文殊普贤骑兽金像
+- 深棕木雕须弥座
+- 九宫格木藻井配蓝色星空圆藻井
+- 重彩壁画
+colors:
+- 辉煌金
+- 深红木色
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 传统大雄宝殿“三世佛+二弟子+文殊普贤”正视全景构图、中轴对称礼佛主坛与圆形星空藻井对位设计参考
+prompt_zh: 传统佛教寺庙大雄宝殿正面中轴对称全景，深灰黑色高光石砖地面，前景正中设红木雕花大供桌与三个米黄色方形拜垫，后方高大的深棕色木雕须弥座主坛上并列供奉三尊巨型铜鎏金三世佛坐像（配镂空火焰大背光）及阿难迦叶两尊弟子立像，主坛左右两侧跨间内对称供奉骑青狮的文殊菩萨与骑白象的普贤菩萨金像，两侧矗立包镶鎏金云纹铜箍的深色实木圆柱，东西两壁镶嵌传统重彩佛教壁画，顶部为九宫格木藻井天花，正中央镶嵌一座圆形蓝底金星贴金斗拱大藻井，恢弘庄严，8K建筑渲染
+tags:
+- 大雄宝殿正视图
+- 三世佛文殊普贤
+- 全堂七尊规制
+- 天圆地方藻井
+- 传统寺院主殿
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2634
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统大雄宝殿三世佛与二弟子、文殊普贤正面中轴全景三维效果图，左下角带半透明莲花图形角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

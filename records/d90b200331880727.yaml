@@ -1,0 +1,77 @@
+id: d90b200331880727
+title_zh: 浅木白石｜原创空间概念
+source:
+  original_path: 设计风格精选20260930/concept-oak-stone.png
+original:
+  path: 设计风格精选20260930/concept-oak-stone.png
+  sha256: d90b20033188072779fa277f96162ac93193c3b54365be372905e260a10d3a89
+  bytes: 2336804
+  width: 1448
+  height: 1086
+  format: PNG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d90b200331880727.jpg
+    sha256: 8616ef35a065ebbf05c88feaa4623c9bfddb439666eb54db0cf20979ae75d82d
+    size: 302379
+    bytes: 302379
+    width: 1448
+    height: 1086
+  thumb512:
+    path: assets/thumb512/d90b200331880727.webp
+    sha256: 6a1296258bd837f1e2a05139b51f54662b6071235ce41bc4b90203eb92d1a206
+    size: 28444
+    bytes: 28444
+    width: 512
+    height: 384
+library_type: 空间展陈
+studio_roles:
+- 风格
+- 纹样
+- 参考
+category_l1: 传统与跨文化风格
+category_l2: 现代侘寂原木石雕空间
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 米白莱姆石莲花浮雕
+- 天然米黄洞石
+- 白橡木格栅
+- 亚麻纱帘
+- 古铜器皿
+colors:
+- 暖米白色
+- 浅原木色
+- 奶油米黄
+- 自然柔白
+style: 现代侘寂禅风 / 自然静修空间
+ai_design_usage: 石材浮雕背景墙概念设计 / 现代禅茶与静修室空间生成 / 自然采光与暖色石材反射光影迁移 / 洞石家具单品融合
+prompt_zh: 现代侘寂禅意茶室与静修大厅空间设计，温暖明亮的自然色调，主背景墙为弧形米白色天然莱姆石，墙面上雕刻巨幅优雅的盛开莲花浅浮雕，顶部与侧边暗藏暖色洗墙灯带；中央摆放整块米黄洞石打造的现代方形矮茶几，上置古铜钵与绿植插花，两侧对称陈设白橡木框架配米色亚麻坐垫的现代扶手椅，左侧落地窗悬挂半透明白纱帘，明媚阳光洒在抛光米色大理石地面上，宁静空灵，大师级室内摄影。
+tags:
+- 侘寂禅意空间
+- 石雕莲花背景墙
+- 莱姆石与原木
+- 洞石茶几
+- 现代佛堂参考
+material_ids: []
+provenance:
+  source: ai_generated
+  url: null
+  credit: 庄严宝刹设计素材
+  license: ai_generated
+  license_status: confirmed
+quality:
+  min_side_px: 1086
+  low_res: false
+  ai_generated: true
+  third_party_watermark: false
+  text_overlay: false
+  notes: AI-generated concept rendering of a sunlit wabi-sabi Zen lounge with a large lotus relief carved on a curved beige
+    stone wall, travertine table, and oak chairs.
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - ai_generated

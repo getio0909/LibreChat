@@ -1,0 +1,72 @@
+id: 0d818027e0db5e2e
+title_zh: 佛教石刻菩萨坐像
+source:
+  original_path: 佛教空间设计案例/佛教石刻菩萨坐像.jpg
+original:
+  path: 佛教空间设计案例/佛教石刻菩萨坐像.jpg
+  sha256: 0d818027e0db5e2e6137d07e00fc4f98e0500c5d6a3e4754f939c068d35b4f09
+  bytes: 53730
+  width: 238
+  height: 378
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0d818027e0db5e2e.jpg
+    sha256: 73a630dc23e7060d1abf0a483d666d1596cc6305717320a31e8c64ee97d84217
+    size: 11943
+    bytes: 11943
+    width: 238
+    height: 378
+  thumb512:
+    path: assets/thumb512/0d818027e0db5e2e.webp
+    sha256: 04a18bbfe57d3cbed7f30025fb6853948531716da639d6d4e29bec4ef67186b1
+    size: 5276
+    bytes: 5276
+    width: 238
+    height: 378
+library_type: 造像雕塑
+studio_roles:
+- 造型
+- 物件
+- 参考
+category_l1: 佛教空间案例
+category_l2: 博物馆暗调聚光石雕文殊菩萨骑狮坐像文物写实
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 砂岩
+- 青石高浮雕与圆雕
+- 重点聚光照明
+colors:
+- 古朴黄褐砂岩
+- 深邃暗黑背景
+style: 当代博物馆暗调戏剧光影佛像展陈风格
+ai_design_usage: 适用场景：石窟风文殊菩萨骑狮石雕造像单品生成 / 博物馆暗场聚光灯佛像摄影光影迁移 / 佛教砂岩雕塑材质肌理参考；推荐搭配：四川红砂岩/山西青砂石古法圆雕 + 纯黑消光博物馆背景墙 + 15°窄光束角2700K博物馆轨道聚光射灯
+prompt_zh: 博物馆暗场聚光灯下的中国古代石刻文殊菩萨骑狮坐像特写，黄褐色砂岩雕刻材质，微仰视半侧面构图，菩萨头戴繁复精美的花冠，面容丰满圆润、慈悲含笑，身后有舟形石雕头光，右手当胸持物，左手轻按膝上经卷，结跏趺坐于仰莲宝座之上；莲座下方雕刻一尊张口咆哮、怒目圆睁、鬃毛卷曲的威猛雄狮；纯黑深邃背景，一束温暖的聚光灯光束自左上方打亮菩萨面部与上身，明暗对比强烈，质感古朴苍劲，博物馆文物摄影。
+tags:
+- 石刻文殊菩萨
+- 骑狮菩萨坐像
+- 砂岩佛像雕塑
+- 博物馆聚光照明
+- 石窟造像艺术
+material_ids: []
+provenance:
+  source: museum
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 238
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 博物馆暗场聚光下黄褐砂岩文殊菩萨骑狮坐像文物实景摄影，原图分辨率极低（238x378）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 238x378 (<800px short side)'

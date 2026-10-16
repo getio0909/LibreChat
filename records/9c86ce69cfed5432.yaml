@@ -1,0 +1,74 @@
+id: 9c86ce69cfed5432
+title_zh: 佛教展厅内部佛像与石材装饰
+source:
+  original_path: 佛教空间设计案例/佛教展厅内部佛像与石材装饰.jpg
+original:
+  path: 佛教空间设计案例/佛教展厅内部佛像与石材装饰.jpg
+  sha256: 9c86ce69cfed54326586196caaeaae95fd83b067135f128824229e102631ea49
+  bytes: 140274
+  width: 530
+  height: 348
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/9c86ce69cfed5432.jpg
+    sha256: 1f217572864f1306d338a79ecffd216cf5af6eff5202d2b6580e958e8a268d9a
+    size: 38823
+    bytes: 38823
+    width: 530
+    height: 348
+  thumb512:
+    path: assets/thumb512/9c86ce69cfed5432.webp
+    sha256: c75f74a2be416ca9273922363885752533727d7730cea2d1d76272f0fc6ae1ee
+    size: 21008
+    bytes: 21008
+    width: 512
+    height: 336
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 新中式八角藻井白石万佛壁佛教展厅场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 汉白玉千佛墙
+- 高光大理石
+- 木构藻井
+colors:
+- 暖白石色
+- 泥金彩绘
+- 灰绿拼花石
+style: 现代新中式禅意佛教空间风格
+ai_design_usage: 适用场景：现代佛教艺术展厅广角空间布局参考 / 素白石材万佛墙与一佛二弟子主坛组合设计 / 现代简化八角垂莲藻井生成；推荐搭配：暖白汉白玉CNC雕刻千佛墙 + 泥金彩绘一佛二弟子造像 + 白色新中式八角垂莲藻井
+  + 灰绿云纹大理石高光拼花地面
+prompt_zh: 新中式素雅白石佛教展厅广角室内全景，右侧主佛坛石雕台基上供奉泥金彩绘释迦牟尼坐佛（配金色火焰背光）与阿难、迦叶二弟子立像，背景为浅浮雕水墨群山与两侧发光经文格栅；正面转角墙面设壶门形大佛龛供奉坐佛；左侧整面长墙为暖白大理石雕刻的矩阵式背光万佛小龛，中部嵌入三个大拱龛供奉三尊白玉立佛；顶部为白色新中式八角形垂莲柱格栅藻井，地面铺设高光灰绿色大理石几何拼花，光影柔和圣洁，现代禅意建筑效果图。
+tags:
+- 新中式佛教展厅
+- 一佛二弟子主坛
+- 白色八角藻井
+- 汉白玉千佛墙
+- 大理石拼花地面
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 348
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 新中式八角藻井与白石万佛壁佛教展厅广角三维效果图，原图分辨率偏低（530x348）。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - 'low_res: 530x348 (<800px short side)'

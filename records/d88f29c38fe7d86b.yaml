@@ -1,0 +1,73 @@
+id: d88f29c38fe7d86b
+title_zh: 佛教寺庙内部圣物展示厅
+source:
+  original_path: 佛教空间设计案例/佛教寺庙内部圣物展示厅.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙内部圣物展示厅.jpg
+  sha256: d88f29c38fe7d86b11a6b983d574cf10a74966cf4aa1b0ed0bb1c31e25d4d644
+  bytes: 3442826
+  width: 7937
+  height: 5613
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d88f29c38fe7d86b.jpg
+    sha256: 30bf73552dbd5f593650d554663daf9cc4a943c984265bdc38265e7ac53d019e
+    size: 655993
+    bytes: 655993
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/d88f29c38fe7d86b.webp
+    sha256: 440f4c726c7ab06220cf583d55dfc1cbecdad0a4ee9b4d820126cb31208cd951
+    size: 42976
+    bytes: 42976
+    width: 512
+    height: 362
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 现代奢石万佛堂
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 黑底金纹镜面奢石地面
+- 汉白玉月台栏杆
+- 九龙金莲舍利塔龛
+- 蓝金摩尼宝瓶佛龛
+- 十层倒锥形千佛塔柱
+colors:
+- 辉煌金
+- 黑金奢石色
+style: 现代奢石与传统佛殿融合风
+ai_design_usage: 佛教圣物舍利展示大厅/中心塔柱式摩尼宝瓶万佛堂概念设计、黑金奢石镜面倒影与多层复合圣坛参考
+prompt_zh: 顶级佛教寺庙内部舍利圣物展示大厅，正面中轴对称广角构图，地面满铺高光镜面黑底金纹奢石大理石大板，完美倒映出中央圣坛，中景为洁白的汉白玉雕花栏杆须弥座月台与台阶，四角矗立四根米白色大理石方形巨柱（配深灰石雕多层莲花柱础），中央矗立一座三层复合通天圣坛：下层为梯形纯金浮雕宝座，中心龛内九龙金莲托举白色舍利塔；中层为宝蓝色山水云纹摩尼宝瓶，火焰龛内供奉金身坐佛；上层为向上发散的十层倒锥形发光千佛宝塔柱，直抵顶部八角形金色莲花藻井，四周环绕金色发光万佛墙，恢弘震撼，8K超高清建筑渲染
+tags:
+- 舍利圣物展示厅
+- 中心塔柱圣坛
+- 黑金奢石地面
+- 摩尼宝瓶佛龛
+- 汉白玉须弥月台
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 5613
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 大型中心塔柱式佛陀舍利圣物展示厅正面超清三维效果图，黑底金白纹镜面奢石地面倒映汉白玉月台与摩尼宝瓶塔龛。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

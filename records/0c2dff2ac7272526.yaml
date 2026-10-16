@@ -1,0 +1,71 @@
+id: 0c2dff2ac7272526
+title_zh: 藏传佛教曼陀罗天花板装饰
+source:
+  original_path: 佛教家具与陈设素材/藏传佛教曼陀罗天花板装饰.jpg
+original:
+  path: 佛教家具与陈设素材/藏传佛教曼陀罗天花板装饰.jpg
+  sha256: 0c2dff2ac727252627cb17b10f0c683940efaf076d96c75be5f3bd4f2b7bdb02
+  bytes: 203452
+  width: 1490
+  height: 700
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/0c2dff2ac7272526.jpg
+    sha256: bb6ccc6d81fe951bb057bf27d169c9ebafc2d10b244f4129814a249a10d4632a
+    size: 220792
+    bytes: 220792
+    width: 1490
+    height: 700
+  thumb512:
+    path: assets/thumb512/0c2dff2ac7272526.webp
+    sha256: 82db10c1d868ffe6012227f2880b34e5e1cbfc59cc3c5b7081782c0a2c9cbb3e
+    size: 35482
+    bytes: 35482
+    width: 512
+    height: 241
+library_type: 家具木作
+studio_roles:
+- 造型
+- 纹样
+- 参考
+category_l1: 佛教家具与陈设
+category_l2: 建筑木石构件
+entity_type: 实物对象写实
+summary_zh: ''
+materials:
+- 实木跌级吊顶
+- 立体彩绘曼陀罗
+colors:
+- 暖胡桃木配五彩坛城
+style: 藏传佛教传统重工彩绘风
+ai_design_usage: 佛堂/茶室顶面曼陀罗藻井吊顶设计 / ControlNet顶面构件植入 / 天圆地方藏式吊顶构造参考
+prompt_zh: 室内天花板仰视特写摄影，一座精美绝伦的藏传佛教曼陀罗藻井实木跌级吊顶，外框为深胡桃木藏式立体方椽头与金色几何彩绘边带，内圈为温暖的柚木平顶并带有隐藏式暖黄灯带，四个角落对称镶嵌绿叶卷草摩尼宝三角形浮雕角花，正中央镶嵌一座大型圆形立体木雕彩绘坛城（曼陀罗），包含五彩火焰圈、四方坛城宫殿城门与中心红金十六瓣莲花日轮，天圆地方，8K超高清建筑构件细节。
+tags:
+- 曼陀罗天花板
+- 藏式藻井吊顶
+- 立体坛城木雕
+- 天圆地方构造
+- 佛堂吊顶设计
+- 建筑木雕构件
+material_ids: []
+provenance:
+  source: own_product
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 700
+  low_res: true
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: Real upward photograph of a wooden coffered ceiling panel with a 3D polychrome Tibetan mandala in the center (1490x700).
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - low_res

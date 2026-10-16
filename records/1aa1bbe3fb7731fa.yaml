@@ -1,0 +1,73 @@
+id: 1aa1bbe3fb7731fa
+title_zh: 佛教文化主题展厅内部场景
+source:
+  original_path: 佛教空间设计案例/佛教文化主题展厅内部场景.jpg
+original:
+  path: 佛教空间设计案例/佛教文化主题展厅内部场景.jpg
+  sha256: 1aa1bbe3fb7731fa8d401cbe907d0c490b7af2e10ae052999f07fa24bb2bc9ac
+  bytes: 1775885
+  width: 2287
+  height: 2551
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/1aa1bbe3fb7731fa.jpg
+    sha256: 2347fb9ea9008dcec510f615d44fd17e950dd9f619a45d5666d2d3e2aab137c6
+    size: 366174
+    bytes: 366174
+    width: 1836
+    height: 2048
+  thumb512:
+    path: assets/thumb512/1aa1bbe3fb7731fa.webp
+    sha256: 5516045a52a02ad668a0b966b81706f599e4ecedcf6649c8303e55c62597afc2
+    size: 31206
+    bytes: 31206
+    width: 459
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 造型
+category_l1: 佛教空间案例
+category_l2: 传统重檐木构佛殿斜坡屋顶与白玉丹陛回廊场景
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 红木梁柱
+- 汉白玉丹陛石
+- 琉璃莲花灯
+colors:
+- 深棕木色
+- 汉白玉白
+- 橙黄莲灯
+style: 中国传统寺院殿堂与佛教造像营造风格
+ai_design_usage: 适用场景：传统寺院大殿室内台基高差与汉白玉丹陛踏步设计 / 露明斜坡木椽屋顶与井字平棊吊顶过渡参考 / 佛殿内部空间透视构图；推荐搭配：汉白玉浮雕丹陛御道踏步与抱鼓石栏杆 + 深红木方柱配透光云石壁灯 + 橙黄琉璃莲花供灯
+  + 露明木椽斜屋顶配暖光洗墙灯带
+prompt_zh: 中国传统佛教文化主题殿堂内部空间，对角线仰视构图，右下角为洁白的汉白玉三级踏步台阶，中央镶嵌浅浮雕团花纹丹陛御道斜坡，两侧配祥云抱鼓石栏板，台基上陈列两座橙黄色发光的盛开莲花供灯，远端背景可见大幅佛教彩绘壁画；画面中景矗立一根高大的深红木方柱，下承青白石覆莲须弥柱础，柱身挂载竖长条暖光云石壁灯；顶部展现斜坡密排木椽屋顶与井字形白色平棊吊顶，暗藏暖色灯带与射灯，庄重古雅，高清建筑室内效果图。
+tags:
+- 汉白玉丹陛踏步
+- 寺院室内台基
+- 斜坡木椽吊顶
+- 琉璃莲花供灯
+- 传统佛殿回廊
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2287
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 传统重檐木构佛塔殿内部汉白玉丹陛踏步、琉璃莲花灯与红木巨柱回廊竖幅三维效果图，左下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

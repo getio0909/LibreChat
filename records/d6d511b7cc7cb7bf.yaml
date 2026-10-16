@@ -1,0 +1,73 @@
+id: d6d511b7cc7cb7bf
+title_zh: 佛教寺庙大殿室内场景
+source:
+  original_path: 佛教空间设计案例/佛教寺庙大殿室内场景.jpg
+original:
+  path: 佛教空间设计案例/佛教寺庙大殿室内场景.jpg
+  sha256: d6d511b7cc7cb7bf578f99ff14d7f6f5933d3abae2a674f8c8f80941d8ec11ce
+  bytes: 4456354
+  width: 4469
+  height: 2633
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/d6d511b7cc7cb7bf.jpg
+    sha256: 43187b8375714df172822136cd5e7a90c1381b0310c868d0c574bf992f96f847
+    size: 407319
+    bytes: 407319
+    width: 2048
+    height: 1207
+  thumb512:
+    path: assets/thumb512/d6d511b7cc7cb7bf.webp
+    sha256: 4fad2d026ed4da4b8cb9e7dd975a226e35c326d5ccc11ab1a07b69fd95867dba
+    size: 31842
+    bytes: 31842
+    width: 512
+    height: 302
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛教空间案例
+category_l2: 传统寺院大殿
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 宝蓝色古法琉璃药师佛坐像配白色圆光
+- 深棕实木梁柱与万字纹格栅隔断
+- 青白石柱础
+- 重彩天王壁画
+- 蓝天星象井字天花
+colors:
+- 宝蓝琉璃色
+- 深木棕
+style: 传统汉传寺院宫殿式风格
+ai_design_usage: 东方净琉璃世界药师殿多进式全景设计、蓝色琉璃主尊造像与发光白色圆光背板搭配、蓝天星象井字吊顶参考
+prompt_zh: 佛教寺庙东方净琉璃世界药师大殿正面中轴对称超宽全景，地面满铺高光镜面深灰褐色水墨云纹大理石大板，倒影清晰，大殿由多列深棕色实木方柱（下承高大的青白石多层莲花须弥座柱础）与半开启的万字纹镂空木格栅折门分隔为中央主殿与两侧外廊，中轴远端主坛供奉一尊晶莹剔透的宝蓝色古法琉璃药师佛坐像，背后是洁白的圆形发光圆光背板，两侧分立金色日光月光菩萨立像，主殿隔墙与两侧外廊镶嵌多幅发光重彩四大天王护法壁画，顶部为蓝天白云星象图案结合木构井字格与小宫灯吊顶，8K超清渲染
+tags:
+- 蓝色琉璃药师佛
+- 净琉璃世界大殿
+- 青白石须弥柱础
+- 蓝天星象井字顶
+- 多进木格栅隔断
+material_ids: []
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2633
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 多进式宝蓝琉璃药师佛大殿正面中轴超宽全景三维效果图，配青白石须弥柱础与星象天花，左下角带莲花角标。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []

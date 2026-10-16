@@ -1,0 +1,73 @@
+id: 17f5ac286d99cb1f
+title_zh: 佛教石材展览立面设计图
+source:
+  original_path: 26年春季佛事展设计方案/佛教石材展览立面设计图.jpg
+original:
+  path: 26年春季佛事展设计方案/佛教石材展览立面设计图.jpg
+  sha256: 17f5ac286d99cb1f008f2854b07e72121243f1cbd5fd92ad86272f1653ad6fdb
+  bytes: 2067834
+  width: 5024
+  height: 3553
+  format: JPEG
+  color_mode: CMYK
+derivatives:
+  ref2048:
+    path: assets/ref2048/17f5ac286d99cb1f.jpg
+    sha256: 9ce47f7250f12a7eb177eb4b142409dc27676003a8fb1ce39e5e1d24ca0321dc
+    size: 257831
+    bytes: 257831
+    width: 2048
+    height: 1448
+  thumb512:
+    path: assets/thumb512/17f5ac286d99cb1f.webp
+    sha256: 76bcb79dd9fdcf3dabb57bf703e3fb189237a62069949bc052eba6d6dce2c886
+    size: 12686
+    bytes: 12686
+    width: 512
+    height: 362
+library_type: 工程图纸
+studio_roles:
+- 参考
+- 造型
+category_l1: 佛事展展位方案
+category_l2: 展览工程图纸-D立面佛龛与d剖面施工图
+entity_type: 工程设计图纸
+summary_zh: ''
+materials:
+- 木作倒圆角(R200/R100)
+- 灯带
+colors:
+- 暖米白(C13M9Y19K0)
+- 暖黄光
+style: 展览工程CAD与3D深化制图
+ai_design_usage: 双层内凹折角藏光佛龛正立面尺寸链与220mm厚墙体剖面构造参考
+prompt_zh: 室内装饰工程CAD立面与剖面施工图，“D立面图”与“d剖面图”，展示新中式佛教展厅双层内凹亚字形折角佛龛背景墙设计，外框为暖米白色木结构贴纸饰面（C13 M9 Y19 K0），双层折角框做倒圆角处理（外圈R:200，内圈R:100）并在侧面凹槽内暗藏黄色灯带，中央镶嵌3600×3100mm天然玉石大板，前方放置石雕须弥座供桌、坐佛与两侧绿植，右下角附220mm厚墙体双层100mm退台藏光d剖面节点详图，带有完整精准的红色尺寸标注（总宽7500mm，总高5000mm）。
+tags:
+- 26年春季佛事展
+- D立面图
+- d剖面图
+- 佛龛施工图
+- 倒圆角R200
+- 暗藏灯带节点
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: 庄严宝刹展位设计方案
+  license: own
+  license_status: confirmed
+quality:
+  min_side_px: 3553
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: true
+  notes: 26年春季佛事展南侧佛龛D立面图与暗藏灯带d剖面CAD施工尺寸详图。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues:
+  - text_overlay

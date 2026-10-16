@@ -1,0 +1,75 @@
+id: 582063d571966364
+title_zh: 佛教主题展览空间设计
+source:
+  original_path: 25年秋季佛事展设计方案/佛教主题展览空间设计.jpg
+original:
+  path: 25年秋季佛事展设计方案/佛教主题展览空间设计.jpg
+  sha256: 582063d571966364185fdb9f4604f2dfeebf78a7ec43ab7a7c6f7882ae156d2d
+  bytes: 4843586
+  width: 2252
+  height: 4000
+  format: JPEG
+  color_mode: RGB
+derivatives:
+  ref2048:
+    path: assets/ref2048/582063d571966364.jpg
+    sha256: 33fdea9d1a4998715d5d68baf1586b43939c8c12f1d5b1c336cce1a8faca6d9c
+    size: 860241
+    bytes: 860241
+    width: 1153
+    height: 2048
+  thumb512:
+    path: assets/thumb512/582063d571966364.webp
+    sha256: 38a3e5f4fa94b4c883fc9e536ba7df48583eb431bbe448481e01ae21a8b214f9
+    size: 46708
+    bytes: 46708
+    width: 288
+    height: 512
+library_type: 空间展陈
+studio_roles:
+- 参考
+- 风格
+- 材质
+category_l1: 佛事展展位方案
+category_l2: 现代佛教展厅-殿堂式核心区
+entity_type: 空间场景设计
+summary_zh: ''
+materials:
+- 金镶玉奢石
+- 敦煌金玉石
+- 深胡桃木
+colors:
+- 暖金琥珀色
+- 玄黑
+- 明黄
+style: 现代新中式殿堂奢石展陈
+ai_design_usage: 佛堂/展厅天地墙一体化透光石空间构图与光影参考
+prompt_zh: 庄严宝刹佛教主题奢石展厅内景，低角度竖幅仰拍，顶部为阶梯式深胡桃木井字格栅藻井天花，内嵌背光天然金镶玉透光云石板并饰有金色宝相莲花团花纹，门头悬挂“莊嚴寶刹”冰蓝色立体发光字；高挑背景墙采用暖金琥珀纹金镶玉大理石大板竖向黑钛分缝拼接，墙前敦煌金浮雕须弥座与汉白玉微缩栏杆上供奉三尊青绿镂空背光彩绘佛菩萨立像；前景中央为厚重饱满的双层莲花瓣玉石雕刻供坛，供奉金甲黄袍伽蓝菩萨坐像与鲜花果品，地面为金镶玉与黑色大理石几何棋盘格高光拼花，左下角摆放新中式实木圈椅，光影庄严神圣，8K建筑摄影实景质感。
+tags:
+- 25年秋季佛事展
+- 庄严宝刹展位
+- 金镶玉透光石藻井
+- 敦煌金须弥座
+- 天地墙奢石一体化
+- 伽蓝菩萨供坛
+material_ids:
+- gold-jade
+- dunhuang-gold
+provenance:
+  source: own_project
+  url: null
+  credit: null
+  license: unknown
+  license_status: unconfirmed
+quality:
+  min_side_px: 2252
+  low_res: false
+  ai_generated: false
+  third_party_watermark: false
+  text_overlay: false
+  notes: 25年秋季佛事展庄严宝刹展位核心区低角度仰视实景，含金镶玉透光石莲花藻井、金镶玉背景墙及敦煌金莲花供坛。
+review:
+  status: draft
+  reviewer: null
+  reviewed_at: null
+  issues: []
