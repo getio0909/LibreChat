@@ -156,4 +156,33 @@ describe('FileGrid', () => {
     fireEvent.click(screen.getByText('notes.txt'));
     expect(onAttach).toHaveBeenCalledWith(expect.objectContaining({ file_id: 'txt' }));
   });
+
+  // 验证生图工具生成的文件在文件面板展示中立本地化名称（不暴露 gemini_image_gen 等工具名），但附加时仍保留内部生产者元数据
+  it('displays neutral localized names for generated images while preserving internal producer metadata on attach', () => {
+    const rawGeneratedFilename =
+      '11111111-2222-4333-8444-555555555555-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.png';
+    mockFiles = [
+      file({
+        file_id: '11111111-2222-4333-8444-555555555555',
+        filename: rawGeneratedFilename,
+        type: 'image/png',
+      }),
+    ];
+
+    const { onAttach } = renderGrid();
+    const expectedNeutralName = 'com_ui_generated_image_filename:V1StGXR8.png';
+    expect(screen.getByText(expectedNeutralName)).toBeInTheDocument();
+    expect(screen.queryByText(/gemini_image_gen/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `com_ui_composer_preview_file:${expectedNeutralName}` }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText(expectedNeutralName));
+    expect(onAttach).toHaveBeenCalledWith(
+      expect.objectContaining({
+        file_id: '11111111-2222-4333-8444-555555555555',
+        filename: rawGeneratedFilename,
+      }),
+    );
+  });
 });

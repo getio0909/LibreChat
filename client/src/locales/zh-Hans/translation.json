@@ -1501,5 +1501,6 @@
   "com_ui_zoom_in": "放大",
   "com_ui_zoom_level": "缩放级别",
   "com_ui_zoom_out": "缩小",
+  "com_ui_generated_image_filename": "设计图-{{0}}",
   "com_user_message": "您"
 }

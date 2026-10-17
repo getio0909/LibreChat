@@ -1418,6 +1418,7 @@
   "com_ui_composer_palette_search": "Search tools, skills and servers",
   "com_ui_composer_preview_failed": "Couldn't load a preview of {{0}}",
   "com_ui_composer_preview_file": "Preview {{0}}",
+  "com_ui_generated_image_filename": "generated-image-{{0}}",
   "com_ui_composer_search_files": "Search files",
   "com_ui_composer_search_mcp": "Search MCP servers",
   "com_ui_composer_search_skills": "Search skills",

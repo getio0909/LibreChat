@@ -187,5 +187,19 @@ describe('Image', () => {
       const img = screen.getByRole('img');
       expect(img).toHaveAttribute('src', '/other/path.png');
     });
+
+    it('replaces generated tool image filenames in alt and aria-label with neutral names', () => {
+      render(
+        <Image
+          imagePath="/images/gen.png"
+          altText="11111111-2222-4333-8444-555555555555-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.png"
+        />,
+      );
+      const img = screen.getByRole('img');
+      const alt = img.getAttribute('alt') ?? '';
+      expect(alt).not.toContain('gemini');
+      expect(alt).not.toContain('gemini_image_gen');
+      expect(alt).toContain('V1StGXR8.png');
+    });
   });
 });

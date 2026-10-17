@@ -8,8 +8,13 @@ import FilePreviewDialog, {
   formatBytes,
   getDisplayType,
 } from '~/components/Chat/Messages/Content/FilePreviewDialog';
+import {
+  getFileType,
+  triggerDownload,
+  toAbsoluteFilePath,
+  formatGeneratedImageFilename,
+} from '~/utils';
 import { getPreviewKind } from '~/components/Chat/Messages/Content/preview';
-import { getFileType, toAbsoluteFilePath, triggerDownload } from '~/utils';
 import DialogImage from '~/components/Chat/Messages/Content/DialogImage';
 import FilePreview from '~/components/Chat/Input/Files/FilePreview';
 import { useGetFiles, useFilePreviewBlob } from '~/data-provider';
@@ -95,7 +100,8 @@ interface FileCardProps {
  *  favourite star. */
 const FileCard = memo(function FileCard({ file, onAttach, onPreview, disabled }: FileCardProps) {
   const localize = useLocalize();
-  const name = file.filename ?? '';
+  // 将生图工具产生的带内部工具名前缀的文件名转换展示为中立本地化名称，保留原始 file.filename 供内部引用
+  const name = formatGeneratedImageFilename(file.filename, localize);
   const details = [
     getDisplayType(localize, file.type ?? undefined, name),
     formatBytes(file.bytes ?? 0),
@@ -226,7 +232,8 @@ export default function FileGrid({
   const visible = useMemo(
     () =>
       files.filter((file) => {
-        if (query !== '' && file.filename?.toLowerCase().includes(query) !== true) {
+        const displayName = formatGeneratedImageFilename(file.filename, localize);
+        if (query !== '' && displayName.toLowerCase().includes(query.toLowerCase()) !== true) {
           return false;
         }
         if (view === 'images') {
@@ -237,10 +244,12 @@ export default function FileGrid({
         }
         return true;
       }),
-    [files, query, view],
+    [files, localize, query, view],
   );
 
   const previewKind = previewing != null ? previewOf(previewing) : null;
+  const previewDisplayName =
+    previewing != null ? formatGeneratedImageFilename(previewing.filename, localize) : undefined;
 
   /* The image is fetched through the backend by id, as the PDF preview is,
      rather than from its stored link: a signed storage link can expire between
@@ -253,7 +262,9 @@ export default function FileGrid({
   const previewFailedRef = useRef<(file: TFile) => void>(() => undefined);
   previewFailedRef.current = (file: TFile) => {
     showToast({
-      message: localize('com_ui_composer_preview_failed', { 0: file.filename ?? '' }),
+      message: localize('com_ui_composer_preview_failed', {
+        0: formatGeneratedImageFilename(file.filename, localize),
+      }),
       status: 'error',
     });
     setPreviewing(null);
@@ -342,17 +353,17 @@ export default function FileGrid({
         src={imageUrl}
         triggerRef={previewTriggerRef}
         showDetails={false}
-        title={previewing?.filename ?? undefined}
+        title={previewDisplayName || undefined}
         downloadImage={() => {
           if (imageUrl != null) {
-            triggerDownload(imageUrl, previewing?.filename ?? 'image');
+            triggerDownload(imageUrl, previewDisplayName || 'image');
           }
         }}
       />
       <FilePreviewDialog
         open={previewKind === 'pdf'}
         onOpenChange={closePreview}
-        fileName={previewing?.filename ?? ''}
+        fileName={previewDisplayName ?? ''}
         fileId={previewing?.file_id}
         filePath={previewing?.filepath}
         fileType={previewing?.type ?? undefined}

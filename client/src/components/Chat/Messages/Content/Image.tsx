@@ -1,7 +1,9 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Skeleton } from '@librechat/client';
 import { apiBaseUrl } from 'librechat-data-provider';
+import { formatGeneratedImageFilename } from '~/utils/downloadFile';
 import { cn, toAbsoluteFilePath } from '~/utils';
+import useLocalize from '~/hooks/useLocalize';
 import DialogImage from './DialogImage';
 
 /** Max display height for chat images (Tailwind JIT class) */
@@ -47,8 +49,12 @@ const Image = ({
   width?: number;
   height?: number;
 }) => {
+  const localize = useLocalize();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  // 隐藏底层生图工具名（如 gemini_image_gen），为对话图片展示与下载提供本地化中立名称
+  const displayAltText = formatGeneratedImageFilename(altText, localize);
+  const downloadFilename = displayAltText || 'image.png';
 
   /** Root-relative server paths (`/images/...` static, `/api/...` downloads and
    *  share routes) are resolved against the API base so they load under a
@@ -67,7 +73,7 @@ const Image = ({
 
       const link = document.createElement('a');
       link.href = url;
-      link.download = altText || 'image.png';
+      link.download = downloadFilename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -77,7 +83,7 @@ const Image = ({
       console.error('Download failed:', error);
       const link = document.createElement('a');
       link.href = absoluteImageUrl;
-      link.download = altText || 'image.png';
+      link.download = downloadFilename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -100,7 +106,7 @@ const Image = ({
       <button
         ref={triggerRef}
         type="button"
-        aria-label={`View ${altText} in dialog`}
+        aria-label={`View ${displayAltText} in dialog`}
         aria-haspopup="dialog"
         onClick={() => setIsOpen(true)}
         className={cn(
@@ -112,7 +118,7 @@ const Image = ({
       >
         {showSkeleton && <Skeleton className="absolute inset-0" aria-hidden="true" />}
         <img
-          alt={altText}
+          alt={displayAltText}
           src={absoluteImageUrl}
           onLoad={() => paintedUrls.add(absoluteImageUrl)}
           className={cn(
@@ -130,6 +136,7 @@ const Image = ({
         downloadImage={downloadImage}
         args={args}
         triggerRef={triggerRef}
+        title={displayAltText || undefined}
       />
     </div>
   );
