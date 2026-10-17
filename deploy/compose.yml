@@ -142,3 +142,8 @@ volumes:
   logs:
   appdata:
   studio-data:
+
+# 为默认Compose网络开启IPv6，确保studio容器可通过IPv6连接火山方舟等双栈上游服务
+networks:
+  default:
+    enable_ipv6: true

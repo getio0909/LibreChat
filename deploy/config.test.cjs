@@ -424,10 +424,21 @@ test('fileConfig permits image uploads on both google and OpenRouter endpoints',
   }
 });
 
-test('deploy/compose.yml configures hardened studio service and api endpoint wiring', () => {
-  const { services, volumes } = parsedCompose;
+test('deploy/compose.yml configures hardened studio service, IPv6 network, and api endpoint wiring', () => {
+  const { services, volumes, networks } = parsedCompose;
   assert.ok(services.studio, 'studio service must be defined in deploy/compose.yml');
   assert.ok('studio-data' in volumes, 'studio-data volume must be defined in deploy/compose.yml');
+  assert.ok(networks && networks.default, 'default network must be defined in deploy/compose.yml');
+  assert.equal(
+    networks.default.enable_ipv6,
+    true,
+    'default compose network must enable IPv6 for Ark reachability',
+  );
+  assert.equal(
+    studioNetworkUsesDefault(services.studio),
+    true,
+    'studio service must use the IPv6-enabled default compose network',
+  );
 
   const studio = services.studio;
   assert.equal(studio.image, '${STUDIO_IMAGE:?Set STUDIO_IMAGE in image.env}');
@@ -449,6 +460,17 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
+
+// 校验服务未挂载到禁用IPv6的独立网络而是使用默认IPv6网络
+function studioNetworkUsesDefault(serviceConfig) {
+  if (!serviceConfig.networks) {
+    return true;
+  }
+  if (Array.isArray(serviceConfig.networks)) {
+    return serviceConfig.networks.includes('default');
+  }
+  return Object.prototype.hasOwnProperty.call(serviceConfig.networks, 'default');
+}
 
 test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding and matches compose host port', () => {
   const rawNginx = fs.readFileSync('deploy/nginx.conf', 'utf8');
