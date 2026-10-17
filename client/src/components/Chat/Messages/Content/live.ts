@@ -8,10 +8,10 @@ import type {
 import type { TOptions } from 'i18next';
 import type { SpanOutcome, SpanSummary } from './outcome';
 import type { TranslationKeys } from '~/hooks';
+import { getMCPToolDisplayLabel, getToolDisplayLabel, parseToolName } from '~/utils/toolLabels';
 import { getBatchActivityLabelPart, getActivityLabelText } from '~/utils/activityLabels';
 import { hasPendingApprovalInPart, hasPendingAuthInPart } from '~/utils/groupToolCalls';
 import { ASK_USER_QUESTION, getSubmittedAskAnswer } from '~/utils/approval';
-import { getToolDisplayLabel, parseToolName } from '~/utils/toolLabels';
 import { getToolIconName, getToolMeta, summarizeSpan } from './outcome';
 import { boundIntentLabel, getToolCallIntent } from './Parts/intent';
 import { isError } from './ToolOutput';
@@ -469,7 +469,9 @@ export function getFailedLines(
     const parsed = parseToolName(toolCall.name ?? '', serverNames);
     const subject =
       getToolCallIntent(toolCall.args) ??
-      (parsed.mcpServer ? parsed.toolName : getToolDisplayLabel(parsed.raw, localize, serverNames));
+      (parsed.mcpServer
+        ? getMCPToolDisplayLabel(parsed.toolName, localize, parsed.mcpServer)
+        : getToolDisplayLabel(parsed.raw, localize, serverNames));
     const failedAt =
       toolCall.backgroundTask?.settledAt ??
       (meta.background != null || toolCall.backgrounded ? undefined : toolCall.runStepClosedAt);

@@ -74,7 +74,10 @@ describe('Header stacking', () => {
       'backdrop-blur-md',
       'border-b',
     );
-    expect(container.firstElementChild).not.toHaveClass('2xl:from-surface-canvas/0', 'to-transparent');
+    expect(container.firstElementChild).not.toHaveClass(
+      '2xl:from-surface-canvas/0',
+      'to-transparent',
+    );
     expect(backgroundTasks).toHaveBeenCalled();
   });
 

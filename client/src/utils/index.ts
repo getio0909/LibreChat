@@ -59,6 +59,7 @@ export * from './toolCallPhase';
 export * from './documentTitle';
 export * from './reasoningLabels';
 export * from './numbers';
+export * from './studio';
 export { default as cn } from './cn';
 export { default as logger } from './logger';
 export { default as getLoginError } from './getLoginError';
@@ -67,6 +68,16 @@ export { default as buildDefaultConvo } from './buildDefaultConvo';
 export { default as getDefaultEndpoint } from './getDefaultEndpoint';
 export { default as createChatSearchParams, processValidSettings } from './createChatSearchParams';
 export { getThemeFromEnv } from './getThemeFromEnv';
+import {
+  buildStudioDraftKey,
+  extractStudioEditorCapability,
+  extractStudioSelectionImageId,
+  loadUIDraft,
+  renewStudioResourceLinks,
+  saveUIDraft,
+  studioUIStore,
+} from './studio';
+import type { StudioUIActionContext } from './studio';
 
 export const languages = [
   'java',
@@ -143,88 +154,118 @@ export const extractContent = (
   return '';
 };
 
-const UI_DRAFT_STORAGE_KEY = 'zyb_studio_ui_drafts_v1';
-const uiDraftMemoryStore = new Map<string, unknown>();
-
-function readSessionDraftMap(): Record<string, unknown> {
-  if (typeof window === 'undefined' || !window.sessionStorage) {
-    return {};
-  }
-  try {
-    const raw = window.sessionStorage.getItem(UI_DRAFT_STORAGE_KEY);
-    if (!raw) {
-      return {};
+function verifyStudioSelectionContext(
+  payload: Record<string, unknown>,
+  context?: StudioUIActionContext,
+):
+  | {
+      ok: true;
+      draftKey: string;
+      editorCapability: string;
+      sessionNonce?: string;
     }
-    const parsed: unknown = JSON.parse(raw);
-    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>)
-      : {};
-  } catch {
-    return {};
+  | {
+      ok: false;
+      reason: string;
+    } {
+  if (!context?.userId?.trim() || !context.resource) {
+    return { ok: false, reason: 'unauthenticated_or_missing_resource' };
   }
-}
-
-export function saveUIDraft(draftKey: string, draft: unknown): void {
+  const resourceImageId = extractStudioSelectionImageId(context.resource.uri);
+  if (!resourceImageId) {
+    return { ok: false, reason: 'invalid_selection_resource' };
+  }
+  if (
+    typeof payload.resourceUri === 'string' &&
+    payload.resourceUri.trim() &&
+    payload.resourceUri.trim() !== context.resource.uri
+  ) {
+    return { ok: false, reason: 'resource_uri_mismatch' };
+  }
+  if (
+    typeof payload.imageId === 'string' &&
+    payload.imageId.trim() &&
+    payload.imageId.trim() !== resourceImageId
+  ) {
+    return { ok: false, reason: 'image_id_mismatch' };
+  }
+  const expectedCapability = extractStudioEditorCapability(context.resource);
+  const providedCapability =
+    typeof payload.editorCapability === 'string' ? payload.editorCapability.trim() : '';
+  if (
+    providedCapability &&
+    expectedCapability !== 'default' &&
+    providedCapability !== expectedCapability
+  ) {
+    return { ok: false, reason: 'capability_mismatch' };
+  }
+  const effectiveCapability =
+    expectedCapability !== 'default'
+      ? expectedCapability
+      : providedCapability || expectedCapability;
+  const draftKey = buildStudioDraftKey(context, effectiveCapability);
   if (!draftKey) {
-    return;
+    return { ok: false, reason: 'invalid_draft_scope' };
   }
-  if (draft == null) {
-    uiDraftMemoryStore.delete(draftKey);
-  } else {
-    uiDraftMemoryStore.set(draftKey, draft);
-  }
-  if (typeof window === 'undefined' || !window.sessionStorage) {
-    return;
-  }
-  try {
-    const map = readSessionDraftMap();
-    if (draft == null) {
-      delete map[draftKey];
-    } else {
-      map[draftKey] = draft;
+  if (typeof payload.draftKey === 'string' && payload.draftKey.trim()) {
+    const expectedIframeKey = `zyb_studio:selection:${resourceImageId}:${effectiveCapability}`;
+    if (payload.draftKey.trim() !== draftKey && payload.draftKey.trim() !== expectedIframeKey) {
+      return { ok: false, reason: 'draft_key_mismatch' };
     }
-    window.sessionStorage.setItem(UI_DRAFT_STORAGE_KEY, JSON.stringify(map));
-  } catch {
-    // Ignore storage quota or private mode errors
   }
-}
-
-export function loadUIDraft(draftKey: string): unknown {
-  if (!draftKey) {
-    return undefined;
-  }
-  if (uiDraftMemoryStore.has(draftKey)) {
-    return uiDraftMemoryStore.get(draftKey);
-  }
-  const map = readSessionDraftMap();
-  if (Object.prototype.hasOwnProperty.call(map, draftKey)) {
-    const draft = map[draftKey];
-    uiDraftMemoryStore.set(draftKey, draft);
-    return draft;
-  }
-  return undefined;
+  return {
+    ok: true,
+    draftKey,
+    editorCapability: effectiveCapability,
+    sessionNonce: typeof payload.sessionNonce === 'string' ? payload.sessionNonce : undefined,
+  };
 }
 
 /** Converts supported legacy MCP-UI actions into the existing conversation submission path. */
-export const handleUIAction = async (result: UIActionResult, ask: TAskFunction) => {
+export const handleUIAction = async (
+  result: UIActionResult,
+  ask: TAskFunction,
+  context?: StudioUIActionContext,
+) => {
   const rawAction = result as {
     type?: string;
     payload?: Record<string, unknown>;
   };
   if (rawAction?.type === 'ui-draft-save') {
     const payload = rawAction.payload ?? {};
-    const draftKey = String(payload.draftKey ?? payload.imageId ?? '');
-    saveUIDraft(draftKey, payload.draft ?? null);
-    return { status: 'saved', draftKey };
+    const verified = verifyStudioSelectionContext(payload, context);
+    if (!verified.ok) {
+      return { status: 'rejected', reason: verified.reason };
+    }
+    saveUIDraft(verified.draftKey, payload.draft ?? null, context?.store ?? studioUIStore);
+    return {
+      status: 'saved',
+      draftKey: verified.draftKey,
+      editorCapability: verified.editorCapability,
+      sessionNonce: verified.sessionNonce,
+    };
   }
   if (rawAction?.type === 'ui-draft-load') {
     const payload = rawAction.payload ?? {};
-    const draftKey = String(payload.draftKey ?? payload.imageId ?? '');
-    const draft = loadUIDraft(draftKey);
-    return { status: 'loaded', draftKey, draft };
+    const verified = verifyStudioSelectionContext(payload, context);
+    if (!verified.ok) {
+      return { status: 'rejected', reason: verified.reason };
+    }
+    const draft = loadUIDraft(verified.draftKey, context?.store ?? studioUIStore);
+    return {
+      status: 'loaded',
+      draftKey: verified.draftKey,
+      editorCapability: verified.editorCapability,
+      sessionNonce: verified.sessionNonce,
+      draft,
+    };
   }
   if (rawAction?.type === 'ui-link-renew') {
-    return { status: 'ready' };
+    const payload = rawAction.payload ?? {};
+    if (!context) {
+      return { status: 'rejected', reason: 'missing_context' };
+    }
+    return renewStudioResourceLinks(payload, context);
   }
 
   const { type, payload } = result;

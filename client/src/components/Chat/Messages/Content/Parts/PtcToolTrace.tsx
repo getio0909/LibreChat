@@ -4,6 +4,7 @@ import type { TranslationKeys } from '~/hooks';
 import type { PtcTraceEntry } from '~/common';
 import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
 import { cn, parseToolName, getRunStepDurationLabels } from '~/utils';
+import { getMCPServerDisplayLabel } from '~/utils/toolLabels';
 import { useMCPServerNames } from '~/hooks/MCP';
 import useFollowScroll from './useFollowScroll';
 import { useLocalize } from '~/hooks';
@@ -60,7 +61,9 @@ function PtcTraceLine({ entry }: { entry: PtcTraceEntry }) {
         <span className="text-text-primary shrink-0">
           {parsed.mcpServer && (
             <>
-              <span className="text-text-secondary">{parsed.mcpServer}</span>
+              <span className="text-text-secondary">
+                {getMCPServerDisplayLabel(parsed.mcpServer, localize)}
+              </span>
               <span className="text-text-tertiary">·</span>
             </>
           )}

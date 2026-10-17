@@ -2674,122 +2674,346 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
     assert f"有效期至 {raw_utc}" not in compare_html
     assert f"有效期至 {raw_utc}" not in model_html
 
-    # 3. 在Playwright中验证：即使短效edt:写链接已失效，baseImg仍通过长效preview_url正常加载；且可通过renewBtn向宿主请求新链接并热更新；同时验证跨断点remount草稿恢复
-    host_html = """<!DOCTYPE html>
+    # 3. 启动真实Starlette/uvicorn测试服务端，验证：
+    # - Finding 1：短效edt:写令牌过期返回404纯文本时，点击确认选区不抛SyntaxError，自动揭示#renewBtn并保留选区草稿
+    # - Finding 2：点击#renewBtn及#compareRenewBtn通过ui-link-renew及POST /files/<token> (action="renew")就地刷新链接，不触发select_region新对话轮次，刷新后即可成功确认选区；已消耗的edt:令牌禁止再次renew
+    # - Finding 3：不同编辑器实例（不同SIGNED_URL能力签名）的DRAFT_KEY严格隔离，不会跨实例串草稿
+    # - Finding 4：非window.parent来源、错误requestId/sessionNonce、跨源或只读img:伪造editorUrl均被拒绝
+    import socket
+    import threading
+    import uvicorn
+    from deploy.studio.models3d import format_utc_timestamp
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_file = user_lc / f"{raw_uuid}__round5c_base.png"
+    save_exact(base_img, base_file)
+    base_sha = hashlib.sha256(base_file.read_bytes()).hexdigest()
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = int(sock.getsockname()[1])
+
+    local_cfg = studio_env.model_copy(
+        update={"public_base_url": f"http://127.0.0.1:{port}"}
+    )
+    studio_app = create_app(settings=local_cfg, rules=load_rules())
+
+    uv_config = uvicorn.Config(
+        studio_app, host="127.0.0.1", port=port, log_level="error"
+    )
+    uv_server = uvicorn.Server(uv_config)
+    server_thread = threading.Thread(target=uv_server.run, daemon=True)
+    server_thread.start()
+    for _ in range(50):
+        if uv_server.started:
+            break
+        time.sleep(0.05)
+    assert uv_server.started is True
+
+    try:
+        preview_tok, preview_exp = sign_image_token(local_cfg, USER_A, raw_uuid)
+        expired_edt_tok, expired_edt_exp = sign_editor_token(
+            local_cfg,
+            USER_A,
+            raw_uuid,
+            base_sha,
+            expires_at=int(time.time()) - 120,
+            nonce="nonce_editor_instance_one",
+        )
+        second_edt_tok, second_edt_exp = sign_editor_token(
+            local_cfg,
+            USER_A,
+            raw_uuid,
+            base_sha,
+            expires_at=int(time.time()) + 600,
+            nonce="nonce_editor_instance_two",
+        )
+        real_preview_url = f"http://127.0.0.1:{port}/files/{preview_tok}"
+        real_expired_editor_url = f"http://127.0.0.1:{port}/files/{expired_edt_tok}"
+        real_second_editor_url = f"http://127.0.0.1:{port}/files/{second_edt_tok}"
+
+        live_editor_html = build_selection_editor_html(
+            image_id=raw_uuid,
+            signed_url=real_expired_editor_url,
+            expires_at=format_utc_timestamp(expired_edt_exp),
+            preview_url=real_preview_url,
+            preview_expires_at=format_utc_timestamp(preview_exp),
+            width=1264,
+            height=848,
+            segment_ready=False,
+        )
+        second_editor_html = build_selection_editor_html(
+            image_id=raw_uuid,
+            signed_url=real_second_editor_url,
+            expires_at=format_utc_timestamp(second_edt_exp),
+            preview_url=real_preview_url,
+            preview_expires_at=format_utc_timestamp(preview_exp),
+            width=1264,
+            height=848,
+            segment_ready=False,
+        )
+
+        expired_compare_tok, expired_cmp_exp = sign_image_token(
+            local_cfg, USER_A, raw_uuid, expires_at=int(time.time()) - 60
+        )
+        expired_compare_url = f"http://127.0.0.1:{port}/files/{expired_compare_tok}"
+        live_compare_html = build_compare_viewer_html(
+            image_id=raw_uuid,
+            base_id=raw_uuid,
+            selection_id=raw_sel_id,
+            before_url=expired_compare_url,
+            after_url=expired_compare_url,
+            expires_at=format_utc_timestamp(expired_cmp_exp),
+            width=320,
+            height=200,
+            selected_pixels=8420,
+        )
+
+        host_html = """<!DOCTYPE html>
 <html><body>
   <iframe id="ed" sandbox="allow-scripts" style="width:760px;height:640px;border:0"></iframe>
+  <iframe id="attacker" sandbox="allow-scripts" style="width:10px;height:10px;border:0"></iframe>
+  <iframe id="cmp" sandbox="allow-scripts" style="width:760px;height:520px;border:0"></iframe>
   <script>
     window.__draftStore = {};
-    window.__renewToolRequests = [];
+    window.__renewRequests = [];
+    window.__toolRequests = [];
+    window.__promptMessages = [];
     window.addEventListener('message', (ev) => {
       if (!ev.data || typeof ev.data !== 'object') return;
       const { type, messageId, payload } = ev.data;
       if (type === 'ui-draft-save' && payload && payload.draftKey) {
-        window.__draftStore[payload.draftKey] = payload.draft;
+        window.__draftStore[payload.draftKey] = {
+          editorCapability: payload.editorCapability,
+          draft: payload.draft
+        };
       } else if (type === 'ui-draft-load' && payload && payload.draftKey) {
-        const saved = window.__draftStore[payload.draftKey] || null;
-        const frame = document.getElementById('ed');
-        if (frame && frame.contentWindow) {
-          frame.contentWindow.postMessage({
+        const record = window.__draftStore[payload.draftKey] || null;
+        if (ev.source && typeof ev.source.postMessage === 'function') {
+          ev.source.postMessage({
             type: 'ui-message-response',
             messageId: messageId,
-            payload: { response: { draft: saved } }
+            payload: {
+              response: {
+                sessionNonce: payload.sessionNonce,
+                editorCapability: record ? record.editorCapability : payload.editorCapability,
+                draft: record ? record.draft : null
+              }
+            }
           }, '*');
         }
-      } else if (type === 'tool' && payload && payload.toolName === 'select_region') {
-        window.__renewToolRequests.push(payload);
+      } else if (type === 'ui-link-renew') {
+        window.__renewRequests.push({ messageId, payload });
+      } else if (type === 'tool') {
+        window.__toolRequests.push(payload);
+      } else if (type === 'prompt') {
+        window.__promptMessages.push(payload);
       }
     });
   </script>
 </body></html>"""
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            executable_path="/usr/bin/chromium",
-            headless=True,
-        )
-        try:
-            page = browser.new_page(viewport={"width": 840, "height": 720})
-            page.set_content(host_html)
-            page.eval_on_selector(
-                "#ed",
-                "(el, html) => { el.srcdoc = html; }",
-                editor_html,
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                executable_path="/usr/bin/chromium",
+                headless=True,
             )
-            frame = page.frame_locator("#ed")
-            frame.locator("#confirmBtn").wait_for(state="visible")
-            page.wait_for_timeout(150)
+            try:
+                page = browser.new_page(viewport={"width": 840, "height": 720})
+                page.set_content(host_html)
+                page.eval_on_selector(
+                    "#ed",
+                    "(el, html) => { el.srcdoc = html; }",
+                    live_editor_html,
+                )
+                frame = page.frame_locator("#ed")
+                frame.locator("#confirmBtn").wait_for(state="visible")
+                page.wait_for_timeout(200)
 
-            # 验证标题栏与有效期显示不包含内部UUID或UTC T...Z后缀，且底图通过preview_url成功加载
-            header_texts = frame.locator(".header-row").inner_text()
-            assert "只改局部 · 选区编辑器（1264×848）" in header_texts
-            assert raw_uuid not in header_texts
-            assert "T09:55:56Z" not in header_texts
-            img_loaded = frame.locator("#baseImg").evaluate(
-                "(img) => img.complete && img.naturalWidth === 320"
-            )
-            assert img_loaded is True
+                # 验证标题栏与有效期显示不包含内部UUID或UTC T...Z后缀，且底图通过preview_url成功加载
+                header_texts = frame.locator(".header-row").inner_text()
+                assert "只改局部 · 选区编辑器（1264×848）" in header_texts
+                assert raw_uuid not in header_texts
+                assert "T09:55:56Z" not in header_texts
+                img_loaded = frame.locator("#baseImg").evaluate(
+                    "(img) => img.complete && img.naturalWidth === 320"
+                )
+                assert img_loaded is True
 
-            # 绘制未确认选区并填写说明文字
-            canvas_box = frame.locator("#overlayCanvas").bounding_box()
-            assert canvas_box is not None
-            cx, cy, cw, ch = (
-                canvas_box["x"],
-                canvas_box["y"],
-                canvas_box["width"],
-                canvas_box["height"],
-            )
-            page.mouse.move(cx + cw * 0.2, cy + ch * 0.2)
-            page.mouse.down()
-            page.mouse.move(cx + cw * 0.7, cy + ch * 0.7, steps=5)
-            page.mouse.up()
-            frame.locator("#instructionInput").fill("局部石材替换为汉白玉")
+                # 绘制未确认选区并填写说明文字
+                canvas_box = frame.locator("#overlayCanvas").bounding_box()
+                assert canvas_box is not None
+                cx, cy, cw, ch = (
+                    canvas_box["x"],
+                    canvas_box["y"],
+                    canvas_box["width"],
+                    canvas_box["height"],
+                )
+                page.mouse.move(cx + cw * 0.2, cy + ch * 0.2)
+                page.mouse.down()
+                page.mouse.move(cx + cw * 0.7, cy + ch * 0.7, steps=5)
+                page.mouse.up()
+                frame.locator("#instructionInput").fill("局部石材替换为汉白玉")
+                assert frame.locator("#confirmBtn").is_disabled() is False
 
-            assert frame.locator("#confirmBtn").is_disabled() is False
+                # 模拟移动端/桌面端断点切换导致同一编辑器实例卸载并重新挂载（remount）
+                page.evaluate(
+                    """(html) => {
+                        const oldFrame = document.getElementById('ed');
+                        const parent = oldFrame.parentElement;
+                        oldFrame.remove();
+                        const nextFrame = document.createElement('iframe');
+                        nextFrame.id = 'ed';
+                        nextFrame.setAttribute('sandbox', 'allow-scripts');
+                        nextFrame.style.cssText = 'width:390px;height:640px;border:0';
+                        nextFrame.srcdoc = html;
+                        parent.appendChild(nextFrame);
+                    }""",
+                    live_editor_html,
+                )
+                remounted = page.frame_locator("#ed")
+                remounted.locator("#confirmBtn").wait_for(state="visible")
+                page.wait_for_timeout(250)
 
-            # 模拟移动端/桌面端断点切换导致iframe卸载并重新挂载（remount）
-            page.evaluate(
-                """(html) => {
-                    const oldFrame = document.getElementById('ed');
-                    const parent = oldFrame.parentElement;
-                    oldFrame.remove();
-                    const nextFrame = document.createElement('iframe');
-                    nextFrame.id = 'ed';
-                    nextFrame.setAttribute('sandbox', 'allow-scripts');
-                    nextFrame.style.cssText = 'width:390px;height:640px;border:0';
-                    nextFrame.srcdoc = html;
-                    parent.appendChild(nextFrame);
-                }""",
-                editor_html,
-            )
-            remounted = page.frame_locator("#ed")
-            remounted.locator("#confirmBtn").wait_for(state="visible")
-            page.wait_for_timeout(200)
+                # 验证同一编辑器实例重新挂载后未确认选区与说明文字自动恢复
+                restored_state = remounted.locator("#overlayCanvas").evaluate(
+                    """(canvas) => {
+                        const ctx = canvas.getContext('2d');
+                        const sample = ctx.getImageData(Math.round(canvas.width * 0.45), Math.round(canvas.height * 0.45), 1, 1).data;
+                        return {
+                            alpha: sample[3],
+                            confirmDisabled: document.getElementById('confirmBtn').disabled,
+                            instruction: document.getElementById('instructionInput').value,
+                            status: document.getElementById('statusText').textContent
+                        };
+                    }"""
+                )
+                assert restored_state["alpha"] > 60
+                assert restored_state["confirmDisabled"] is False
+                assert restored_state["instruction"] == "局部石材替换为汉白玉"
+                assert "已恢复未确认的选区草稿" in restored_state["status"]
 
-            # 验证重新挂载后未确认选区与说明文字已自动恢复，确认按钮保持可用
-            restored_state = remounted.locator("#overlayCanvas").evaluate(
-                """(canvas) => {
-                    const ctx = canvas.getContext('2d');
-                    const sample = ctx.getImageData(Math.round(canvas.width * 0.45), Math.round(canvas.height * 0.45), 1, 1).data;
-                    return {
-                        alpha: sample[3],
+                # Finding 1：点击确认按钮时，过期edt:令牌在/files/<token>返回404纯文本Not Found，编辑器不得抛SyntaxError，必须展示续期按钮与中文引导
+                remounted.locator("#confirmBtn").click()
+                page.wait_for_timeout(250)
+                after_404 = remounted.locator("#editorRoot").evaluate(
+                    """() => ({
+                        renewHidden: document.getElementById('renewBtn').hidden,
+                        status: document.getElementById('statusText').textContent,
+                        confirmDisabled: document.getElementById('confirmBtn').disabled
+                    })"""
+                )
+                assert after_404["renewHidden"] is False
+                assert "请点击“重新获取链接”刷新后继续（选区草稿已保留）" in after_404["status"]
+                assert after_404["confirmDisabled"] is False
+
+                # Finding 4：伪造来自非window.parent（兄弟iframe）、错误messageId/sessionNonce、跨源URL或只读img:令牌的续期消息，均不得篡改写目标URL
+                page.evaluate(
+                    """(readonlyPreviewUrl) => {
+                        const attacker = document.getElementById('attacker');
+                        attacker.srcdoc = `<script>
+                          window.parent.frames[0].postMessage({
+                            type: 'ui-message-response',
+                            messageId: 'forged-msg',
+                            payload: { response: { editorUrl: 'http://127.0.0.1:1/files/evil.0000000000000000000000000000000000000000000000000000000000000000' } }
+                          }, '*');
+                        <\\/script>`;
+                        const edWin = document.getElementById('ed').contentWindow;
+                        edWin.postMessage({
+                          type: 'ui-message-response',
+                          messageId: 'unrequested-id',
+                          payload: { response: { editorUrl: readonlyPreviewUrl } }
+                        }, '*');
+                    }""",
+                    real_preview_url,
+                )
+                page.wait_for_timeout(150)
+                assert len(page.evaluate("() => window.__promptMessages")) == 0
+
+                # Finding 2：点击“重新获取链接”，通过ui-link-renew与POST /files/<token> (action="renew")就地刷新写令牌，不触发任何type="tool"新轮次
+                remounted.locator("#renewBtn").click()
+                page.wait_for_timeout(350)
+                renew_reqs = page.evaluate("() => window.__renewRequests")
+                tool_reqs = page.evaluate("() => window.__toolRequests")
+                assert len(renew_reqs) >= 1
+                assert len(tool_reqs) == 0
+                assert renew_reqs[-1]["payload"]["imageId"] == raw_uuid
+                assert renew_reqs[-1]["payload"]["resourceUri"] == f"ui://zyb_studio/selection/{raw_uuid}"
+                assert len(renew_reqs[-1]["payload"]["sessionNonce"]) >= 16
+
+                after_renew = remounted.locator("#editorRoot").evaluate(
+                    """() => ({
+                        renewHidden: document.getElementById('renewBtn').hidden,
+                        status: document.getElementById('statusText').textContent,
+                        instruction: document.getElementById('instructionInput').value
+                    })"""
+                )
+                assert after_renew["renewHidden"] is True
+                assert "已更新选区链接" in after_renew["status"]
+                assert after_renew["instruction"] == "局部石材替换为汉白玉"
+
+                # 刷新后再次点击确认选区，写操作成功完成并向宿主发送prompt消息
+                remounted.locator("#confirmBtn").click()
+                page.wait_for_timeout(300)
+                prompts = page.evaluate("() => window.__promptMessages")
+                assert len(prompts) == 1
+                assert f"底图 {raw_uuid}" in prompts[0]["prompt"]
+                assert "局部石材替换为汉白玉" in prompts[0]["prompt"]
+
+                # 已确认消费过的一次性edt:令牌不得再次续期（返回409 Conflict）
+                consumed_renew_status = page.evaluate(
+                    """async (expiredEditorUrl) => {
+                        const res = await fetch(expiredEditorUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'renew' })
+                        });
+                        return res.status;
+                    }""",
+                    real_expired_editor_url,
+                )
+                assert consumed_renew_status == 409
+
+                # Finding 3：挂载同一张图片的第二个独立编辑器实例（不同SIGNED_URL nonce），验证草稿严格隔离，不恢复第一个实例的选区与说明文字
+                page.eval_on_selector(
+                    "#ed",
+                    "(el, html) => { el.srcdoc = html; }",
+                    second_editor_html,
+                )
+                second_frame = page.frame_locator("#ed")
+                second_frame.locator("#confirmBtn").wait_for(state="visible")
+                page.wait_for_timeout(200)
+                second_state = second_frame.locator("#editorRoot").evaluate(
+                    """() => ({
                         confirmDisabled: document.getElementById('confirmBtn').disabled,
-                        instruction: document.getElementById('instructionInput').value,
-                        status: document.getElementById('statusText').textContent
-                    };
-                }"""
-            )
-            assert restored_state["alpha"] > 60
-            assert restored_state["confirmDisabled"] is False
-            assert restored_state["instruction"] == "局部石材替换为汉白玉"
-            assert "已恢复未确认的选区草稿" in restored_state["status"]
+                        instruction: document.getElementById('instructionInput').value
+                    })"""
+                )
+                assert second_state["confirmDisabled"] is True
+                assert second_state["instruction"] == ""
 
-            # 触发续期按钮，验证向宿主发送标准MCP UI tool请求
-            remounted.locator("#renewBtn").evaluate("(btn) => { btn.hidden = false; btn.click(); }")
-            page.wait_for_timeout(100)
-            renew_reqs = page.evaluate("() => window.__renewToolRequests")
-            assert len(renew_reqs) == 1
-            assert renew_reqs[0]["toolName"] == "select_region"
-            assert renew_reqs[0]["params"]["image_id"] == raw_uuid
-        finally:
-            browser.close()
+                # 验证对比视图#compareRenewBtn同样通过ui-link-renew与POST /files/<token> (action="renew")就地刷新前后对比图，不调用select_region
+                page.eval_on_selector(
+                    "#cmp",
+                    "(el, html) => { el.srcdoc = html; }",
+                    live_compare_html,
+                )
+                cmp_frame = page.frame_locator("#cmp")
+                cmp_frame.locator("#compareRenewBtn").wait_for(state="visible")
+                cmp_frame.locator("#compareRenewBtn").click()
+                page.wait_for_timeout(350)
+                assert len(page.evaluate("() => window.__toolRequests")) == 0
+                cmp_state = cmp_frame.locator("#compareRoot").evaluate(
+                    """() => ({
+                        renewHidden: document.getElementById('compareRenewBtn').hidden,
+                        canvasW: document.getElementById('compareCanvas').width
+                    })"""
+                )
+                assert cmp_state["renewHidden"] is True
+                assert cmp_state["canvasW"] == 320
+            finally:
+                browser.close()
+    finally:
+        uv_server.should_exit = True
+        server_thread.join(timeout=5.0)

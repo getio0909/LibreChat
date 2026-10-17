@@ -73,6 +73,9 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     shared_token: studioJson.shared_token,
     file_signing_key: studioJson.file_signing_key,
     public_base_url: 'https://dev.xuqian.io',
+    file_token_ttl_seconds: 86400,
+    preview_token_ttl_seconds: 604800,
+    editor_token_ttl_seconds: 900,
     gemini_api_key: 'fixture-gemini-key',
     ark_api_key: 'fixture-ark-key',
     image_provider: 'gemini',
@@ -105,15 +108,34 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
   const invalidEnable3d = runBundle({ STUDIO_ENABLE_3D: 'maybe' });
   assert.notEqual(invalidEnable3d.result.status, 0);
 
-  // 验证 DEPLOY_URL 与显式 STUDIO_FILE_SIGNING_KEY 会写入 studio.json。
+  // 验证 DEPLOY_URL、显式 STUDIO_FILE_SIGNING_KEY 以及三项签名令牌 TTL 覆盖会写入 studio.json。
   const explicitSigningKey = 'c'.repeat(64);
   const customBundle = runBundle({
     DEPLOY_URL: 'https://studio.example.com/',
     STUDIO_FILE_SIGNING_KEY: explicitSigningKey,
+    STUDIO_FILE_TOKEN_TTL_SECONDS: '172800',
+    STUDIO_PREVIEW_TOKEN_TTL_SECONDS: '1209600',
+    STUDIO_EDITOR_TOKEN_TTL_SECONDS: '300',
   });
   assert.equal(customBundle.result.status, 0, customBundle.result.stderr);
   assert.equal(customBundle.studioJson.public_base_url, 'https://studio.example.com');
   assert.equal(customBundle.studioJson.file_signing_key, explicitSigningKey);
+  assert.equal(customBundle.studioJson.file_token_ttl_seconds, 172800);
+  assert.equal(customBundle.studioJson.preview_token_ttl_seconds, 1209600);
+  assert.equal(customBundle.studioJson.editor_token_ttl_seconds, 300);
+
+  // 验证越界或非整数 TTL 配置被 bundle.mjs 拒绝。
+  for (const badOverride of [
+    { STUDIO_FILE_TOKEN_TTL_SECONDS: '59' },
+    { STUDIO_FILE_TOKEN_TTL_SECONDS: '604801' },
+    { STUDIO_PREVIEW_TOKEN_TTL_SECONDS: '299' },
+    { STUDIO_PREVIEW_TOKEN_TTL_SECONDS: '2592001' },
+    { STUDIO_EDITOR_TOKEN_TTL_SECONDS: '59' },
+    { STUDIO_EDITOR_TOKEN_TTL_SECONDS: '901' },
+    { STUDIO_PREVIEW_TOKEN_TTL_SECONDS: 'not-a-number' },
+  ]) {
+    assert.notEqual(runBundle(badOverride).result.status, 0);
+  }
 
   // 验证 image.env 同时包含 LIBRECHAT_IMAGE 和 STUDIO_IMAGE。
   assert.match(imageEnv, /^LIBRECHAT_IMAGE=ghcr\.io\/getio0909\/librechat-dev@sha256:1{64}$/m);
@@ -153,7 +175,7 @@ test('bundle rejects missing or malformed image references, URLs, signing keys, 
   assert.notEqual(runBundle({ USER_PASSWORD: 'short' }).result.status, 0);
 });
 
-test('bundle reuses existing file_signing_key when studio.json already exists in target directory', () => {
+test('bundle reuses existing file_signing_key and custom token TTLs when studio.json already exists in target directory', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-bundle-reuse-'));
   try {
     const baseEnv = {
@@ -176,7 +198,12 @@ test('bundle reuses existing file_signing_key when studio.json already exists in
     };
     const first = spawnSync(process.execPath, ['deploy/bundle.mjs'], {
       encoding: 'utf8',
-      env: baseEnv,
+      env: {
+        ...baseEnv,
+        STUDIO_FILE_TOKEN_TTL_SECONDS: '172800',
+        STUDIO_PREVIEW_TOKEN_TTL_SECONDS: '1209600',
+        STUDIO_EDITOR_TOKEN_TTL_SECONDS: '450',
+      },
     });
     assert.equal(first.status, 0, first.stderr);
     const studioPath = path.join(root, 'bundle', 'studio.json');
@@ -191,6 +218,9 @@ test('bundle reuses existing file_signing_key when studio.json already exists in
 
     assert.equal(secondStudio.file_signing_key, firstStudio.file_signing_key);
     assert.notEqual(secondStudio.shared_token, firstStudio.shared_token);
+    assert.equal(secondStudio.file_token_ttl_seconds, 172800);
+    assert.equal(secondStudio.preview_token_ttl_seconds, 1209600);
+    assert.equal(secondStudio.editor_token_ttl_seconds, 450);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

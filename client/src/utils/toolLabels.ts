@@ -48,6 +48,11 @@ export const MCP_TOOL_FRIENDLY_NAME_KEYS: Record<string, TranslationKeys> = {
   check_3d_model: 'com_ui_tool_name_check_3d_model',
 };
 
+/** MCP server id → tool id → translation key so server-specific tool labels never bleed across servers. */
+export const MCP_SERVER_TOOL_FRIENDLY_NAME_KEYS: Record<string, Record<string, TranslationKeys>> = {
+  zyb_studio: MCP_TOOL_FRIENDLY_NAME_KEYS,
+};
+
 export function getMCPServerDisplayLabel(
   serverName: string | undefined,
   localize: (key: TranslationKeys) => string,
@@ -62,11 +67,18 @@ export function getMCPServerDisplayLabel(
 export function getMCPToolDisplayLabel(
   toolName: string | undefined,
   localize: (key: TranslationKeys) => string,
+  serverName?: string,
 ): string {
   if (!toolName) {
     return '';
   }
-  const key = MCP_TOOL_FRIENDLY_NAME_KEYS[toolName];
+  if (serverName && (toolName === serverName || toolName === 'oauth')) {
+    return getMCPServerDisplayLabel(serverName, localize);
+  }
+  if (!serverName && MCP_SERVER_FRIENDLY_NAME_KEYS[toolName]) {
+    return getMCPServerDisplayLabel(toolName, localize);
+  }
+  const key = serverName ? MCP_SERVER_TOOL_FRIENDLY_NAME_KEYS[serverName]?.[toolName] : undefined;
   return key ? localize(key) : toolName;
 }
 
@@ -80,8 +92,7 @@ export interface ParsedToolName {
    *  code-style badge next to the server name. */
   toolName: string;
   /** Translation key for a user-friendly display name, when the raw
-   *  name matches a built-in native tool (web_search, execute_code, …).
-   *  Absent for MCP tools and unknown names. */
+   *  name matches a built-in native tool or a localized MCP server tool. */
   friendlyKey?: TranslationKeys;
 }
 
@@ -98,9 +109,20 @@ export function parseToolName(
 ): ParsedToolName {
   if (rawName.includes(Constants.mcp_delimiter)) {
     const [toolName, mcpServer = ''] = splitToolCallName(rawName, knownServerNames);
-    return { raw: rawName, mcpServer, toolName };
+    let friendlyKey: TranslationKeys | undefined;
+    if (mcpServer && (toolName === 'oauth' || toolName === mcpServer)) {
+      friendlyKey = MCP_SERVER_FRIENDLY_NAME_KEYS[mcpServer];
+    } else if (mcpServer) {
+      friendlyKey = MCP_SERVER_TOOL_FRIENDLY_NAME_KEYS[mcpServer]?.[toolName];
+    }
+    return {
+      raw: rawName,
+      mcpServer,
+      toolName,
+      ...(friendlyKey ? { friendlyKey } : {}),
+    };
   }
-  const friendlyKey = TOOL_FRIENDLY_NAME_KEYS[rawName] ?? MCP_TOOL_FRIENDLY_NAME_KEYS[rawName];
+  const friendlyKey = TOOL_FRIENDLY_NAME_KEYS[rawName];
   return {
     raw: rawName,
     mcpServer: '',

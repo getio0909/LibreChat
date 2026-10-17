@@ -58,8 +58,7 @@ describe('parseToolName', () => {
 
 describe('getToolDisplayLabel', () => {
   const identityLocalize = (key: string): string => key;
-  const zhLocalize = (key: string): string =>
-    (zhHans as Record<string, string>)[key] ?? key;
+  const zhLocalize = (key: string): string => (zhHans as Record<string, string>)[key] ?? key;
 
   it('returns the MCP server name for an MCP tool', () => {
     expect(getToolDisplayLabel('search_code_mcp_github', identityLocalize)).toBe('github');
@@ -85,11 +84,28 @@ describe('getToolDisplayLabel', () => {
       check_3d_model: '查询 3D 进度',
     };
     for (const [toolName, expected] of Object.entries(expectedZhToolNames)) {
-      const label = getMCPToolDisplayLabel(toolName, zhLocalize);
+      const label = getMCPToolDisplayLabel(toolName, zhLocalize, 'zyb_studio');
       expect(label).toBe(expected);
       expect(label).not.toMatch(/gemini|openai|fal|tripo|hunyuan|zyb_studio/i);
       expect(MCP_TOOL_FRIENDLY_NAME_KEYS[toolName]).toBeDefined();
+      expect(getMCPToolDisplayLabel(toolName, zhLocalize, 'other_mcp_server')).toBe(toolName);
+      expect(
+        parseToolName(`${toolName}${Constants.mcp_delimiter}other_mcp_server`, ['other_mcp_server'])
+          .friendlyKey,
+      ).toBeUndefined();
+      expect(
+        parseToolName(`${toolName}${Constants.mcp_delimiter}zyb_studio`, ['zyb_studio'])
+          .friendlyKey,
+      ).toBe(MCP_TOOL_FRIENDLY_NAME_KEYS[toolName]);
     }
+
+    expect(getMCPToolDisplayLabel('zyb_studio', zhLocalize, 'zyb_studio')).toBe('设计工坊');
+    expect(getMCPToolDisplayLabel('oauth', zhLocalize, 'zyb_studio')).toBe('设计工坊');
+    expect(parseToolName('edit_region')).toEqual({
+      raw: 'edit_region',
+      mcpServer: '',
+      toolName: 'edit_region',
+    });
   });
 
   it('returns the friendly translation key for a known native tool', () => {

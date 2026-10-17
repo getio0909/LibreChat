@@ -447,7 +447,12 @@ def sign_file_token(
 
 # 校验HMAC-SHA256签名访问令牌并返回（user_id, model_id, expires_at）
 def verify_file_token(
-    settings: StudioSettings, token: str, *, now: float | None = None
+    settings: StudioSettings,
+    token: str,
+    *,
+    now: float | None = None,
+    allow_expired: bool = False,
+    max_expired_age_seconds: int | None = None,
 ) -> tuple[str, str, int]:
     cleaned_token = token if isinstance(token, str) else ""
     match = FILE_TOKEN_RE.fullmatch(cleaned_token)
@@ -478,7 +483,13 @@ def verify_file_token(
     exp = int(raw_exp)
     current_ts = time.time() if now is None else float(now)
     if current_ts >= exp:
-        raise ValueError("Token has expired")
+        if not allow_expired:
+            raise ValueError("Token has expired")
+        if (
+            max_expired_age_seconds is not None
+            and (current_ts - exp) > max_expired_age_seconds
+        ):
+            raise ValueError("Token has expired beyond renewal window")
     return uid, mid, exp
 
 
@@ -799,8 +810,22 @@ def build_model_viewer_html(
   </div>
 
   <script type="module">
-    let currentModelUrl = {safe_url_js};
+    const INITIAL_MODEL_URL = {safe_url_js};
+    let currentModelUrl = INITIAL_MODEL_URL;
     const MODEL_ID = {safe_model_id_js};
+    const RESOURCE_URI = 'ui://zyb_studio/model/' + MODEL_ID;
+    const SESSION_NONCE = (() => {{
+      const buf = new Uint32Array(4);
+      if (window.crypto && window.crypto.getRandomValues) {{
+        window.crypto.getRandomValues(buf);
+        return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+      }}
+      return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+    }})();
+    let reqCounter = 0;
+    let pendingRenewRequestId = null;
+    let renderDataReceived = false;
+
     const shell = document.getElementById('viewer-shell');
     const container = document.getElementById('canvas-container');
     const loadingEl = document.getElementById('loading-state');
@@ -812,6 +837,24 @@ def build_model_viewer_html(
     const retryBtn = document.getElementById('retry-btn');
     const renewBtn = document.getElementById('renew-btn');
     const expiresBadge = document.getElementById('model-expires-badge');
+
+    function nextRequestId(prefix) {{
+      reqCounter += 1;
+      return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+    }}
+
+    function isValidRenewedModelUrl(candidateUrl) {{
+      if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+      try {{
+        const cand = new URL(candidateUrl, window.location.href);
+        if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+        const ref = new URL(INITIAL_MODEL_URL, window.location.href);
+        if (cand.origin !== ref.origin) return false;
+        return /\\/(?:studio-files|files)\\/[A-Za-z0-9_-]+\\.[0-9a-f]{{64}}$/.test(cand.pathname);
+      }} catch (_e) {{
+        return false;
+      }}
+    }}
 
     function formatLocalExpiry(isoStr) {{
       if (!isoStr) return '';
@@ -855,35 +898,91 @@ def build_model_viewer_html(
 
     let loadModelFn = null;
 
+    function applyRenewedModelLinks(candidate) {{
+      if (!candidate || typeof candidate !== 'object') return false;
+      if (candidate.modelId && candidate.modelId !== MODEL_ID) return false;
+      const nextUrl = candidate.modelUrl || candidate.model_url || candidate.signedUrl || candidate.signed_url;
+      if (!isValidRenewedModelUrl(nextUrl)) return false;
+      currentModelUrl = nextUrl;
+      const nextExpires = candidate.expiresAt || candidate.expires_at;
+      if (nextExpires && expiresBadge) {{
+        expiresBadge.dataset.expires = nextExpires;
+        expiresBadge.textContent = '有效期至 ' + formatLocalExpiry(nextExpires);
+      }}
+      if (typeof loadModelFn === 'function') {{
+        loadModelFn();
+      }}
+      return true;
+    }}
+
+    async function renewModelDirectly() {{
+      try {{
+        const res = await fetch(currentModelUrl, {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{
+            action: 'renew',
+            resource_uri: RESOURCE_URI,
+            model_url: currentModelUrl
+          }})
+        }});
+        const rawText = await res.text();
+        let data = {{}};
+        if (rawText) {{
+          try {{
+            const parsed = JSON.parse(rawText);
+            if (parsed && typeof parsed === 'object') data = parsed;
+          }} catch (_e) {{}}
+        }}
+        if (res.ok && applyRenewedModelLinks(data)) {{
+          return true;
+        }}
+      }} catch (_err) {{}}
+      return false;
+    }}
+
     if (renewBtn) {{
-      renewBtn.addEventListener('click', () => {{
+      renewBtn.addEventListener('click', async () => {{
+        errorMsgEl.textContent = '正在刷新三维模型预览链接，请稍候…';
         if (window.parent && window.parent !== window) {{
+          pendingRenewRequestId = nextRequestId('renew-3d');
           window.parent.postMessage({{
-            type: 'tool',
-            messageId: 'renew-3d-' + Date.now(),
+            type: 'ui-link-renew',
+            messageId: pendingRenewRequestId,
             payload: {{
-              toolName: 'check_3d_model',
-              params: {{ job_id: MODEL_ID }}
+              resourceUri: RESOURCE_URI,
+              modelId: MODEL_ID,
+              sessionNonce: SESSION_NONCE,
+              modelUrl: currentModelUrl
             }}
           }}, '*');
-          errorMsgEl.textContent = '已向设计助手请求刷新三维模型预览链接，请稍候…';
+        }}
+        const ok = await renewModelDirectly();
+        if (!ok && (!window.parent || window.parent === window)) {{
+          errorMsgEl.textContent = '预览链接刷新失败，请稍后重试。';
         }}
       }});
     }}
 
     window.addEventListener('message', (ev) => {{
+      if (!window.parent || window.parent === window || ev.source !== window.parent) return;
       if (!ev.data || typeof ev.data !== 'object') return;
+      const msgType = ev.data.type;
       const payload = ev.data.payload || {{}};
-      const candidate = payload.response || payload.renderData || payload;
-      if (candidate && typeof candidate.modelUrl === 'string' && candidate.modelUrl) {{
-        currentModelUrl = candidate.modelUrl;
-        if (candidate.expiresAt && expiresBadge) {{
-          expiresBadge.dataset.expires = candidate.expiresAt;
-          expiresBadge.textContent = '有效期至 ' + formatLocalExpiry(candidate.expiresAt);
+      if (msgType === 'ui-lifecycle-iframe-render-data' && !renderDataReceived) {{
+        renderDataReceived = true;
+        const renderData = payload.renderData || payload;
+        if (renderData && typeof renderData === 'object') {{
+          applyRenewedModelLinks(renderData.renewedLinks || renderData);
         }}
-        if (typeof loadModelFn === 'function') {{
-          loadModelFn();
-        }}
+        return;
+      }}
+      if (msgType === 'ui-message-response' && ev.data.messageId && ev.data.messageId === pendingRenewRequestId) {{
+        pendingRenewRequestId = null;
+        const resp = payload.response || payload;
+        if (!resp || typeof resp !== 'object') return;
+        if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+        applyRenewedModelLinks(resp);
       }}
     }});
 

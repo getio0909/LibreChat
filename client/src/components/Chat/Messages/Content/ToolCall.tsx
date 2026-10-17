@@ -132,9 +132,9 @@ export default function ToolCall({
        *  share a built-in's name (`read_file`, `set_memory`) as that native
        *  tool and show, and announce, an unrelated label. */
       isMCPToolCall
-        ? getMCPToolDisplayLabel(function_name, localize)
+        ? getMCPToolDisplayLabel(function_name, localize, mcpServerName)
         : getToolDisplayLabel(function_name, localize, mcpServerNames),
-    [function_name, isMCPToolCall, localize, mcpServerNames],
+    [function_name, isMCPToolCall, localize, mcpServerName, mcpServerNames],
   );
   const mcpIconMap = useMCPIconMap();
   const mcpIconUrl = isMCPToolCall ? mcpIconMap.get(mcpServerName) : undefined;

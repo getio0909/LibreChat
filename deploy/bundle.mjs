@@ -134,6 +134,37 @@ function resolveEnable3d() {
   throw new Error('STUDIO_ENABLE_3D must be "true" or "false" when provided.');
 }
 
+// 解析有界整数配置项；优先读取环境变量，未设置时复用已有 studio.json 中的合法值，否则回退默认值。
+function resolveBoundedIntegerSetting(envName, fieldName, fallback, min, max, targetDir) {
+  const raw = process.env[envName];
+  if (raw !== undefined && raw !== null && String(raw).trim() !== '') {
+    const cleaned = String(raw).trim();
+    if (!/^\d+$/.test(cleaned)) {
+      throw new Error(`${envName} must be an integer between ${min} and ${max}.`);
+    }
+    const parsed = Number.parseInt(cleaned, 10);
+    if (!Number.isSafeInteger(parsed) || parsed < min || parsed > max) {
+      throw new Error(`${envName} must be an integer between ${min} and ${max}.`);
+    }
+    return parsed;
+  }
+  if (targetDir) {
+    const existingStudioPath = path.join(targetDir, 'studio.json');
+    if (existsSync(existingStudioPath)) {
+      try {
+        const existing = JSON.parse(readFileSync(existingStudioPath, 'utf8'));
+        const candidate = existing?.[fieldName];
+        if (Number.isSafeInteger(candidate) && candidate >= min && candidate <= max) {
+          return candidate;
+        }
+      } catch {
+        // 忽略损坏的旧配置并回退默认值。
+      }
+    }
+  }
+  return fallback;
+}
+
 const geminiApiKey = requireSafeSingleLineSecret('GEMINI_API_KEY');
 const openrouterApiKey = requireSafeSingleLineSecret('OPENROUTER_API_KEY');
 const enable3d = resolveEnable3d();
@@ -145,6 +176,30 @@ const studioImage = requireImageReference('STUDIO_IMAGE');
 const sharedToken = resolveStudioSharedToken();
 const fileSigningKey = resolveFileSigningKey(target);
 const publicBaseUrl = resolvePublicBaseUrl();
+const fileTokenTtlSeconds = resolveBoundedIntegerSetting(
+  'STUDIO_FILE_TOKEN_TTL_SECONDS',
+  'file_token_ttl_seconds',
+  86400,
+  60,
+  604800,
+  target,
+);
+const previewTokenTtlSeconds = resolveBoundedIntegerSetting(
+  'STUDIO_PREVIEW_TOKEN_TTL_SECONDS',
+  'preview_token_ttl_seconds',
+  604800,
+  300,
+  2592000,
+  target,
+);
+const editorTokenTtlSeconds = resolveBoundedIntegerSetting(
+  'STUDIO_EDITOR_TOKEN_TTL_SECONDS',
+  'editor_token_ttl_seconds',
+  900,
+  60,
+  900,
+  target,
+);
 const accounts = {
   admin: requireAccountConfig('ADMIN'),
   user: requireAccountConfig('USER'),
@@ -171,6 +226,9 @@ const studioSettings = {
   shared_token: sharedToken,
   file_signing_key: fileSigningKey,
   public_base_url: publicBaseUrl,
+  file_token_ttl_seconds: fileTokenTtlSeconds,
+  preview_token_ttl_seconds: previewTokenTtlSeconds,
+  editor_token_ttl_seconds: editorTokenTtlSeconds,
   gemini_api_key: geminiApiKey,
   ark_api_key: arkApiKey,
   image_provider: 'gemini',
