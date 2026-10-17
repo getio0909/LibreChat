@@ -102,7 +102,7 @@ endpoints:
       - tools
       - context
 
-# 模型预设规范：对外隐藏底层模型与厂商名称，仅挂载概念设计 MCP 服务
+# 模型预设规范：对外隐藏底层模型与厂商名称，挂载内置生图工具与概念设计专精 MCP 服务
 modelSpecs:
   enforce: true
   prioritize: true
@@ -120,6 +120,8 @@ modelSpecs:
         endpoint: google
         model: gemini-4-argon
         iconURL: /assets/zybc-seal.svg
+        tools:
+          - gemini_image_gen
         thinking: true
         thinkingLevel: high
         # Google 官方文档：gemini-4-argon 共享输入输出总窗口 1,048,576，默认最大输出 65,536；
@@ -127,7 +129,7 @@ modelSpecs:
         maxContextTokens: 200000
         maxOutputTokens: 65536
         promptPrefix: &designPromptPrefix |-
-          你是庄严宝刹设计助手，专注佛堂、石材、家具与展位。必调工具：查图库 search_library（kb_ 前缀可传 base_id、image_id、reference_ids）；多方案 design_concepts；出图 generate_image；整图改 edit_image（未知调 list_images）；局部改先 select_region 确认，再 edit_region（传 selection_id、instruction）；石材对比 compare_materials（传 target、materials）；references 含 id、use。保留石材原名；仅作视觉参考，非制造模型。禁提模型或厂商名。
+          你是庄严宝刹设计助手，专注佛堂、石材、家具与展位。概念方案用中文提1至3个方向（含定位、构思、材质工艺，缺尺寸造价写待确认），调 gemini_image_gen（prompt、image_ids、aspect_ratio、resolution）出图或改图：单品棚拍四分之三视角，空间按完整场景，禁文字水印；改图保持未改主体、五官姿态与光线不变；用途分参考、物件、造型、材质、纹样、风格（材质仅取色泽纹理，不取展架；prompt 石材写视觉特征或附图石材，中文留原名）。专精工具：查图库 search_library（kb_ 传 base_id、image_id）；石材对比 compare_materials（base_id、target、materials）；局部改先 select_region（image_id）确认，再 edit_region（base_id、selection_id、instruction、references 含 id、use，或 job_id）；三维 create_3d_model（image_id、detail）与 check_3d_model（job_id）。仅作视觉参考，非施工图。禁提模型厂商名。
     - name: zyb-design-fast
       label: 庄严设计助手 · 快速
       description: 快速响应的概念设计与图像改图助手
@@ -141,6 +143,8 @@ modelSpecs:
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
         iconURL: /assets/zybc-seal.svg
+        tools:
+          - gemini_image_gen
         # OpenRouter 公开模型接口：anthropic/claude-haiku-5.5 总窗口 1,000,000，最大补全输出 128,000；
         # 为控制每轮重发历史的输入费用，上下文上限取 200,000（远低于模型窗口）
         maxContextTokens: 200000
@@ -164,9 +168,8 @@ mcpServers:
     chatMenu: false
     # 内部令牌认证服务无需 OAuth，关闭启动与每请求 OAuth 探测以避免 403 噪音
     requiresOAuth: false
-    # 单次 design_concepts 规划最长 540s + 出图最长 240s = 780s，预留 120s 缓冲设为 900s（900,000ms）
+    # 覆盖三维模型轮询（最长 480s）与多石材并发对比生图（最长 240s），设为 900s（900,000ms）
     timeout: 900000
     headers:
       X-LibreChat-User-ID: '{{LIBRECHAT_USER_ID}}'
-      X-LibreChat-Conversation-ID: '{{LIBRECHAT_BODY_CONVERSATIONID}}'
       X-Studio-Token: '${STUDIO_SHARED_TOKEN}'

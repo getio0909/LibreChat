@@ -100,3 +100,57 @@ describe('loadEphemeralAgent → resolveSender parity', () => {
     expect(sender).toBe(parseEphemeralAgentId(agent?.id ?? '')?.sender);
   });
 });
+
+// 验证 modelSpec.preset.tools 可同时挂载内置工具（如 gemini_image_gen）与 MCP 服务且不污染 model_parameters
+describe('loadEphemeralAgent — modelSpec.preset.tools', () => {
+  test('equips built-in tools from modelSpec.preset.tools alongside mcpServers and strips tools from model_parameters', async () => {
+    const reqWithSpecTools = {
+      user: { id: 'user-1' },
+      config: {
+        modelSpecs: {
+          list: [
+            {
+              name: 'zyb-design',
+              label: '展厅设计',
+              mcpServers: ['zyb_studio'],
+              preset: {
+                endpoint: 'custom',
+                model: 'gemini-3.1-pro',
+                tools: ['gemini_image_gen', { pluginKey: 'calculator' }],
+              },
+            },
+          ],
+        },
+      },
+      body: {},
+    } as unknown as Parameters<typeof loadEphemeralAgent>[0]['req'];
+
+    const agent = await loadEphemeralAgent(
+      {
+        req: reqWithSpecTools,
+        spec: 'zyb-design',
+        endpoint: 'custom',
+        model_parameters: {
+          model: 'gemini-3.1-pro',
+          tools: ['gemini_image_gen'],
+        } as never,
+      },
+      {
+        ...deps,
+        getMCPServerTools: async () => ({
+          select_region_mcp_zyb_studio: {},
+          compare_materials_mcp_zyb_studio: {},
+        }),
+      },
+    );
+
+    expect(agent?.tools).toEqual([
+      'gemini_image_gen',
+      'calculator',
+      'select_region_mcp_zyb_studio',
+      'compare_materials_mcp_zyb_studio',
+    ]);
+    expect(agent?.model_parameters).not.toHaveProperty('tools');
+  });
+});
+

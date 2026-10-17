@@ -64,10 +64,11 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
   assert.notEqual(studioJson.shared_token, studioJson.file_signing_key);
   assert.match(dotEnv, /^APP_TITLE=LibreChat$/m);
   assert.match(dotEnv, /^GOOGLE_KEY='fixture-gemini-key'$/m);
+  assert.match(dotEnv, /^GEMINI_IMAGE_MODEL='gemini-nano-banana-2.1'$/m);
   assert.match(dotEnv, /^OPENROUTER_API_KEY='fixture-openrouter-key'$/m);
   assert.ok(dotEnv.includes(`STUDIO_SHARED_TOKEN='${studioJson.shared_token}'`));
 
-  // 验证 studio.json 包含所有契约规定的配置项。
+  // 验证 studio.json 包含所有契约规定的配置项（提供 ARK_API_KEY 时默认启用 3D）。
   assert.deepEqual(studioJson, {
     shared_token: studioJson.shared_token,
     file_signing_key: studioJson.file_signing_key,
@@ -76,18 +77,15 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     ark_api_key: 'fixture-ark-key',
     image_provider: 'gemini',
     gemini_image_model: 'gemini-nano-banana-2.1',
-    enable_3d: false,
+    enable_3d: true,
     seedream_model: 'doubao-seedream-5-0-pro-260628',
     seed3d_model: 'doubao-seed3d-2-0-260328',
-    planner_model: 'gemini-4-argon',
-    planner_thinking_level: 'HIGH',
     max_parallel_per_user: 3,
     seed3d_max_parallel: 5,
     seedream_timeout_seconds: 240,
-    planner_timeout_seconds: 540,
   });
 
-  // 验证 ARK_API_KEY 为可选项，未提供或为空字符串时 studio.json 中 ark_api_key 为空字符串。
+  // 验证 ARK_API_KEY 为可选项，未提供或为空字符串时 studio.json 中 ark_api_key 为空且 enable_3d 自动设为 false。
   const withoutArk = runBundle({ ARK_API_KEY: '' });
   assert.equal(withoutArk.result.status, 0, withoutArk.result.stderr);
   assert.equal(withoutArk.studioJson.ark_api_key, '');

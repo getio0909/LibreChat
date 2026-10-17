@@ -16,6 +16,8 @@ const {
   buildMCPImageToolContext,
   applyModelSpecPreset,
   initializeAgent,
+  loadEphemeralAgent,
+  requiresEphemeralUserConnection,
   isChatSelectableMCPServer,
 } = require('@librechat/api');
 
@@ -34,28 +36,25 @@ const VENDOR_NAME_PATTERN =
 // 禁止残留的旧版 CAD 服务或容器标识。
 const LEGACY_CAD_PATTERN = /freecad|blender|design_tools|dufs|compile_drawing_sheet/i;
 
-// 契约允许的工具名与参数字段集合（来自 p1-contract.md §2.3、WP-P2a、WP-P2b 与 WP-P3a 扩展）。
+// 契约允许的内置生图工具、专精 MCP 工具名与参数字段集合。
 const CONTRACT_IDENTIFIERS = new Set([
-  'design_concepts',
-  'generate_image',
-  'edit_image',
+  'gemini_image_gen',
   'select_region',
   'edit_region',
-  'list_images',
   'search_library',
   'compare_materials',
   'create_3d_model',
   'check_3d_model',
   'prompt',
+  'image_ids',
+  'aspect_ratio',
+  'resolution',
   'base_id',
   'selection_id',
   'instruction',
   'references',
   'id',
   'use',
-  'reference_ids',
-  'aspect_ratio',
-  'resolution',
   'query',
   'library_type',
   'role',
@@ -258,11 +257,33 @@ test('both modelSpecs compute large effective context budgets via initializeAgen
   }
 });
 
-test('only zyb_studio is attached and no CAD servers or prompts remain', () => {
+test('only zyb_studio is attached alongside built-in gemini_image_gen and no CAD servers or prompts remain', async () => {
   const config = configSchema.parse(parsedYaml);
   assert.deepEqual(Object.keys(config.mcpServers), ['zyb_studio']);
   for (const spec of config.modelSpecs.list) {
     assert.deepEqual(spec.mcpServers, ['zyb_studio']);
+    assert.deepEqual(spec.preset.tools, ['gemini_image_gen']);
+    const loadedAgent = await loadEphemeralAgent(
+      {
+        req: { user: { id: 'user-1' }, config: { modelSpecs: config.modelSpecs }, body: {} },
+        spec: spec.name,
+        endpoint: spec.preset.endpoint,
+        model_parameters: { model: spec.preset.model },
+      },
+      {
+        getAgent: async () => null,
+        getMCPServerTools: async () => ({
+          select_region_mcp_zyb_studio: {},
+          edit_region_mcp_zyb_studio: {},
+          search_library_mcp_zyb_studio: {},
+          compare_materials_mcp_zyb_studio: {},
+          create_3d_model_mcp_zyb_studio: {},
+          check_3d_model_mcp_zyb_studio: {},
+        }),
+      },
+    );
+    assert.ok(loadedAgent.tools.includes('gemini_image_gen'));
+    assert.ok(loadedAgent.tools.includes('select_region_mcp_zyb_studio'));
   }
   assert.doesNotMatch(rawYaml, LEGACY_CAD_PATTERN);
   assert.doesNotMatch(rawCompose, LEGACY_CAD_PATTERN);
@@ -293,32 +314,36 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
     assert.doesNotMatch(spec.label, VENDOR_NAME_PATTERN);
     assert.doesNotMatch(spec.description || '', VENDOR_NAME_PATTERN);
     assert.doesNotMatch(spec.preset.modelLabel || '', VENDOR_NAME_PATTERN);
-    assert.doesNotMatch(spec.preset.promptPrefix || '', VENDOR_NAME_PATTERN);
-
-    // 验证中文提示词精简且包含八个默认启用工具名（3D 工具已暂停提供）。
     const prefix = spec.preset.promptPrefix || '';
+    // 剔除固定内置工具标识符 gemini_image_gen 后，校验提示词正文不包含任何厂商或底层模型名称。
+    assert.doesNotMatch(prefix.replaceAll('gemini_image_gen', ''), VENDOR_NAME_PATTERN);
+
     const chineseChars = (prefix.match(/[\u4e00-\u9fff]/g) || []).length;
     assert.ok(
-      chineseChars > 0 && chineseChars <= 250,
-      `Expected <= 250 Chinese characters, got ${chineseChars}`,
+      chineseChars > 0 && chineseChars <= 380,
+      `Expected <= 380 Chinese characters, got ${chineseChars}`,
     );
-    assert.ok(prefix.length <= 400, `Expected <= 400 total characters, got ${prefix.length}`);
+    assert.ok(prefix.length <= 520, `Expected <= 520 total characters, got ${prefix.length}`);
     for (const toolName of [
-      'design_concepts',
-      'generate_image',
-      'edit_image',
+      'gemini_image_gen',
       'select_region',
       'edit_region',
-      'list_images',
       'search_library',
       'compare_materials',
+      'create_3d_model',
+      'check_3d_model',
     ]) {
       assert.ok(prefix.includes(toolName), `promptPrefix must reference ${toolName}`);
     }
-    for (const heldToolName of ['create_3d_model', 'check_3d_model']) {
+    for (const removedToolName of [
+      'design_concepts',
+      'generate_image',
+      'edit_image',
+      'list_images',
+    ]) {
       assert.ok(
-        !prefix.includes(heldToolName),
-        `promptPrefix must not reference held 3D tool ${heldToolName}`,
+        !prefix.includes(removedToolName),
+        `promptPrefix must not reference removed duplicate tool ${removedToolName}`,
       );
     }
   }
@@ -335,11 +360,14 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
         `Non-contract identifier "${identifier}" found in promptPrefix of ${spec.name}`,
       );
     }
+    assert.ok(prefix.includes('prompt'), 'promptPrefix must mention prompt');
+    assert.ok(prefix.includes('image_ids'), 'promptPrefix must mention image_ids');
+    assert.ok(prefix.includes('aspect_ratio'), 'promptPrefix must mention aspect_ratio');
+    assert.ok(prefix.includes('resolution'), 'promptPrefix must mention resolution');
     assert.ok(prefix.includes('base_id'), 'promptPrefix must mention base_id');
     assert.ok(prefix.includes('selection_id'), 'promptPrefix must mention selection_id');
     assert.ok(prefix.includes('instruction'), 'promptPrefix must mention instruction');
     assert.ok(prefix.includes('references'), 'promptPrefix must mention references');
-    assert.ok(prefix.includes('reference_ids'), 'promptPrefix must mention reference_ids');
     assert.ok(prefix.includes('kb_'), 'promptPrefix must mention kb_ IDs');
     assert.ok(prefix.includes('target'), 'promptPrefix must mention compare_materials target');
     assert.ok(
@@ -347,9 +375,9 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
       'promptPrefix must mention compare_materials materials',
     );
     assert.ok(prefix.includes('image_id'), 'promptPrefix must mention image_id');
-    assert.ok(!prefix.includes('create_3d_model'), 'promptPrefix must not mention create_3d_model');
-    assert.ok(!prefix.includes('check_3d_model'), 'promptPrefix must not mention check_3d_model');
-    assert.doesNotMatch(prefix, /\b(reference_uses|image_ids)\b/);
+    assert.ok(prefix.includes('create_3d_model'), 'promptPrefix must mention create_3d_model');
+    assert.ok(prefix.includes('check_3d_model'), 'promptPrefix must mention check_3d_model');
+    assert.doesNotMatch(prefix, /\b(reference_uses|reference_ids)\b/);
   }
 
   const mcpContext = buildMCPImageToolContext({
@@ -358,10 +386,13 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
   assert.ok(mcpContext.includes('- img-1 (booth.png, upload, turn 1)'));
   const backtickTokens = [...mcpContext.matchAll(/`([^`]+)`/g)].map((m) => m[1]);
   assert.deepEqual(backtickTokens, [
-    'edit_image.base_id',
+    'gemini_image_gen.image_ids',
+    'select_region.image_id',
+    'edit_region.base_id',
+    'compare_materials.base_id',
     'references[].id',
     'references[].use',
-    'design_concepts.reference_ids',
+    'create_3d_model.image_id',
   ]);
   for (const token of backtickTokens) {
     for (const part of token.split(/[.[\]]+/).filter(Boolean)) {
@@ -384,17 +415,15 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   assert.equal(studioServer.title, '设计工具');
   assert.equal(studioServer.chatMenu, false);
   assert.equal(studioServer.requiresOAuth, false);
-  // 超时时间须大于规划（540s）与生图（240s）之和 780,000ms。
   assert.equal(studioServer.timeout, 900000);
-  assert.ok(studioServer.timeout >= (540 + 240) * 1000);
   assert.equal(isChatSelectableMCPServer(studioServer), false);
+  assert.equal(requiresEphemeralUserConnection(studioServer), false);
   assert.deepEqual(studioServer.headers, {
     'X-LibreChat-User-ID': '{{LIBRECHAT_USER_ID}}',
-    'X-LibreChat-Conversation-ID': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
     'X-Studio-Token': '${STUDIO_SHARED_TOKEN}',
   });
 
-  // 验证 processMCPEnv 能正确替换用户 ID、会话 ID 与共享令牌环境变量。
+  // 验证 processMCPEnv 能正确替换用户 ID 与共享令牌环境变量，且不含请求体占位符。
   const previousToken = process.env.STUDIO_SHARED_TOKEN;
   process.env.STUDIO_SHARED_TOKEN = 'test-shared-secret-token';
   try {
@@ -405,7 +434,6 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
     });
     assert.deepEqual(resolved.headers, {
       'X-LibreChat-User-ID': 'user-123',
-      'X-LibreChat-Conversation-ID': 'conv-456',
       'X-Studio-Token': 'test-shared-secret-token',
     });
   } finally {
@@ -471,6 +499,10 @@ test('deploy/compose.yml configures hardened studio service, IPv6 network, and a
   const api = services.api;
   assert.equal(api.environment.ENDPOINTS, 'custom,google');
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
+  assert.equal(
+    api.environment.GEMINI_IMAGE_MODEL,
+    '${GEMINI_IMAGE_MODEL:-gemini-nano-banana-2.1}',
+  );
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
 

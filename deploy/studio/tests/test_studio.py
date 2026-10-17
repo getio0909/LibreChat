@@ -19,7 +19,6 @@ from deploy.studio.images import (
     NATIVE,
     GenerationUncertain,
     build_edit_prompt,
-    build_generate_prompt,
     comparison_target,
     gemini_aspect_and_size,
     generate_gemini,
@@ -36,8 +35,7 @@ from deploy.studio.models3d import (
     parse_seed3d_query_response,
     sign_file_token,
 )
-from deploy.studio.planner import build_planner_system_prompt, plan_concepts
-from deploy.studio.store import list_user_images, resolve_image
+from deploy.studio.store import resolve_image
 
 # 测试固定常量定义
 VALID_TOKEN = "a" * 64
@@ -179,14 +177,11 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
     assert loaded.ark_api_key == ""
     assert loaded.seedream_model == "doubao-seedream-5-0-pro-260628"
     assert loaded.seed3d_model == "doubao-seed3d-2-0-260328"
-    assert loaded.planner_model == "gemini-4-argon"
-    assert loaded.planner_thinking_level == "HIGH"
     assert loaded.max_parallel_per_user == 3
     assert loaded.seed3d_max_parallel == 5
     assert loaded.public_base_url == "https://dev.xuqian.io"
     assert loaded.file_token_ttl_seconds == 86400
     assert loaded.seedream_timeout_seconds == 240
-    assert loaded.planner_timeout_seconds == 540
     assert loaded.kb_root == Path("/kb")
 
     # 当启用seedream或enable_3d时必须提供ark_api_key
@@ -264,7 +259,7 @@ def test_auth_and_health_endpoints(studio_env: StudioSettings) -> None:
     asyncio.run(_run())
 
 
-# 校验图片ID解析（上传__、生成-、@latest、studio img_）以及跨用户隔离
+# 校验图片ID解析（上传__、内置gemini_image_gen产图-、@latest、studio img_）以及跨用户隔离
 def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -> None:
     user_a_lc = studio_env.librechat_images_dir / USER_A
     user_b_lc = studio_env.librechat_images_dir / USER_B
@@ -281,7 +276,7 @@ def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -
 
     img_gen_a = (
         user_a_lc
-        / f"{gen_id_a}-generate_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-myT.webp"
+        / f"{gen_id_a}-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.webp"
     )
     img_gen_a.write_bytes(_make_image_bytes(160, 120, fmt="WEBP"))
     os.utime(img_gen_a, ns=(1_700_000_005_000_000_000, 1_700_000_005_000_000_000))
@@ -329,11 +324,6 @@ def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -
 
     res_latest = resolve_image(studio_env, USER_A, "@latest")
     assert res_latest.id == studio_id_a
-
-    # 验证list_user_images按时间倒序排列且只包含用户A自己的图片
-    listed_a = list_user_images(studio_env, USER_A, limit=10)
-    assert [item["id"] for item in listed_a] == [studio_id_a, gen_id_a, upload_id_a]
-    assert [item["kind"] for item in listed_a] == ["studio", "generated", "upload"]
 
     # 验证用户A无法解析用户B的file_id，用户B也无法解析用户A的studio_id或file_id
     with pytest.raises(ValueError, match="not found"):
@@ -404,39 +394,33 @@ def test_prompt_rules_and_stone_neutralization(tmp_path: Path) -> None:
     rules = load_rules()
     ref1 = tmp_path / "ref1.jpg"
     ref2 = tmp_path / "ref2.jpg"
+    ref3 = tmp_path / "ref3.jpg"
     ref1.write_bytes(_make_image_bytes(32, 32))
     ref2.write_bytes(_make_image_bytes(32, 32))
+    ref3.write_bytes(_make_image_bytes(32, 32))
 
-    # 整图修改下底图是图1，参考图从图2开始计数
+    # 改图下底图是图1，参考图从图2开始计数
     edit_prompt, edit_paths = build_edit_prompt(
-        "把佛龛台面换成敦煌金，背板用梵高皇，墙上保留敦煌壁画，底座换成敦煌壁",
+        "把佛龛台面换成敦煌金，背板用梵高皇，墙上保留敦煌壁画，底座换成敦煌壁，局部点缀金镶玉与梦幻庄园",
         [
             {"id": "r1", "path": ref1, "use": "材质", "note": "天川金台面样板"},
             {"id": "r2", "path": ref2, "use": "材质", "note": "梵高皇背板样板"},
+            {"id": "r3", "path": ref3, "use": "材质", "note": "金镶玉纹理"},
         ],
         rules,
     )
-    assert edit_paths == [ref1, ref2]
+    assert edit_paths == [ref1, ref2, ref3]
     assert "敦煌金" not in edit_prompt
     assert "天川金" not in edit_prompt
     assert "梵高皇" not in edit_prompt
+    assert "金镶玉" not in edit_prompt
+    assert "梦幻庄园" not in edit_prompt
     assert "图2所示石材" in edit_prompt
     assert "图3所示石材" in edit_prompt
+    assert "图4所示石材" in edit_prompt
     assert "敦煌壁画" in edit_prompt
     assert rules.edit_rules in edit_prompt
     assert "图1是唯一的修改底图" in edit_prompt
-
-    # 生图模式下参考图从图1开始计数
-    gen_prompt, gen_paths = build_generate_prompt(
-        "设计一款金镶玉与梦幻庄园结合的供桌",
-        [{"id": "r1", "path": ref1, "use": "材质", "note": "金镶玉纹理"}],
-        rules,
-    )
-    assert gen_paths == [ref1]
-    assert "金镶玉" not in gen_prompt
-    assert "梦幻庄园" not in gen_prompt
-    assert "图1所示石材" in gen_prompt
-    assert rules.reference_rules in gen_prompt
 
 
 # 校验Seedream请求载荷、各比例尺寸、receipt状态流转与超时uncertain无重试
@@ -566,89 +550,6 @@ def test_seedream_payloads_sizes_and_uncertain_timeout(
     asyncio.run(_run())
 
 
-# 校验Gemini 4 Argon概念规划器REST载荷（thinkingLevel HIGH、JSON Schema、无重试）
-def test_planner_gemini_rest_payload_and_no_retry(studio_env: StudioSettings) -> None:
-    rules = load_rules()
-    captured: list[dict[str, Any]] = []
-
-    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
-        assert request.url == httpx.URL(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-4-argon:generateContent"
-        )
-        assert request.headers["x-goog-api-key"] == studio_env.gemini_api_key
-        payload = json.loads(request.content.decode("utf-8"))
-        captured.append(payload)
-        concepts = [
-            {
-                "title": f"方案{i}",
-                "positioning": f"定位说明{i}",
-                "description": f"整体视觉与结构描述{i}",
-                "materials": f"主材建议（待确认）{i}",
-                "key_details": f"关键工艺细节{i}",
-                "image_prompt": f"A coherent studio concept view {i} with warm stone texture.",
-            }
-            for i in range(1, 4)
-        ]
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {"thought": True, "text": "internal reasoning"},
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": concepts}, ensure_ascii=False
-                                    )
-                                },
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
-
-    async def _run() -> None:
-        concepts = await plan_concepts(
-            studio_env,
-            rules,
-            brief="设计一座寺庙大殿供桌",
-            count=3,
-            transport=httpx.MockTransport(_gemini_handler),
-        )
-        assert len(concepts) == 3
-        assert len(captured) == 1
-        gen_cfg = captured[0]["generationConfig"]
-        assert gen_cfg["thinkingConfig"]["thinkingLevel"] == "HIGH"
-        assert gen_cfg["responseMimeType"] == "application/json"
-        assert "responseSchema" in gen_cfg
-        sys_text = captured[0]["systemInstruction"]["parts"][0]["text"]
-        assert rules.planner_system.replace("{count}", "3") in sys_text
-        assert rules.planner_rules.replace("{count}", "3") in sys_text
-        assert rules.no_reference_rules.replace("{count}", "3") in sys_text
-
-        # 验证超时不自动重试
-        fail_calls = 0
-
-        async def _fail_handler(request: httpx.Request) -> httpx.Response:
-            nonlocal fail_calls
-            fail_calls += 1
-            raise httpx.ReadTimeout("timeout")
-
-        with pytest.raises(RuntimeError, match="no automatic retry"):
-            await plan_concepts(
-                studio_env,
-                rules,
-                brief="测试超时",
-                count=2,
-                transport=httpx.MockTransport(_fail_handler),
-            )
-        assert fail_calls == 1
-
-    asyncio.run(_run())
-
-
 # 递归检查JSON Schema中不包含禁用关键字
 def _assert_flat_schema(node: Any) -> None:
     forbidden = {"prefixItems", "oneOf", "anyOf", "$ref", "$defs"}
@@ -662,7 +563,7 @@ def _assert_flat_schema(node: Any) -> None:
             _assert_flat_schema(item)
 
 
-# 校验MCP tools/list扁平Schema（默认不含3D工具）与tools/call端到端调用（generate_image、edit_image、design_concepts、list_images）
+# 校验MCP tools/list扁平Schema（仅保留真实业务缺口工具且默认不含3D工具）与compare_materials端到端调用
 def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None:
     # 为用户A准备一张上传参考图
     user_a_lc = studio_env.librechat_images_dir / USER_A
@@ -685,47 +586,16 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
 
     async def _gemini_handler(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content.decode("utf-8"))
-        if "gemini-nano-banana-2.1" in request.url.path:
-            assert request.headers.get("x-goog-api-key") == studio_env.gemini_api_key
-            assert body["generationConfig"]["responseModalities"] == [
-                "TEXT",
-                "IMAGE",
-            ]
-            gemini_image_requests.append(body)
-            return httpx.Response(
-                200,
-                json=_gemini_image_response(raw_big_png, mime_type="image/png"),
-            )
-
-        assert body["generationConfig"]["thinkingConfig"]["thinkingLevel"] == "HIGH"
-        concepts = [
-            {
-                "title": f"禅意石案 {i}",
-                "positioning": "大殿主供案",
-                "description": "简洁庄严的石木结合供案",
-                "materials": "黄色纹理石材（待确认）",
-                "key_details": "倒角收边与内收束腰",
-                "image_prompt": f"Minimalist temple stone altar concept {i} using 敦煌金.",
-            }
-            for i in range(1, 3)
+        assert "gemini-nano-banana-2.1" in request.url.path
+        assert request.headers.get("x-goog-api-key") == studio_env.gemini_api_key
+        assert body["generationConfig"]["responseModalities"] == [
+            "TEXT",
+            "IMAGE",
         ]
+        gemini_image_requests.append(body)
         return httpx.Response(
             200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": concepts}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
+            json=_gemini_image_response(raw_big_png, mime_type="image/png"),
         )
 
     app = create_app(
@@ -737,7 +607,6 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
     headers = {
         "X-Studio-Token": VALID_TOKEN,
         "X-LibreChat-User-ID": USER_A,
-        "X-LibreChat-Conversation-ID": "NO_PARENT",
     }
 
     async def _run() -> None:
@@ -750,7 +619,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
         ):
             assert app.state.session_manager is not None
             assert getattr(app.state.session_manager, "_task_group", None) is not None
-            # 1. 验证默认enable_3d=False时tools/list仅返回8个工具（不含create_3d_model/check_3d_model）且Schema完全扁平
+            # 1. 验证默认enable_3d=False时tools/list仅返回4个专有工具且移除重复工具与3D工具
             list_res = await client.post(
                 "/mcp",
                 headers=headers,
@@ -759,12 +628,8 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
             assert list_res.status_code == 200
             tools = list_res.json()["result"]["tools"]
             assert [t["name"] for t in tools] == [
-                "design_concepts",
-                "generate_image",
-                "edit_image",
                 "select_region",
                 "edit_region",
-                "list_images",
                 "search_library",
                 "compare_materials",
             ]
@@ -803,8 +668,8 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 assert hold_result["isError"] is True
                 assert "on hold" in hold_result["content"][0]["text"]
 
-            # 2. 端到端调用generate_image，返回文本JSON块+小于3MB的展示图像块，且落盘保留原始PNG字节
-            call_gen_res = await client.post(
+            # 2. 端到端调用compare_materials，返回文本JSON块+内联对比UI资源+小于3MB的展示图像块，且落盘保留原始PNG字节
+            call_cmp_res = await client.post(
                 "/mcp",
                 headers=headers,
                 json={
@@ -812,30 +677,27 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                     "id": 2,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "prompt": "用敦煌金制作一尊佛龛底座",
-                            "aspect": "4:3",
+                            "base_id": upload_id,
+                            "target": "供桌台面",
+                            "materials": ["天川金"],
                             "size": "2K",
-                            "references": [
-                                {"id": upload_id, "use": "材质", "note": "敦煌金样板"}
-                            ],
                         },
                     },
                 },
             )
-            assert call_gen_res.status_code == 200
-            result_gen = call_gen_res.json()["result"]
-            assert result_gen.get("isError") is False
-            content_blocks = result_gen["content"]
+            assert call_cmp_res.status_code == 200
+            result_cmp = call_cmp_res.json()["result"]
+            assert result_cmp.get("isError") is False
+            content_blocks = result_cmp["content"]
             assert len(content_blocks) == 2
             assert content_blocks[0]["type"] == "text"
             assert content_blocks[1]["type"] == "image"
 
             text_meta = json.loads(content_blocks[0]["text"])
-            generated_studio_id = text_meta["id"]
+            generated_studio_id = text_meta["variants"][0]["image_id"]
             assert generated_studio_id.startswith("img_")
-            assert text_meta["size"] == "1100x1100"
             for forbidden_key in (
                 "prompt",
                 "model",
@@ -860,95 +722,13 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 / "original.png"
             )
             assert saved_orig.read_bytes() == raw_big_png
-            gen_uris, gen_prompt = _extract_gemini_parts(gemini_image_requests[-1])
-            assert len(gen_uris) == 1
+            cmp_uris, cmp_prompt = _extract_gemini_parts(gemini_image_requests[-1])
+            assert len(cmp_uris) >= 2
             assert gemini_image_requests[-1]["generationConfig"]["imageConfig"] == {
                 "aspectRatio": "4:3",
                 "imageSize": "2K",
             }
-            assert "敦煌金" not in gen_prompt
-            assert "图1所示石材" in gen_prompt
-
-            # 3. 端到端调用edit_image（使用@latest作为底图，保持底图1:1比例）
-            call_edit_res = await client.post(
-                "/mcp",
-                headers=headers,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 3,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "edit_image",
-                        "arguments": {
-                            "base_id": "@latest",
-                            "instruction": "将顶部线脚改为天川金材质",
-                            "references": [
-                                {"id": upload_id, "use": "材质", "note": "天川金样板"}
-                            ],
-                            "size": "1K",
-                        },
-                    },
-                },
-            )
-            assert call_edit_res.status_code == 200
-            edit_result = call_edit_res.json()["result"]
-            assert edit_result.get("isError") is False
-            edit_uris, edit_prompt = _extract_gemini_parts(gemini_image_requests[-1])
-            assert gemini_image_requests[-1]["generationConfig"]["imageConfig"] == {
-                "aspectRatio": "1:1",
-                "imageSize": "1K",
-            }
-            assert len(edit_uris) == 2
-            assert "天川金" not in edit_prompt
-            assert "图2所示石材" in edit_prompt
-
-            # 4. 端到端调用design_concepts，验证规划+并发出图且不泄露image_prompt与模型名
-            call_concepts_res = await client.post(
-                "/mcp",
-                headers=headers,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 4,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "design_concepts",
-                        "arguments": {
-                            "brief": "设计两款寺庙石材供桌",
-                            "count": 2,
-                            "with_images": True,
-                            "aspect": "16:9",
-                            "size": "2K",
-                            "reference_ids": [upload_id],
-                        },
-                    },
-                },
-            )
-            assert call_concepts_res.status_code == 200
-            concepts_result = call_concepts_res.json()["result"]
-            assert concepts_result.get("isError") is False
-            assert len(concepts_result["content"]) == 3
-            concepts_summary = json.loads(concepts_result["content"][0]["text"])
-            assert concepts_summary["count"] == 2
-            for c_item in concepts_summary["concepts"]:
-                assert "image_prompt" not in c_item
-                assert c_item["image_id"].startswith("img_")
-
-            # 5. 端到端调用list_images
-            call_list_res = await client.post(
-                "/mcp",
-                headers=headers,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 5,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {"limit": 10}},
-                },
-            )
-            assert call_list_res.status_code == 200
-            listed_payload = json.loads(
-                call_list_res.json()["result"]["content"][0]["text"]
-            )
-            assert listed_payload["count"] == 5
+            assert "供桌台面" in cmp_prompt
 
     asyncio.run(_run())
 
@@ -1003,55 +783,31 @@ def test_concurrency_cap_and_mcp_error_states(
 
     asyncio.run(_run_401())
 
-    # 校验单用户并发上限max_parallel_per_user=2
+    # 校验单用户并发上限max_parallel_per_user=2（通过compare_materials三材质并发渲染验证）
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_id = "e0000000-1111-2222-3333-444444444444"
+    (user_lc / f"{base_id}__base.jpg").write_bytes(
+        _make_image_bytes(120, 90, fmt="JPEG")
+    )
+
     capped_settings = studio_env.model_copy(update={"max_parallel_per_user": 2})
     active_in_flight = 0
     max_observed_in_flight = 0
     small_jpg = _make_image_bytes(32, 32, fmt="JPEG")
 
-    async def _gemini_3_concepts(request: httpx.Request) -> httpx.Response:
+    async def _gemini_3_variants(request: httpx.Request) -> httpx.Response:
         nonlocal active_in_flight, max_observed_in_flight
-        if "gemini-nano-banana-2.1" in request.url.path:
-            active_in_flight += 1
-            max_observed_in_flight = max(max_observed_in_flight, active_in_flight)
-            await asyncio.sleep(0.05)
-            active_in_flight -= 1
-            return httpx.Response(200, json=_gemini_image_response(small_jpg))
-
-        concepts = [
-            {
-                "title": f"方向{i}",
-                "positioning": "定位",
-                "description": "描述",
-                "materials": "材质",
-                "key_details": "细节",
-                "image_prompt": f"Concept {i}",
-            }
-            for i in range(1, 4)
-        ]
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": concepts}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
+        active_in_flight += 1
+        max_observed_in_flight = max(max_observed_in_flight, active_in_flight)
+        await asyncio.sleep(0.05)
+        active_in_flight -= 1
+        return httpx.Response(200, json=_gemini_image_response(small_jpg))
 
     app = create_app(
         settings=capped_settings,
         rules=load_rules(),
-        gemini_transport=httpx.MockTransport(_gemini_3_concepts),
+        gemini_transport=httpx.MockTransport(_gemini_3_variants),
     )
 
     async def _run_concurrency() -> None:
@@ -1067,22 +823,23 @@ def test_concurrency_cap_and_mcp_error_states(
                     "id": 10,
                     "method": "tools/call",
                     "params": {
-                        "name": "design_concepts",
+                        "name": "compare_materials",
                         "arguments": {
-                            "brief": "三方案并发限制测试",
-                            "count": 3,
-                            "with_images": True,
+                            "base_id": base_id,
+                            "target": "供桌台面",
+                            "materials": ["天川金", "梵高皇", "蓝金灰"],
                         },
                     },
                 },
             )
             assert res.status_code == 200
+            assert res.json()["result"]["isError"] is False
             assert max_observed_in_flight == 2
 
     asyncio.run(_run_concurrency())
 
 
-# 校验POST派发后取消请求会落盘uncertain，且启动时自动将遗留pending对账为uncertain并在list_images警告展示
+# 校验POST派发后取消请求会落盘uncertain，且启动时自动将遗留pending对账为uncertain
 def test_cancellation_marks_uncertain_and_startup_reconciles_pending(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
@@ -1135,36 +892,12 @@ def test_cancellation_marks_uncertain_and_startup_reconciles_pending(
             encoding="utf-8",
         )
 
-        app = create_app(settings=studio_env, rules=load_rules())
+        create_app(settings=studio_env, rules=load_rules())
         reconciled_receipt = json.loads(
             (abandoned_job_dir / "receipt.json").read_text(encoding="utf-8")
         )
         assert reconciled_receipt["state"] == "uncertain"
-
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
-            res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 20,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {"limit": 10}},
-                },
-            )
-            assert res.status_code == 200
-            payload = json.loads(res.json()["result"]["content"][0]["text"])
-            by_id = {item["id"]: item for item in payload["images"]}
-            assert "img_cancelled01" in by_id
-            assert by_id["img_cancelled01"]["state"] == "uncertain"
-            assert by_id["img_cancelled01"]["warning"] is True
-            assert "img_abandoned02" in by_id
-            assert by_id["img_abandoned02"]["state"] == "uncertain"
-            assert by_id["img_abandoned02"]["warning"] is True
-            assert len(payload["warnings"]) >= 2
+        assert "finished" in reconciled_receipt
 
     asyncio.run(_run())
 
@@ -1195,6 +928,13 @@ def test_receipt_write_failure_preserves_uncertain_warning(
     async def _invalid_body_handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"data": [], "candidates": []})
 
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_id = "d0000000-1111-2222-3333-444444444444"
+    (user_lc / f"{base_id}__base.jpg").write_bytes(
+        _make_image_bytes(120, 90, fmt="JPEG")
+    )
+
     async def _run() -> None:
         for idx, handler in enumerate(
             (_timeout_handler, _502_handler, _invalid_body_handler)
@@ -1220,7 +960,7 @@ def test_receipt_write_failure_preserves_uncertain_warning(
                     transport=httpx.MockTransport(handler),
                 )
 
-        # 通过MCP调用generate_image时同样返回uncertain状态与可能已计费提示
+        # 通过MCP调用compare_materials时同样在变体结果中返回uncertain状态与可能已计费提示
         app = create_app(
             settings=studio_env,
             rules=load_rules(),
@@ -1239,8 +979,12 @@ def test_receipt_write_failure_preserves_uncertain_warning(
                     "id": 21,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
-                        "arguments": {"prompt": "供桌设计"},
+                        "name": "compare_materials",
+                        "arguments": {
+                            "base_id": base_id,
+                            "target": "供桌台面",
+                            "materials": ["天川金"],
+                        },
                     },
                 },
             )
@@ -1248,111 +992,13 @@ def test_receipt_write_failure_preserves_uncertain_warning(
             result = res.json()["result"]
             assert result["isError"] is True
             err_body = json.loads(result["content"][0]["text"])
-            assert err_body["state"] == "uncertain"
-            assert "may have been billed" in err_body["error"]
+            assert err_body["variants"][0]["state"] == "uncertain"
+            assert "may have been billed" in err_body["variants"][0]["error"]
 
     asyncio.run(_run())
 
 
-# 校验design_concepts规划阶段受每用户并发上限与全局并发上限约束，且在出图前释放规划信号量
-def test_planner_concurrency_caps_single_and_multi_user(
-    studio_env: StudioSettings,
-) -> None:
-    user_c = "65f00000000000000000000c"
-    capped = studio_env.model_copy(
-        update={"max_parallel_per_user": 2, "global_max_parallel": 3}
-    )
-
-    active_planner = 0
-    max_planner_observed = 0
-
-    async def _slow_gemini_handler(request: httpx.Request) -> httpx.Response:
-        nonlocal active_planner, max_planner_observed
-        active_planner += 1
-        max_planner_observed = max(max_planner_observed, active_planner)
-        await asyncio.sleep(0.05)
-        active_planner -= 1
-        concept = {
-            "title": "禅案",
-            "positioning": "定位",
-            "description": "描述",
-            "materials": "材质（待确认）",
-            "key_details": "细节",
-            "image_prompt": "A stone altar concept.",
-        }
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": [concept]}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
-
-    app = create_app(
-        settings=capped,
-        rules=load_rules(),
-        gemini_transport=httpx.MockTransport(_slow_gemini_handler),
-    )
-
-    async def _call_plan(client: httpx.AsyncClient, uid: str, req_id: int) -> None:
-        res = await client.post(
-            "/mcp",
-            headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": uid},
-            json={
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "method": "tools/call",
-                "params": {
-                    "name": "design_concepts",
-                    "arguments": {
-                        "brief": "并发规划限制测试",
-                        "count": 1,
-                        "with_images": False,
-                    },
-                },
-            },
-        )
-        assert res.status_code == 200
-        assert res.json()["result"]["isError"] is False
-
-    async def _run() -> None:
-        nonlocal max_planner_observed
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
-            # 1. 单用户发起4个并发with_images=False规划请求，受max_parallel_per_user=2限制
-            max_planner_observed = 0
-            await asyncio.gather(*(_call_plan(client, USER_A, i) for i in range(1, 5)))
-            assert max_planner_observed == 2
-
-            # 2. 三个用户同时各发起2个并发with_images=False规划请求（共6个），受global_max_parallel=3限制
-            max_planner_observed = 0
-            await asyncio.gather(
-                _call_plan(client, USER_A, 11),
-                _call_plan(client, USER_A, 12),
-                _call_plan(client, USER_B, 13),
-                _call_plan(client, USER_B, 14),
-                _call_plan(client, user_c, 15),
-                _call_plan(client, user_c, 16),
-            )
-            assert max_planner_observed == 3
-
-    asyncio.run(_run())
-
-
-# 校验LibreChat用户目录中的头像文件（avatar-*、agent-*-avatar-*）与非UUID前缀文件不会被列出或成为@latest
+# 校验LibreChat用户目录中的头像文件（avatar-*、agent-*-avatar-*）与非UUID前缀文件不会被解析或成为@latest
 def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
     user_lc = studio_env.librechat_images_dir / USER_A
     user_lc.mkdir(parents=True, mode=0o700)
@@ -1360,9 +1006,9 @@ def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
     valid_upload_id = "12345678-1234-1234-1234-123456789abc"
     valid_file = user_lc / f"{valid_upload_id}__design.png"
     valid_file.write_bytes(_make_image_bytes(100, 100, fmt="PNG"))
-    os.utime(valid_file, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000))
+    os.utime(valid_file, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000_000))
 
-    # 写入更新时间戳的头像与非UUID文件，验证不会抢占@latest或进入列表
+    # 写入更新时间戳的头像与非UUID文件，验证不会抢占@latest
     for bogus_name in (
         "avatar-1700000999.png",
         "agent-xyz123-avatar-1700000999.png",
@@ -1372,9 +1018,6 @@ def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
         bogus_file = user_lc / bogus_name
         bogus_file.write_bytes(_make_image_bytes(64, 64, fmt="PNG"))
         os.utime(bogus_file, ns=(1_700_000_999_000_000_000, 1_700_000_999_000_000_000))
-
-    listed = list_user_images(studio_env, USER_A, limit=20)
-    assert [item["id"] for item in listed] == [valid_upload_id]
 
     latest = resolve_image(studio_env, USER_A, "@latest")
     assert latest.id == valid_upload_id
@@ -1394,20 +1037,14 @@ def test_stone_neutralization_only_for_matching_references(
     matched_ref = tmp_path / "vangogh_sample.jpg"
     matched_ref.write_bytes(_make_image_bytes(32, 32))
 
-    # 1. 无参考图生图：保留客户原文“敦煌金”，不得凭空生成“图1所示石材”
-    no_ref_prompt, no_ref_paths = build_generate_prompt("用敦煌金设计供桌", [], rules)
-    assert no_ref_paths == []
-    assert "敦煌金" in no_ref_prompt
-    assert "所示石材" not in no_ref_prompt
-
-    # 2. 无额外参考图改图：保留客户原文“敦煌金”，不得指向底图“图1所示石材”
+    # 1. 无额外参考图改图：保留客户原文“敦煌金”，不得指向底图“图1所示石材”
     no_ref_edit, no_ref_edit_paths = build_edit_prompt("把台面换成敦煌金", [], rules)
     assert no_ref_edit_paths == []
     assert "敦煌金" in no_ref_edit
     assert "所示石材" not in no_ref_edit
 
-    # 3. 含无关参考图与另一款匹配石材参考图：只替换匹配的梵高皇/敦煌壁，保留未匹配的敦煌金
-    mixed_prompt, _ = build_generate_prompt(
+    # 2. 含无关参考图与另一款匹配石材参考图：只替换匹配的梵高皇（图3），保留未匹配的敦煌金
+    mixed_prompt, _ = build_edit_prompt(
         "台面用敦煌金，背板用梵高皇",
         [
             {"id": "u1", "path": unrelated_ref, "use": "造型", "note": "明式束腰造型"},
@@ -1416,12 +1053,12 @@ def test_stone_neutralization_only_for_matching_references(
         rules,
     )
     assert "敦煌金" in mixed_prompt
-    assert "图1所示石材" not in mixed_prompt
+    assert "图2所示石材" not in mixed_prompt
     assert "梵高皇" not in mixed_prompt
-    assert "图2所示石材" in mixed_prompt
+    assert "图3所示石材" in mixed_prompt
 
 
-# 校验EXIF Orientation 6与8的4000x3000底图在edit_image中旋转像素尺寸与请求输出比例一致（竖幅）
+# 校验EXIF Orientation 6与8的4000x3000底图在compare_materials中旋转像素尺寸与请求输出比例一致（竖幅）
 def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> None:
     user_lc = studio_env.librechat_images_dir / USER_A
     user_lc.mkdir(parents=True, mode=0o700)
@@ -1436,7 +1073,7 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
         _make_image_bytes(4000, 3000, fmt="JPEG", exif_orientation=8)
     )
 
-    # 验证store解析与列表尺寸均为EXIF转置后的竖幅3000x4000
+    # 验证store解析尺寸均为EXIF转置后的竖幅3000x4000
     for fid in (id_orient_6, id_orient_8):
         resolved = resolve_image(studio_env, USER_A, fid)
         assert (resolved.width, resolved.height) == (3000, 4000)
@@ -1471,10 +1108,11 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
                         "id": idx,
                         "method": "tools/call",
                         "params": {
-                            "name": "edit_image",
+                            "name": "compare_materials",
                             "arguments": {
                                 "base_id": fid,
-                                "instruction": "微调边角倒角",
+                                "target": "供桌台面",
+                                "materials": ["天川金"],
                                 "size": "2K",
                             },
                         },
@@ -1491,203 +1129,6 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
                 with Image.open(io.BytesIO(base64.b64decode(sent_b64))) as sent_im:
                     assert sent_im.width < sent_im.height
                     assert sent_im.size == (1536, 2048)
-
-    asyncio.run(_run())
-
-
-# 校验概念方案渲染时即使规划器的image_prompt遗漏了必选副件与空间布局，仍会附带原始brief作为design_constraints发送给生图接口
-def test_concept_rendering_includes_binding_design_constraints(
-    studio_env: StudioSettings,
-) -> None:
-    image_prompts: list[str] = []
-    small_jpg = _make_image_bytes(64, 48, fmt="JPEG")
-
-    # 模拟规划器在image_prompt中遗漏了“配套三足香炉”和“禅堂全景布局”，只写了孤立供桌
-    async def _omitting_gemini_handler(request: httpx.Request) -> httpx.Response:
-        body = json.loads(request.content.decode("utf-8"))
-        if "gemini-nano-banana-2.1" in request.url.path:
-            _, prompt_text = _extract_gemini_parts(body)
-            image_prompts.append(prompt_text)
-            return httpx.Response(200, json=_gemini_image_response(small_jpg))
-
-        concept = {
-            "title": "极简石案",
-            "positioning": "主供桌定位",
-            "description": "石质供桌配三足香炉",
-            "materials": "青石（待确认）",
-            "key_details": "直腿内收",
-            "image_prompt": "An isolated stone altar table in a neutral studio.",
-        }
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": [concept]}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
-
-    app = create_app(
-        settings=studio_env,
-        rules=load_rules(),
-        gemini_transport=httpx.MockTransport(_omitting_gemini_handler),
-    )
-
-    brief_text = (
-        "设计禅堂中轴线上的石材供桌，桌面正中必须放置配套三足香炉，保留完整禅堂空间布局"
-    )
-
-    async def _run() -> None:
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
-            res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 30,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "design_concepts",
-                        "arguments": {
-                            "brief": brief_text,
-                            "count": 1,
-                            "with_images": True,
-                        },
-                    },
-                },
-            )
-            assert res.status_code == 200
-            assert res.json()["result"]["isError"] is False
-            assert len(image_prompts) == 1
-            sent_prompt = image_prompts[0]
-            assert "design_constraints" in sent_prompt
-            assert (
-                json.dumps({"design_constraints": brief_text}, ensure_ascii=False)
-                in sent_prompt
-            )
-            assert "配套三足香炉" in sent_prompt
-            assert "完整禅堂空间布局" in sent_prompt
-
-    asyncio.run(_run())
-
-
-# 校验count=1/2/3时组装的systemInstruction与user提示词中无冲突数量指令，且仅引用responseSchema定义的6个字段
-def test_planner_instructions_consistent_for_counts_1_to_3(
-    studio_env: StudioSettings,
-) -> None:
-    rules = load_rules()
-    forbidden_count_tokens = ("exactly 4", "3–4", "3-4", "4 个", "4个", "{count}")
-    forbidden_legacy_fields = (
-        '"summary"',
-        "material_notes",
-        '"silhouette"',
-        "key_features",
-        '"craftsmanship"',
-        '"styling"',
-        "render_prompt",
-    )
-    expected_schema_fields = (
-        "title",
-        "positioning",
-        "description",
-        "materials",
-        "key_details",
-        "image_prompt",
-    )
-
-    async def _run() -> None:
-        for count in (1, 2, 3):
-            sys_no_ref = build_planner_system_prompt(
-                rules, has_references=False, count=count
-            )
-            sys_with_ref = build_planner_system_prompt(
-                rules, has_references=True, count=count
-            )
-            for sys_text in (sys_no_ref, sys_with_ref):
-                assert f"围绕当前品类和目标提出 {count} 个不同" in sys_text
-                assert f"concepts长度严格为 {count}" in sys_text
-                assert f"在全部 {count} 个方向中均须保留" in sys_text
-                for bad_tok in forbidden_count_tokens:
-                    assert bad_tok not in sys_text
-                for legacy_field in forbidden_legacy_fields:
-                    assert legacy_field not in sys_text
-                for valid_field in expected_schema_fields:
-                    assert valid_field in sys_text
-            assert f"完成既定 JSON 格式的 {count} 个完整设计方向" in sys_no_ref
-
-            captured: list[dict[str, Any]] = []
-
-            async def _gemini_handler(
-                request: httpx.Request,
-                target_count: int = count,
-                bucket: list[dict[str, Any]] = captured,
-            ) -> httpx.Response:
-                body = json.loads(request.content.decode("utf-8"))
-                bucket.append(body)
-                concepts = [
-                    {
-                        "title": f"方案{i}",
-                        "positioning": "禅意定位",
-                        "description": "造型说明",
-                        "materials": "石材（待确认）",
-                        "key_details": "工艺收口",
-                        "image_prompt": f"Concept {i} render prompt.",
-                    }
-                    for i in range(1, target_count + 1)
-                ]
-                return httpx.Response(
-                    200,
-                    json={
-                        "candidates": [
-                            {
-                                "content": {
-                                    "parts": [
-                                        {
-                                            "text": json.dumps(
-                                                {"concepts": concepts},
-                                                ensure_ascii=False,
-                                            )
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                )
-
-            result = await plan_concepts(
-                studio_env,
-                rules,
-                brief="设计寺庙供桌",
-                count=count,
-                transport=httpx.MockTransport(_gemini_handler),
-            )
-            assert len(result) == count
-            sent_body = captured[0]
-            sent_sys = sent_body["systemInstruction"]["parts"][0]["text"]
-            sent_user = sent_body["contents"][0]["parts"][0]["text"]
-            schema_props = sent_body["generationConfig"]["responseSchema"][
-                "properties"
-            ]["concepts"]["items"]["properties"]
-            assert set(schema_props.keys()) == set(expected_schema_fields)
-            for text_part in (sent_sys, sent_user):
-                for bad_tok in forbidden_count_tokens:
-                    assert bad_tok not in text_part
-                for legacy_field in forbidden_legacy_fields:
-                    assert legacy_field not in text_part
 
     asyncio.run(_run())
 
@@ -1776,23 +1217,23 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
             assert shared_mgr is not None
             assert getattr(shared_mgr, "_task_group", None) is not None
 
-            # 并发执行User A与User B的generate_image，且各自只允许解析自身名下的参考图
+            # 并发执行User A与User B的compare_materials，且各自只允许解析自身名下的底图
             req_a = client.post(
                 "/mcp",
                 headers={
                     "X-Studio-Token": VALID_TOKEN,
                     "X-LibreChat-User-ID": USER_A,
-                    "X-LibreChat-Conversation-ID": "conv-user-a-001",
                 },
                 json={
                     "jsonrpc": "2.0",
                     "id": 101,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "prompt": "用户A专属供案",
-                            "references": [{"id": upload_a, "use": "造型"}],
+                            "base_id": upload_a,
+                            "target": "供桌台面",
+                            "materials": ["天川金"],
                         },
                     },
                 },
@@ -1802,17 +1243,17 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
                 headers={
                     "X-Studio-Token": VALID_TOKEN,
                     "X-LibreChat-User-ID": USER_B,
-                    "X-LibreChat-Conversation-ID": "conv-user-b-002",
                 },
                 json={
                     "jsonrpc": "2.0",
                     "id": 102,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "prompt": "用户B专属香炉",
-                            "references": [{"id": upload_b, "use": "造型"}],
+                            "base_id": upload_b,
+                            "target": "香炉底座",
+                            "materials": ["梵高皇"],
                         },
                     },
                 },
@@ -1826,8 +1267,8 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
             assert body_a["isError"] is False
             assert body_b["isError"] is False
 
-            img_id_a = json.loads(body_a["content"][0]["text"])["id"]
-            img_id_b = json.loads(body_b["content"][0]["text"])["id"]
+            img_id_a = json.loads(body_a["content"][0]["text"])["variants"][0]["image_id"]
+            img_id_b = json.loads(body_b["content"][0]["text"])["variants"][0]["image_id"]
             assert img_id_a != img_id_b
 
             # 验证生成结果分别落盘在各自用户的目录且互不可见
@@ -1839,50 +1280,8 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
             assert not (
                 studio_env.data_dir / "users" / USER_B / "jobs" / img_id_a
             ).exists()
-
-            # 并发调用list_images验证各自只返回自己的上传图与生成图
-            list_a, list_b = await asyncio.gather(
-                client.post(
-                    "/mcp",
-                    headers={
-                        "X-Studio-Token": VALID_TOKEN,
-                        "X-LibreChat-User-ID": USER_A,
-                    },
-                    json={
-                        "jsonrpc": "2.0",
-                        "id": 103,
-                        "method": "tools/call",
-                        "params": {"name": "list_images", "arguments": {"limit": 10}},
-                    },
-                ),
-                client.post(
-                    "/mcp",
-                    headers={
-                        "X-Studio-Token": VALID_TOKEN,
-                        "X-LibreChat-User-ID": USER_B,
-                    },
-                    json={
-                        "jsonrpc": "2.0",
-                        "id": 104,
-                        "method": "tools/call",
-                        "params": {"name": "list_images", "arguments": {"limit": 10}},
-                    },
-                ),
-            )
-            ids_a = {
-                item["id"]
-                for item in json.loads(list_a.json()["result"]["content"][0]["text"])[
-                    "images"
-                ]
-            }
-            ids_b = {
-                item["id"]
-                for item in json.loads(list_b.json()["result"]["content"][0]["text"])[
-                    "images"
-                ]
-            }
-            assert ids_a == {upload_a, img_id_a}
-            assert ids_b == {upload_b, img_id_b}
+            assert resolve_image(studio_env, USER_A, "@latest").id == img_id_a
+            assert resolve_image(studio_env, USER_B, "@latest").id == img_id_b
 
     asyncio.run(_run())
 
@@ -2069,7 +1468,31 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
     assert flagged_rej.warning is True
     assert "rejected" in flagged_rej.warning_reasons
 
-    # 4. 在generate_image与edit_image中使用kb_<id>作为材质参考或底图，验证石材名通过catalog资产ID中性化且返回flagged警告
+    # 4. 在build_edit_prompt与compare_materials中使用kb_<id>作为材质参考或底图，验证石材名通过catalog资产ID中性化且返回flagged警告
+    rules = load_rules()
+    edit_prompt, _ = build_edit_prompt(
+        "采用敦煌金台面配莲花纹浮雕制作供桌",
+        [
+            {
+                "id": resolved.id,
+                "path": resolved.path,
+                "use": "材质",
+                "note": "",
+                "material_ids": resolved.material_ids,
+            },
+            {
+                "id": flagged_ai.id,
+                "path": flagged_ai.path,
+                "use": "纹样",
+                "note": "",
+                "material_ids": flagged_ai.material_ids,
+            },
+        ],
+        rules,
+    )
+    assert "敦煌金" not in edit_prompt
+    assert "图2所示石材" in edit_prompt
+
     gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
@@ -2079,7 +1502,7 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
 
     app = create_app(
         settings=studio_env,
-        rules=load_rules(),
+        rules=rules,
         gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
@@ -2088,39 +1511,8 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
         async with httpx.AsyncClient(
             transport=transport, base_url="http://studio:8000"
         ) as client:
-            # 传入kb_1111111111111111（不写note）与带标记的kb_6666666666666661
-            gen_res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 202,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "generate_image",
-                        "arguments": {
-                            "prompt": "采用敦煌金台面配莲花纹浮雕制作供桌",
-                            "references": [
-                                {"id": "kb_1111111111111111", "use": "材质"},
-                                {"id": "kb_6666666666666661", "use": "纹样"},
-                            ],
-                        },
-                    },
-                },
-            )
-            assert gen_res.status_code == 200
-            gen_result = gen_res.json()["result"]
-            assert gen_result.get("isError") is False
-            meta = json.loads(gen_result["content"][0]["text"])
-            assert "warnings" in meta
-            assert any("kb_6666666666666661" in w for w in meta["warnings"])
-            # 即使未提供note，通过kb_1111111111111111匹配catalog中的敦煌金后仍将“敦煌金”中性化为“图1所示石材”
-            _, gen_prompt = _extract_gemini_parts(gemini_requests[-1])
-            assert "敦煌金" not in gen_prompt
-            assert "图1所示石材" in gen_prompt
-
-            # 使用kb_5555555555555551作为edit_image的base_id
-            edit_res = await client.post(
+            # 使用带标记的kb_6666666666666661作为compare_materials的base_id，验证返回flagged警告且正常渲染
+            cmp_res = await client.post(
                 "/mcp",
                 headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
                 json={
@@ -2128,22 +1520,24 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
                     "id": 203,
                     "method": "tools/call",
                     "params": {
-                        "name": "edit_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "base_id": "kb_5555555555555551",
-                            "instruction": "将供桌台面替换为梵高皇",
-                            "references": [
-                                {"id": "kb_2222222222222221", "use": "材质"}
-                            ],
+                            "base_id": "kb_6666666666666661",
+                            "target": "供桌台面",
+                            "materials": ["梵高皇"],
                         },
                     },
                 },
             )
-            assert edit_res.status_code == 200
-            assert edit_res.json()["result"].get("isError") is False
-            _, edit_prompt = _extract_gemini_parts(gemini_requests[-1])
-            assert "梵高皇" not in edit_prompt
-            assert "图2所示石材" in edit_prompt
+            assert cmp_res.status_code == 200
+            cmp_result = cmp_res.json()["result"]
+            assert cmp_result.get("isError") is False
+            meta = json.loads(cmp_result["content"][0]["text"])
+            assert "warnings" in meta
+            assert any("kb_6666666666666661" in w for w in meta["warnings"])
+            _, cmp_prompt = _extract_gemini_parts(gemini_requests[-1])
+            assert "梵高皇" not in cmp_prompt
+            assert "图2所示石材" in cmp_prompt
 
     asyncio.run(_run())
 
@@ -2576,7 +1970,7 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
         async with httpx.AsyncClient(
             transport=transport, base_url="http://studio:8000"
         ) as client:
-            # 0. 当enable_3d=True时tools/list包含create_3d_model与check_3d_model（共10个工具）
+            # 0. 当enable_3d=True时tools/list包含create_3d_model与check_3d_model（共6个工具）
             list_res = await client.post(
                 "/mcp",
                 headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
@@ -2591,7 +1985,7 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
             tool_names = [t["name"] for t in list_res.json()["result"]["tools"]]
             assert "create_3d_model" in tool_names
             assert "check_3d_model" in tool_names
-            assert len(tool_names) == 10
+            assert len(tool_names) == 6
 
             # 1. 标准精度（100k faces / low）+ ZIP内嵌GLB解包
             res_std = await client.post(
@@ -3489,26 +2883,10 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
                 ns=(1_700_000_060_000_000_000, 1_700_000_060_000_000_000),
             )
 
-            # 3. 验证list_images不会将search_library预览缩略图列为generated
-            list_res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 411,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {"limit": 20}},
-                },
-            )
-            assert list_res.status_code == 200
-            listed_payload = json.loads(list_res.json()["result"]["content"][0]["text"])
-            listed_ids = [item["id"] for item in listed_payload["images"]]
-            assert listed_ids == [upload_id]
-            assert preview_uuid_1 not in listed_ids
-            assert preview_uuid_2 not in listed_ids
+            # 3. 验证@latest跳过search_library预览缩略图，准确选中早先的上传底图upload_id
+            assert resolve_image(studio_env, USER_A, "@latest").id == upload_id
 
-            # 4. 验证@latest跳过search_library预览缩略图，准确选中早先的上传底图upload_id
-            edit_latest_res = await client.post(
+            cmp_latest_res = await client.post(
                 "/mcp",
                 headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
                 json={
@@ -3516,55 +2894,45 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
                     "id": 412,
                     "method": "tools/call",
                     "params": {
-                        "name": "edit_image",
+                        "name": "compare_materials",
                         "arguments": {
                             "base_id": "@latest",
-                            "instruction": "将背景墙调亮",
+                            "target": "背景墙",
+                            "materials": ["天川金"],
                         },
                     },
                 },
             )
-            assert edit_latest_res.status_code == 200
-            edit_latest_meta = json.loads(
-                edit_latest_res.json()["result"]["content"][0]["text"]
+            assert cmp_latest_res.status_code == 200
+            cmp_latest_meta = json.loads(
+                cmp_latest_res.json()["result"]["content"][0]["text"]
             )
-            assert edit_latest_meta["base_id"] == upload_id
+            assert cmp_latest_meta["base_id"] == upload_id
             latest_uris, _ = _extract_gemini_parts(gemini_requests[-1])
-            assert latest_uris == [expected_upload_uri]
+            assert latest_uris[0] == expected_upload_uri
 
-            # 5. 验证显式传入带标记预览图的UUID时，自动映射回kb_3333333333333332的ref2048高清图、保留石材名中性化并返回low_res警告
-            edit_with_preview_res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 413,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "edit_image",
-                        "arguments": {
-                            "base_id": upload_id,
-                            "instruction": "将供桌台面替换为金镶玉",
-                            "references": [
-                                {"id": preview_uuid_2, "use": "材质"},
-                            ],
-                        },
-                    },
-                },
+            # 4. 验证显式传入带标记预览图的UUID时，自动映射回kb_3333333333333332的ref2048高清图、保留石材名中性化并返回low_res警告
+            resolved_preview_2 = resolve_image(studio_env, USER_A, preview_uuid_2)
+            assert resolved_preview_2.id == "kb_3333333333333332"
+            assert resolved_preview_2.warning is True
+            assert "low_res" in resolved_preview_2.warning_reasons
+            assert (
+                normalize_reference(resolved_preview_2.path, allowed_roots)
+                == expected_flagged_gold_ref2048_uri
             )
-            assert edit_with_preview_res.status_code == 200
-            edit_preview_result = edit_with_preview_res.json()["result"]
-            assert edit_preview_result.get("isError") is False
-            edit_preview_meta = json.loads(edit_preview_result["content"][0]["text"])
-            assert any(
-                "kb_3333333333333332" in w and "low_res" in w
-                for w in edit_preview_meta["warnings"]
+            preview_prompt, _ = build_edit_prompt(
+                "将供桌台面替换为金镶玉",
+                [
+                    {
+                        "id": resolved_preview_2.id,
+                        "path": resolved_preview_2.path,
+                        "use": "材质",
+                        "note": "",
+                        "material_ids": resolved_preview_2.material_ids,
+                    }
+                ],
+                rules,
             )
-            preview_uris, preview_prompt = _extract_gemini_parts(gemini_requests[-1])
-            assert preview_uris == [
-                expected_upload_uri,
-                expected_flagged_gold_ref2048_uri,
-            ]
             assert "金镶玉" not in preview_prompt
             assert "图2所示石材" in preview_prompt
 
@@ -3618,7 +2986,7 @@ def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
         assert "7243258cbd656d7c" in real_mural_hits
         assert "d2149859ecaf18f1" in real_mural_hits
 
-    # 3. 校验使用kb_3333333333333331或kb_9999999999999991生图时，绝不会把提示词中的“敦煌壁”或“梵高皇”误中性化
+    # 3. 校验使用kb_3333333333333331或kb_9999999999999991改图时，绝不会把提示词中的“敦煌壁”或“梵高皇”误中性化
     rules = load_rules()
     resolved_gold = resolve_image(
         studio_env, USER_A, "kb_3333333333333331", kb_index=kb_index
@@ -3626,7 +2994,7 @@ def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
     resolved_mural = resolve_image(
         studio_env, USER_A, "kb_9999999999999991", kb_index=kb_index
     )
-    prompt_with_gold, _ = build_generate_prompt(
+    prompt_with_gold, _ = build_edit_prompt(
         "用金镶玉做供桌，墙面保留敦煌壁与梵高皇装饰及敦煌壁画",
         [
             {
@@ -3640,12 +3008,12 @@ def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
         rules,
     )
     assert "金镶玉" not in prompt_with_gold
-    assert "图1所示石材" in prompt_with_gold
+    assert "图2所示石材" in prompt_with_gold
     assert "敦煌壁" in prompt_with_gold
     assert "梵高皇" in prompt_with_gold
     assert "敦煌壁画" in prompt_with_gold
 
-    prompt_with_mural, _ = build_generate_prompt(
+    prompt_with_mural, _ = build_edit_prompt(
         "参考敦煌壁画方柱设计展厅，采用敦煌壁与梵高皇背景墙",
         [
             {
@@ -5127,7 +4495,7 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
     user_lc = studio_env.librechat_images_dir / USER_A
     user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
 
-    # 1. 创建上传图与四类产图工具输出（模拟LibreChat resizeImageBuffer重编码后的真实文件名与WebP字节）
+    # 1. 创建上传图与产图工具输出（含内置gemini_image_gen、edit_region与compare_materials，模拟LibreChat resizeImageBuffer重编码后的真实文件名与WebP字节）
     upload_id = "10000000-1111-2222-3333-444444444444"
     (user_lc / f"{upload_id}__client_photo.jpg").write_bytes(
         _make_image_bytes(140, 100, color=(90, 80, 70), fmt="JPEG")
@@ -5140,31 +4508,22 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
     producing_specs = [
         (
             "20000001-1111-2222-3333-444444444444",
-            "generate_image",
-            "V1StGXR8_Z5jdHi6B-gn1",
+            "gemini_image_gen_img_V1StGXR8_Z5jdHi6B-gn1",
             10,
         ),
         (
             "20000002-1111-2222-3333-444444444444",
-            "edit_image",
-            "V1StGXR8_Z5jdHi6B-ed2",
+            "edit_region_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-er2",
             20,
         ),
         (
-            "20000003-1111-2222-3333-444444444444",
-            "design_concepts",
-            "V1StGXR8_Z5jdHi6B-dc3",
-            30,
-        ),
-        (
             "20000004-1111-2222-3333-444444444444",
-            "compare_materials",
-            "V1StGXR8_Z5jdHi6B-cm4",
+            "compare_materials_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-cm4",
             40,
         ),
     ]
-    for fid, tool_name, nanoid, sec in producing_specs:
-        fpath = user_lc / f"{fid}-{tool_name}_mcp_zyb_studio_img_{nanoid}.webp"
+    for fid, suffix_stem, sec in producing_specs:
+        fpath = user_lc / f"{fid}-{suffix_stem}.webp"
         with Image.open(
             io.BytesIO(_make_image_bytes(200, 150, color=(sec, 100, 150), fmt="PNG"))
         ) as im:
@@ -5188,12 +4547,12 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
         ),
         (
             "30000003-1111-2222-3333-444444444444",
-            "list_images_mcp_zyb_studio_img_V1StGXR8_ls3",
+            "select_region_mcp_zyb_studio_img_V1StGXR8_sr3",
             70,
         ),
         (
             "30000004-1111-2222-3333-444444444444",
-            "generate_image_mcp_other_server_img_V1StGXR8_ot4",
+            "compare_materials_mcp_other_server_img_V1StGXR8_ot4",
             80,
         ),
     ]
@@ -5203,17 +4562,8 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
         ts_ns = (1_700_000_000 + sec) * 1_000_000_000
         os.utime(fpath, ns=(ts_ns, ts_ns))
 
-    # 验证list_images与@latest仅包含上传图与四类产图工具输出，且@latest指向最新的compare_materials输出
-    listed = list_user_images(studio_env, USER_A, limit=20)
-    listed_ids = [item["id"] for item in listed]
-    assert listed_ids == [
-        "20000004-1111-2222-3333-444444444444",
-        "20000003-1111-2222-3333-444444444444",
-        "20000002-1111-2222-3333-444444444444",
-        "20000001-1111-2222-3333-444444444444",
-        upload_id,
-    ]
-    for fid, _, _, _ in producing_specs:
+    # 验证resolve_image与@latest仅识别上传图与允许的产图工具输出，且@latest指向最新的compare_materials输出
+    for fid, _, _ in producing_specs:
         resolved_prod = resolve_image(studio_env, USER_A, fid)
         assert resolved_prod.id == fid
         assert resolved_prod.kind == "generated"
@@ -5318,12 +4668,7 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
             t2_ns = time.time_ns() + 5_000_000
             os.utime(s2_file_0, ns=(t2_ns, t2_ns))
 
-            # 验证search_library输出不进入list_images或@latest，但resolve_image按批次与顺序精确映射回各自的kb_<id>
-            after_list = list_user_images(studio_env, USER_A, limit=20)
-            after_ids = [item["id"] for item in after_list]
-            assert s1_uuid_0 not in after_ids
-            assert s1_uuid_1 not in after_ids
-            assert s2_uuid_0 not in after_ids
+            # 验证search_library输出不抢占@latest，但resolve_image按批次与顺序精确映射回各自的kb_<id>
             assert resolve_image(studio_env, USER_A, "@latest").id == (
                 "20000004-1111-2222-3333-444444444444"
             )
@@ -5429,7 +4774,7 @@ def test_kb_index_and_search_library_with_607_records_and_region_filter(
     asyncio.run(_run())
 
 
-# 校验Gemini生图、Seedream、Seed3D与Gemini规划器均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
+# 校验Gemini生图、Seedream与Seed3D均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
 def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_uncertain(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
@@ -5454,12 +4799,8 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         observed_timeouts["seedream"] = dict(request.extensions.get("timeout") or {})
         raise httpx.ConnectError("IPv4 unreachable before dispatch")
 
-    async def _inspect_planner_handler(request: httpx.Request) -> httpx.Response:
-        observed_timeouts["planner"] = dict(request.extensions.get("timeout") or {})
-        raise httpx.ConnectTimeout("connect timed out before dispatch")
-
     async def _run() -> None:
-        # 1. 验证Gemini生图、Seedream、Planner与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
+        # 1. 验证Gemini生图、Seedream与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
         with pytest.raises(RuntimeError, match="not billed") as exc_gem_conn:
             await generate_gemini(
                 studio_env,
@@ -5593,20 +4934,6 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         )
         assert rec_rt["state"] == "uncertain"
 
-        # 验证Gemini规划器connect=10.0超时配置与派发前连接异常提示
-        with pytest.raises(RuntimeError, match="not billed"):
-            await plan_concepts(
-                studio_env,
-                rules,
-                brief="供桌方案",
-                count=1,
-                transport=httpx.MockTransport(_inspect_planner_handler),
-            )
-        assert observed_timeouts["planner"]["connect"] == 10.0
-        assert observed_timeouts["planner"]["read"] == float(
-            studio_env.planner_timeout_seconds
-        )
-
         # 2. 验证Seed3D _build_client配置connect=10.0，且ConnectError/ConnectTimeout与派发后ReadTimeout分流
         mgr_probe = ModelJobManager(
             studio_env,
@@ -5646,8 +4973,8 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
                 transport=httpx.ASGITransport(app=app_conn),
                 base_url="http://studio:8000",
             ) as client:
-                # MCP generate_image：返回state=failed, billed=False，且list_images不出现uncertain警告
-                res_img = await client.post(
+                # MCP compare_materials：返回变体state=failed且提示not billed，无uncertain计费警告
+                res_cmp = await client.post(
                     "/mcp",
                     headers={
                         "X-Studio-Token": VALID_TOKEN,
@@ -5658,40 +4985,23 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
                         "id": 800 + idx,
                         "method": "tools/call",
                         "params": {
-                            "name": "generate_image",
-                            "arguments": {"prompt": "须弥座设计"},
+                            "name": "compare_materials",
+                            "arguments": {
+                                "base_id": src_upload_id,
+                                "target": "须弥座",
+                                "materials": ["天川金"],
+                            },
                         },
                     },
                 )
-                img_res = res_img.json()["result"]
-                assert img_res["isError"] is True
-                img_err = json.loads(img_res["content"][0]["text"])
-                assert img_err["state"] == "failed"
-                assert img_err["billed"] is False
-                assert "not billed" in img_err["error"]
-                assert "may have been billed" not in img_err["error"]
-                assert "uncertain" not in img_err["error"].casefold()
-
-                res_list = await client.post(
-                    "/mcp",
-                    headers={
-                        "X-Studio-Token": VALID_TOKEN,
-                        "X-LibreChat-User-ID": USER_A,
-                    },
-                    json={
-                        "jsonrpc": "2.0",
-                        "id": 810 + idx,
-                        "method": "tools/call",
-                        "params": {"name": "list_images", "arguments": {"limit": 10}},
-                    },
-                )
-                list_payload = json.loads(
-                    res_list.json()["result"]["content"][0]["text"]
-                )
-                assert list_payload["warnings"] == []
-                assert all(
-                    item.get("state") != "uncertain" for item in list_payload["images"]
-                )
+                cmp_res = res_cmp.json()["result"]
+                assert cmp_res["isError"] is True
+                cmp_err = json.loads(cmp_res["content"][0]["text"])
+                variant_err = cmp_err["variants"][0]
+                assert variant_err.get("state") != "uncertain"
+                assert "not billed" in variant_err["error"]
+                assert "may have been billed" not in variant_err["error"]
+                assert "uncertain" not in variant_err["error"].casefold()
 
                 # MCP create_3d_model + check_3d_model：返回state=failed, billed=False，无uncertain计费警告
                 res_3d = await client.post(

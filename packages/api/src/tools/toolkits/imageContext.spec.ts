@@ -62,11 +62,15 @@ describe('buildMCPImageToolContext', () => {
     expect(result).toContain('- file-up-1 (booth.png, upload, turn 1)');
     expect(result).toContain('- file-gen-1 (concept_1.png, generated, turn 1)');
     expect(result).toContain('- file-up-2 (slab.webp, upload, turn 2)');
-    expect(result).toContain('`edit_image.base_id`');
+    expect(result).toContain('`gemini_image_gen.image_ids`');
+    expect(result).toContain('`select_region.image_id`');
+    expect(result).toContain('`edit_region.base_id`');
+    expect(result).toContain('`compare_materials.base_id`');
     expect(result).toContain('`references[].id`');
     expect(result).toContain('`references[].use`');
-    expect(result).toContain('`design_concepts.reference_ids`');
-    expect(result).not.toContain('image_ids');
+    expect(result).toContain('`create_3d_model.image_id`');
+    expect(result).not.toContain('edit_image.base_id');
+    expect(result).not.toContain('design_concepts.reference_ids');
     expect(result).not.toContain('reference_uses');
     expect(result).not.toContain('MCP image tools');
   });

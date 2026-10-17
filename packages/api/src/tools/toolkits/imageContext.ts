@@ -316,6 +316,6 @@ export function buildMCPImageToolContext({
     'Conversation images available for MCP tools:',
     ...lines,
     '',
-    'Pass image IDs using `edit_image.base_id`, `references[].id` with `references[].use`, or `design_concepts.reference_ids`.',
+    'Pass image IDs using `gemini_image_gen.image_ids`, `select_region.image_id`, `edit_region.base_id`, `compare_materials.base_id`, `references[].id` with `references[].use`, or `create_3d_model.image_id`.',
   ].join('\n');
 }

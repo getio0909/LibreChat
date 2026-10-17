@@ -35,9 +35,7 @@ from .images import (
     REFERENCE_USES,
     GenerationUncertain,
     build_edit_prompt,
-    build_generate_prompt,
     build_local_edit_prompt,
-    build_stone_replacements,
     comparison_target,
     encode_display_image,
     generate_image_with_provider,
@@ -59,7 +57,6 @@ from .models3d import (
     sign_file_token,
     verify_file_token,
 )
-from .planner import plan_concepts
 from .regions import (
     EditorTokenReplayError,
     OnnxSamSegmenter,
@@ -81,7 +78,6 @@ from .store import (
     ResolvedImage,
     allocate_studio_job,
     ensure_safe_subpath,
-    list_user_images,
     normalize_conversation_id,
     read_bytes_no_follow,
     reconcile_pending_receipts,
@@ -106,7 +102,7 @@ _request_ctx_var: ContextVar[RequestContext | None] = ContextVar(
 )
 
 
-# 十个固定MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
+# 专精业务MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
 REFERENCE_ITEM_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -128,115 +124,6 @@ REFERENCE_ITEM_SCHEMA: dict[str, Any] = {
 }
 
 STUDIO_TOOLS: list[types.Tool] = [
-    types.Tool(
-        name="design_concepts",
-        description="根据设计需求规划多个差异化中文概念方案，并可并发生成各方案的概念效果图。",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "brief": {
-                    "type": "string",
-                    "description": "设计需求与背景描述",
-                },
-                "count": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 3,
-                    "default": 3,
-                    "description": "概念方案数量（1-3）",
-                },
-                "with_images": {
-                    "type": "boolean",
-                    "default": True,
-                    "description": "是否同时为每个方案生成概念效果图",
-                },
-                "aspect": {
-                    "type": "string",
-                    "enum": ["1:1", "4:3", "3:4", "16:9", "9:16"],
-                    "default": "4:3",
-                    "description": "画面比例",
-                },
-                "size": {
-                    "type": "string",
-                    "enum": ["1K", "2K"],
-                    "default": "2K",
-                    "description": "输出尺寸档位",
-                },
-                "reference_ids": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "maxItems": 10,
-                    "default": [],
-                    "description": "参考图片编号列表（支持 file_id、img_<hex>、kb_<id> 或 @latest，最多10张）",
-                },
-            },
-            "required": ["brief"],
-        },
-    ),
-    types.Tool(
-        name="generate_image",
-        description="根据设计描述与可选参考图片生成单张概念效果图。",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "prompt": {
-                    "type": "string",
-                    "description": "画面设计描述",
-                },
-                "aspect": {
-                    "type": "string",
-                    "enum": ["1:1", "4:3", "3:4", "16:9", "9:16"],
-                    "default": "4:3",
-                    "description": "画面比例",
-                },
-                "size": {
-                    "type": "string",
-                    "enum": ["1K", "2K"],
-                    "default": "2K",
-                    "description": "输出尺寸档位",
-                },
-                "references": {
-                    "type": "array",
-                    "items": REFERENCE_ITEM_SCHEMA,
-                    "maxItems": 10,
-                    "default": [],
-                    "description": "参考图片列表（最多10张）",
-                },
-            },
-            "required": ["prompt"],
-        },
-    ),
-    types.Tool(
-        name="edit_image",
-        description="以选定图片为底图并保持底图比例进行整图修改，可附带最多9张补充参考图片。",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "base_id": {
-                    "type": "string",
-                    "description": "底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
-                },
-                "instruction": {
-                    "type": "string",
-                    "description": "修改说明",
-                },
-                "references": {
-                    "type": "array",
-                    "items": REFERENCE_ITEM_SCHEMA,
-                    "maxItems": 9,
-                    "default": [],
-                    "description": "补充参考图片列表（最多9张）",
-                },
-                "size": {
-                    "type": "string",
-                    "enum": ["1K", "2K"],
-                    "default": "2K",
-                    "description": "输出尺寸档位",
-                },
-            },
-            "required": ["base_id", "instruction"],
-        },
-    ),
     types.Tool(
         name="select_region",
         description="打开内联局部选区编辑器，支持框选、多边形套索、画笔涂抹加减选（及离线点选分割就绪时的点选识别），确认选区后生成绑定的选区编号（selection_id）。",
@@ -285,23 +172,6 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "enum": ["1K", "2K"],
                     "default": "2K",
                     "description": "局部裁切重绘尺寸档位",
-                },
-            },
-            "required": [],
-        },
-    ),
-    types.Tool(
-        name="list_images",
-        description="按时间倒序列出当前用户最近上传和生成的图片。",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 50,
-                    "default": 20,
-                    "description": "返回的最大图片数量（1-50）",
                 },
             },
             "required": [],
@@ -613,34 +483,6 @@ def build_mcp_server(
                     f"Tool '{name}' is disabled because 3D model generation is on hold"
                 )
 
-            if name == "list_images":
-                limit = int(args.get("limit", 20))
-                images = list_user_images(
-                    settings, user_id, limit=limit, kb_index=active_kb
-                )
-                warnings = [
-                    (
-                        f"Image job {item['id']} is in recoverable state (the paid crop was saved; call finish_region_edit with job_id '{item['id']}' to composite without rebilling)."
-                        if item.get("state") == "recoverable"
-                        else f"Image job {item['id']} is in uncertain state (the request may have been billed)."
-                    )
-                    for item in images
-                    if item.get("warning")
-                ]
-                payload = {
-                    "images": images,
-                    "count": len(images),
-                    "warnings": warnings,
-                }
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text", text=json.dumps(payload, ensure_ascii=False)
-                        )
-                    ],
-                    isError=False,
-                )
-
             if name == "search_library":
                 if "query" not in args or not isinstance(args.get("query"), str):
                     raise ValueError("query is required and must be a string")
@@ -715,179 +557,6 @@ def build_mcp_server(
                             text=json.dumps(search_payload, ensure_ascii=False),
                         ),
                         *thumb_blocks,
-                    ],
-                    isError=False,
-                )
-
-            if name == "generate_image":
-                prompt = str(args.get("prompt") or "").strip()
-                if not prompt:
-                    raise ValueError("prompt must be a non-empty string")
-                aspect = str(args.get("aspect", "4:3"))
-                size = str(args.get("size", "2K"))
-                if size not in NATIVE or aspect not in NATIVE[size]:
-                    raise ValueError("Invalid size or aspect parameter")
-                raw_refs = args.get("references") or []
-                if not isinstance(raw_refs, list) or len(raw_refs) > MAX_REFERENCES:
-                    raise ValueError(f"At most {MAX_REFERENCES} references are allowed")
-
-                resolved_objs: list[ResolvedImage] = []
-                resolved_refs: list[dict[str, Any]] = []
-                for item in raw_refs:
-                    if not isinstance(item, dict):
-                        raise TypeError("Each reference must be an object")
-                    resolved = resolve_image(
-                        settings,
-                        user_id,
-                        str(item.get("id") or ""),
-                        kb_index=active_kb,
-                    )
-                    resolved_objs.append(resolved)
-                    resolved_refs.append(
-                        {
-                            "id": resolved.id,
-                            "path": resolved.path,
-                            "use": str(item.get("use") or "参考"),
-                            "note": str(item.get("note") or ""),
-                            "material_ids": resolved.material_ids,
-                        }
-                    )
-
-                full_prompt, unique_paths = build_generate_prompt(
-                    prompt, resolved_refs, active_rules
-                )
-                ref_uris = [normalize_reference(p, allowed_roots) for p in unique_paths]
-
-                async with limiter.acquire(user_id):
-                    img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_image_with_provider(
-                        settings,
-                        full_prompt,
-                        ref_uris,
-                        size=size,
-                        aspect=aspect,
-                        destination=job_dir,
-                        ark_transport=ark_transport,
-                        gemini_transport=gemini_transport,
-                    )
-
-                display_bytes, display_mime = encode_display_image(
-                    gen_result["raw_bytes"]
-                )
-                b64_display = base64.b64encode(display_bytes).decode("ascii")
-                summary = {
-                    "id": img_id,
-                    "kind": "studio",
-                    "width": gen_result["width"],
-                    "height": gen_result["height"],
-                    "size": f"{gen_result['width']}x{gen_result['height']}",
-                    "warnings": _collect_flag_warnings(resolved_objs),
-                }
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text", text=json.dumps(summary, ensure_ascii=False)
-                        ),
-                        types.ImageContent(
-                            type="image", data=b64_display, mimeType=display_mime
-                        ),
-                    ],
-                    isError=False,
-                )
-
-            if name == "edit_image":
-                base_id = str(args.get("base_id") or "").strip()
-                instruction = str(args.get("instruction") or "").strip()
-                if not base_id or not instruction:
-                    raise ValueError("base_id and instruction are required")
-                size = str(args.get("size", "2K"))
-                if size not in NATIVE:
-                    raise ValueError("Invalid size parameter")
-                raw_refs = args.get("references") or []
-                if (
-                    not isinstance(raw_refs, list)
-                    or len(raw_refs) > MAX_EDIT_REFERENCES
-                ):
-                    raise ValueError(
-                        f"At most {MAX_EDIT_REFERENCES} additional references are allowed"
-                    )
-
-                base_resolved = resolve_image(
-                    settings, user_id, base_id, kb_index=active_kb
-                )
-                base_uri, base_size = normalize_reference_with_size(
-                    base_resolved.path, allowed_roots
-                )
-
-                resolved_objs = [base_resolved]
-                resolved_refs = []
-                for item in raw_refs:
-                    if not isinstance(item, dict):
-                        raise TypeError("Each reference must be an object")
-                    resolved = resolve_image(
-                        settings,
-                        user_id,
-                        str(item.get("id") or ""),
-                        kb_index=active_kb,
-                    )
-                    resolved_objs.append(resolved)
-                    resolved_refs.append(
-                        {
-                            "id": resolved.id,
-                            "path": resolved.path,
-                            "use": str(item.get("use") or "参考"),
-                            "note": str(item.get("note") or ""),
-                            "material_ids": resolved.material_ids,
-                        }
-                    )
-
-                full_prompt, unique_paths = build_edit_prompt(
-                    instruction, resolved_refs, active_rules
-                )
-                extra_uris = [
-                    normalize_reference(p, allowed_roots) for p in unique_paths
-                ]
-                all_uris = [base_uri, *extra_uris]
-                if len(all_uris) > MAX_REFERENCES:
-                    raise ValueError(
-                        f"Total images including base exceed limit of {MAX_REFERENCES}"
-                    )
-
-                async with limiter.acquire(user_id):
-                    img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_image_with_provider(
-                        settings,
-                        full_prompt,
-                        all_uris,
-                        size=size,
-                        aspect="source",
-                        source_size=base_size,
-                        destination=job_dir,
-                        ark_transport=ark_transport,
-                        gemini_transport=gemini_transport,
-                    )
-
-                display_bytes, display_mime = encode_display_image(
-                    gen_result["raw_bytes"]
-                )
-                b64_display = base64.b64encode(display_bytes).decode("ascii")
-                summary = {
-                    "id": img_id,
-                    "base_id": base_resolved.id,
-                    "kind": "studio",
-                    "width": gen_result["width"],
-                    "height": gen_result["height"],
-                    "size": f"{gen_result['width']}x{gen_result['height']}",
-                    "warnings": _collect_flag_warnings(resolved_objs),
-                }
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text", text=json.dumps(summary, ensure_ascii=False)
-                        ),
-                        types.ImageContent(
-                            type="image", data=b64_display, mimeType=display_mime
-                        ),
                     ],
                     isError=False,
                 )
@@ -1069,164 +738,6 @@ def build_mcp_server(
                         types.TextContent(
                             type="text",
                             text=json.dumps(compare_payload, ensure_ascii=False),
-                        ),
-                        *image_blocks,
-                    ],
-                    isError=is_err,
-                )
-
-            if name == "design_concepts":
-                brief = str(args.get("brief") or "").strip()
-                if not brief:
-                    raise ValueError("brief must be a non-empty string")
-                count = int(args.get("count", 3))
-                with_images = bool(args.get("with_images", True))
-                aspect = str(args.get("aspect", "4:3"))
-                size = str(args.get("size", "2K"))
-                if size not in NATIVE or aspect not in NATIVE[size]:
-                    raise ValueError("Invalid size or aspect parameter")
-                raw_ref_ids = args.get("reference_ids") or []
-                if (
-                    not isinstance(raw_ref_ids, list)
-                    or len(raw_ref_ids) > MAX_REFERENCES
-                ):
-                    raise ValueError(
-                        f"At most {MAX_REFERENCES} reference_ids are allowed"
-                    )
-
-                resolved_ref_items = [
-                    resolve_image(settings, user_id, str(rid), kb_index=active_kb)
-                    for rid in raw_ref_ids
-                ]
-                unique_ref_paths: list[Any] = []
-                canonical_ref_ids: list[str] = []
-                for item in resolved_ref_items:
-                    canonical_ref_ids.append(item.id)
-                    if item.path not in unique_ref_paths:
-                        unique_ref_paths.append(item.path)
-                ref_uris = [
-                    normalize_reference(p, allowed_roots) for p in unique_ref_paths
-                ]
-
-                async with limiter.acquire(user_id):
-                    planned = await plan_concepts(
-                        settings,
-                        active_rules,
-                        brief=brief,
-                        count=count,
-                        reference_ids=canonical_ref_ids,
-                        reference_data_uris=ref_uris,
-                        transport=gemini_transport,
-                    )
-
-                concept_refs = [
-                    {
-                        "id": item.id,
-                        "path": item.path,
-                        "use": "参考",
-                        "note": item.path.stem,
-                        "material_ids": item.material_ids,
-                    }
-                    for item in resolved_ref_items
-                ]
-                stone_map = build_stone_replacements(
-                    active_rules, unique_ref_paths, concept_refs, has_base=False
-                )
-
-                public_concepts: list[dict[str, Any]] = []
-                image_blocks = []
-                warnings = _collect_flag_warnings(resolved_ref_items)
-                render_errors: list[str] = []
-
-                if with_images:
-                    # 按每用户并发上限并发生成各概念方案的效果图，并附带原始brief作为硬性design_constraints
-                    clean_brief = neutralize_stone_names(brief, stone_map)
-                    constraints_line = json.dumps(
-                        {"design_constraints": clean_brief}, ensure_ascii=False
-                    )
-
-                    async def _render_concept(
-                        concept_item: dict[str, str],
-                    ) -> tuple[dict[str, Any] | None, str | None]:
-                        raw_img_prompt = neutralize_stone_names(
-                            concept_item["image_prompt"], stone_map
-                        )
-                        full_prompt = active_rules.render_prefix + raw_img_prompt
-                        if ref_uris:
-                            full_prompt = (
-                                f"{full_prompt}\n{active_rules.reference_rules}"
-                            )
-                        full_prompt = f"{full_prompt}\n{constraints_line}"
-                        try:
-                            async with limiter.acquire(user_id):
-                                img_id, job_dir = allocate_studio_job(settings, user_id)
-                                result = await generate_image_with_provider(
-                                    settings,
-                                    full_prompt,
-                                    ref_uris,
-                                    size=size,
-                                    aspect=aspect,
-                                    destination=job_dir,
-                                    ark_transport=ark_transport,
-                                    gemini_transport=gemini_transport,
-                                )
-                            return {"id": img_id, **result}, None
-                        except (ValueError, TypeError, RuntimeError, OSError) as exc:
-                            return None, str(exc)
-
-                    rendered = await asyncio.gather(
-                        *(_render_concept(c) for c in planned)
-                    )
-                    for concept_item, (img_res, err_text) in zip(planned, rendered):
-                        entry: dict[str, Any] = {
-                            "title": concept_item["title"],
-                            "positioning": concept_item["positioning"],
-                            "description": concept_item["description"],
-                            "materials": concept_item["materials"],
-                            "key_details": concept_item["key_details"],
-                        }
-                        if img_res is not None:
-                            entry["image_id"] = img_res["id"]
-                            entry["width"] = img_res["width"]
-                            entry["height"] = img_res["height"]
-                            entry["size"] = f"{img_res['width']}x{img_res['height']}"
-                            disp_bytes, disp_mime = encode_display_image(
-                                img_res["raw_bytes"]
-                            )
-                            image_blocks.append(
-                                types.ImageContent(
-                                    type="image",
-                                    data=base64.b64encode(disp_bytes).decode("ascii"),
-                                    mimeType=disp_mime,
-                                )
-                            )
-                        elif err_text:
-                            render_errors.append(err_text)
-                            warnings.append(err_text)
-                        public_concepts.append(entry)
-                else:
-                    for concept_item in planned:
-                        public_concepts.append(
-                            {
-                                "title": concept_item["title"],
-                                "positioning": concept_item["positioning"],
-                                "description": concept_item["description"],
-                                "materials": concept_item["materials"],
-                                "key_details": concept_item["key_details"],
-                            }
-                        )
-
-                summary_payload = {
-                    "concepts": public_concepts,
-                    "count": len(public_concepts),
-                    "warnings": warnings,
-                }
-                is_err = bool(with_images and not image_blocks and render_errors)
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text",
-                            text=json.dumps(summary_payload, ensure_ascii=False),
                         ),
                         *image_blocks,
                     ],

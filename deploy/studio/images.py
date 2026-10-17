@@ -535,54 +535,6 @@ def build_stone_replacements(
     return replacements
 
 
-# 组装概念生图提示词、参考规则与参考图路径列表
-def build_generate_prompt(
-    prompt: str,
-    references: list[dict[str, Any]],
-    rules: StudioRules,
-) -> tuple[str, list[Path]]:
-    if len(references) > MAX_REFERENCES:
-        raise ValueError(f"At most {MAX_REFERENCES} reference images are allowed")
-    unique_paths: list[Path] = []
-    for ref in references:
-        use = ref.get("use", "参考")
-        if use not in REFERENCE_USES:
-            raise ValueError(f"Invalid reference use: {use}")
-        p = Path(ref["path"])
-        if p not in unique_paths:
-            unique_paths.append(p)
-
-    replacements = build_stone_replacements(
-        rules, unique_paths, references, has_base=False
-    )
-    clean_prompt = neutralize_stone_names(prompt.strip(), replacements)
-    if not unique_paths:
-        return rules.render_prefix + clean_prompt, []
-
-    lines: list[str] = []
-    for ref in references:
-        p = Path(ref["path"])
-        sample = f"图{unique_paths.index(p) + 1}"
-        use = ref.get("use", "参考")
-        raw_note = (ref.get("note") or "").strip()
-        part = (
-            neutralize_stone_names(raw_note, replacements) if raw_note else use
-        ).rstrip("。；，.!?;:,！？")
-        lines.append(f"从{sample}取用{part}，用于新方案的相应部分。")
-        if use == "材质":
-            lines.append(
-                f"{sample}只提供颜色与纹理，用于新设计的指定部位，不取用样图背景、地面、支架、标签与其他物件。"
-            )
-
-    compose_tail = (
-        "按说明组合成新的完整设计，各参考图地位相同，不默认第一张是底图。"
-        "只取指定内容，统一比例、透视、光线与构图，不拼成对照图或分栏图。"
-    )
-    body = "\n".join([clean_prompt, *lines, compose_tail])
-    full_prompt = f"{rules.render_prefix}{rules.reference_rules}\n{body}"
-    return full_prompt, unique_paths
-
-
 # 组装整图修改提示词、底图保护规则与参考图路径列表
 def build_edit_prompt(
     instruction: str,

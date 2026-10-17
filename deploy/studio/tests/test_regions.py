@@ -46,7 +46,7 @@ from deploy.studio.regions import (
     verify_onnx_model_dir,
     verify_sam2_model_dir,
 )
-from deploy.studio.store import list_user_images, resolve_image
+from deploy.studio.store import resolve_image
 
 # 测试固定令牌、签名密钥与隔离用户编号
 VALID_TOKEN = "a" * 64
@@ -694,9 +694,9 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             mask = mask_for(confirm_selection, base_img.size)
             assert count_outside_changes(base_img, saved_img, mask) == 0
 
-            # 验证 list_images 能识别 edit_region 产出的新图片
-            listed = list_user_images(studio_env, USER_A)
-            assert any(item["id"] == edit_summary["id"] for item in listed)
+            # 验证 resolve_image(@latest) 能识别 edit_region 产出的新图片
+            latest_resolved = resolve_image(studio_env, USER_A, "@latest")
+            assert latest_resolved.id == edit_summary["id"]
 
     asyncio.run(_run())
 
@@ -1553,31 +1553,14 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             assert (job_dir / "local_recovery.json").is_file()
             assert not (job_dir / "original.png").exists()
 
-            # 2. list_images 必须暴露该 job_id 为 recoverable 状态并附带计费与恢复警告
-            list_res = await client.post(
-                "/mcp",
-                headers=headers_a,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 42,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {}},
-                },
+            # 2. 校验 receipt.json 记录了 recoverable 状态，且未完成合成的任务不会被 @latest 误选为已完成图片
+            receipt_data = json.loads(
+                (job_dir / "receipt.json").read_text(encoding="utf-8")
             )
-            assert list_res.status_code == 200
-            list_payload = json.loads(list_res.json()["result"]["content"][0]["text"])
-            rec_items = [
-                item for item in list_payload["images"] if item["id"] == job_id
-            ]
-            assert len(rec_items) == 1
-            assert rec_items[0]["state"] == "recoverable"
-            assert rec_items[0]["warning"] is True
-            assert any(
-                job_id in w and "finish_region_edit" in w
-                for w in list_payload["warnings"]
-            )
+            assert receipt_data["state"] == "recoverable"
+            assert resolve_image(studio_env, USER_A, "@latest").id == upload_id
 
-            # 3. 恢复原底图字节后，调用 finish_region_edit(job_id) 直接用已保存的 generated_crop.png 完成回贴，不触发第二次供应商请求
+            # 3. 恢复原底图字节后，调用 finish_region_edit(job_id) 直接用已保存的 crop.png 完成回贴，不触发第二次供应商请求
             base_file.write_bytes(original_base_bytes)
             recover_res = await client.post(
                 "/mcp",

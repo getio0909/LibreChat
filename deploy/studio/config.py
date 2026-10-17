@@ -40,13 +40,8 @@ class StoneMaterial(BaseModel):
 class StudioRules(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    reference_rules: str
     edit_rules: str
-    planner_rules: str
-    planner_system: str
-    render_prefix: str
     edit_prefix: str
-    no_reference_rules: str
     materials: list[StoneMaterial]
 
 
@@ -65,13 +60,10 @@ class StudioSettings(BaseModel):
     ark_api_key: str = ""
     seedream_model: str = "doubao-seedream-5-0-pro-260628"
     seed3d_model: str = "doubao-seed3d-2-0-260328"
-    planner_model: str = "gemini-4-argon"
-    planner_thinking_level: str = "HIGH"
     max_parallel_per_user: int = Field(default=3, ge=1, le=10)
     global_max_parallel: int = Field(default=12, ge=1, le=64)
     seed3d_max_parallel: int = Field(default=5, ge=1, le=32)
     seedream_timeout_seconds: int = Field(default=240, ge=5, le=600)
-    planner_timeout_seconds: int = Field(default=540, ge=5, le=600)
     seed3d_poll_timeout_seconds: float = Field(default=480.0, gt=0.0, le=600.0)
     seed3d_poll_initial_seconds: float = Field(default=2.0, gt=0.0, le=60.0)
     seed3d_poll_max_interval_seconds: float = Field(default=15.0, gt=0.0, le=60.0)
@@ -172,20 +164,12 @@ def load_rules(rules_dir: str | Path = RULES_DIR) -> StudioRules:
         raise ValueError("Rules directory is invalid")
     image_cfg = json.loads((base / "studio-image.json").read_text(encoding="utf-8"))
     runtime_cfg = json.loads((base / "studio-runtime.json").read_text(encoding="utf-8"))
-    policy_cfg = json.loads(
-        (base / "studio-creation-policy.json").read_text(encoding="utf-8")
-    )
     materials_cfg = json.loads(
         (base / "studio-materials.json").read_text(encoding="utf-8")
     )
     return StudioRules(
-        reference_rules=image_cfg["reference_rules"],
         edit_rules=image_cfg["edit_rules"],
-        planner_rules=runtime_cfg["planner_rules"],
-        planner_system=runtime_cfg["planner_system"],
-        render_prefix=runtime_cfg["render_prefix"],
         edit_prefix=runtime_cfg["edit_prefix"],
-        no_reference_rules=policy_cfg["no_reference_rules"],
         materials=[StoneMaterial.model_validate(item) for item in materials_cfg],
     )
 

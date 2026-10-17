@@ -131,11 +131,12 @@ const accounts = {
   user: requireAccountConfig('USER'),
 };
 
-// 将基础环境变量与 Google、OpenRouter 及 Studio 共享令牌写入 .env。
+// 将基础环境变量与 Google、OpenRouter、内置生图模型及 Studio 共享令牌写入 .env。
 const baseEnv = (process.env.LIBRECHAT_ENV || '').replace(/\s+$/, '');
 const envLines = [
   ...(baseEnv ? [baseEnv] : []),
   `GOOGLE_KEY='${geminiApiKey}'`,
+  `GEMINI_IMAGE_MODEL='gemini-nano-banana-2.1'`,
   `OPENROUTER_API_KEY='${openrouterApiKey}'`,
   `STUDIO_SHARED_TOKEN='${sharedToken}'`,
   '',
@@ -146,6 +147,12 @@ writeFileSync(path.join(target, '.env'), envLines.join('\n'), { mode: 0o600 });
 const imageEnvContent = `LIBRECHAT_IMAGE=${librechatImage}\nSTUDIO_IMAGE=${studioImage}\n`;
 writeFileSync(path.join(target, 'image.env'), imageEnvContent, { mode: 0o600 });
 
+// 当配置了火山方舟密钥（如 J5005 测试环境）时默认启用 3D 模型生成，也可通过 STUDIO_ENABLE_3D 显式覆盖。
+const enable3d =
+  process.env.STUDIO_ENABLE_3D !== undefined
+    ? process.env.STUDIO_ENABLE_3D === 'true'
+    : Boolean(arkApiKey);
+
 // 生成权限为 0600 的 studio.json 配置文件。
 const studioSettings = {
   shared_token: sharedToken,
@@ -155,15 +162,12 @@ const studioSettings = {
   ark_api_key: arkApiKey,
   image_provider: 'gemini',
   gemini_image_model: 'gemini-nano-banana-2.1',
-  enable_3d: false,
+  enable_3d: enable3d,
   seedream_model: 'doubao-seedream-5-0-pro-260628',
   seed3d_model: 'doubao-seed3d-2-0-260328',
-  planner_model: 'gemini-4-argon',
-  planner_thinking_level: 'HIGH',
   max_parallel_per_user: 3,
   seed3d_max_parallel: 5,
   seedream_timeout_seconds: 240,
-  planner_timeout_seconds: 540,
 };
 writeFileSync(path.join(target, 'studio.json'), `${JSON.stringify(studioSettings, null, 2)}\n`, {
   mode: 0o600,
