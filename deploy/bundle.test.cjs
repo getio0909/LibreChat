@@ -76,6 +76,7 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     file_token_ttl_seconds: 86400,
     preview_token_ttl_seconds: 604800,
     editor_token_ttl_seconds: 900,
+    editor_capability_max_lifetime_seconds: 86400,
     gemini_api_key: 'fixture-gemini-key',
     ark_api_key: 'fixture-ark-key',
     image_provider: 'gemini',
@@ -84,8 +85,16 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     seedream_model: 'doubao-seedream-5-0-pro-260628',
     seed3d_model: 'doubao-seed3d-2-0-260328',
     max_parallel_per_user: 3,
+    global_max_parallel: 12,
+    comparison_preview_max_bytes: 49152,
+    segment_max_pending_requests: 2,
+    segment_request_timeout_seconds: 90,
     seed3d_max_parallel: 5,
     seedream_timeout_seconds: 240,
+    seed3d_poll_timeout_seconds: 480,
+    seed3d_poll_initial_seconds: 2,
+    seed3d_poll_max_interval_seconds: 15,
+    seed3d_background_timeout_seconds: 1800,
   });
 
   // 验证 3D 关闭时 ARK_API_KEY 为可选项，未提供或为空字符串时 studio.json 中 ark_api_key 为空且 enable_3d 为 false。
@@ -116,6 +125,12 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     STUDIO_FILE_TOKEN_TTL_SECONDS: '172800',
     STUDIO_PREVIEW_TOKEN_TTL_SECONDS: '1209600',
     STUDIO_EDITOR_TOKEN_TTL_SECONDS: '300',
+    STUDIO_EDITOR_CAPABILITY_MAX_LIFETIME_SECONDS: '3600',
+    STUDIO_COMPARISON_PREVIEW_MAX_BYTES: '32768',
+    STUDIO_SEGMENT_MAX_PENDING_REQUESTS: '3',
+    STUDIO_SEGMENT_REQUEST_TIMEOUT_SECONDS: '45.5',
+    STUDIO_GLOBAL_MAX_PARALLEL: '16',
+    STUDIO_SEED3D_POLL_TIMEOUT_SECONDS: '400.5',
   });
   assert.equal(customBundle.result.status, 0, customBundle.result.stderr);
   assert.equal(customBundle.studioJson.public_base_url, 'https://studio.example.com');
@@ -123,6 +138,12 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
   assert.equal(customBundle.studioJson.file_token_ttl_seconds, 172800);
   assert.equal(customBundle.studioJson.preview_token_ttl_seconds, 1209600);
   assert.equal(customBundle.studioJson.editor_token_ttl_seconds, 300);
+  assert.equal(customBundle.studioJson.editor_capability_max_lifetime_seconds, 3600);
+  assert.equal(customBundle.studioJson.comparison_preview_max_bytes, 32768);
+  assert.equal(customBundle.studioJson.segment_max_pending_requests, 3);
+  assert.equal(customBundle.studioJson.segment_request_timeout_seconds, 45.5);
+  assert.equal(customBundle.studioJson.global_max_parallel, 16);
+  assert.equal(customBundle.studioJson.seed3d_poll_timeout_seconds, 400.5);
 
   // 验证越界或非整数 TTL 配置被 bundle.mjs 拒绝。
   for (const badOverride of [
@@ -133,6 +154,11 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     { STUDIO_EDITOR_TOKEN_TTL_SECONDS: '59' },
     { STUDIO_EDITOR_TOKEN_TTL_SECONDS: '901' },
     { STUDIO_PREVIEW_TOKEN_TTL_SECONDS: 'not-a-number' },
+    { STUDIO_COMPARISON_PREVIEW_MAX_BYTES: '16383' },
+    { STUDIO_COMPARISON_PREVIEW_MAX_BYTES: '49153' },
+    { STUDIO_SEGMENT_MAX_PENDING_REQUESTS: '0' },
+    { STUDIO_SEGMENT_REQUEST_TIMEOUT_SECONDS: '0' },
+    { STUDIO_EDITOR_CAPABILITY_MAX_LIFETIME_SECONDS: '899' },
   ]) {
     assert.notEqual(runBundle(badOverride).result.status, 0);
   }
@@ -175,7 +201,7 @@ test('bundle rejects missing or malformed image references, URLs, signing keys, 
   assert.notEqual(runBundle({ USER_PASSWORD: 'short' }).result.status, 0);
 });
 
-test('bundle reuses existing file_signing_key and custom token TTLs when studio.json already exists in target directory', () => {
+test('bundle preserves validated Studio settings when studio.json already exists in target directory', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-bundle-reuse-'));
   try {
     const baseEnv = {
@@ -203,6 +229,11 @@ test('bundle reuses existing file_signing_key and custom token TTLs when studio.
         STUDIO_FILE_TOKEN_TTL_SECONDS: '172800',
         STUDIO_PREVIEW_TOKEN_TTL_SECONDS: '1209600',
         STUDIO_EDITOR_TOKEN_TTL_SECONDS: '450',
+        STUDIO_ENABLE_3D: 'true',
+        DEPLOY_URL: 'https://studio.example.test/',
+        STUDIO_COMPARISON_PREVIEW_MAX_BYTES: '32768',
+        STUDIO_SEGMENT_MAX_PENDING_REQUESTS: '4',
+        STUDIO_SEED3D_POLL_INITIAL_SECONDS: '3.5',
       },
     });
     assert.equal(first.status, 0, first.stderr);
@@ -218,11 +249,15 @@ test('bundle reuses existing file_signing_key and custom token TTLs when studio.
 
     assert.equal(secondStudio.file_signing_key, firstStudio.file_signing_key);
     assert.notEqual(secondStudio.shared_token, firstStudio.shared_token);
+    assert.equal(secondStudio.enable_3d, true);
+    assert.equal(secondStudio.public_base_url, 'https://studio.example.test');
     assert.equal(secondStudio.file_token_ttl_seconds, 172800);
     assert.equal(secondStudio.preview_token_ttl_seconds, 1209600);
     assert.equal(secondStudio.editor_token_ttl_seconds, 450);
+    assert.equal(secondStudio.comparison_preview_max_bytes, 32768);
+    assert.equal(secondStudio.segment_max_pending_requests, 4);
+    assert.equal(secondStudio.seed3d_poll_initial_seconds, 3.5);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
-

@@ -751,6 +751,8 @@ async def generate_seedream(
         record.update(
             state="rejected", http_status=response.status_code, finished=time.time()
         )
+        if response.status_code == 429:
+            record.update(billed=False, error_code="rate_limited")
         try:
             write_receipt(destination, record)
         except OSError:
@@ -1141,6 +1143,8 @@ async def generate_gemini(
         record.update(
             state="rejected", http_status=response.status_code, finished=time.time()
         )
+        if response.status_code == 429:
+            record.update(billed=False, error_code="rate_limited")
         try:
             write_receipt(destination, record)
         except OSError:

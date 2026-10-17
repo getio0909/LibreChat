@@ -944,7 +944,7 @@ function resolveOpenAISummarization(
       proxy: process.env.PROXY ?? undefined,
       headers: resolveModelHeaders({
         headers: headers ?? {},
-        user: createSafeUser(headerContext.user),
+        user: createSafeUser(headerContext.user, headerContext.tenantId),
         tenantId: headerContext.tenantId,
         body: headerContext.requestBody,
       }),
@@ -1085,7 +1085,7 @@ function resolveAzureSummarization(
     ? (sourceOptions.configuration?.defaultHeaders as Record<string, string> | undefined)
     : resolveModelHeaders({
         headers: mergeHeaders(appConfig?.endpoints?.all?.headers, headers) ?? {},
-        user: createSafeUser(headerContext.user),
+        user: createSafeUser(headerContext.user, headerContext.tenantId),
         tenantId: headerContext.tenantId,
         body: headerContext.requestBody,
       });
@@ -1236,7 +1236,7 @@ function resolveSummarizationProvider(
       customEndpointConfig.headers != null
         ? resolveModelHeaders({
             headers: customEndpointConfig.headers as Record<string, string>,
-            user: createSafeUser(headerContext.user),
+            user: createSafeUser(headerContext.user, headerContext.tenantId),
             tenantId: headerContext.tenantId,
             body: headerContext.requestBody,
           })
@@ -2439,7 +2439,7 @@ export async function createRun({
      */
     resolveConfigHeaders({
       llmConfig: agent.model_parameters as Partial<t.RunLLMConfig>,
-      user: createSafeUser(user),
+      user: createSafeUser(user, tenantId),
       tenantId,
       body: requestBody,
     });

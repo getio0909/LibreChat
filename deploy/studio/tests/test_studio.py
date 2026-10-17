@@ -1098,6 +1098,70 @@ def test_compare_materials_retries_only_unbilled_variant(
     asyncio.run(_run())
 
 
+def test_compare_materials_retries_rate_limited_variant_without_regenerating_sibling(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e4444444-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    attempts = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 2:
+            return httpx.Response(429, json={"error": "rate limited"})
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+    body = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": "compare_materials",
+            "arguments": {
+                "base_id": base_id,
+                "target": "供桌台面",
+                "materials": ["敦煌金", "金镶玉"],
+                "idempotency_key": "rate-limit-retry",
+            },
+        },
+    }
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            headers = {"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A}
+            first = await client.post("/mcp", headers=headers, json=body)
+            first_payload = json.loads(first.json()["result"]["content"][0]["text"])
+            assert first_payload["count"] == 1
+            successful = next(v for v in first_payload["variants"] if "image_id" in v)
+            second = await client.post("/mcp", headers=headers, json=body)
+            second_payload = json.loads(second.json()["result"]["content"][0]["text"])
+            assert second_payload["count"] == 2
+            assert successful["image_id"] in {
+                variant["image_id"] for variant in second_payload["variants"]
+            }
+            third = await client.post("/mcp", headers=headers, json=body)
+            assert json.loads(third.json()["result"]["content"][0]["text"])["count"] == 2
+            assert attempts == 3
+
+    asyncio.run(_run())
+
+
 # 两个顺序相反且包含相同石材的并发请求必须共用任务，并且不会互相等待成死锁。
 def test_compare_materials_overlapping_reordered_batches(
     studio_env: StudioSettings,

@@ -55,6 +55,7 @@ class StudioSettings(BaseModel):
     file_token_ttl_seconds: int = Field(default=86400, ge=60, le=604800)
     preview_token_ttl_seconds: int = Field(default=604800, ge=300, le=2592000)
     editor_token_ttl_seconds: int = Field(default=900, ge=60, le=900)
+    editor_capability_max_lifetime_seconds: int = Field(default=86400, ge=900, le=604800)
     image_provider: Literal["gemini", "seedream"] = "gemini"
     gemini_image_model: str = "gemini-nano-banana-2.1"
     enable_3d: bool = False
@@ -65,6 +66,8 @@ class StudioSettings(BaseModel):
     max_parallel_per_user: int = Field(default=3, ge=1, le=10)
     global_max_parallel: int = Field(default=12, ge=1, le=64)
     comparison_preview_max_bytes: int = Field(default=48 * 1024, ge=16 * 1024, le=48 * 1024)
+    segment_max_pending_requests: int = Field(default=2, ge=1, le=32)
+    segment_request_timeout_seconds: float = Field(default=90.0, gt=0.0, le=300.0)
     seed3d_max_parallel: int = Field(default=5, ge=1, le=32)
     seedream_timeout_seconds: int = Field(default=240, ge=5, le=600)
     seed3d_poll_timeout_seconds: float = Field(default=480.0, gt=0.0, le=600.0)

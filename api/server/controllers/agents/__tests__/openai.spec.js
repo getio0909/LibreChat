@@ -1890,6 +1890,29 @@ describe('OpenAIChatCompletionController', () => {
   });
 
   describe('execution envelope', () => {
+    it('projects a request-only tenant into agent and tool user contexts', async () => {
+      const api = require('@librechat/api');
+      api.createSafeUser.mockImplementation((user, tenantId) => ({
+        id: user.id,
+        studioPrincipal: `${tenantId}:${user.id}`,
+      }));
+      req.user = { id: 'user-123' };
+
+      req.tenantId = 'tenant-a';
+      await OpenAIChatCompletionController(req, res);
+      req.tenantId = 'tenant-b';
+      await OpenAIChatCompletionController(req, res);
+
+      expect(api.createRun.mock.calls[0][0].user.studioPrincipal).toBe('tenant-a:user-123');
+      expect(api.createRun.mock.calls[1][0].user.studioPrincipal).toBe('tenant-b:user-123');
+      const run = await api.createRun.mock.results[0].value;
+      const toolContexts = run.processStream.mock.calls.map((call) => call[1].configurable.user);
+      expect(toolContexts.map((user) => user.studioPrincipal)).toEqual([
+        'tenant-a:user-123',
+        'tenant-b:user-123',
+      ]);
+    });
+
     it('creates the portable run input before agent initialization', async () => {
       req.user = {
         id: 'user-123',

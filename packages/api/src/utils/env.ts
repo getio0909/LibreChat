@@ -109,9 +109,11 @@ export function encodeHeaderValue(value: string): string {
  */
 export function createSafeUser(
   user:
-    | (Partial<SafeUser> & Pick<IUser, 'tenantId'> & { federatedTokens?: IUser['federatedTokens'] })
+    | (Partial<SafeUser> &
+        Partial<Pick<IUser, 'tenantId'>> & { federatedTokens?: IUser['federatedTokens'] })
     | null
     | undefined,
+  requestTenantId?: string | null,
 ): Partial<SafeUser> & { federatedTokens?: IUser['federatedTokens'] } {
   if (!user) {
     return {};
@@ -140,10 +142,10 @@ export function createSafeUser(
 
   if (safeUser.id) {
     // 工作台专用占位符只暴露派生身份，不将原始租户编号加入通用用户字段
-    safeUser.studioPrincipal = deriveStudioStorageUserId(
-      String(safeUser.id),
-      user.tenantId ?? null,
-    );
+    const tenantId = user.tenantId ?? requestTenantId;
+    safeUser.studioPrincipal = tenantId
+      ? deriveStudioStorageUserId(String(safeUser.id), tenantId)
+      : user.studioPrincipal || deriveStudioStorageUserId(String(safeUser.id));
   }
 
   if ('federatedTokens' in user) {

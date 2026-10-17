@@ -817,6 +817,25 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   );
   assert.ok(deployStep, 'CI deploy job must have Deploy the published image step');
   assert.equal(deployStep.env.STUDIO_ENABLE_3D, "${{ vars.STUDIO_ENABLE_3D || 'true' }}");
+  for (const name of [
+    'STUDIO_FILE_TOKEN_TTL_SECONDS',
+    'STUDIO_PREVIEW_TOKEN_TTL_SECONDS',
+    'STUDIO_EDITOR_TOKEN_TTL_SECONDS',
+    'STUDIO_EDITOR_CAPABILITY_MAX_LIFETIME_SECONDS',
+    'STUDIO_MAX_PARALLEL_PER_USER',
+    'STUDIO_GLOBAL_MAX_PARALLEL',
+    'STUDIO_COMPARISON_PREVIEW_MAX_BYTES',
+    'STUDIO_SEGMENT_MAX_PENDING_REQUESTS',
+    'STUDIO_SEGMENT_REQUEST_TIMEOUT_SECONDS',
+    'STUDIO_SEED3D_MAX_PARALLEL',
+    'STUDIO_SEEDREAM_TIMEOUT_SECONDS',
+    'STUDIO_SEED3D_POLL_TIMEOUT_SECONDS',
+    'STUDIO_SEED3D_POLL_INITIAL_SECONDS',
+    'STUDIO_SEED3D_POLL_MAX_INTERVAL_SECONDS',
+    'STUDIO_SEED3D_BACKGROUND_TIMEOUT_SECONDS',
+  ]) {
+    assert.equal(deployStep.env[name], `\${{ vars.${name} }}`);
+  }
   assert.doesNotMatch(deployStep.run, /for name in [^\n]*\bARK_API_KEY\b/);
   assert.match(deployStep.run, /STUDIO_ENABLE_3D.*==.*"true".*ARK_API_KEY/);
 });

@@ -482,7 +482,7 @@ export async function resolveActivityLabelModel({
    *  conversation/user metadata need them on label calls too. */
   resolveConfigHeaders({
     llmConfig: clientOptions,
-    user: createSafeUser(req.user as IUser | undefined),
+    user: createSafeUser(req.user as IUser | undefined, resolveRequestTenantId(req)),
     tenantId: resolveRequestTenantId(req),
     body: ids,
   });

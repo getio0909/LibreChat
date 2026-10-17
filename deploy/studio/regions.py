@@ -1526,6 +1526,7 @@ def sign_editor_token(
     expires_at: int | None = None,
     ttl_seconds: int | None = None,
     nonce: str | None = None,
+    issued_at: int | None = None,
 ) -> tuple[str, int]:
     uid = validate_user_id(user_id)
     cleaned_img = _validate_token_image_id(image_id)
@@ -1539,6 +1540,10 @@ def sign_editor_token(
     )
     if not EDITOR_NONCE_RE.fullmatch(token_nonce):
         raise ValueError("Invalid editor token nonce")
+    issued = int(time.time()) if issued_at is None else int(issued_at)
+    max_expires_at = issued + settings.editor_capability_max_lifetime_seconds
+    if int(time.time()) >= max_expires_at:
+        raise ValueError("Editor capability has reached its maximum lifetime")
     if expires_at is not None:
         exp = int(expires_at)
     else:
@@ -1560,7 +1565,8 @@ def sign_editor_token(
             )
         effective_ttl = max(1, min(raw_ttl, EDITOR_TOKEN_MAX_TTL_SECONDS))
         exp = int(time.time()) + effective_ttl
-    payload_raw = f"edt:{uid}:{exp}:{cleaned_sha}:{token_nonce}:{cleaned_img}".encode()
+    exp = min(exp, max_expires_at)
+    payload_raw = f"edt:{uid}:{exp}:{issued}:{cleaned_sha}:{token_nonce}:{cleaned_img}".encode()
     payload_b64 = base64.urlsafe_b64encode(payload_raw).decode("ascii").rstrip("=")
     key_bytes = bytes.fromhex(settings.file_signing_key)
     signature = hmac.new(
@@ -1625,15 +1631,24 @@ def verify_editor_token(
         decoded = base64.urlsafe_b64decode(payload_b64 + padding).decode("utf-8")
     except Exception as exc:
         raise ValueError("Invalid editor token payload encoding") from exc
-    parts = decoded.split(":", 5)
-    if len(parts) != 6 or parts[0] != "edt":
+    parts = decoded.split(":", 6)
+    if len(parts) not in (6, 7) or parts[0] != "edt":
         raise ValueError("Invalid editor token payload structure")
-    _, raw_uid, raw_exp, raw_sha, raw_nonce, raw_image_id = parts
+    if len(parts) == 7:
+        _, raw_uid, raw_exp, raw_issued, raw_sha, raw_nonce, raw_image_id = parts
+        if not raw_issued.isdigit() or len(raw_issued) > 12:
+            raise ValueError("Invalid editor token issue time")
+        issued = int(raw_issued)
+    else:
+        _, raw_uid, raw_exp, raw_sha, raw_nonce, raw_image_id = parts
+        issued = int(raw_exp) - EDITOR_TOKEN_MAX_TTL_SECONDS
     uid = validate_user_id(raw_uid)
     if not raw_exp.isdigit() or len(raw_exp) > 12:
         raise ValueError("Invalid editor token expiration")
     exp = int(raw_exp)
     current_ts = time.time() if now is None else float(now)
+    if issued > current_ts + 60 or exp > issued + settings.editor_capability_max_lifetime_seconds:
+        raise ValueError("Invalid editor token lifetime")
     if current_ts >= exp:
         if not allow_expired:
             raise ValueError("Editor token has expired")
@@ -1653,6 +1668,7 @@ def verify_editor_token(
         "image_sha256": raw_sha,
         "nonce": raw_nonce,
         "expires_at": exp,
+        "issued_at": issued,
     }
 
 

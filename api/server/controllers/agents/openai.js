@@ -1137,7 +1137,7 @@ const executeOpenAIChatCompletion = async (envelope, { req, res }) => {
         customHandlers: handlers,
         modelCallbacks: [terminalRunError.modelCallback],
         requestBody: mcpRequestBody,
-        user: { ...createSafeUser(req.user), id: userId },
+        user: { ...createSafeUser(req.user, req.tenantId), id: userId },
         traceContext: { endpoint: EModelEndpoint.agents },
         tenantId: principal.tenantId,
         /** Bills subagent child-run model calls (reported outside the
@@ -1154,7 +1154,7 @@ const executeOpenAIChatCompletion = async (envelope, { req, res }) => {
         configurable: {
           thread_id: conversationId,
           user_id: userId,
-          user: createSafeUser(req.user),
+          user: createSafeUser(req.user, req.tenantId),
           requestBody: mcpRequestBody,
           ...(userMCPAuthMap != null && { userMCPAuthMap }),
         },

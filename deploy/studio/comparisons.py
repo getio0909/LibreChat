@@ -94,6 +94,11 @@ def saved_comparison_result(
             receipt_file.unlink()
             return None
         if receipt.get("state") == "rejected":
+            if receipt.get("http_status") == 429 and receipt.get("billed") is not True:
+                if any(path.name != "receipt.json" for path in job_dir.iterdir()):
+                    return None, "Previous comparison job has unexpected files; no paid retry was made", True
+                receipt_file.unlink()
+                return None
             return None, "Previous comparison variant was rejected; no paid retry was made", False
     except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
         pass

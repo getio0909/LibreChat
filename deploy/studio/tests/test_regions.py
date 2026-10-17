@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import hashlib
+import hmac
 import io
 import json
 import os
@@ -9,6 +10,8 @@ import re
 import resource
 import shutil
 import signal
+import threading
+import time
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -65,6 +68,161 @@ VENDOR_PATTERN = re.compile(
     r"gemini|argon|claude|haiku|sonnet|opus|openrouter|seedream|seed3d|volcengine|google|anthropic|deepseek|doubao|\bark\b|openai|gpt|豆包|火山|字节",
     re.IGNORECASE,
 )
+
+
+def test_renewal_requires_authenticated_owner_and_caps_editor_lifetime(
+    studio_env: StudioSettings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    settings = studio_env.model_copy(
+        update={"editor_capability_max_lifetime_seconds": 3600}
+    )
+    user_lc = settings.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    image_id = "aaaaaaaa-2222-3333-4444-555555555555"
+    image_path = user_lc / f"{image_id}__base.png"
+    save_exact(Image.new("RGB", (240, 180), (140, 120, 100)), image_path)
+    image_sha = hashlib.sha256(image_path.read_bytes()).hexdigest()
+    issued_at = int(time.time()) - 3500
+    editor_token, _ = sign_editor_token(
+        settings, USER_A, image_id, image_sha, issued_at=issued_at
+    )
+    preview_token, _ = sign_image_token(settings, USER_A, image_id)
+    app = create_app(settings=settings, rules=load_rules())
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            owner_headers = {
+                "X-Studio-Token": VALID_TOKEN,
+                "X-LibreChat-User-ID": USER_A,
+            }
+            other_headers = {**owner_headers, "X-LibreChat-User-ID": USER_B}
+            for token in (editor_token, preview_token):
+                assert (await client.post(f"/files/{token}", json={"action": "renew"})).status_code == 403
+                assert (
+                    await client.post(
+                        f"/files/{token}", headers=other_headers, json={"action": "renew"}
+                    )
+                ).status_code == 403
+
+            principal_a = hashlib.sha256(
+                json.dumps(["studio-user-v1", "tenant-a", USER_A], separators=(",", ":")).encode()
+            ).hexdigest()[:24]
+            principal_b = hashlib.sha256(
+                json.dumps(["studio-user-v1", "tenant-b", USER_A], separators=(",", ":")).encode()
+            ).hexdigest()[:24]
+            scoped_token, _ = sign_image_token(settings, principal_a, image_id)
+            cross_tenant = await client.post(
+                f"/files/{scoped_token}",
+                headers={**owner_headers, "X-LibreChat-User-ID": principal_b},
+                json={"action": "renew"},
+            )
+            assert cross_tenant.status_code == 403
+
+            owner_preview = await client.post(
+                f"/files/{preview_token}", headers=owner_headers, json={"action": "renew"}
+            )
+            assert owner_preview.status_code == 200
+            legacy_exp = int(time.time()) - 120
+            legacy_payload = (
+                f"edt:{USER_A}:{legacy_exp}:{image_sha}:legacy_editor_nonce_123:{image_id}"
+            )
+            legacy_b64 = base64.urlsafe_b64encode(legacy_payload.encode()).decode().rstrip("=")
+            legacy_sig = hmac.new(
+                bytes.fromhex(settings.file_signing_key),
+                legacy_b64.encode(),
+                hashlib.sha256,
+            ).hexdigest()
+            legacy = await client.post(
+                f"/files/{legacy_b64}.{legacy_sig}",
+                headers=owner_headers,
+                json={"action": "renew"},
+            )
+            assert legacy.status_code == 200
+            legacy_renewed_token = legacy.json()["editor_url"].rsplit("/", 1)[-1]
+            assert verify_editor_token(settings, legacy_renewed_token)["issued_at"] == legacy_exp - 900
+
+            first = await client.post(
+                f"/files/{editor_token}", headers=owner_headers, json={"action": "renew"}
+            )
+            assert first.status_code == 200
+            renewed_token = first.json()["editor_url"].rsplit("/", 1)[-1]
+            first_claims = verify_editor_token(settings, renewed_token)
+            assert first_claims["issued_at"] == issued_at
+            assert first_claims["expires_at"] <= issued_at + 3600
+
+            second = await client.post(
+                f"/files/{renewed_token}", headers=owner_headers, json={"action": "renew"}
+            )
+            assert second.status_code == 200
+            repeated_token = second.json()["editor_url"].rsplit("/", 1)[-1]
+            assert verify_editor_token(settings, repeated_token)["expires_at"] <= issued_at + 3600
+
+            monkeypatch.setattr("deploy.studio.regions.time.time", lambda: issued_at + 3601)
+            expired = await client.post(
+                f"/files/{repeated_token}", headers=owner_headers, json={"action": "renew"}
+            )
+            assert expired.status_code == 404
+
+    asyncio.run(_run())
+
+
+def test_segment_admission_bounds_burst_and_includes_queue_wait(
+    studio_env: StudioSettings,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    settings = studio_env.model_copy(
+        update={"segment_max_pending_requests": 2, "segment_request_timeout_seconds": 0.15}
+    )
+    user_lc = settings.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    image_id = "bbbbbbbb-2222-3333-4444-555555555555"
+    image_path = user_lc / f"{image_id}__base.png"
+    save_exact(Image.new("RGB", (240, 180), (140, 120, 100)), image_path)
+    image_sha = hashlib.sha256(image_path.read_bytes()).hexdigest()
+    editor_token, _ = sign_editor_token(settings, USER_A, image_id, image_sha)
+    started = threading.Event()
+    release = threading.Event()
+    worker_lock = threading.Lock()
+
+    class BlockingSegmenter:
+        def segment(self, _image: Path, _points: Any, _existing: Any, _operation: str) -> dict[str, Any]:
+            with worker_lock:
+                started.set()
+                release.wait(timeout=2)
+                return {"selection": {"version": 1, "shapes": []}}
+
+    app = create_app(settings=settings, rules=load_rules(), segmenter=BlockingSegmenter())
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            body = {"action": "segment", "points": [{"x": 10, "y": 10}]}
+            first = asyncio.create_task(client.post(f"/files/{editor_token}", json=body))
+            assert await asyncio.to_thread(started.wait, 1)
+            second = asyncio.create_task(client.post(f"/files/{editor_token}", json=body))
+            await asyncio.sleep(0.03)
+            overload = await client.post(f"/files/{editor_token}", json=body)
+            assert overload.status_code == 503
+            assert "繁忙" in overload.json()["error"]
+            first_response, second_response = await asyncio.gather(first, second)
+            assert first_response.status_code == second_response.status_code == 503
+            assert "超时" in second_response.json()["error"]
+            still_full = await client.post(f"/files/{editor_token}", json=body)
+            assert still_full.status_code == 503
+            release.set()
+            await asyncio.sleep(0.05)
+            recovered = await client.post(f"/files/{editor_token}", json=body)
+            assert recovered.status_code == 200
+
+    try:
+        asyncio.run(_run())
+    finally:
+        release.set()
+    assert "Segmentation admission limit reached" in caplog.text
+    assert "选区分割" not in caplog.text
 
 
 # 构建带记录与样图的测试知识库目录
@@ -2828,6 +2986,21 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
             )
             try:
                 page = browser.new_page(viewport={"width": 840, "height": 720})
+
+                def _authorize_test_renewal(route: Any) -> None:
+                    req = route.request
+                    if req.method == "POST" and json.loads(req.post_data or "{}").get("action") == "renew":
+                        route.continue_(
+                            headers={
+                                **req.headers,
+                                "x-studio-token": VALID_TOKEN,
+                                "x-librechat-user-id": USER_A,
+                            }
+                        )
+                    else:
+                        route.continue_()
+
+                page.route(f"http://127.0.0.1:{port}/files/**", _authorize_test_renewal)
                 page.set_content(host_html)
                 page.eval_on_selector(
                     "#ed",

@@ -933,7 +933,7 @@ ${memory ?? 'No existing memories'}`;
      */
     resolveConfigHeaders({
       llmConfig: finalLLMConfig as unknown as RunLLMConfig,
-      user: user ? createSafeUser(user) : undefined,
+      user: user ? createSafeUser(user, tenantId) : undefined,
       tenantId,
       body: { conversationId, messageId },
     });

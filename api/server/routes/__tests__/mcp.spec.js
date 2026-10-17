@@ -251,6 +251,7 @@ describe('MCP Routes', () => {
 
     app.use((req, res, next) => {
       req.user = currentUser ?? { id: 'test-user-id' };
+      req.tenantId = req.get('x-test-tenant') || undefined;
       next();
     });
 
@@ -2705,6 +2706,33 @@ describe('MCP Routes', () => {
   describe('POST /:serverName/reinitialize', () => {
     // mockRegistryInstance is defined at the top of the file
 
+    it('keeps request-only tenant scope during MCP reinitialization', async () => {
+      currentUser = { id: '65f0000000000000000000a1', role: 'user' };
+      mockRegistryInstance.getServerConfig.mockResolvedValue({
+        endpoint: 'http://test-server.com',
+      });
+      require('~/config').getMCPManager.mockReturnValue({
+        disconnectUserConnection: jest.fn().mockResolvedValue(),
+      });
+      require('~/server/services/Tools/mcp').reinitMCPServer.mockResolvedValue({
+        success: true,
+        message: 'Reinitialized',
+        serverName: 'test-server',
+      });
+
+      for (const tenant of ['tenant-a', 'tenant-b']) {
+        const response = await request(app)
+          .post('/api/mcp/test-server/reinitialize')
+          .set('x-test-tenant', tenant);
+        expect(response.status).toBe(200);
+      }
+      const reinit = require('~/server/services/Tools/mcp').reinitMCPServer;
+      const principalA = reinit.mock.calls[0][0].user.studioPrincipal;
+      const principalB = reinit.mock.calls[1][0].user.studioPrincipal;
+      expect(principalA).toMatch(/^[a-f0-9]{24}$/);
+      expect(principalA).not.toBe(principalB);
+    });
+
     it('should return 404 when server is not found in configuration', async () => {
       const mockMcpManager = {
         disconnectUserConnection: jest.fn().mockResolvedValue(),
@@ -3015,6 +3043,40 @@ describe('MCP Routes', () => {
         findPluginAuthsByKeys: require('~/models').findPluginAuthsByKeys,
       });
     });
+  });
+
+  it('routes Studio renewal through the authenticated tenant scoped host', async () => {
+    const originalFetch = global.fetch;
+    const originalUrl = process.env.STUDIO_MCP_URL;
+    const originalSecret = process.env.STUDIO_SHARED_TOKEN;
+    const token = `${'a'.repeat(40)}.${'b'.repeat(64)}`;
+    const fetchMock = jest.fn().mockResolvedValue(
+      new Response(JSON.stringify({ status: 'renewed', preview_url: 'https://studio.test/new' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    global.fetch = fetchMock;
+    process.env.STUDIO_MCP_URL = 'http://studio:8000/mcp';
+    process.env.STUDIO_SHARED_TOKEN = 'a'.repeat(64);
+    currentUser = { id: '65f0000000000000000000a1', role: 'user' };
+    try {
+      const response = await request(app)
+        .post(`/api/mcp/studio/renew/${token}`)
+        .set('x-test-tenant', 'tenant-a')
+        .send({ action: 'renew', image_id: 'image-1' });
+      expect(response.status).toBe(200);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock.mock.calls[0][0].href).toBe(`http://studio:8000/files/${token}`);
+      expect(fetchMock.mock.calls[0][1].headers['X-LibreChat-User-ID']).toMatch(/^[a-f0-9]{24}$/);
+      expect(fetchMock.mock.calls[0][1].headers['X-LibreChat-User-ID']).not.toBe(currentUser.id);
+    } finally {
+      global.fetch = originalFetch;
+      if (originalUrl === undefined) delete process.env.STUDIO_MCP_URL;
+      else process.env.STUDIO_MCP_URL = originalUrl;
+      if (originalSecret === undefined) delete process.env.STUDIO_SHARED_TOKEN;
+      else process.env.STUDIO_SHARED_TOKEN = originalSecret;
+    }
   });
 
   describe('GET /connection/status', () => {

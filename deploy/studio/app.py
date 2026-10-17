@@ -4,6 +4,7 @@ import contextlib
 import hashlib
 import hmac
 import json
+import logging
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -97,6 +98,8 @@ from .store import (
     user_studio_dir,
     validate_user_id,
 )
+
+_LOG = logging.getLogger(__name__)
 
 
 # 单次MCP请求的认证上下文
@@ -1230,6 +1233,14 @@ def create_app(
         ark_transport=ark_transport,
     )
     active_segmenter = segmenter if segmenter is not None else SupervisedSegmenter()
+    pending_segment_requests = 0
+
+    def _release_segment_slot(task: asyncio.Task[Any]) -> None:
+        nonlocal pending_segment_requests
+        pending_segment_requests -= 1
+        if not task.cancelled():
+            task.exception()
+
     mcp_server = build_mcp_server(
         active_settings,
         active_rules,
@@ -1359,6 +1370,7 @@ def create_app(
 
     # 校验HMAC签名令牌并提供3D模型GLB下载、只读图片预览（img:）及选区编辑器交互（edt:）服务
     async def signed_file_endpoint(request: Request) -> Response:
+        nonlocal pending_segment_requests
         token = str(request.path_params.get("token") or "")
         if not token or "/" in token or "\\" in token or ".." in token:
             return PlainTextResponse(
@@ -1420,6 +1432,18 @@ def create_app(
             30 * 86400,
         )
 
+        def _can_renew_owner(token_user_id: str) -> bool:
+            provided_secret = request.headers.get("x-studio-token", "")
+            if not hmac.compare_digest(provided_secret, active_settings.shared_token):
+                return False
+            try:
+                authenticated_user = validate_user_id(
+                    request.headers.get("x-librechat-user-id")
+                )
+            except ValueError:
+                return False
+            return hmac.compare_digest(authenticated_user, token_user_id)
+
         def _extract_token_from_url_or_raw(raw_val: object) -> str:
             cleaned = str(raw_val or "").strip()
             if not cleaned:
@@ -1467,6 +1491,12 @@ def create_app(
                             allow_expired=True,
                             max_expired_age_seconds=max_renewal_age,
                         )
+                        if not _can_renew_owner(user_id):
+                            return JSONResponse(
+                                {"error": "Authenticated owner required for renewal"},
+                                status_code=403,
+                                headers=_signed_file_cors_headers(),
+                            )
                         resolved = resolve_image(
                             active_settings, user_id, image_id, kb_index=kb_index
                         )
@@ -1660,6 +1690,12 @@ def create_app(
                     max_expired_age_seconds=max_renewal_age if is_renew_post else None,
                 )
                 user_id = str(claims["user_id"])
+                if is_renew_post and not _can_renew_owner(user_id):
+                    return JSONResponse(
+                        {"error": "Authenticated owner required for renewal"},
+                        status_code=403,
+                        headers=_signed_file_cors_headers(),
+                    )
                 image_id = str(claims["image_id"])
                 expected_sha = str(claims["image_sha256"])
                 editor_nonce = str(claims["nonce"])
@@ -1719,13 +1755,21 @@ def create_app(
                     new_preview_tok, preview_exp = sign_image_token(
                         active_settings, user_id, resolved.id
                     )
-                    new_editor_tok, editor_exp = sign_editor_token(
-                        active_settings,
-                        user_id,
-                        resolved.id,
-                        expected_sha,
-                        nonce=editor_nonce,
-                    )
+                    try:
+                        new_editor_tok, editor_exp = sign_editor_token(
+                            active_settings,
+                            user_id,
+                            resolved.id,
+                            expected_sha,
+                            nonce=editor_nonce,
+                            issued_at=int(claims["issued_at"]),
+                        )
+                    except ValueError:
+                        return PlainTextResponse(
+                            "Not Found",
+                            status_code=404,
+                            headers=_signed_file_cors_headers(),
+                        )
                     editor_ref = payload.get("editor_url") or payload.get("editorUrl")
                     preview_ref = (
                         payload.get("preview_url")
@@ -1753,17 +1797,39 @@ def create_app(
                         headers=_signed_file_cors_headers(),
                     )
                 if action == "segment":
-                    try:
-                        seg_out = await asyncio.to_thread(
+                    if pending_segment_requests >= active_settings.segment_max_pending_requests:
+                        _LOG.warning("Segmentation admission limit reached")
+                        return JSONResponse(
+                            {"error": "选区分割繁忙，请稍后重试。"},
+                            status_code=503,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    pending_segment_requests += 1
+                    segment_task = asyncio.create_task(
+                        asyncio.to_thread(
                             active_segmenter.segment,
                             resolved.path,
                             payload.get("points"),
                             payload.get("existing"),
                             str(payload.get("operation") or "add"),
                         )
+                    )
+                    segment_task.add_done_callback(_release_segment_slot)
+                    try:
+                        seg_out = await asyncio.wait_for(
+                            asyncio.shield(segment_task),
+                            timeout=active_settings.segment_request_timeout_seconds,
+                        )
                         return JSONResponse(
                             seg_out,
                             status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except asyncio.TimeoutError:
+                        _LOG.warning("Segmentation request timed out including queue wait")
+                        return JSONResponse(
+                            {"error": "选区分割等待超时，请稍后重试。"},
+                            status_code=503,
                             headers=_signed_file_cors_headers(),
                         )
                     except SegmentationUnavailable:
@@ -1838,6 +1904,12 @@ def create_app(
                         allow_expired=True,
                         max_expired_age_seconds=max_renewal_age,
                     )
+                    if not _can_renew_owner(user_id):
+                        return JSONResponse(
+                            {"error": "Authenticated owner required for renewal"},
+                            status_code=403,
+                            headers=_signed_file_cors_headers(),
+                        )
                     load_saved_model_bytes(active_settings, user_id, model_id)
                 except (ValueError, RuntimeError, OSError):
                     return PlainTextResponse(

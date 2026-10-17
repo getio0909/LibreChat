@@ -101,8 +101,19 @@ function resolveFileSigningKey(targetDir) {
 }
 
 // 解析公开部署基础 URL（来自 DEPLOY_URL，用于拼接签名下载链接）。
-function resolvePublicBaseUrl() {
-  const raw = process.env.DEPLOY_URL || 'https://dev.xuqian.io';
+function resolvePublicBaseUrl(targetDir) {
+  let raw = process.env.DEPLOY_URL;
+  if (!raw && targetDir) {
+    try {
+      const existing = JSON.parse(readFileSync(path.join(targetDir, 'studio.json'), 'utf8'));
+      if (typeof existing.public_base_url === 'string') {
+        raw = existing.public_base_url;
+      }
+    } catch {
+      // 忽略缺失或损坏的旧配置。
+    }
+  }
+  raw ||= 'https://dev.xuqian.io';
   const cleaned = raw.trim().replace(/\/+$/, '');
   if (!/^https?:\/\/[^\s'\\]+$/.test(cleaned)) {
     throw new Error('DEPLOY_URL must be a valid single-line HTTP(S) URL.');
@@ -119,9 +130,19 @@ const target = path.join(runnerTemp, 'bundle');
 mkdirSync(target, { recursive: true });
 
 // 解析 3D 模型生成开关：仅当 STUDIO_ENABLE_3D 显式设为 true 时启用（如 J5005 测试环境），生产环境默认关闭直至具备出网条件；启用 3D 时必须提供 ARK_API_KEY。
-function resolveEnable3d() {
+function resolveEnable3d(targetDir) {
   const raw = process.env.STUDIO_ENABLE_3D;
   if (raw === undefined || raw === null || raw.trim() === '') {
+    if (targetDir) {
+      try {
+        const existing = JSON.parse(readFileSync(path.join(targetDir, 'studio.json'), 'utf8'));
+        if (typeof existing.enable_3d === 'boolean') {
+          return existing.enable_3d;
+        }
+      } catch {
+        // 忽略缺失或损坏的旧配置。
+      }
+    }
     return false;
   }
   const normalized = raw.trim().toLowerCase();
@@ -165,9 +186,47 @@ function resolveBoundedIntegerSetting(envName, fieldName, fallback, min, max, ta
   return fallback;
 }
 
+// 解析有界数值配置项，保留合法的已有部署值。
+function resolveBoundedNumberSetting(envName, fieldName, fallback, min, max, targetDir) {
+  const raw = process.env[envName];
+  if (raw !== undefined && raw !== null && String(raw).trim() !== '') {
+    const cleaned = String(raw).trim();
+    const parsed = Number(cleaned);
+    if (
+      !/^\d+(?:\.\d+)?$/.test(cleaned) ||
+      !Number.isFinite(parsed) ||
+      parsed <= min ||
+      parsed > max
+    ) {
+      throw new Error(`${envName} must be a number greater than ${min} and at most ${max}.`);
+    }
+    return parsed;
+  }
+  if (targetDir) {
+    const existingStudioPath = path.join(targetDir, 'studio.json');
+    if (existsSync(existingStudioPath)) {
+      try {
+        const existing = JSON.parse(readFileSync(existingStudioPath, 'utf8'));
+        const candidate = existing?.[fieldName];
+        if (
+          typeof candidate === 'number' &&
+          Number.isFinite(candidate) &&
+          candidate > min &&
+          candidate <= max
+        ) {
+          return candidate;
+        }
+      } catch {
+        // 忽略损坏的旧配置并回退默认值。
+      }
+    }
+  }
+  return fallback;
+}
+
 const geminiApiKey = requireSafeSingleLineSecret('GEMINI_API_KEY');
 const openrouterApiKey = requireSafeSingleLineSecret('OPENROUTER_API_KEY');
-const enable3d = resolveEnable3d();
+const enable3d = resolveEnable3d(target);
 const arkApiKey = enable3d
   ? requireSafeSingleLineSecret('ARK_API_KEY')
   : optionalSafeSingleLineSecret('ARK_API_KEY');
@@ -175,7 +234,7 @@ const librechatImage = requireImageReference('LIBRECHAT_IMAGE');
 const studioImage = requireImageReference('STUDIO_IMAGE');
 const sharedToken = resolveStudioSharedToken();
 const fileSigningKey = resolveFileSigningKey(target);
-const publicBaseUrl = resolvePublicBaseUrl();
+const publicBaseUrl = resolvePublicBaseUrl(target);
 const fileTokenTtlSeconds = resolveBoundedIntegerSetting(
   'STUDIO_FILE_TOKEN_TTL_SECONDS',
   'file_token_ttl_seconds',
@@ -198,6 +257,102 @@ const editorTokenTtlSeconds = resolveBoundedIntegerSetting(
   900,
   60,
   900,
+  target,
+);
+const editorCapabilityMaxLifetimeSeconds = resolveBoundedIntegerSetting(
+  'STUDIO_EDITOR_CAPABILITY_MAX_LIFETIME_SECONDS',
+  'editor_capability_max_lifetime_seconds',
+  86400,
+  900,
+  604800,
+  target,
+);
+const maxParallelPerUser = resolveBoundedIntegerSetting(
+  'STUDIO_MAX_PARALLEL_PER_USER',
+  'max_parallel_per_user',
+  3,
+  1,
+  10,
+  target,
+);
+const globalMaxParallel = resolveBoundedIntegerSetting(
+  'STUDIO_GLOBAL_MAX_PARALLEL',
+  'global_max_parallel',
+  12,
+  1,
+  64,
+  target,
+);
+const comparisonPreviewMaxBytes = resolveBoundedIntegerSetting(
+  'STUDIO_COMPARISON_PREVIEW_MAX_BYTES',
+  'comparison_preview_max_bytes',
+  48 * 1024,
+  16 * 1024,
+  48 * 1024,
+  target,
+);
+const segmentMaxPendingRequests = resolveBoundedIntegerSetting(
+  'STUDIO_SEGMENT_MAX_PENDING_REQUESTS',
+  'segment_max_pending_requests',
+  2,
+  1,
+  32,
+  target,
+);
+const segmentRequestTimeoutSeconds = resolveBoundedNumberSetting(
+  'STUDIO_SEGMENT_REQUEST_TIMEOUT_SECONDS',
+  'segment_request_timeout_seconds',
+  90,
+  0,
+  300,
+  target,
+);
+const seed3dMaxParallel = resolveBoundedIntegerSetting(
+  'STUDIO_SEED3D_MAX_PARALLEL',
+  'seed3d_max_parallel',
+  5,
+  1,
+  32,
+  target,
+);
+const seedreamTimeoutSeconds = resolveBoundedIntegerSetting(
+  'STUDIO_SEEDREAM_TIMEOUT_SECONDS',
+  'seedream_timeout_seconds',
+  240,
+  5,
+  600,
+  target,
+);
+const seed3dPollTimeoutSeconds = resolveBoundedNumberSetting(
+  'STUDIO_SEED3D_POLL_TIMEOUT_SECONDS',
+  'seed3d_poll_timeout_seconds',
+  480,
+  0,
+  600,
+  target,
+);
+const seed3dPollInitialSeconds = resolveBoundedNumberSetting(
+  'STUDIO_SEED3D_POLL_INITIAL_SECONDS',
+  'seed3d_poll_initial_seconds',
+  2,
+  0,
+  60,
+  target,
+);
+const seed3dPollMaxIntervalSeconds = resolveBoundedNumberSetting(
+  'STUDIO_SEED3D_POLL_MAX_INTERVAL_SECONDS',
+  'seed3d_poll_max_interval_seconds',
+  15,
+  0,
+  60,
+  target,
+);
+const seed3dBackgroundTimeoutSeconds = resolveBoundedNumberSetting(
+  'STUDIO_SEED3D_BACKGROUND_TIMEOUT_SECONDS',
+  'seed3d_background_timeout_seconds',
+  1800,
+  0,
+  3600,
   target,
 );
 const accounts = {
@@ -229,6 +384,7 @@ const studioSettings = {
   file_token_ttl_seconds: fileTokenTtlSeconds,
   preview_token_ttl_seconds: previewTokenTtlSeconds,
   editor_token_ttl_seconds: editorTokenTtlSeconds,
+  editor_capability_max_lifetime_seconds: editorCapabilityMaxLifetimeSeconds,
   gemini_api_key: geminiApiKey,
   ark_api_key: arkApiKey,
   image_provider: 'gemini',
@@ -236,9 +392,17 @@ const studioSettings = {
   enable_3d: enable3d,
   seedream_model: 'doubao-seedream-5-0-pro-260628',
   seed3d_model: 'doubao-seed3d-2-0-260328',
-  max_parallel_per_user: 3,
-  seed3d_max_parallel: 5,
-  seedream_timeout_seconds: 240,
+  max_parallel_per_user: maxParallelPerUser,
+  global_max_parallel: globalMaxParallel,
+  comparison_preview_max_bytes: comparisonPreviewMaxBytes,
+  segment_max_pending_requests: segmentMaxPendingRequests,
+  segment_request_timeout_seconds: segmentRequestTimeoutSeconds,
+  seed3d_max_parallel: seed3dMaxParallel,
+  seedream_timeout_seconds: seedreamTimeoutSeconds,
+  seed3d_poll_timeout_seconds: seed3dPollTimeoutSeconds,
+  seed3d_poll_initial_seconds: seed3dPollInitialSeconds,
+  seed3d_poll_max_interval_seconds: seed3dPollMaxIntervalSeconds,
+  seed3d_background_timeout_seconds: seed3dBackgroundTimeoutSeconds,
 };
 writeFileSync(path.join(target, 'studio.json'), `${JSON.stringify(studioSettings, null, 2)}\n`, {
   mode: 0o600,

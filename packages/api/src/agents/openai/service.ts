@@ -878,7 +878,10 @@ export async function createAgentChatCompletion(
 
     // Create and run the agent
     if (deps.createRun) {
-      const reqUser = (req as unknown as { user?: Parameters<typeof createSafeUser>[0] }).user;
+      const { user: reqUser, tenantId: requestTenantId } = req as unknown as {
+        user?: Parameters<typeof createSafeUser>[0];
+        tenantId?: string;
+      };
       const userId = reqUser?.id ?? 'api-user';
       /**
        * Propagate the full safe user (id + role), matching the in-repo agent
@@ -888,7 +891,10 @@ export async function createAgentChatCompletion(
        * host app didn't attach a user, this falls back to a bare id, which
        * correctly leaves MCP gated.
        */
-      const safeUser: Record<string, unknown> = { ...createSafeUser(reqUser), id: userId };
+      const safeUser: Record<string, unknown> = {
+        ...createSafeUser(reqUser, requestTenantId),
+        id: userId,
+      };
       const run = await deps.createRun({
         agents: [initializedAgent],
         messages,
@@ -898,7 +904,7 @@ export async function createAgentChatCompletion(
         requestBody: mcpRequestBody,
         user: safeUser,
         traceContext: { endpoint: EModelEndpoint.agents },
-        tenantId: typeof reqUser?.tenantId === 'string' ? reqUser.tenantId : undefined,
+        tenantId: reqUser?.tenantId ?? requestTenantId,
         appConfig: selectCreateRunAppConfig(deps.appConfig),
       });
 

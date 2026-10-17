@@ -1,3 +1,4 @@
+import { request } from 'librechat-data-provider';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
 import type { TStartupConfig, UIResource } from 'librechat-data-provider';
@@ -348,10 +349,10 @@ describe('UIResourceRenderer', () => {
   it('completes real @mcp-ui/client postMessage round trips for draft restore and in-place link renewal and upgrades persisted Studio HTML', async () => {
     mockLegacyRenderer.mockImplementation((props) => actualMcpUi.UIResourceRenderer(props));
 
-    const oldEditorUrl = makeSignedStudioUrl('edt', 'img_demo123', 'a');
-    const oldPreviewUrl = makeSignedStudioUrl('img', 'img_demo123', 'b');
-    const newEditorUrl = makeSignedStudioUrl('edt', 'img_demo123', 'c');
-    const newPreviewUrl = makeSignedStudioUrl('img', 'img_demo123', 'd');
+    const oldEditorUrl = makeSignedStudioUrl('edt', 'img_demo123', 'a', window.location.origin);
+    const oldPreviewUrl = makeSignedStudioUrl('img', 'img_demo123', 'b', window.location.origin);
+    const newEditorUrl = makeSignedStudioUrl('edt', 'img_demo123', 'c', window.location.origin);
+    const newPreviewUrl = makeSignedStudioUrl('img', 'img_demo123', 'd', window.location.origin);
 
     const persistedLegacyHtml = [
       '<div class="header-row">',
@@ -384,7 +385,6 @@ describe('UIResourceRenderer', () => {
     });
     saveUIDraft(scopedKey, { tool: 'polygon', instruction: '局部底座浮雕加深' });
 
-    const originalFetch = global.fetch;
     const mockFetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -397,7 +397,7 @@ describe('UIResourceRenderer', () => {
           previewExpiresAt: '2026-04-24T12:30:00Z',
         }),
     });
-    global.fetch = mockFetch as unknown as typeof fetch;
+    const fetchSpy = jest.spyOn(request, 'authenticatedFetch').mockImplementation(mockFetch);
 
     try {
       const { container } = renderEnabled(<UIResourceRenderer resource={resource} />);
@@ -437,7 +437,7 @@ describe('UIResourceRenderer', () => {
         '*',
       );
 
-      // 2. 触发真实的 ui-link-renew 消息，校验宿主调用 POST /files/<token> (action="renew") 并通过 ui-message-response 回传新令牌且升级持久化HTML
+      // 触发真实的 ui-link-renew 消息，校验宿主通过已认证的续期路径回传新令牌并升级持久化HTML
       await act(async () => {
         window.dispatchEvent(
           new MessageEvent('message', {
@@ -460,7 +460,7 @@ describe('UIResourceRenderer', () => {
 
       await waitFor(() => {
         expect(mockFetch).toHaveBeenCalledWith(
-          oldEditorUrl,
+          `/api/mcp/studio/renew/${oldEditorUrl.split('/').pop()}`,
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -491,7 +491,7 @@ describe('UIResourceRenderer', () => {
       expect(updatedSrcDoc).toContain(newEditorUrl);
       expect(updatedSrcDoc).toContain(newPreviewUrl);
     } finally {
-      global.fetch = originalFetch;
+      fetchSpy.mockRestore();
     }
   });
 

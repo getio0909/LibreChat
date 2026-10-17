@@ -87,11 +87,25 @@ fi
 if ! jq -e '
   (.shared_token | type == "string" and length >= 64)
   and (.file_signing_key | type == "string" and test("^[0-9a-fA-F]{64}$"))
+  and (.public_base_url | type == "string" and test("^https?://[^[:space:]]+$"))
+  and (.enable_3d | type == "boolean")
   and (.gemini_api_key | type == "string" and length >= 1)
   and ((.ark_api_key // "") | type == "string")
   and ((.file_token_ttl_seconds // 86400) | type == "number" and floor == . and . >= 60 and . <= 604800)
   and ((.preview_token_ttl_seconds // 604800) | type == "number" and floor == . and . >= 300 and . <= 2592000)
   and ((.editor_token_ttl_seconds // 900) | type == "number" and floor == . and . >= 60 and . <= 900)
+  and ((.editor_capability_max_lifetime_seconds // 86400) | type == "number" and floor == . and . >= 900 and . <= 604800)
+  and ((.max_parallel_per_user // 3) | type == "number" and floor == . and . >= 1 and . <= 10)
+  and ((.global_max_parallel // 12) | type == "number" and floor == . and . >= 1 and . <= 64)
+  and ((.comparison_preview_max_bytes // 49152) | type == "number" and floor == . and . >= 16384 and . <= 49152)
+  and ((.segment_max_pending_requests // 2) | type == "number" and floor == . and . >= 1 and . <= 32)
+  and ((.segment_request_timeout_seconds // 90) | type == "number" and . > 0 and . <= 300)
+  and ((.seed3d_max_parallel // 5) | type == "number" and floor == . and . >= 1 and . <= 32)
+  and ((.seedream_timeout_seconds // 240) | type == "number" and floor == . and . >= 5 and . <= 600)
+  and ((.seed3d_poll_timeout_seconds // 480) | type == "number" and . > 0 and . <= 600)
+  and ((.seed3d_poll_initial_seconds // 2) | type == "number" and . > 0 and . <= 60)
+  and ((.seed3d_poll_max_interval_seconds // 15) | type == "number" and . > 0 and . <= 60)
+  and ((.seed3d_background_timeout_seconds // 1800) | type == "number" and . > 0 and . <= 3600)
 ' "$stage/studio.json" >/dev/null; then
   echo 'Studio configuration settings are invalid.' >&2
   exit 1

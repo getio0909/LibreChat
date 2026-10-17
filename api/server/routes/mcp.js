@@ -11,6 +11,7 @@ const {
 const {
   getBasePath,
   createSafeUser,
+  renewStudioLinks,
   createAuthIdentityContext,
   MCPOAuthHandler,
   MCPTokenStorage,
@@ -874,7 +875,7 @@ router.post('/oauth/cancel/:serverName', requireJwtAuth, async (req, res) => {
   }
 });
 
-function createMCPStatusRuntimeContext(user, mcpConfig, serverNames) {
+function createMCPStatusRuntimeContext(user, mcpConfig, serverNames, tenantId) {
   const customUserVarServers = serverNames.filter((serverName) => {
     const customUserVars = mcpConfig[serverName]?.customUserVars;
     return (
@@ -901,7 +902,7 @@ function createMCPStatusRuntimeContext(user, mcpConfig, serverNames) {
     });
     return mcpAllowlistsPromise;
   };
-  return { user: createSafeUser(user), loadUserMCPAuthMap, loadMCPAllowlists };
+  return { user: createSafeUser(user, tenantId), loadUserMCPAuthMap, loadMCPAllowlists };
 }
 
 function getMCPReinitializeOAuthTimeout(oauthExpiresAt) {
@@ -924,7 +925,7 @@ router.post(
   async (req, res, next) => {
     try {
       const { serverName } = req.params;
-      const user = createSafeUser(req.user);
+      const user = createSafeUser(req.user, req.tenantId ?? getTenantId());
 
       if (!user.id) {
         return res.status(401).json({ error: 'User not authenticated' });
@@ -1058,7 +1059,12 @@ router.get('/connection/status', requireJwtAuth, configMiddleware, async (req, r
       user.id,
       { role: user.role, tenantId: getTenantId(), appConfig: req.config },
     );
-    const runtimeContext = createMCPStatusRuntimeContext(user, mcpConfig, Object.keys(mcpConfig));
+    const runtimeContext = createMCPStatusRuntimeContext(
+      user,
+      mcpConfig,
+      Object.keys(mcpConfig),
+      req.tenantId ?? getTenantId(),
+    );
     const connectionStatus = Object.fromEntries(
       await Promise.all(
         Object.entries(mcpConfig).map(async ([serverName, config]) => {
@@ -1137,7 +1143,12 @@ router.get('/connection/status/:serverName', requireJwtAuth, configMiddleware, a
         .json({ error: `MCP server '${serverName}' not found in configuration` });
     }
 
-    const runtimeContext = createMCPStatusRuntimeContext(user, mcpConfig, [serverName]);
+    const runtimeContext = createMCPStatusRuntimeContext(
+      user,
+      mcpConfig,
+      [serverName],
+      req.tenantId ?? getTenantId(),
+    );
 
     const { value: serverStatus, generation: authorizationGeneration } =
       await readMCPRecoveryGenerationAround(
@@ -1395,5 +1406,17 @@ router.post(
  * @route GET /api/mcp/sandbox
  */
 router.get('/sandbox', serveMCPSandbox);
+
+router.post('/studio/renew/:token', requireJwtAuth, checkMCPUsePermissions, async (req, res) => {
+  const result = await renewStudioLinks({
+    token: req.params.token,
+    body: req.body,
+    user: req.user,
+    tenantId: req.tenantId ?? getTenantId(),
+    mcpUrl: process.env.STUDIO_MCP_URL,
+    sharedToken: process.env.STUDIO_SHARED_TOKEN,
+  });
+  res.status(result.status).json(result.body);
+});
 
 module.exports = router;

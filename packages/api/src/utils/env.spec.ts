@@ -512,6 +512,22 @@ describe('resolveHeaders', () => {
     expect(tenantA).not.toHaveProperty('tenantId');
   });
 
+  it('uses the authenticated request tenant when it is absent from the user document', () => {
+    const userId = '65f0000000000000000000a1';
+    const requestUser = createTestUser({ id: userId, tenantId: undefined });
+    const tenantA = createSafeUser(requestUser, 'tenant-a');
+    const tenantB = createSafeUser(requestUser, 'tenant-b');
+    const headers = { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' };
+
+    expect(tenantA.studioPrincipal).toMatch(/^[a-f0-9]{24}$/);
+    expect(tenantA.studioPrincipal).not.toBe(tenantB.studioPrincipal);
+    expect(tenantA).not.toHaveProperty('tenantId');
+    expect(createSafeUser(tenantA).studioPrincipal).toBe(tenantA.studioPrincipal);
+    expect(resolveHeaders({ headers, user: createSafeUser(tenantA) })['X-Studio-Principal']).toBe(
+      tenantA.studioPrincipal,
+    );
+  });
+
   it('resolves Studio principals from raw request users and lean users', () => {
     const userId = '65f0000000000000000000a1';
     const tenantA = createTestUser({ id: userId, tenantId: 'tenant-a' });

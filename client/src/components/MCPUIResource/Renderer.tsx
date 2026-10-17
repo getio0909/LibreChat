@@ -4,6 +4,7 @@ import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
 import {
   isHtmlMediaType,
   isMcpAppMimeType,
+  request,
   resolveMCPUIResourceMimeType,
 } from 'librechat-data-provider';
 import type { UIResource } from 'librechat-data-provider';
@@ -32,6 +33,20 @@ type UIResourceRendererProps = Omit<
 };
 
 const NOOP_ASK: TAskFunction = () => undefined;
+
+const renewThroughHost = async (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> => {
+  const endpoint = new URL(String(input), window.location.origin);
+  const match = /^\/(?:studio-files|files)\/([A-Za-z0-9_-]+\.[a-f0-9]{64})$/.exec(
+    endpoint.pathname,
+  );
+  if (endpoint.origin !== window.location.origin || !match) {
+    throw new Error('Invalid Studio renewal endpoint');
+  }
+  return request.authenticatedFetch(`/api/mcp/studio/renew/${encodeURIComponent(match[1])}`, init);
+};
 
 export function isSupportedUIResource(
   resource: UIResource | null | undefined,
@@ -106,6 +121,7 @@ export default function UIResourceRenderer({
           conversationId,
           resource,
           store: studioUIStore,
+          renewFetcher: renewThroughHost as typeof fetch,
         });
       }
       return onUIAction?.(result);
