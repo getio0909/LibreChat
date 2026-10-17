@@ -572,8 +572,8 @@ describe('UIResourceRenderer', () => {
   it('renews 3D model viewer links for ui://zyb_studio/model/ with INITIAL_MODEL_URL and preserves renewed links across unmount and remount', async () => {
     mockLegacyRenderer.mockImplementation((props) => actualMcpUi.UIResourceRenderer(props));
 
-    const oldModelUrl = makeSignedStudioUrl('model', 'mdl_demo123', 'e');
-    const newModelUrl = makeSignedStudioUrl('model', 'mdl_demo123', 'f');
+    const oldModelUrl = makeSignedStudioUrl('model', 'mdl_demo123', 'e', window.location.origin);
+    const newModelUrl = makeSignedStudioUrl('model', 'mdl_demo123', 'f', window.location.origin);
 
     const modelHtml = [
       '<div class="bottom-bar">',
@@ -590,7 +590,6 @@ describe('UIResourceRenderer', () => {
       text: modelHtml,
     };
 
-    const originalFetch = global.fetch;
     const mockFetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -604,7 +603,7 @@ describe('UIResourceRenderer', () => {
           expires_at: '2026-04-17T13:00:00Z',
         }),
     });
-    global.fetch = mockFetch as unknown as typeof fetch;
+    const fetchSpy = jest.spyOn(request, 'authenticatedFetch').mockImplementation(mockFetch);
 
     try {
       const { container, unmount } = renderEnabled(<UIResourceRenderer resource={modelResource} />);
@@ -639,7 +638,7 @@ describe('UIResourceRenderer', () => {
 
       await waitFor(() => {
         expect(mockFetch).toHaveBeenCalledWith(
-          oldModelUrl,
+          `/api/mcp/studio/renew/${oldModelUrl.split('/').pop()}`,
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -730,7 +729,7 @@ describe('UIResourceRenderer', () => {
       expect(upgradedLegacyModel).toContain(`const MODEL_URL = "${newModelUrl}";`);
       expect(upgradedLegacyModel).toContain('const EXPIRES_AT = "2026-04-17T13:00:00Z";');
     } finally {
-      global.fetch = originalFetch;
+      fetchSpy.mockRestore();
     }
   });
 

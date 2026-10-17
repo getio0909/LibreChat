@@ -811,12 +811,12 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.match(rawSmokeTest, /"create_3d_model"/);
   assert.match(rawSmokeTest, /"check_3d_model"/);
 
-  // 验证部署工作流显式传递 STUDIO_ENABLE_3D（J5005 测试环境默认 true），且仅在启用 3D 时强制要求 ARK_API_KEY。
+  // 验证部署工作流显式传递 STUDIO_ENABLE_3D（生产部署默认 false，需仓库变量显式开启），且仅在启用 3D 时强制要求 ARK_API_KEY。
   const deployStep = workflow.jobs.deploy.steps.find(
     (step) => step.name === 'Deploy the published image',
   );
   assert.ok(deployStep, 'CI deploy job must have Deploy the published image step');
-  assert.equal(deployStep.env.STUDIO_ENABLE_3D, "${{ vars.STUDIO_ENABLE_3D || 'true' }}");
+  assert.equal(deployStep.env.STUDIO_ENABLE_3D, "${{ vars.STUDIO_ENABLE_3D || 'false' }}");
   for (const name of [
     'STUDIO_FILE_TOKEN_TTL_SECONDS',
     'STUDIO_PREVIEW_TOKEN_TTL_SECONDS',
