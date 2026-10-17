@@ -42,6 +42,13 @@ async function expectNoErrorBoundary(page: Page, errors: string[]) {
 }
 
 test.describe('denied web storage', () => {
+  test.beforeEach(async ({ page }) => {
+    // 存储被浏览器拒绝时，通过独立的语言 cookie 保持英文定位器有效。
+    await page.addInitScript(() => {
+      document.cookie = 'lang=en; path=/; SameSite=Lax';
+    });
+  });
+
   test('the chat shell loads when the browser denies Web Storage @scenario:denied-web-storage-loads-the-chat', async ({
     page,
   }) => {

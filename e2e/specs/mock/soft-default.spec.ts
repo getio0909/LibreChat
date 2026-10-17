@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { TStartupConfig } from 'librechat-data-provider';
 import type { Page } from '@playwright/test';
 import { getPrimaryE2EUser } from '../../setup/users.mock';
+import { setEnglishLanguage } from '../../setup/language';
 import { cleanupAgent } from './agents.helpers';
 import {
   NEW_CHAT_PATH,
@@ -27,6 +28,8 @@ const modelTrigger = (page: Page) => page.getByRole('button', { name: 'Select a 
 
 /** Reset selection state so the test starts as a fresh instance (auth stays in cookies). */
 async function startFresh(page: Page) {
+  // 清除模型选择后重新注入测试语言，避免依赖产品的默认语言。
+  await setEnglishLanguage(page.context());
   await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
   await page.evaluate(() => localStorage.clear());
   await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
@@ -262,9 +265,8 @@ test.describe('soft default model spec', () => {
     const main = page.getByRole('main');
     const composer = page.getByRole('textbox', { name: 'Message input' });
     const user = getPrimaryE2EUser();
-    // The placeholder mirrors the sender chain, so a spec-launched chat shows the
-    // spec label (matching the model selector), not the endpoint's display label.
-    await expect(composer).toHaveAttribute('placeholder', new RegExp(SOFT_DEFAULT_LABEL), {
+    // 品牌界面的输入提示保持通用，模型选择器与欢迎区仍需排除旧智能体状态。
+    await expect(composer).toHaveAttribute('placeholder', 'Message', {
       timeout: 15000,
     });
     await expect(main).toContainText(user.name, { timeout: 15000 });
