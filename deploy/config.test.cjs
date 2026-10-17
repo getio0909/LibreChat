@@ -12,6 +12,7 @@ const {
 } = require('librechat-data-provider');
 const {
   getGoogleConfig,
+  geminiToolkit,
   processMCPEnv,
   buildMCPImageToolContext,
   applyModelSpecPreset,
@@ -43,7 +44,8 @@ const VENDOR_NAME_PATTERN =
 // 禁止残留的旧版 CAD 服务或容器标识。
 const LEGACY_CAD_PATTERN = /freecad|blender|design_tools|dufs|compile_drawing_sheet/i;
 
-// 契约允许的内置生图工具、专精 MCP 工具名与参数字段集合。
+// 契约允许的内置生图工具、专精 MCP 工具名与参数字段集合（内置生图参数从真实 geminiToolkit schema 同步）。
+const GEMINI_SCHEMA_KEYS = Object.keys(geminiToolkit.gemini_image_gen.schema.properties || {});
 const CONTRACT_IDENTIFIERS = new Set([
   'gemini_image_gen',
   'select_region',
@@ -52,10 +54,7 @@ const CONTRACT_IDENTIFIERS = new Set([
   'compare_materials',
   'create_3d_model',
   'check_3d_model',
-  'prompt',
-  'image_ids',
-  'aspect_ratio',
-  'resolution',
+  ...GEMINI_SCHEMA_KEYS,
   'base_id',
   'selection_id',
   'instruction',
@@ -408,9 +407,13 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
 
 test('promptPrefix and MCP image context mention only tool and argument names present in the contract', () => {
   const config = configSchema.parse(parsedYaml);
+  assert.deepEqual(
+    [...GEMINI_SCHEMA_KEYS].sort(),
+    ['aspectRatio', 'imageSize', 'image_ids', 'prompt'],
+  );
   for (const spec of config.modelSpecs.list) {
     const prefix = spec.preset.promptPrefix || '';
-    const identifiers = prefix.match(/[a-z_][a-z0-9_]*/g) || [];
+    const identifiers = prefix.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
     for (const identifier of identifiers) {
       assert.ok(
         CONTRACT_IDENTIFIERS.has(identifier),
@@ -419,8 +422,10 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
     }
     assert.ok(prefix.includes('prompt'), 'promptPrefix must mention prompt');
     assert.ok(prefix.includes('image_ids'), 'promptPrefix must mention image_ids');
-    assert.ok(prefix.includes('aspect_ratio'), 'promptPrefix must mention aspect_ratio');
-    assert.ok(prefix.includes('resolution'), 'promptPrefix must mention resolution');
+    assert.ok(prefix.includes('aspectRatio'), 'promptPrefix must mention aspectRatio');
+    assert.ok(prefix.includes('imageSize'), 'promptPrefix must mention imageSize');
+    assert.ok(!prefix.includes('aspect_ratio'), 'promptPrefix must not mention aspect_ratio');
+    assert.ok(!prefix.includes('resolution'), 'promptPrefix must not mention resolution');
     assert.ok(prefix.includes('base_id'), 'promptPrefix must mention base_id');
     assert.ok(prefix.includes('selection_id'), 'promptPrefix must mention selection_id');
     assert.ok(prefix.includes('instruction'), 'promptPrefix must mention instruction');
@@ -434,7 +439,7 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
     assert.ok(prefix.includes('image_id'), 'promptPrefix must mention image_id');
     assert.ok(prefix.includes('create_3d_model'), 'promptPrefix must mention create_3d_model');
     assert.ok(prefix.includes('check_3d_model'), 'promptPrefix must mention check_3d_model');
-    assert.doesNotMatch(prefix, /\b(reference_uses|reference_ids)\b/);
+    assert.doesNotMatch(prefix, /\b(reference_uses|reference_ids|aspect_ratio|resolution)\b/);
   }
 
   const mcpContext = buildMCPImageToolContext({
