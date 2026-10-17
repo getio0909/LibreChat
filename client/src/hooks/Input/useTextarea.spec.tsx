@@ -1163,29 +1163,51 @@ describe('useTextarea model-independent placeholder', () => {
     await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
   });
 
-  it.each(['de', 'fi', 'zh-Hans'])(
-    'uses the standalone Message fallback in %s',
-    async (language) => {
-      const i18n = createInstance();
-      await i18n.init({
-        lng: language,
-        fallbackLng: 'en',
-        resources: {
-          en: { translation: translations },
-          de: { translation: germanTranslations },
-          fi: { translation: finnishTranslations },
-          'zh-Hans': { translation: chineseTranslations },
-        },
-        interpolation: { escapeValue: false },
-      });
-      mockLocalize.mockImplementation((key, options) =>
-        String(i18n.t(key as keyof typeof translations, options)),
-      );
-      const { textArea } = renderTextareaHook();
+  it.each(['de', 'fi'])('uses the standalone Message fallback in %s', async (language) => {
+    const i18n = createInstance();
+    await i18n.init({
+      lng: language,
+      fallbackLng: 'en',
+      resources: {
+        en: { translation: translations },
+        de: { translation: germanTranslations },
+        fi: { translation: finnishTranslations },
+        'zh-Hans': { translation: chineseTranslations },
+      },
+      interpolation: { escapeValue: false },
+    });
+    mockLocalize.mockImplementation((key, options) =>
+      String(i18n.t(key as keyof typeof translations, options)),
+    );
+    const { textArea } = renderTextareaHook();
 
-      await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
-    },
-  );
+    await waitFor(() => expect(textArea).toHaveAttribute('placeholder', 'Message'));
+  });
+
+  // 验证简体中文环境下输入框占位符使用中文提示文案，不暴露底层模型名称。
+  it('renders the localized Chinese placeholder in zh-Hans', async () => {
+    const i18n = createInstance();
+    await i18n.init({
+      lng: 'zh-Hans',
+      fallbackLng: 'en',
+      resources: {
+        en: { translation: translations },
+        'zh-Hans': { translation: chineseTranslations },
+      },
+      interpolation: { escapeValue: false },
+    });
+    mockLocalize.mockImplementation((key, options) =>
+      String(i18n.t(key as keyof typeof translations, options)),
+    );
+    const { textArea } = renderTextareaHook();
+
+    await waitFor(() =>
+      expect(textArea).toHaveAttribute(
+        'placeholder',
+        chineseTranslations.com_endpoint_message_placeholder,
+      ),
+    );
+  });
 
   it('keeps Message when the selected model changes', async () => {
     const { textArea, rerender } = renderTextareaHook();

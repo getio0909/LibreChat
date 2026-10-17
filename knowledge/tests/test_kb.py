@@ -600,3 +600,28 @@ def test_mpo_original_preserved_and_primary_frame_used(tmp_path):
         red, green, blue = derivative.getpixel((500, 400))
         assert red > 240 and green < 10 and blue < 10
     assert validate_repository(repo) == []
+
+
+# 验证真实knowledge/语料在复合中文查询（含口语停用词与多词组合）下的分词与加权检索结果
+def test_real_kb_chinese_multi_term_search() -> None:
+    project_root = REPO_ROOT.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from deploy.studio.kb import load_kb_index
+
+    kb_index = load_kb_index(REPO_ROOT)
+    assert len(kb_index.records) == 607
+
+    for query in (
+        "「须弥座石雕参考」",
+        "须弥座石雕参考",
+        "找几张须弥座石雕参考图片",
+    ):
+        results = kb_index.search(query, limit=6)
+        assert len(results) == 6
+        result_ids = [r.kb_id for r in results]
+        assert "kb_9ffe71e1ee8bd6e7" in result_ids
+        assert "kb_db8c9deb470a3da2" in result_ids
+        for rec in results:
+            assert not rec.is_flagged
+            assert "须弥座" in rec.search_all and "石雕" in rec.search_all

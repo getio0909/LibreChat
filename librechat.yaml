@@ -16,7 +16,10 @@ interface:
     use: true
     create: false
     share: false
+    placeholder: '请选择设计工具'
   customWelcome: '庄严宝刹 AI 设计助手'
+  # 替换为中性中文页脚，隐藏默认 LibreChat 版本与标语
+  customFooter: '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考'
 
 # 聊天附件上传配置，允许两个模型端点上传参考图片
 fileConfig:
@@ -34,13 +37,23 @@ fileConfig:
 
 # 模型端点配置：原生 Google 端点与 OpenRouter 自定义端点
 endpoints:
+  all:
+    titleConvo: true
+    # 强制使用中文生成简短对话标题，避免产生英文标题
+    titlePrompt: &chineseTitlePrompt |-
+      请根据以下对话内容，生成一个简短精炼的中文标题（不超过12个汉字，不要使用标点符号、书名号或引号，只返回标题本身）。
+
+      对话内容：
+      {convo}
   google:
     titleConvo: true
     titleModel: gemini-4-argon
+    titlePrompt: *chineseTitlePrompt
   custom:
     - name: OpenRouter
       apiKey: '${OPENROUTER_API_KEY}'
       baseURL: https://openrouter.ai/api/v1
+      iconURL: /assets/zybc-seal.svg
       models:
         default:
           - anthropic/claude-haiku-5.5
@@ -48,13 +61,14 @@ endpoints:
       titleConvo: true
       titleModel: anthropic/claude-haiku-5.5
       titleEndpoint: OpenRouterTitles
+      titlePrompt: *chineseTitlePrompt
       addParams:
         reasoning_effort: ''
         reasoning:
           effort: high
           enabled: true
-        maxTokens: 128000
-        maxCompletionTokens: 128000
+        maxTokens: 32000
+        maxCompletionTokens: 32000
       dropParams:
         - stop
         - temperature
@@ -64,6 +78,7 @@ endpoints:
     - name: OpenRouterTitles
       apiKey: '${OPENROUTER_API_KEY}'
       baseURL: https://openrouter.ai/api/v1
+      iconURL: /assets/zybc-seal.svg
       models:
         default:
           - anthropic/claude-haiku-5.5
@@ -95,25 +110,42 @@ modelSpecs:
     - name: zyb-design
       label: 庄严设计助手
       description: 寺院装饰、石材大板、家具与展位概念设计主力助手
+      iconURL: /assets/zybc-seal.svg
       default: true
+      # 隐藏输入框下方的可移除工具标签栏，防止设计师误删概念设计工具
+      hideBadgeRow: true
       mcpServers:
         - zyb_studio
       preset:
         endpoint: google
         model: gemini-4-argon
+        iconURL: /assets/zybc-seal.svg
         thinking: true
         thinkingLevel: high
+        # Google 官方文档：gemini-4-argon 共享输入输出总窗口 1,048,576，默认最大输出 65,536；
+        # 为控制每轮重发历史的输入费用，上下文上限取 200,000（远低于模型窗口）
+        maxContextTokens: 200000
+        maxOutputTokens: 65536
         promptPrefix: &designPromptPrefix |-
           你是庄严宝刹设计助手，专注佛堂、石材、家具与展位。必调工具：查图库 search_library（kb_ 前缀可传 base_id、image_id、reference_ids）；多方案 design_concepts；出图 generate_image；整图改 edit_image（未知调 list_images）；局部改先 select_region 确认，再 edit_region（传 selection_id、instruction）；石材对比 compare_materials（传 target、materials）；三维 create_3d_model（传 detail，返 job_id 调 check_3d_model，留视图标记附链接）；references 含 id、use。保留石材原名；仅作视觉参考，非制造模型。禁提模型或厂商名。
     - name: zyb-design-fast
       label: 庄严设计助手 · 快速
       description: 快速响应的概念设计与图像改图助手
+      iconURL: /assets/zybc-seal.svg
       default: false
+      # 隐藏输入框下方的可移除工具标签栏，防止设计师误删概念设计工具
+      hideBadgeRow: true
       mcpServers:
         - zyb_studio
       preset:
         endpoint: OpenRouter
         model: anthropic/claude-haiku-5.5
+        iconURL: /assets/zybc-seal.svg
+        # OpenRouter 公开模型接口：anthropic/claude-haiku-5.5 总窗口 1,000,000，最大补全输出 128,000；
+        # 为控制每轮重发历史的输入费用，上下文上限取 200,000（远低于模型窗口）
+        maxContextTokens: 200000
+        # 对话回复无需 128,000 输出预留；取 32,000 使上下文上限内留出约 168,000 给对话历史
+        max_tokens: 32000
         promptPrefix: *designPromptPrefix
 
 # 启用内联 MCP UI 资源渲染并允许访问内部 Docker 网络中的概念设计 MCP 服务地址
@@ -127,7 +159,13 @@ mcpServers:
   zyb_studio:
     type: streamable-http
     url: http://studio:8000/mcp
-    timeout: 600000
+    title: 庄严宝刹设计工坊
+    # 从聊天工具下拉菜单隐藏，仅通过 modelSpecs 自动挂载，防止被设计师手动取消勾选
+    chatMenu: false
+    # 内部令牌认证服务无需 OAuth，关闭启动与每请求 OAuth 探测以避免 403 噪音
+    requiresOAuth: false
+    # 单次 design_concepts 规划最长 540s + 出图最长 240s = 780s，预留 120s 缓冲设为 900s（900,000ms）
+    timeout: 900000
     headers:
       X-LibreChat-User-ID: '{{LIBRECHAT_USER_ID}}'
       X-LibreChat-Conversation-ID: '{{LIBRECHAT_BODY_CONVERSATIONID}}'

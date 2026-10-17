@@ -8,8 +8,9 @@ services:
       - '127.0.0.1:${APP_PORT:-3080}:3080'
     env_file: .env
     environment:
-      # 后端启动配置决定浏览器标题，不能只修改前端 HTML 或环境变量示例。
+      # 后端启动配置决定浏览器标题与页脚，不能只修改前端 HTML 或环境变量示例。
       APP_TITLE: 庄严宝刹 AI 设计助手
+      CUSTOM_FOOTER: 庄严宝刹 AI 设计助手 · 仅供内部概念设计参考
       HOST: 0.0.0.0
       PORT: 3080
       NODE_ENV: production
@@ -141,3 +142,8 @@ volumes:
   logs:
   appdata:
   studio-data:
+
+# 为默认Compose网络开启IPv6，确保studio容器可通过IPv6连接火山方舟等双栈上游服务
+networks:
+  default:
+    enable_ipv6: true

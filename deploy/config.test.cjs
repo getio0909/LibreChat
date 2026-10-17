@@ -4,16 +4,28 @@ const assert = require('node:assert/strict');
 const yaml = require('js-yaml');
 const {
   configSchema,
+  EModelEndpoint,
   fileConfig: defaultFileConfig,
   mergeFileConfig,
   getEndpointFileConfig,
+  validateVisionModel,
 } = require('librechat-data-provider');
-const { getGoogleConfig, processMCPEnv, buildMCPImageToolContext } = require('@librechat/api');
+const {
+  getGoogleConfig,
+  processMCPEnv,
+  buildMCPImageToolContext,
+  applyModelSpecPreset,
+  initializeAgent,
+  isChatSelectableMCPServer,
+} = require('@librechat/api');
 
 const rawYaml = fs.readFileSync('librechat.yaml', 'utf8');
 const parsedYaml = yaml.load(rawYaml);
 const rawCompose = fs.readFileSync('deploy/compose.yml', 'utf8');
 const parsedCompose = yaml.load(rawCompose);
+const zhHansTranslations = JSON.parse(
+  fs.readFileSync('client/src/locales/zh-Hans/translation.json', 'utf8'),
+);
 
 // 禁止在面向用户的名称、描述或提示词中出现的厂商与模型标识。
 const VENDOR_NAME_PATTERN =
@@ -77,11 +89,16 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
   const [defaultSpec, fastSpec] = config.modelSpecs.list;
   assert.equal(defaultSpec.name, 'zyb-design');
   assert.equal(defaultSpec.default, true);
+  assert.equal(defaultSpec.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(defaultSpec.hideBadgeRow, true);
   assert.equal(defaultSpec.preset.endpoint, 'google');
   assert.equal(defaultSpec.preset.model, 'gemini-4-argon');
+  assert.equal(defaultSpec.preset.iconURL, '/assets/zybc-seal.svg');
   assert.equal(defaultSpec.preset.thinking, true);
   assert.equal(defaultSpec.preset.thinkingLevel, 'high');
   assert.equal(defaultSpec.preset.thinkingBudget, undefined);
+  assert.equal(defaultSpec.preset.maxContextTokens, 200000);
+  assert.equal(defaultSpec.preset.maxOutputTokens, 65536);
 
   // 验证 Google LLM 配置为 Gemini 4 Argon 生成 HIGH thinkingLevel 且不发送 thinkingBudget。
   const { llmConfig } = getGoogleConfig(
@@ -103,17 +120,142 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
 
   assert.equal(fastSpec.name, 'zyb-design-fast');
   assert.equal(fastSpec.default, false);
+  assert.equal(fastSpec.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(fastSpec.hideBadgeRow, true);
   assert.equal(fastSpec.preset.endpoint, 'OpenRouter');
   assert.equal(fastSpec.preset.model, 'anthropic/claude-haiku-5.5');
+  assert.equal(fastSpec.preset.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(fastSpec.preset.maxContextTokens, 200000);
+  assert.equal(fastSpec.preset.max_tokens, 32000);
 
   // 验证 OpenRouter 与轻量级标题端点配置。
   const openRouterEndpoint = config.endpoints.custom.find((ep) => ep.name === 'OpenRouter');
   const titleEndpoint = config.endpoints.custom.find((ep) => ep.name === 'OpenRouterTitles');
   assert.ok(openRouterEndpoint, 'OpenRouter custom endpoint must exist');
   assert.ok(titleEndpoint, 'OpenRouterTitles custom endpoint must exist');
+  assert.equal(openRouterEndpoint.iconURL, '/assets/zybc-seal.svg');
+  assert.equal(titleEndpoint.iconURL, '/assets/zybc-seal.svg');
   assert.equal(openRouterEndpoint.titleConvo, true);
   assert.equal(openRouterEndpoint.titleEndpoint, 'OpenRouterTitles');
   assert.deepEqual(openRouterEndpoint.models.default, ['anthropic/claude-haiku-5.5']);
+  assert.ok(config.endpoints.all?.titlePrompt?.includes('{convo}'));
+  assert.ok(config.endpoints.google?.titlePrompt?.includes('{convo}'));
+  assert.ok(openRouterEndpoint.titlePrompt?.includes('{convo}'));
+});
+
+test('both modelSpecs compute large effective context budgets via initializeAgent and never collapse to 1024', async () => {
+  const config = configSchema.parse(parsedYaml);
+  const previousGoogleKey = process.env.GOOGLE_KEY;
+  const previousOpenRouterKey = process.env.OPENROUTER_API_KEY;
+  process.env.GOOGLE_KEY = 'fixture-google-key';
+  process.env.OPENROUTER_API_KEY = 'fixture-openrouter-key';
+
+  try {
+    const appConfig = {
+      endpoints: {
+        ...config.endpoints,
+        custom: config.endpoints.custom,
+      },
+    };
+    const db = {
+      getProjectFiles: async () => [],
+      getFiles: async () => [],
+      getConvoFiles: async () => [],
+      updateFilesUsage: async () => [],
+      getUserKey: async () => 'fixture-key',
+      getUserKeyValues: async () => ({ apiKey: 'fixture-key' }),
+      getToolFilesByIds: async () => [],
+    };
+    const loadTools = async () => ({
+      tools: [],
+      toolContextMap: {},
+      dynamicToolContextMap: {},
+      toolDefinitions: [],
+      hasDeferredTools: false,
+    });
+
+    // 预估系统提示词与 8 个 MCP 工具 schema 的总词元开销上限（实测约 1,813 tokens，此处按 5,000 保守预留）。
+    const instructionAndToolTokensReserve = 5000;
+
+    for (const spec of config.modelSpecs.list) {
+      const endpoint = spec.preset.endpoint;
+      const endpointType =
+        endpoint === EModelEndpoint.google ? EModelEndpoint.google : EModelEndpoint.custom;
+      const { parsedBody } = applyModelSpecPreset({
+        modelSpec: spec,
+        parsedBody: { spec: spec.name },
+        endpoint,
+        endpointType,
+        includePresetDefaults: true,
+      });
+      const {
+        spec: _s,
+        iconURL: _i,
+        agent_id: _a,
+        chatProjectId: _c,
+        ...model_parameters
+      } = parsedBody;
+      const agent = {
+        id: EModelEndpoint.agents,
+        name: spec.label,
+        provider: endpoint,
+        model: spec.preset.model,
+        instructions: spec.preset.promptPrefix,
+        tools: [],
+        model_parameters,
+      };
+      const initialized = await initializeAgent(
+        {
+          req: { user: { id: 'user-1' }, config: appConfig, body: {} },
+          res: {},
+          agent,
+          loadTools,
+          endpointOption: { endpoint, endpointType, model_parameters },
+          allowedProviders: new Set([endpoint, 'google', 'openAI', 'custom']),
+          isInitialAgent: true,
+        },
+        db,
+      );
+
+      assert.notEqual(
+        initialized.maxContextTokens,
+        1024,
+        `${spec.name} maxContextTokens must not collapse to the 1024 floor`,
+      );
+      assert.ok(
+        initialized.baseContextTokens >= 100000,
+        `${spec.name} baseContextTokens must remain >= 100k, got ${initialized.baseContextTokens}`,
+      );
+      const availableForMessages = initialized.maxContextTokens - instructionAndToolTokensReserve;
+      assert.ok(
+        availableForMessages >= 100000,
+        `${spec.name} availableForMessages must be at least 100k, got ${availableForMessages}`,
+      );
+
+      if (spec.name === 'zyb-design') {
+        // gemini-4-argon：上下文上限 200,000 - 最大输出 65,536 = 134,464 可用于输入
+        assert.equal(initialized.maxContextTokens, 200000);
+        assert.equal(initialized.baseContextTokens, 134464);
+        assert.equal(initialized.model_parameters.maxOutputTokens, 65536);
+      } else if (spec.name === 'zyb-design-fast') {
+        // anthropic/claude-haiku-5.5：上下文上限 200,000 - 最大输出 32,000 = 168,000 可用于输入
+        assert.equal(initialized.maxContextTokens, 200000);
+        assert.equal(initialized.baseContextTokens, 168000);
+        assert.equal(initialized.model_parameters.maxTokens, 32000);
+      }
+    }
+  } finally {
+    if (previousGoogleKey === undefined) {
+      delete process.env.GOOGLE_KEY;
+    } else {
+      process.env.GOOGLE_KEY = previousGoogleKey;
+    }
+    if (previousOpenRouterKey === undefined) {
+      delete process.env.OPENROUTER_API_KEY;
+    } else {
+      process.env.OPENROUTER_API_KEY = previousOpenRouterKey;
+    }
+  }
 });
 
 test('only zyb_studio is attached and no CAD servers or prompts remain', () => {
@@ -129,6 +271,23 @@ test('only zyb_studio is attached and no CAD servers or prompts remain', () => {
 test('customer-facing labels, descriptions, welcome text, and promptPrefix contain no vendor names', () => {
   const config = configSchema.parse(parsedYaml);
   assert.doesNotMatch(config.interface.customWelcome || '', VENDOR_NAME_PATTERN);
+  assert.equal(parsedYaml.interface.customFooter, '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考');
+  assert.equal(
+    parsedCompose.services.api.environment.CUSTOM_FOOTER,
+    '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考',
+  );
+  assert.doesNotMatch(parsedYaml.interface.customFooter, VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(parsedYaml.interface.customFooter, /librechat|every ai for everyone/i);
+  assert.doesNotMatch(config.interface.mcpServers?.placeholder || '', VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(config.mcpServers.zyb_studio.title || '', VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(config.endpoints.all?.titlePrompt || '', VENDOR_NAME_PATTERN);
+  assert.doesNotMatch(config.endpoints.google?.titlePrompt || '', VENDOR_NAME_PATTERN);
+  assert.match(
+    zhHansTranslations.com_endpoint_message_placeholder || '',
+    /[\u4e00-\u9fff]/,
+    'zh-Hans composer placeholder must be Chinese',
+  );
+  assert.notEqual(zhHansTranslations.com_endpoint_message_placeholder, 'Message');
 
   for (const spec of config.modelSpecs.list) {
     assert.doesNotMatch(spec.label, VENDOR_NAME_PATTERN);
@@ -218,7 +377,13 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   const studioServer = config.mcpServers.zyb_studio;
   assert.equal(studioServer.type, 'streamable-http');
   assert.equal(studioServer.url, 'http://studio:8000/mcp');
-  assert.equal(studioServer.timeout, 600000);
+  assert.equal(studioServer.title, '庄严宝刹设计工坊');
+  assert.equal(studioServer.chatMenu, false);
+  assert.equal(studioServer.requiresOAuth, false);
+  // 超时时间须大于规划（540s）与生图（240s）之和 780,000ms。
+  assert.equal(studioServer.timeout, 900000);
+  assert.ok(studioServer.timeout >= (540 + 240) * 1000);
+  assert.equal(isChatSelectableMCPServer(studioServer), false);
   assert.deepEqual(studioServer.headers, {
     'X-LibreChat-User-ID': '{{LIBRECHAT_USER_ID}}',
     'X-LibreChat-Conversation-ID': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
@@ -268,10 +433,21 @@ test('fileConfig permits image uploads on both google and OpenRouter endpoints',
   }
 });
 
-test('deploy/compose.yml configures hardened studio service and api endpoint wiring', () => {
-  const { services, volumes } = parsedCompose;
+test('deploy/compose.yml configures hardened studio service, IPv6 network, and api endpoint wiring', () => {
+  const { services, volumes, networks } = parsedCompose;
   assert.ok(services.studio, 'studio service must be defined in deploy/compose.yml');
   assert.ok('studio-data' in volumes, 'studio-data volume must be defined in deploy/compose.yml');
+  assert.ok(networks && networks.default, 'default network must be defined in deploy/compose.yml');
+  assert.equal(
+    networks.default.enable_ipv6,
+    true,
+    'default compose network must enable IPv6 for Ark reachability',
+  );
+  assert.equal(
+    studioNetworkUsesDefault(services.studio),
+    true,
+    'studio service must use the IPv6-enabled default compose network',
+  );
 
   const studio = services.studio;
   assert.equal(studio.image, '${STUDIO_IMAGE:?Set STUDIO_IMAGE in image.env}');
@@ -293,6 +469,17 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
+
+// 校验服务未挂载到禁用IPv6的独立网络而是使用默认IPv6网络
+function studioNetworkUsesDefault(serviceConfig) {
+  if (!serviceConfig.networks) {
+    return true;
+  }
+  if (Array.isArray(serviceConfig.networks)) {
+    return serviceConfig.networks.includes('default');
+  }
+  return Object.prototype.hasOwnProperty.call(serviceConfig.networks, 'default');
+}
 
 test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding and matches compose host port', () => {
   const rawNginx = fs.readFileSync('deploy/nginx.conf', 'utf8');
@@ -402,3 +589,137 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.match(rawSmokeTest, /"create_3d_model"/);
   assert.match(rawSmokeTest, /"check_3d_model"/);
 });
+
+test('gemini-4-argon is recognized as multimodal and formats image blocks, tool image results, and thought signatures without throwing', async () => {
+  // 校验 data-provider 视觉模型白名单与 @librechat/agents 补丁挂载
+  assert.equal(
+    validateVisionModel({ model: 'gemini-4-argon' }),
+    true,
+    'validateVisionModel must recognize gemini-4-argon',
+  );
+
+  const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const apiPkg = JSON.parse(fs.readFileSync('api/package.json', 'utf8'));
+  const packagesApiPkg = JSON.parse(fs.readFileSync('packages/api/package.json', 'utf8'));
+  assert.equal(rootPkg.scripts.postinstall, 'patch-package --error-on-fail');
+  assert.ok(rootPkg.dependencies['patch-package'], 'patch-package must be in root dependencies');
+  assert.equal(apiPkg.dependencies['@librechat/agents'], '4.0.4');
+  assert.equal(packagesApiPkg.peerDependencies['@librechat/agents'], '4.0.4');
+  assert.equal(fs.existsSync('patches/@librechat+agents+4.0.4.patch'), true);
+
+  const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
+  const dockerfileMulti = fs.readFileSync('Dockerfile.multi', 'utf8');
+  assert.match(dockerfile, /COPY --chown=node:node patches \.\/patches/);
+  assert.match(dockerfileMulti, /COPY patches \.\/patches/);
+
+  // 校验 CustomChatGoogleGenerativeAI 对 gemini-4-argon 的多模态请求、工具图像结果与 thoughtSignature 处理
+  const { CustomChatGoogleGenerativeAI } = require('@librechat/agents/llm/google');
+  const { HumanMessage, AIMessage, ToolMessage } = require('@langchain/core/messages');
+
+  const llm = new CustomChatGoogleGenerativeAI({
+    model: 'gemini-4-argon',
+    apiKey: 'test-api-key',
+  });
+  assert.equal(llm._isMultimodalModel, true);
+
+  let capturedRequest = null;
+  llm.client.generateContent = async (req) => {
+    capturedRequest = req;
+    return {
+      response: {
+        candidates: [
+          {
+            content: { role: 'model', parts: [{ text: 'ok' }] },
+            finishReason: 'STOP',
+          },
+        ],
+        usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5, totalTokenCount: 15 },
+      },
+    };
+  };
+
+  const userImg = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  const toolImg = 'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+
+  await llm._generate(
+    [
+      new HumanMessage({
+        content: [
+          { type: 'text', text: '分析上传图并检索知识库' },
+          { type: 'image_url', image_url: `data:image/png;base64,${userImg}` },
+        ],
+      }),
+      new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            id: 'call_1',
+            name: 'search_library_mcp_zyb_studio',
+            args: { query: '须弥座' },
+            type: 'tool_call',
+          },
+          {
+            id: 'call_2',
+            name: 'generate_image_mcp_zyb_studio',
+            args: { prompt: '供桌' },
+            type: 'tool_call',
+          },
+        ],
+        additional_kwargs: {
+          __gemini_function_call_thought_signatures__: {
+            call_1: 'explicit_thought_sig_1',
+          },
+        },
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_1',
+        name: 'search_library_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"count":1}' },
+          { type: 'image_url', image_url: `data:image/webp;base64,${toolImg}` },
+        ],
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_2',
+        name: 'generate_image_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"id":"img_1234"}' },
+          { type: 'image_url', image_url: `data:image/webp;base64,${toolImg}` },
+        ],
+      }),
+    ],
+    {},
+  );
+
+  assert.ok(capturedRequest, 'generateContent must be invoked with formatted request');
+  assert.equal(capturedRequest.contents.length, 4);
+  assert.deepEqual(capturedRequest.contents[0].parts[1], {
+    inlineData: { mimeType: 'image/png', data: userImg },
+  });
+  assert.equal(capturedRequest.contents[1].parts[0].thoughtSignature, 'explicit_thought_sig_1');
+  assert.ok(
+    typeof capturedRequest.contents[1].parts[1].thoughtSignature === 'string' &&
+      capturedRequest.contents[1].parts[1].thoughtSignature.length > 20,
+    'missing thoughtSignature on gemini-4-argon must fall back to DUMMY_SIGNATURE',
+  );
+  assert.deepEqual(capturedRequest.contents[2].parts[0].functionResponse.response.result[1], {
+    inlineData: { mimeType: 'image/webp', data: toolImg },
+  });
+});
+
+test('zh-Hans locale translates designer-visible Projects sidebar and upstream model error strings', () => {
+  // 校验简体中文语言包覆盖项目侧栏与上游模型错误提示键
+  const zhTranslation = JSON.parse(
+    fs.readFileSync('client/src/locales/zh-Hans/translation.json', 'utf8'),
+  );
+  assert.equal(zhTranslation.com_ui_projects, '项目');
+  assert.equal(zhTranslation.com_ui_project, '项目');
+  assert.equal(zhTranslation.com_ui_create_project, '创建项目');
+  assert.equal(zhTranslation.com_ui_new_chat_in_project, '在 {{name}} 中新建对话');
+  assert.equal(zhTranslation.com_error_upstream_model, '模型服务暂时无法完成此请求。');
+  assert.equal(
+    zhTranslation.com_error_upstream_model_status,
+    '模型服务暂时无法完成此请求（状态码 {{0}}）。',
+  );
+});
+
