@@ -44,9 +44,9 @@ MODEL_REVISION = "de431c4043854a71d8101e17995dfe596bf101a5"
 MODEL_SHA256 = "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7"
 MODEL_FILE_SHA256S: dict[str, str] = {
     "model.safetensors": MODEL_SHA256,
-    "config.json": "bfdc695acbd97dc36ff8c2c525faaf25ccdbff2b9c3176fe1323acfa5fb9cf11",
-    "preprocessor_config.json": "2de8ffca4ebddc7fb3efeefcc86fe9327a272a76524e6bbab42f59fa32f55e9c",
-    "processor_config.json": "f1aa5beebdb6e95b5924f5eb1c0fa007ba3e0a7e4a6d491c4e98b16a3d5a5828",
+    "config.json": "860aff9751b139d83a4ad7df1e5535416fded533e0ead02625edbefcb9953cce",
+    "preprocessor_config.json": "6ebf229ee259368ce4a8d4f2fe893a72b053023710853e257253939e601f583d",
+    "processor_config.json": "f8a68e865cfad115c1c2763f3d93eca7b1c622da06da2a9273eb437fb2389b6d",
 }
 DEFAULT_SAM2_MODEL_DIR = Path("/opt/studio-models/sam2.1-hiera-tiny")
 DEFAULT_SAM2_ONNX_DIR = DEFAULT_SAM2_MODEL_DIR
@@ -847,7 +847,7 @@ def verify_sam2_model_dir(
             )
 
     manifest_path = base / "manifest.json"
-    file_hashes: dict[str, str] = {"model.safetensors": MODEL_SHA256}
+    file_hashes: dict[str, str] = dict(MODEL_FILE_SHA256S)
     if expected_sha256 is not None:
         file_hashes["model.safetensors"] = expected_sha256.strip().lower()
     elif manifest_path.is_file() and not manifest_path.is_symlink():

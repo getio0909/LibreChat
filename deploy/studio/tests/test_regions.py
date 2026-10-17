@@ -21,6 +21,7 @@ from deploy.studio.config import StudioSettings, load_rules, load_settings
 from deploy.studio.images import GEMINI_NATIVE
 from deploy.studio.regions import (
     DEFAULT_SAM2_MODEL_DIR,
+    MODEL_FILE_SHA256S,
     MODEL_REPO,
     MODEL_REVISION,
     MODEL_SHA256,
@@ -717,6 +718,26 @@ def test_segmentation_adapter_mocked_and_endpoint(
         MODEL_SHA256
         == "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7"
     )
+    assert MODEL_FILE_SHA256S == {
+        "model.safetensors": "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7",
+        "config.json": "860aff9751b139d83a4ad7df1e5535416fded533e0ead02625edbefcb9953cce",
+        "preprocessor_config.json": "6ebf229ee259368ce4a8d4f2fe893a72b053023710853e257253939e601f583d",
+        "processor_config.json": "f8a68e865cfad115c1c2763f3d93eca7b1c622da06da2a9273eb437fb2389b6d",
+    }
+    assert all(
+        re.fullmatch(r"[0-9a-f]{64}", digest) for digest in MODEL_FILE_SHA256S.values()
+    )
+    dockerfile_text = (
+        Path(__file__).resolve().parents[1] / "Dockerfile"
+    ).read_text(encoding="utf-8")
+    dockerfile_files_match = re.search(
+        r"files\s*=\s*\{(.*?)\};", dockerfile_text, flags=re.DOTALL
+    )
+    assert dockerfile_files_match is not None
+    dockerfile_pins = dict(
+        re.findall(r"'([^']+)':\s*'([^']+)'", dockerfile_files_match.group(1))
+    )
+    assert dockerfile_pins == MODEL_FILE_SHA256S
 
     model_dir = tmp_path / "sam2_safetensors"
     model_dir.mkdir(parents=True, mode=0o700)

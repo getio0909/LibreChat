@@ -673,6 +673,60 @@ test('studio Dockerfile copies knowledge/ to /kb while LibreChat app image exclu
   assert.doesNotMatch(appDockerfileMulti, /\bknowledge\b/);
 });
 
+test('studio SAM 2.1 manifest pins every downloaded file with a verified 64-hex SHA-256 digest and enforces mismatch failure', () => {
+  // 校验 deploy/studio/Dockerfile 与 deploy/studio/regions.py 的 SAM 2.1 文件清单完整列出所有下载文件且均为64位十六进制SHA-256摘要。
+  const studioDockerfile = fs.readFileSync('deploy/studio/Dockerfile', 'utf8');
+  const regionsPy = fs.readFileSync('deploy/studio/regions.py', 'utf8');
+
+  const expectedPins = {
+    'model.safetensors': '48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7',
+    'config.json': '860aff9751b139d83a4ad7df1e5535416fded533e0ead02625edbefcb9953cce',
+    'preprocessor_config.json': '6ebf229ee259368ce4a8d4f2fe893a72b053023710853e257253939e601f583d',
+    'processor_config.json': 'f8a68e865cfad115c1c2763f3d93eca7b1c622da06da2a9273eb437fb2389b6d',
+  };
+
+  const dockerfileFilesBlock = studioDockerfile.match(/files\s*=\s*\{([\s\S]*?)\};/);
+  assert.ok(dockerfileFilesBlock, 'deploy/studio/Dockerfile must define files = { ... } manifest');
+  const dockerfilePins = {};
+  for (const match of dockerfileFilesBlock[1].matchAll(/'([^']+)':\s*'([^']+)'/g)) {
+    dockerfilePins[match[1]] = match[2];
+  }
+
+  assert.deepEqual(
+    Object.keys(dockerfilePins).sort(),
+    Object.keys(expectedPins).sort(),
+    'Dockerfile files manifest must list every downloaded SAM 2.1 file',
+  );
+  for (const [fileName, expectedSha] of Object.entries(expectedPins)) {
+    assert.match(
+      dockerfilePins[fileName],
+      /^[0-9a-f]{64}$/,
+      `Dockerfile digest for ${fileName} must be 64 lowercase hex chars`,
+    );
+    assert.equal(dockerfilePins[fileName], expectedSha);
+  }
+  assert.match(
+    studioDockerfile,
+    /RuntimeError\(f'SHA256 mismatch for \{name\}: \{actual\} != \{expected\}'\)/,
+    'Dockerfile must fail the build when any downloaded file SHA-256 mismatches',
+  );
+
+  const regionsManifestBlock = regionsPy.match(
+    /MODEL_FILE_SHA256S:\s*dict\[str,\s*str\]\s*=\s*\{([\s\S]*?)\}/,
+  );
+  assert.ok(regionsManifestBlock, 'deploy/studio/regions.py must define MODEL_FILE_SHA256S');
+  const regionsPins = {};
+  for (const match of regionsManifestBlock[1].matchAll(
+    /"([^"]+)":\s*(?:"([^"]+)"|(MODEL_SHA256))/g,
+  )) {
+    regionsPins[match[1]] =
+      match[3] === 'MODEL_SHA256'
+        ? (regionsPy.match(/MODEL_SHA256\s*=\s*"([^"]+)"/) || [])[1]
+        : match[2];
+  }
+  assert.deepEqual(regionsPins, expectedPins);
+});
+
 test('CI workflow builds studio image with root context, runs Python 3.13 and knowledge checks, and runs smoke test', () => {
   const rawWorkflow = fs.readFileSync('.github/workflows/development.yml', 'utf8');
   const workflow = yaml.load(rawWorkflow);
