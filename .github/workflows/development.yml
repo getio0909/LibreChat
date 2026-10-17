@@ -47,7 +47,8 @@ jobs:
       - name: Verify studio service and deployment configuration
         run: |
           node --test deploy/*.test.cjs
-          python -m pip install -r deploy/studio/requirements.txt jsonschema pytest
+          python -m pip install -r deploy/studio/requirements.txt jsonschema pytest playwright==1.63.0
+          python -m playwright install --with-deps --only-shell chromium
           python knowledge/tools/validate.py
           python -m pytest knowledge/tests
           python -m pytest deploy/studio

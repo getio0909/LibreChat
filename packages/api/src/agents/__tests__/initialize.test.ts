@@ -6408,15 +6408,19 @@ describe('initializeAgent turn delivery routing', () => {
       '- img-gen-t1 (img-gen-t1-generate_image_mcp_studio.png, generated, turn 1)',
     );
     expect(mcpImageContext).toContain('- img-upload-t2 (marble_ref.webp, upload, turn 2)');
-    expect(mcpImageContext).toContain('`edit_image.base_id`');
+    expect(mcpImageContext).toContain('`gemini_image_gen.image_ids`');
+    expect(mcpImageContext).toContain('`select_region.image_id`');
+    expect(mcpImageContext).toContain('`edit_region.base_id`');
+    expect(mcpImageContext).toContain('`compare_materials.base_id`');
     expect(mcpImageContext).toContain('`references[].id`');
     expect(mcpImageContext).toContain('`references[].use`');
-    expect(mcpImageContext).toContain('`design_concepts.reference_ids`');
+    expect(mcpImageContext).toContain('`create_3d_model.image_id`');
     expect(mcpImageContext).not.toContain('img-other-user');
     expect(mcpImageContext).not.toContain('foreign.png');
     expect(mcpImageContext).not.toContain('img-sibling');
     expect(mcpImageContext).not.toContain('sibling.png');
-    expect(mcpImageContext).not.toContain('image_ids');
+    expect(mcpImageContext).not.toContain('edit_image.base_id');
+    expect(mcpImageContext).not.toContain('design_concepts.reference_ids');
     expect(mcpImageContext).not.toContain('reference_uses');
   });
 });

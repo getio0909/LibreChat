@@ -2207,7 +2207,6 @@ def test_selection_editor_subtract_renders_zero_alpha_and_disables_confirm_on_fu
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            executable_path="/usr/bin/chromium",
             headless=True,
         )
         try:
@@ -2534,7 +2533,6 @@ def test_playwright_sandboxed_selection_editor_null_origin_cors_subtract_and_pro
 
         with sync_playwright() as p:
             browser = p.chromium.launch(
-                executable_path="/usr/bin/chromium",
                 headless=True,
                 args=["--no-sandbox", "--disable-gpu"],
             )
@@ -2986,7 +2984,6 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
 
         with sync_playwright() as p:
             browser = p.chromium.launch(
-                executable_path="/usr/bin/chromium",
                 headless=True,
             )
             try:
