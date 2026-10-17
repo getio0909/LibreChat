@@ -108,7 +108,7 @@ case "$url" in
     if [[ -n "${DEPLOY_TEST_AGENTS_DB:-}" && -f "$DEPLOY_TEST_AGENTS_DB" ]]; then
       cp "$DEPLOY_TEST_AGENTS_DB" "$output"
     else
-      printf '{"data":[]}\n' > "$output"
+      printf '{"data":[],"has_more":false,"after":null}\n' > "$output"
     fi
     ;;
   */api/agents\?limit=100\&cursor=*)
@@ -124,8 +124,11 @@ case "$url" in
   */api/agents/*/expanded)
     test "$method" = GET
     test "$auth" = "Authorization: Bearer mock-jwt-token"
-    printf '{"error":"Not found"}\n' > "$output"
-    exit 22
+    agent_id=${url%/expanded}
+    agent_id=${agent_id##*/}
+    jq -s --arg id "$agent_id" '([.[].data[]? | select(.id == $id)] | .[0]) // empty' \
+      "$DEPLOY_TEST_AGENTS_DB" "${DEPLOY_TEST_AGENTS_PAGE2:-$DEPLOY_TEST_AGENTS_DB}" > "$output"
+    test -s "$output"
     ;;
   */api/agents|*/api/agents/*)
     test "$auth" = "Authorization: Bearer mock-jwt-token"
@@ -181,7 +184,7 @@ printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]}]}' > "$work/existing-agents.json"
+printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手","instructions":"owned <!-- librechat-studio-owner:zyb-design:v1 -->","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速","instructions":"owned <!-- librechat-studio-owner:zyb-design-fast:v1 -->","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]}],"has_more":false,"after":null}' > "$work/existing-agents.json"
 
 # 首次部署与重部署成功后，librechat.yaml 中的占位符应被替换为解析后的持久化 agent_id。
 mkdir -p "$work/expected-first" "$work/redeployed"
@@ -262,7 +265,7 @@ done
 
 # 验证分页拉取与归属保护：第一页含非 Studio 同名智能体且带分页游标，第二页含真实 Studio 智能体时绝不覆盖同名外部智能体。
 printf '%s\n' '{"data":[{"id":"agent_unrelated_user_id","_id":"670000000000000000000099","name":"庄严设计助手","tools":["web_search"]}],"has_more":true,"after":"cursor_p2"}' > "$work/agents-page1.json"
-printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]}],"has_more":false,"after":null}' > "$work/agents-page2.json"
+cp "$work/existing-agents.json" "$work/agents-page2.json"
 mkdir -p "$work/paginated"
 cp "$work/previous/"* "$work/previous/.env" "$work/paginated/"
 chmod 600 "$work/paginated/"* "$work/paginated/.env"
@@ -279,6 +282,42 @@ grep -q '^api:GET:/api/agents?limit=100&cursor=cursor_p2$' "$DEPLOY_TEST_LOG"
 grep -q '^api:PATCH:/api/agents/agent_studio_main_id:agent_studio_main_id$' "$DEPLOY_TEST_LOG"
 grep -q '^api:PATCH:/api/agents/agent_studio_fast_id:agent_studio_fast_id$' "$DEPLOY_TEST_LOG"
 echo 'Deployment pagination and Studio agent ownership test passed.'
+
+# 同名、同工具的外部智能体没有归属标记时，只允许新建；持久化 ID 若指向它则必须失败关闭。
+printf '%s\n' '{"data":[{"id":"agent_foreign","_id":"670000000000000000000099","name":"庄严设计助手","instructions":"foreign instructions","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]}],"has_more":false,"after":null}' > "$work/foreign-agents.json"
+mkdir -p "$work/foreign-create" "$work/foreign-persisted" "$work/incomplete-page"
+for scenario in foreign-create foreign-persisted incomplete-page; do
+  cp "$work/previous/"* "$work/previous/.env" "$work/$scenario/"
+  chmod 600 "$work/$scenario/"* "$work/$scenario/.env"
+done
+export DEPLOY_TEST_AGENTS_DB="$work/foreign-agents.json"
+: > "$DEPLOY_TEST_LOG"
+SSH_ORIGINAL_COMMAND="deploy $work/foreign-create" bash "$work/deploy.sh" "$work/foreign-create" \
+  < "$work/bundle.tgz" > "$work/output.log" 2>&1
+grep -q '^api:POST:/api/agents:agent_studio_main_id$' "$DEPLOY_TEST_LOG"
+! grep -q '^api:PATCH:/api/agents/agent_foreign:' "$DEPLOY_TEST_LOG"
+
+printf '%s\n' '{"agent___STUDIO_AGENT_ID_MAIN__":"agent_foreign"}' > "$work/foreign-persisted/.studio_agent_ids.json"
+: > "$DEPLOY_TEST_LOG"
+if SSH_ORIGINAL_COMMAND="deploy $work/foreign-persisted" bash "$work/deploy.sh" "$work/foreign-persisted" \
+  < "$work/bundle.tgz" > "$work/output.log" 2>&1; then
+  echo 'Foreign persisted agent was adopted.' >&2
+  exit 1
+fi
+grep -q 'Persisted Studio agent ID has no matching ownership marker.' "$work/output.log"
+! grep -qE '^api:(POST|PATCH):/api/agents' "$DEPLOY_TEST_LOG"
+
+printf '%s\n' '{"data":[],"has_more":true,"after":null}' > "$work/incomplete-agents.json"
+export DEPLOY_TEST_AGENTS_DB="$work/incomplete-agents.json"
+: > "$DEPLOY_TEST_LOG"
+if SSH_ORIGINAL_COMMAND="deploy $work/incomplete-page" bash "$work/deploy.sh" "$work/incomplete-page" \
+  < "$work/bundle.tgz" > "$work/output.log" 2>&1; then
+  echo 'Incomplete agent pagination was accepted.' >&2
+  exit 1
+fi
+grep -q 'Studio agent listing returned incomplete pagination.' "$work/output.log"
+! grep -qE '^api:(POST|PATCH):/api/agents' "$DEPLOY_TEST_LOG"
+echo 'Deployment foreign ownership and incomplete pagination tests passed.'
 
 # 验证首次部署生成的签名密钥在后续重部署时不会被新归档中的随机密钥覆盖。
 mkdir -p "$work/bundle2"

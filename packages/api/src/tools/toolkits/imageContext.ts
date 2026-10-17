@@ -16,7 +16,9 @@ import type { TImageReferencesConfig } from 'librechat-data-provider';
 import type { AppConfig } from '@librechat/data-schemas';
 import type { FormatEnum } from 'sharp';
 import { getBalanceConfig, getTransactionsConfig } from '~/app/config';
+import { deriveStudioStorageUserId } from '~/utils/studioIdentity';
 import { getEnvProxyDispatcher } from '~/utils/proxy';
+import { getSafeErrorMetadata } from '~/utils/errors';
 import { loadServiceKey } from '~/utils/key';
 import { geminiToolkit } from './gemini';
 
@@ -356,6 +358,7 @@ export interface GeminiReferenceFileRecord {
   height?: number;
   bytes?: number;
   user?: string | { toString(): string };
+  tenantId?: string | null;
 }
 
 export interface GeminiInlineImagePart {
@@ -455,11 +458,22 @@ export function isStudioReferenceId(id: string): boolean {
   return STUDIO_KB_ID_RE.test(trimmed) || STUDIO_IMG_ID_RE.test(trimmed);
 }
 
-// 为特定用户与工作台引用编号派生确定性 UUID，确保多用户桥接同一 kb_ 资产时各自拥有独立的授权 File 记录
-export function deriveStudioBridgeFileId(userId: string, studioRefId: string): string {
+// 为租户、用户与工作台引用编号派生确定性 UUID，避免不同租户的 File 记录互相覆盖
+export function deriveStudioBridgeFileId(
+  userId: string,
+  studioRefId: string,
+  tenantId?: string | null,
+): string {
   const digest = crypto
     .createHash('sha256')
-    .update(`studio-bridge:${String(userId).trim()}:${String(studioRefId).trim().toLowerCase()}`)
+    .update(
+      JSON.stringify([
+        'studio-bridge-v2',
+        tenantId ?? null,
+        String(userId).trim(),
+        String(studioRefId).trim().toLowerCase(),
+      ]),
+    )
     .digest('hex');
   return [
     digest.slice(0, 8),
@@ -601,6 +615,8 @@ async function loadStudioReferenceBytes({
   if (!STUDIO_USER_ID_RE.test(normalizedUserId)) {
     return { status: 'missing' };
   }
+  const tenantId = req?.user?.tenantId ?? null;
+  const studioUserId = deriveStudioStorageUserId(normalizedUserId, tenantId);
 
   const settings = readStudioSettingsJson(settingsFile);
   const effectiveKbRoot = kbRoot || process.env.STUDIO_KB_ROOT || settings.kb_root || '/kb';
@@ -630,7 +646,7 @@ async function loadStudioReferenceBytes({
       }
     }
   } else if (STUDIO_IMG_ID_RE.test(normalizedId)) {
-    const userRoot = path.join(effectiveDataDir, 'users', normalizedUserId);
+    const userRoot = path.join(effectiveDataDir, 'users', studioUserId);
     const jobDir = path.join(userRoot, 'jobs', normalizedId);
     const receiptRes = readSafeFileUnderRootBounded(path.join(jobDir, 'receipt.json'), userRoot);
     if (receiptRes.status === 'ok') {
@@ -692,7 +708,8 @@ async function loadStudioReferenceBytes({
       method: 'GET',
       headers: {
         'X-Studio-Token': sharedToken,
-        'X-LibreChat-User-ID': normalizedUserId,
+        'X-LibreChat-User-ID': studioUserId,
+        'X-LibreChat-Raw-User-ID': normalizedUserId,
       },
       signal: controller.signal,
     });
@@ -797,6 +814,9 @@ export async function resolveGeminiReferenceImages({
   }
 
   const effectiveUserId = String(userId || req?.user?.id || '').trim();
+  const tenantId = req?.user?.tenantId ?? null;
+  const isOwnedFile = (file: GeminiReferenceFileRecord): boolean =>
+    String(file.user ?? '') === effectiveUserId && (file.tenantId ?? null) === tenantId;
 
   // 按输入顺序去重（包括相同 ID 以及同一 Studio 资产的原始 ID 与派生桥接 UUID）
   const uniqueImageIds: string[] = [];
@@ -810,7 +830,7 @@ export async function resolveGeminiReferenceImages({
     }
     const canonicalKey =
       effectiveUserId && isStudioReferenceId(trimmed)
-        ? deriveStudioBridgeFileId(effectiveUserId, trimmed).toLowerCase()
+        ? deriveStudioBridgeFileId(effectiveUserId, trimmed, tenantId).toLowerCase()
         : trimmed.toLowerCase();
     if (seenInputKeys.has(canonicalKey)) {
       continue;
@@ -821,7 +841,7 @@ export async function resolveGeminiReferenceImages({
 
   const requestFilesMap = new Map<string, GeminiReferenceFileRecord>();
   for (const file of imageFiles) {
-    if (file?.file_id) {
+    if (file?.file_id && isOwnedFile(file)) {
       requestFilesMap.set(file.file_id, { ...file });
     }
   }
@@ -843,7 +863,7 @@ export async function resolveGeminiReferenceImages({
       continue;
     }
     if (effectiveUserId && isStudioReferenceId(id)) {
-      const bridgedId = deriveStudioBridgeFileId(effectiveUserId, id);
+      const bridgedId = deriveStudioBridgeFileId(effectiveUserId, id, tenantId);
       const bridgedRequestFile = requestFilesMap.get(bridgedId);
       if (bridgedRequestFile) {
         orderedFiles[i] = bridgedRequestFile;
@@ -860,6 +880,7 @@ export async function resolveGeminiReferenceImages({
       (await getFiles(
         {
           user: effectiveUserId,
+          tenantId,
           file_id: { $in: Array.from(idsToFetch) },
           height: { $exists: true },
           width: { $exists: true },
@@ -870,7 +891,7 @@ export async function resolveGeminiReferenceImages({
 
     const fetchedById = new Map<string, GeminiReferenceFileRecord>();
     for (const file of fetchedFiles) {
-      if (file?.file_id) {
+      if (file?.file_id && isOwnedFile(file)) {
         fetchedById.set(file.file_id, file);
       }
     }
@@ -880,7 +901,7 @@ export async function resolveGeminiReferenceImages({
       const matched =
         fetchedById.get(id) ??
         (isStudioReferenceId(id)
-          ? fetchedById.get(deriveStudioBridgeFileId(effectiveUserId, id))
+          ? fetchedById.get(deriveStudioBridgeFileId(effectiveUserId, id, tenantId))
           : undefined);
       if (matched) {
         orderedFiles[idx] = matched;
@@ -934,7 +955,7 @@ export async function resolveGeminiReferenceImages({
     if (loaded.status !== 'ok') {
       continue;
     }
-    const bridgedFileId = deriveStudioBridgeFileId(effectiveUserId, normalizedId);
+    const bridgedFileId = deriveStudioBridgeFileId(effectiveUserId, normalizedId, tenantId);
     const baseFilename = `studio_ref_${normalizedId}_img_${bridgedFileId.slice(0, 8)}`;
     const effectiveReq: GeminiReferenceRequestContext = {
       ...req,
@@ -1153,12 +1174,12 @@ export function extractStudioArtifactImageIds(output: {
 
   const foundIds: string[] = [];
   for (const text of texts) {
-    const trimmed = text.trim();
-    if (!trimmed.startsWith('{')) {
+    const firstBlock = text.split(/\n\s*\n/, 1)[0]?.trim();
+    if (!firstBlock?.startsWith('{')) {
       continue;
     }
     try {
-      const parsed = JSON.parse(trimmed) as Record<string, unknown>;
+      const parsed = JSON.parse(firstBlock) as Record<string, unknown>;
       const readCandidateId = (record: Record<string, unknown>): string => {
         if (typeof record.image_id === 'string') {
           return record.image_id;
@@ -1194,51 +1215,31 @@ export function extractStudioArtifactImageIds(output: {
 const PERSISTENCE_ERROR_TEXT =
   'Image persistence failed (code: IMAGE_PERSISTENCE_FAILED). The generated image could not be saved.';
 
-// 当图像落盘失败时清除对外暴露的 generated_image_id 与 artifact.file_ids，防止后续工具引用不存在的文件 ID
+// 图像落盘失败后用固定错误替换整个工具结果，避免任何未发布编号从文本、JSON 或附件流出
 function scrubUnpersistedImageOutput(output: {
   content?: unknown;
+  isError?: boolean;
+  structuredContent?: unknown;
   artifact?: {
     file_ids?: string[];
     content?: unknown[];
     files?: unknown[];
   };
 }): void {
+  output.isError = true;
+  delete output.structuredContent;
   if (output.artifact) {
+    for (const key of Object.keys(output.artifact)) {
+      delete (output.artifact as Record<string, unknown>)[key];
+    }
     output.artifact.file_ids = [];
     output.artifact.content = [];
     output.artifact.files = [];
   }
-  if (typeof output.content === 'string') {
-    const scrubbed = output.content
-      .replace(/\n*generated_image_id:\s*"[^"]*"/g, '')
-      .replace(/\n*referenced_image_ids:\s*\[[^\]]*\]/g, '')
-      .trim();
-    output.content = scrubbed ? `${scrubbed}\n\n${PERSISTENCE_ERROR_TEXT}` : PERSISTENCE_ERROR_TEXT;
-  } else if (Array.isArray(output.content)) {
-    let updated = false;
-    output.content = output.content.map((part) => {
-      if (
-        part &&
-        typeof part === 'object' &&
-        typeof (part as { text?: unknown }).text === 'string'
-      ) {
-        const rawText = (part as { text: string }).text;
-        if (rawText.includes('generated_image_id:')) {
-          updated = true;
-          return {
-            ...(part as Record<string, unknown>),
-            text: PERSISTENCE_ERROR_TEXT,
-          };
-        }
-      }
-      return part;
-    });
-    if (!updated) {
-      output.content = [{ type: ContentTypes.TEXT, text: PERSISTENCE_ERROR_TEXT }];
-    }
-  } else {
-    output.content = [{ type: ContentTypes.TEXT, text: PERSISTENCE_ERROR_TEXT }];
-  }
+  output.content =
+    typeof output.content === 'string'
+      ? PERSISTENCE_ERROR_TEXT
+      : [{ type: ContentTypes.TEXT, text: PERSISTENCE_ERROR_TEXT }];
 }
 
 export interface ProcessToolImageArtifactsParams {
@@ -1246,6 +1247,8 @@ export interface ProcessToolImageArtifactsParams {
     name?: string;
     tool_call_id?: string;
     content?: unknown;
+    isError?: boolean;
+    structuredContent?: unknown;
     artifact?: {
       file_ids?: string[];
       files?: Array<GeminiReferenceFileRecord | null | undefined>;
@@ -1273,22 +1276,23 @@ export interface ProcessToolImageArtifactsParams {
       context: string;
     },
   ) => Promise<Record<string, unknown> | null | undefined>;
-  createFile?: (
-    data: Record<string, unknown>,
-    disableTTL?: boolean,
-  ) => Promise<GeminiReferenceFileRecord | null | undefined>;
-  getStrategyFunctions?: (source: string) => {
-    saveBuffer?: (params: {
-      userId: string;
-      fileName: string;
+  uploadImageBuffer?: (params: {
+    req: GeminiReferenceRequestContext;
+    context: string;
+    resize: false;
+    metadata: {
       buffer: Buffer;
-      tenantId?: string | null;
-    }) => Promise<string>;
-  };
+      width: number;
+      height: number;
+      bytes: number;
+      filename: string;
+      type: string;
+      file_id: string;
+    };
+  }) => Promise<Record<string, unknown> | null | undefined>;
   kbRoot?: string;
   dataDir?: string;
   settingsFile?: string;
-  fileStrategy?: string;
   fetchImpl?: typeof fetch;
   logger?: {
     error?: (...args: unknown[]) => void;
@@ -1305,27 +1309,41 @@ export async function processToolImageArtifacts({
   metadata,
   artifactPromises,
   saveBase64Image,
-  createFile,
-  getStrategyFunctions,
+  uploadImageBuffer,
   kbRoot,
   dataDir,
   settingsFile,
-  fileStrategy,
   fetchImpl,
   logger = defaultLogger,
   buildMetadata,
   onFileSaved,
-}: ProcessToolImageArtifactsParams): Promise<void> {
+}: ProcessToolImageArtifactsParams): Promise<boolean> {
   const content = output?.artifact?.content;
+  const isStudioImageTool =
+    /^(?:edit_region|finish_region_edit|compare_materials|generate_image)_mcp_zyb_studio$/.test(
+      output.name ?? '',
+    );
   if (!Array.isArray(content) || content.length === 0) {
-    return;
+    const advertisesUnpublishedImage =
+      (isStudioImageTool && extractStudioArtifactImageIds(output).length > 0) ||
+      (typeof output.content === 'string' && /\bgenerated_image_id\s*:/.test(output.content));
+    if (advertisesUnpublishedImage) {
+      scrubUnpersistedImageOutput(output);
+      return false;
+    }
+    return true;
   }
 
   const studioImgIds = extractStudioArtifactImageIds(output);
   const effectiveUserId = String(req?.user?.id || metadata?.user_id || '').trim();
   const effectiveLimits = resolveImageReferencesConfig(req?.config?.imageReferences);
-  const imageArtifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
-  let hasPersistenceFailure = false;
+  const images = content.filter((part) => part?.type === 'image_url');
+  if (isStudioImageTool && studioImgIds.length !== images.length) {
+    scrubUnpersistedImageOutput(output);
+    return false;
+  }
+  const savedMetadata: Record<string, unknown>[] = [];
+  let imageIndex = 0;
 
   for (let i = 0; i < content.length; i++) {
     const part = content[i];
@@ -1334,16 +1352,19 @@ export async function processToolImageArtifacts({
     }
     const url = part.image_url?.url;
     if (!url) {
-      continue;
+      scrubUnpersistedImageOutput(output);
+      artifactPromises.push(Promise.resolve(null));
+      return false;
     }
 
     const prePersisted = output.artifact?.files?.[i];
-    const studioImgId = studioImgIds[i];
+    const studioImgId = isStudioImageTool ? studioImgIds[imageIndex] : undefined;
+    imageIndex++;
 
-    const imagePromise = (async (): Promise<Record<string, unknown> | null> => {
+    try {
       let file: Record<string, unknown> | null | undefined;
 
-      if (prePersisted && prePersisted.file_id && prePersisted.filepath) {
+      if (!isStudioImageTool && prePersisted && prePersisted.file_id && prePersisted.filepath) {
         file = { ...prePersisted };
       } else if (studioImgId && effectiveUserId) {
         const loaded = await loadStudioReferenceBytes({
@@ -1358,67 +1379,36 @@ export async function processToolImageArtifacts({
           fetchImpl,
         });
         if (loaded.status === 'ok') {
-          const file_id =
-            output.artifact?.file_ids?.[i] ||
-            deriveStudioBridgeFileId(effectiveUserId, studioImgId);
+          const file_id = deriveStudioBridgeFileId(
+            effectiveUserId,
+            studioImgId,
+            req?.user?.tenantId,
+          );
           const baseFilename = `${output.name || 'studio'}_img_${studioImgId}`;
-          if (typeof createFile === 'function' && typeof getStrategyFunctions === 'function') {
-            const source =
-              fileStrategy || (req?.config?.fileStrategy as string | undefined) || 'local';
-            const { saveBuffer } = getStrategyFunctions(source);
-            if (typeof saveBuffer === 'function') {
-              let ext = 'png';
-              if (loaded.mimeType === 'image/jpeg') {
-                ext = 'jpg';
-              } else if (loaded.mimeType === 'image/webp') {
-                ext = 'webp';
-              }
-              const fullFilename = `${file_id}-${baseFilename}.${ext}`;
-              const { width, height } = await readImageDimensions(loaded.buffer);
-              const filepath = await saveBuffer({
-                userId: effectiveUserId,
-                fileName: fullFilename,
-                buffer: loaded.buffer,
-                tenantId: req?.user?.tenantId,
-              });
-              if (filepath) {
-                const created = await createFile(
-                  {
-                    type: loaded.mimeType,
-                    source,
-                    context: FileContext.image_generation,
-                    file_id,
-                    filepath,
-                    filename: fullFilename,
-                    user: effectiveUserId,
-                    bytes: loaded.buffer.length,
-                    width,
-                    height,
-                    tenantId: req?.user?.tenantId,
-                  },
-                  true,
-                );
-                if (created) {
-                  file = { ...created };
-                }
-              }
-            }
-          } else if (typeof saveBase64Image === 'function') {
-            const canonicalUrl = `data:${loaded.mimeType};base64,${loaded.buffer.toString('base64')}`;
-            file = await saveBase64Image(canonicalUrl, {
+          if (typeof uploadImageBuffer === 'function' && req) {
+            const { width, height } = await readImageDimensions(loaded.buffer);
+            const ext = loaded.mimeType === 'image/jpeg' ? 'jpg' : loaded.mimeType.split('/')[1];
+            file = await uploadImageBuffer({
               req,
-              file_id,
-              filename: baseFilename,
-              endpoint: metadata?.provider,
               context: FileContext.image_generation,
+              resize: false,
+              metadata: {
+                buffer: loaded.buffer,
+                width,
+                height,
+                bytes: loaded.buffer.length,
+                filename: `${baseFilename}.${ext}`,
+                type: loaded.mimeType,
+                file_id,
+              },
             });
           }
           if (file && output.artifact) {
             output.artifact.file_ids = output.artifact.file_ids ?? [];
-            output.artifact.file_ids[i] = file_id;
+            output.artifact.file_ids[i] = String(file.file_id);
           }
         }
-      } else if (typeof saveBase64Image === 'function') {
+      } else if (!isStudioImageTool && typeof saveBase64Image === 'function') {
         const filename = `${output.name}_img_${nanoid()}`;
         const file_id = output.artifact?.file_ids?.[i];
         file = await saveBase64Image(url, {
@@ -1431,33 +1421,31 @@ export async function processToolImageArtifacts({
       }
 
       if (!file || typeof file.file_id !== 'string' || typeof file.filepath !== 'string') {
-        hasPersistenceFailure = true;
-        return null;
+        scrubUnpersistedImageOutput(output);
+        artifactPromises.push(Promise.resolve(null));
+        return false;
       }
 
       const fileMetadata = buildMetadata(file);
       if (!fileMetadata) {
-        hasPersistenceFailure = true;
-        return null;
+        scrubUnpersistedImageOutput(output);
+        artifactPromises.push(Promise.resolve(null));
+        return false;
       }
-
-      onFileSaved(fileMetadata);
-      return fileMetadata;
-    })().catch((error) => {
-      hasPersistenceFailure = true;
-      logger?.error?.('Error processing artifact content:', error);
-      return null;
-    });
-
-    artifactPromises.push(imagePromise);
-    imageArtifactPromises.push(imagePromise);
+      savedMetadata.push(fileMetadata);
+    } catch (error) {
+      logger?.error?.('Error processing artifact content:', getSafeErrorMetadata(error));
+      scrubUnpersistedImageOutput(output);
+      artifactPromises.push(Promise.resolve(null));
+      return false;
+    }
   }
 
-  await Promise.all(imageArtifactPromises);
-
-  if (hasPersistenceFailure) {
-    scrubUnpersistedImageOutput(output);
+  for (const fileMetadata of savedMetadata) {
+    artifactPromises.push(Promise.resolve(fileMetadata));
+    onFileSaved(fileMetadata);
   }
+  return true;
 }
 
 // 为 googleapis.com 域名请求按需挂载代理分发器

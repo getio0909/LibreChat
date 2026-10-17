@@ -619,6 +619,9 @@ const Part = memo(function Part({
         alignRight={isCreatedByUser}
         width={imageFile.width}
         height={imageFile.height}
+        fileId={imageFile.file_id}
+        fileContext={imageFile.context}
+        fileType={imageFile.type}
       />
     );
   }

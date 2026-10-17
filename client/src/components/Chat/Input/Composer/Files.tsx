@@ -101,7 +101,7 @@ interface FileCardProps {
 const FileCard = memo(function FileCard({ file, onAttach, onPreview, disabled }: FileCardProps) {
   const localize = useLocalize();
   // 将生图工具产生的带内部工具名前缀的文件名转换展示为中立本地化名称，保留原始 file.filename 供内部引用
-  const name = formatGeneratedImageFilename(file.filename, localize);
+  const name = formatGeneratedImageFilename(file, localize);
   const details = [
     getDisplayType(localize, file.type ?? undefined, name),
     formatBytes(file.bytes ?? 0),
@@ -232,7 +232,7 @@ export default function FileGrid({
   const visible = useMemo(
     () =>
       files.filter((file) => {
-        const displayName = formatGeneratedImageFilename(file.filename, localize);
+        const displayName = formatGeneratedImageFilename(file, localize);
         if (query !== '' && displayName.toLowerCase().includes(query.toLowerCase()) !== true) {
           return false;
         }
@@ -249,7 +249,7 @@ export default function FileGrid({
 
   const previewKind = previewing != null ? previewOf(previewing) : null;
   const previewDisplayName =
-    previewing != null ? formatGeneratedImageFilename(previewing.filename, localize) : undefined;
+    previewing != null ? formatGeneratedImageFilename(previewing, localize) : undefined;
 
   /* The image is fetched through the backend by id, as the PDF preview is,
      rather than from its stored link: a signed storage link can expire between
@@ -263,7 +263,7 @@ export default function FileGrid({
   previewFailedRef.current = (file: TFile) => {
     showToast({
       message: localize('com_ui_composer_preview_failed', {
-        0: formatGeneratedImageFilename(file.filename, localize),
+        0: formatGeneratedImageFilename(file, localize),
       }),
       status: 'error',
     });
@@ -368,6 +368,7 @@ export default function FileGrid({
         filePath={previewing?.filepath}
         fileType={previewing?.type ?? undefined}
         fileSource={previewing?.source}
+        fileContext={previewing?.context}
         fileSize={previewing?.bytes}
         deliveryPath={previewing?.llmDeliveryPath}
         triggerRef={previewTriggerRef}

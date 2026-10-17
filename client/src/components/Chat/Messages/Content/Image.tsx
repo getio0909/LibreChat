@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Skeleton } from '@librechat/client';
 import { apiBaseUrl } from 'librechat-data-provider';
+import type { TFile } from 'librechat-data-provider';
 import { formatGeneratedImageFilename } from '~/utils/downloadFile';
 import { cn, toAbsoluteFilePath } from '~/utils';
 import useLocalize from '~/hooks/useLocalize';
@@ -34,6 +35,9 @@ const Image = ({
   args,
   width,
   height,
+  fileId,
+  fileContext,
+  fileType,
 }: {
   imagePath: string;
   altText: string;
@@ -48,12 +52,18 @@ const Image = ({
   };
   width?: number;
   height?: number;
+  fileId?: string;
+  fileContext?: TFile['context'];
+  fileType?: string;
 }) => {
   const localize = useLocalize();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  // 隐藏底层生图工具名（如 gemini_image_gen），为对话图片展示与下载提供本地化中立名称
-  const displayAltText = formatGeneratedImageFilename(altText, localize);
+  // 依据持久化 File 上下文判断产图来源，避免用户上传文件名触发误改名
+  const displayAltText = formatGeneratedImageFilename(
+    { filename: altText, file_id: fileId, context: fileContext, type: fileType },
+    localize,
+  );
   const downloadFilename = displayAltText || 'image.png';
 
   /** Root-relative server paths (`/images/...` static, `/api/...` downloads and

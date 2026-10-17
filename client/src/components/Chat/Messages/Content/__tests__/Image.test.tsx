@@ -14,6 +14,7 @@ jest.mock('~/utils', () => ({
 }));
 
 jest.mock('librechat-data-provider', () => ({
+  FileContext: jest.requireActual('librechat-data-provider').FileContext,
   apiBaseUrl: () => '',
 }));
 
@@ -193,13 +194,16 @@ describe('Image', () => {
         <Image
           imagePath="/images/gen.png"
           altText="11111111-2222-4333-8444-555555555555-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.png"
+          fileId="11111111-2222-4333-8444-555555555555"
+          fileContext={jest.requireActual('librechat-data-provider').FileContext.image_generation}
+          fileType="image/png"
         />,
       );
       const img = screen.getByRole('img');
       const alt = img.getAttribute('alt') ?? '';
       expect(alt).not.toContain('gemini');
       expect(alt).not.toContain('gemini_image_gen');
-      expect(alt).toContain('V1StGXR8.png');
+      expect(alt).toContain('11111111.png');
     });
   });
 });

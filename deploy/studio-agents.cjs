@@ -12,6 +12,10 @@ const STUDIO_AGENT_PROVIDERS = Object.freeze({
 });
 
 const STUDIO_AGENT_TOOLS = Object.freeze(['gemini_image_gen', 'sys__all__sys_mcp_zyb_studio']);
+const STUDIO_AGENT_OWNER_MARKERS = Object.freeze({
+  'zyb-design': '<!-- librechat-studio-owner:zyb-design:v1 -->',
+  'zyb-design-fast': '<!-- librechat-studio-owner:zyb-design-fast:v1 -->',
+});
 
 function buildStudioAgentDefinitions(config) {
   const specs = config?.modelSpecs?.list ?? [];
@@ -43,7 +47,7 @@ function buildStudioAgentDefinitions(config) {
         description: spec.description,
         provider,
         model: preset.model,
-        instructions: preset.promptPrefix ?? '',
+        instructions: `${preset.promptPrefix ?? ''}\n\n${STUDIO_AGENT_OWNER_MARKERS[spec.name]}`,
         tools: [...STUDIO_AGENT_TOOLS],
         mcpServerNames: ['zyb_studio'],
         model_parameters: modelParameters,
@@ -52,37 +56,38 @@ function buildStudioAgentDefinitions(config) {
   });
 }
 
-function isStudioOwnedAgent(agent, expectedName) {
+function isStudioOwnedAgent(agent, specName) {
   if (!agent || typeof agent !== 'object') {
     return false;
   }
   if (typeof agent.id !== 'string' || !/^agent_[A-Za-z0-9_-]+$/.test(agent.id)) {
     return false;
   }
-  if (expectedName !== undefined && agent.name !== expectedName) {
+  const marker = STUDIO_AGENT_OWNER_MARKERS[specName];
+  if (!marker || typeof agent.instructions !== 'string') {
     return false;
   }
-  if (!Array.isArray(agent.tools)) {
-    return false;
-  }
-  return STUDIO_AGENT_TOOLS.every((requiredTool) => agent.tools.includes(requiredTool));
+  return agent.instructions.endsWith(marker);
 }
 
-function findStudioOwnedAgent(agents, expectedName, persistedId) {
+function findStudioOwnedAgent(agents, specName, persistedId) {
   if (!Array.isArray(agents)) {
     return null;
   }
   if (typeof persistedId === 'string' && persistedId.length > 0) {
-    const byId = agents.find(
-      (candidate) => candidate && candidate.id === persistedId && isStudioOwnedAgent(candidate),
-    );
+    const byId = agents.find((candidate) => candidate && candidate.id === persistedId);
     if (byId) {
+      if (!isStudioOwnedAgent(byId, specName)) {
+        throw new Error('Persisted Studio agent ID has no matching ownership marker');
+      }
       return byId;
     }
   }
-  return (
-    agents.find((candidate) => isStudioOwnedAgent(candidate, expectedName)) ?? null
-  );
+  const matches = agents.filter((candidate) => isStudioOwnedAgent(candidate, specName));
+  if (matches.length > 1) {
+    throw new Error('Multiple Studio agents carry the same ownership marker');
+  }
+  return matches[0] ?? null;
 }
 
 async function collectPaginatedAgents(fetchPage, options = {}) {
@@ -94,23 +99,30 @@ async function collectPaginatedAgents(fetchPage, options = {}) {
 
   for (let pageIndex = 0; pageIndex < maxPages; pageIndex++) {
     const page = await fetchPage({ limit, cursor });
-    const items = Array.isArray(page?.data) ? page.data : [];
+    if (!Array.isArray(page?.data) || typeof page.has_more !== 'boolean') {
+      throw new Error('Invalid Studio agent listing page');
+    }
+    const items = page.data;
     collected.push(...items);
     const nextCursor = typeof page?.after === 'string' && page.after.length > 0 ? page.after : null;
-    if (!page?.has_more || !nextCursor || seenCursors.has(nextCursor)) {
-      break;
+    if (!page.has_more) {
+      return collected;
+    }
+    if (!nextCursor || seenCursors.has(nextCursor)) {
+      throw new Error('Incomplete Studio agent pagination');
     }
     seenCursors.add(nextCursor);
     cursor = nextCursor;
   }
 
-  return collected;
+  throw new Error('Studio agent listing exceeded pagination limit');
 }
 
 module.exports = {
   STUDIO_AGENT_PLACEHOLDERS,
   STUDIO_AGENT_PROVIDERS,
   STUDIO_AGENT_TOOLS,
+  STUDIO_AGENT_OWNER_MARKERS,
   buildStudioAgentDefinitions,
   isStudioOwnedAgent,
   findStudioOwnedAgent,

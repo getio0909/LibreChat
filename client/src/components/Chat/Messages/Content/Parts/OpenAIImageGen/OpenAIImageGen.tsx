@@ -292,6 +292,9 @@ export default function OpenAIImageGen({
                 width={Number(dimensions.width?.split('px')[0])}
                 height={Number(dimensions.height?.split('px')[0])}
                 args={parsedArgs}
+                fileId={(attachment as TFile | undefined)?.file_id}
+                fileContext={(attachment as TFile | undefined)?.context}
+                fileType={(attachment as TFile | undefined)?.type}
               />
             )}
           </div>

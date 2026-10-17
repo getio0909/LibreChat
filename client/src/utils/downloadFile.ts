@@ -1,39 +1,33 @@
-import { FileSources } from 'librechat-data-provider';
+import { FileSources, FileContext } from 'librechat-data-provider';
+import type { TFile } from 'librechat-data-provider';
 
 const blobDownloadFilenames = new Map<string, string>();
-const GENERATED_TOOL_IMAGE_FILENAME_RE =
-  /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-)?([A-Za-z0-9_.-]+?)_img_([A-Za-z0-9_-]+?)(\.[A-Za-z0-9]+)?$/i;
-const KNOWN_TOOL_PRODUCER_RE =
-  /^(?:gemini_image_gen|image_gen_oai|image_edit_oai|dalle|flux|edit_region|finish_region_edit|compare_materials|generate_image|studio(?:_ref(?:_(?:kb_[0-9a-f]{16}|img_[0-9a-f]{32}))?)?|.*_mcp_.*)$/i;
+const GENERATED_IMAGE_EXTENSIONS: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
 
 export const isHttpDownloadTarget = (target?: string | null): boolean =>
   /^https?:\/\//i.test(target ?? '');
 
-// 仅将已知生图/工作台工具产出的文件名格式化为无厂商/工具名的本地化名称，保留普通用户上传文件名（如 vacation_img_01.png）不变
+// 仅依据 File 持久化的产图上下文生成中立名称，不从用户可控文件名猜测生产者
 export function formatGeneratedImageFilename(
-  filename?: string | null,
+  file?: Pick<TFile, 'filename'> & Partial<Pick<TFile, 'file_id' | 'context' | 'type'>>,
   localize?: (
     phraseKey: 'com_ui_generated_image_filename',
     options?: Record<string, string | number>,
   ) => string,
 ): string {
-  const raw = (filename ?? '').trim();
+  const raw = (file?.filename ?? '').trim();
   if (!raw) {
     return '';
   }
-  const match = GENERATED_TOOL_IMAGE_FILENAME_RE.exec(raw);
-  if (!match) {
+  if (file?.context !== FileContext.image_generation) {
     return raw;
   }
-  const producer = match[1] ?? '';
-  if (!KNOWN_TOOL_PRODUCER_RE.test(producer)) {
-    return raw;
-  }
-  const rawTag = match[2] ?? '';
-  const cleanedTag = rawTag.replace(/^img_/i, '');
-  const shortId =
-    cleanedTag.replace(/[^A-Za-z0-9]/g, '').slice(0, 8) || rawTag.slice(0, 8) || 'img';
-  const ext = match[3] || '.png';
+  const shortId = (file.file_id ?? '').replace(/[^A-Za-z0-9]/g, '').slice(0, 8) || 'image';
+  const ext = GENERATED_IMAGE_EXTENSIONS[file.type ?? ''] ?? '.png';
   const suffix = `${shortId}${ext}`;
   if (typeof localize === 'function') {
     const localized = localize('com_ui_generated_image_filename', { 0: suffix });
@@ -48,8 +42,15 @@ export function getDownloadFilename(
   fileName: string,
   fileId?: string,
   fileSource?: string | null,
+  fileContext?: TFile['context'],
+  fileType?: string,
 ): string {
-  const sanitizedFileName = formatGeneratedImageFilename(fileName);
+  const sanitizedFileName = formatGeneratedImageFilename({
+    filename: fileName,
+    file_id: fileId,
+    context: fileContext,
+    type: fileType,
+  });
   const filename = sanitizedFileName || fileId || 'download';
   if (fileSource !== FileSources.text || filename.toLowerCase().endsWith('.txt')) {
     return filename;

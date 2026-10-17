@@ -41,7 +41,7 @@ const {
 const { processFileCitations } = require('~/server/services/Files/Citations');
 const { processCodeOutput, runPreviewFinalize } = require('~/server/services/Files/Code/process');
 const { preflightCodeOutputBatch } = require('~/server/services/Files/Code/preflight');
-const { saveBase64Image } = require('~/server/services/Files/process');
+const { saveBase64Image, uploadImageBuffer } = require('~/server/services/Files/process');
 
 function isHostFileAuthoringArtifact(artifact) {
   return artifact?.[HOST_FILE_AUTHORING_ARTIFACT_KEY] === true;
@@ -977,6 +977,30 @@ function createToolEndCallback({ req, res, artifactPromises, streamId = null, jo
       return;
     }
 
+    const imagesPublished = await processToolImageArtifacts({
+      output,
+      req,
+      metadata,
+      artifactPromises,
+      saveBase64Image,
+      uploadImageBuffer,
+      logger,
+      buildMetadata: (file) =>
+        Object.assign(file, {
+          messageId: metadata.run_id,
+          toolCallId: output.tool_call_id,
+          conversationId: metadata.thread_id,
+        }),
+      onFileSaved: (fileMetadata) => {
+        if (streamId || res.headersSent) {
+          writeAttachment(res, streamId, fileMetadata, jobCreatedAt);
+        }
+      },
+    });
+    if (!imagesPublished) {
+      return;
+    }
+
     if (!output.artifact) {
       return;
     }
@@ -1077,26 +1101,6 @@ function createToolEndCallback({ req, res, artifactPromises, streamId = null, jo
     }
 
     if (output.artifact.content) {
-      await processToolImageArtifacts({
-        output,
-        req,
-        metadata,
-        artifactPromises,
-        saveBase64Image,
-        logger,
-        buildMetadata: (file) =>
-          Object.assign(file, {
-            messageId: metadata.run_id,
-            toolCallId: output.tool_call_id,
-            conversationId: metadata.thread_id,
-          }),
-        onFileSaved: (fileMetadata) => {
-          if (!streamId && !res.headersSent) {
-            return;
-          }
-          writeAttachment(res, streamId, fileMetadata, jobCreatedAt);
-        },
-      });
       return;
     }
 
@@ -1327,6 +1331,34 @@ function createResponsesToolEndCallback({ req, res, tracker, artifactPromises })
       return;
     }
 
+    const imagesPublished = await processToolImageArtifacts({
+      output,
+      req,
+      metadata,
+      artifactPromises,
+      saveBase64Image,
+      uploadImageBuffer,
+      logger,
+      buildMetadata: (file) => Object.assign(file, { toolCallId: output.tool_call_id }),
+      onFileSaved: (fileMetadata) => {
+        if (res.headersSent && !res.writableEnded) {
+          const attachment = {
+            file_id: fileMetadata.file_id,
+            filename: fileMetadata.filename,
+            type: fileMetadata.type,
+            url: fileMetadata.filepath,
+            width: fileMetadata.width,
+            height: fileMetadata.height,
+            tool_call_id: output.tool_call_id,
+          };
+          writeResponsesAttachment(res, tracker, attachment, metadata);
+        }
+      },
+    });
+    if (!imagesPublished) {
+      return;
+    }
+
     if (!output.artifact) {
       return;
     }
@@ -1420,32 +1452,6 @@ function createResponsesToolEndCallback({ req, res, tracker, artifactPromises })
     }
 
     if (output.artifact.content) {
-      await processToolImageArtifacts({
-        output,
-        req,
-        metadata,
-        artifactPromises,
-        saveBase64Image,
-        logger,
-        buildMetadata: (file) =>
-          Object.assign(file, {
-            toolCallId: output.tool_call_id,
-          }),
-        onFileSaved: (fileMetadata) => {
-          if (res.headersSent && !res.writableEnded) {
-            const attachment = {
-              file_id: fileMetadata.file_id,
-              filename: fileMetadata.filename,
-              type: fileMetadata.type,
-              url: fileMetadata.filepath,
-              width: fileMetadata.width,
-              height: fileMetadata.height,
-              tool_call_id: output.tool_call_id,
-            };
-            writeResponsesAttachment(res, tracker, attachment, metadata);
-          }
-        },
-      });
       return;
     }
 

@@ -494,6 +494,24 @@ describe('resolveHeaders', () => {
     );
   });
 
+  it('derives a tenant-scoped Studio principal without exposing the tenant ID', () => {
+    const userId = '65f0000000000000000000a1';
+    const tenantA = createSafeUser(createTestUser({ id: userId, tenantId: 'tenant-a' }));
+    const tenantB = createSafeUser(createTestUser({ id: userId, tenantId: 'tenant-b' }));
+    const principalA = resolveHeaders({
+      headers: { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' },
+      user: tenantA,
+    })['X-Studio-Principal'];
+    const principalB = resolveHeaders({
+      headers: { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' },
+      user: tenantB,
+    })['X-Studio-Principal'];
+    expect(principalA).toMatch(/^[a-f0-9]{24}$/);
+    expect(principalA).not.toBe(principalB);
+    expect(principalA).not.toContain('tenant-a');
+    expect(tenantA).not.toHaveProperty('tenantId');
+  });
+
   it('should handle multiple placeholders in one value', () => {
     const user = { id: 'abc', email: 'me@example.com' };
     const headers = {

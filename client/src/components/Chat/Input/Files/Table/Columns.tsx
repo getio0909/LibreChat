@@ -107,7 +107,7 @@ export const columns: ColumnDef<TFile>[] = [
     cell: ({ row }) => {
       const localize = useLocalize();
       const file = row.original;
-      const displayName = formatGeneratedImageFilename(file.filename, localize);
+      const displayName = formatGeneratedImageFilename(file, localize);
       if (file.type?.startsWith('image')) {
         return (
           <div className="flex gap-2">

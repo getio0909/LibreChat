@@ -38,7 +38,7 @@ export default function useRecentFiles(
   const files = useMemo(() => {
     if (searching) {
       return (all ?? []).filter((file) =>
-        formatGeneratedImageFilename(file.filename, localize).toLowerCase().includes(query),
+        formatGeneratedImageFilename(file, localize).toLowerCase().includes(query),
       );
     }
     return recent ?? [];

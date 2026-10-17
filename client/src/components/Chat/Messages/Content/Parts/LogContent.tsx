@@ -240,6 +240,9 @@ const LogContent: React.FC<LogContentProps> = ({ output = '', renderImages, atta
           key={renderAttachmentKey('image', attachment, index)}
           altText={attachment.filename}
           imagePath={attachment.filepath}
+          fileId={attachment.file_id}
+          fileContext={attachment.context}
+          fileType={attachment.type}
         />
       ))}
     </>

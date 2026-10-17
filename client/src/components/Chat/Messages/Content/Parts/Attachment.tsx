@@ -431,6 +431,9 @@ const ImageAttachment = memo(({ attachment }: { attachment: TAttachment }) => {
         width={width}
         height={height}
         className="mb-4"
+        fileId={'file_id' in attachment ? attachment.file_id : undefined}
+        fileContext={'context' in attachment ? attachment.context : undefined}
+        fileType={'type' in attachment ? attachment.type : undefined}
       />
     </div>
   );

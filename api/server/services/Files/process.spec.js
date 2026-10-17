@@ -274,6 +274,7 @@ const {
   processDeleteRequest,
   processFileUpload,
   processFileURL,
+  uploadImageBuffer,
   retrieveAndProcessFile,
   sweepExpiredFiles,
   startExpiredFileSweep,
@@ -372,6 +373,54 @@ const setupStoredFileUpload = (result = {}) => {
   getStrategyFunctions.mockReturnValue({ handleFileUpload });
   return handleFileUpload;
 };
+
+describe('lossless generated image publication', () => {
+  it('keeps original PNG bytes and records the tenant-scoped File without resizing', async () => {
+    jest.clearAllMocks();
+    const original = Buffer.from('canonical-png-bytes');
+    const saveBuffer = jest.fn(async () => '/images/user-123/canonical.png');
+    getStrategyFunctions.mockReturnValue({ saveBuffer });
+    db.createFile.mockImplementationOnce(async (record) => record);
+    const req = makeReq({ mimetype: 'image/png' });
+    const file = await uploadImageBuffer({
+      req,
+      context: FileContext.image_generation,
+      resize: false,
+      metadata: {
+        buffer: original,
+        width: 4096,
+        height: 2048,
+        bytes: original.length,
+        filename: 'studio-original.png',
+        type: 'image/png',
+        file_id: 'tenant-scoped-uuid',
+      },
+    });
+
+    expect(saveBuffer).toHaveBeenCalledWith({
+      userId: 'user-123',
+      fileName: 'tenant-scoped-uuid-studio-original.png',
+      buffer: original,
+      tenantId: 'tenant-a',
+    });
+    expect(db.createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        file_id: 'tenant-scoped-uuid',
+        user: 'user-123',
+        tenantId: 'tenant-a',
+        context: FileContext.image_generation,
+        type: 'image/png',
+        bytes: original.length,
+        width: 4096,
+        height: 2048,
+        filepath: '/images/user-123/canonical.png',
+      }),
+      true,
+    );
+    expect(file.file_id).toBe('tenant-scoped-uuid');
+    expect(require('~/server/services/Files/images').resizeAndConvert).not.toHaveBeenCalled();
+  });
+});
 
 describe('upload retention scheduling', () => {
   beforeEach(() => {

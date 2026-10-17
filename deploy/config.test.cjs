@@ -26,6 +26,7 @@ const {
   STUDIO_AGENT_PLACEHOLDERS,
   STUDIO_AGENT_PROVIDERS,
   STUDIO_AGENT_TOOLS,
+  STUDIO_AGENT_OWNER_MARKERS,
   buildStudioAgentDefinitions,
   isStudioOwnedAgent,
   findStudioOwnedAgent,
@@ -296,7 +297,11 @@ test('saved Studio agents carry gemini_image_gen and sys__all__sys_mcp_zyb_studi
       function: { name: 'search_library_mcp_zyb_studio', description: 'search', parameters: {} },
     },
     compare_materials_mcp_zyb_studio: {
-      function: { name: 'compare_materials_mcp_zyb_studio', description: 'compare', parameters: {} },
+      function: {
+        name: 'compare_materials_mcp_zyb_studio',
+        description: 'compare',
+        parameters: {},
+      },
     },
     create_3d_model_mcp_zyb_studio: {
       function: { name: 'create_3d_model_mcp_zyb_studio', description: '3d', parameters: {} },
@@ -420,10 +425,12 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
 
 test('promptPrefix and MCP image context mention only tool and argument names present in the contract', () => {
   const config = configSchema.parse(parsedYaml);
-  assert.deepEqual(
-    [...GEMINI_SCHEMA_KEYS].sort(),
-    ['aspectRatio', 'imageSize', 'image_ids', 'prompt'],
-  );
+  assert.deepEqual([...GEMINI_SCHEMA_KEYS].sort(), [
+    'aspectRatio',
+    'imageSize',
+    'image_ids',
+    'prompt',
+  ]);
   for (const spec of config.modelSpecs.list) {
     const prefix = spec.preset.promptPrefix || '';
     const identifiers = prefix.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
@@ -494,7 +501,8 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   assert.equal(isChatSelectableMCPServer(studioServer), false);
   assert.equal(requiresEphemeralUserConnection(studioServer), false);
   assert.deepEqual(studioServer.headers, {
-    'X-LibreChat-User-ID': '{{LIBRECHAT_USER_ID}}',
+    'X-LibreChat-User-ID': '{{LIBRECHAT_STUDIO_PRINCIPAL}}',
+    'X-LibreChat-Raw-User-ID': '{{LIBRECHAT_USER_ID}}',
     'X-Studio-Token': '${STUDIO_SHARED_TOKEN}',
   });
 
@@ -504,11 +512,12 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   try {
     const resolved = processMCPEnv({
       options: studioServer,
-      user: { id: 'user-123' },
+      user: { id: 'user-123', studioPrincipal: 'user-123' },
       body: { conversationId: 'conv-456' },
     });
     assert.deepEqual(resolved.headers, {
       'X-LibreChat-User-ID': 'user-123',
+      'X-LibreChat-Raw-User-ID': 'user-123',
       'X-Studio-Token': 'test-shared-secret-token',
     });
   } finally {
@@ -525,6 +534,11 @@ test('fileConfig permits image uploads on agents, google, and OpenRouter endpoin
   const merged = mergeFileConfig(config.fileConfig);
 
   assert.deepEqual(config.fileConfig.imageGeneration, { percentage: 100 });
+  assert.equal(merged.serverFileSizeLimit, 128 * 1024 * 1024);
+  for (const endpoint of ['agents', 'google', 'OpenRouter']) {
+    assert.equal(config.fileConfig.endpoints[endpoint].fileSizeLimit, 128);
+    assert.equal(config.fileConfig.endpoints[endpoint].totalSizeLimit, 256);
+  }
 
   // 验证 2400×1792 的 2K 生图在配置了 imageGeneration.percentage: 100 后不会再被缩放到 1029×768。
   const sharp = require('sharp');
@@ -598,10 +612,7 @@ test('deploy/compose.yml configures hardened studio service, IPv6 network, and a
   const api = services.api;
   assert.equal(api.environment.ENDPOINTS, 'agents,custom,google');
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
-  assert.equal(
-    api.environment.GEMINI_IMAGE_MODEL,
-    '${GEMINI_IMAGE_MODEL:-gemini-nano-banana-2.1}',
-  );
+  assert.equal(api.environment.GEMINI_IMAGE_MODEL, '${GEMINI_IMAGE_MODEL:-gemini-nano-banana-2.1}');
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
 
@@ -782,7 +793,8 @@ test('gemini-4-argon is recognized as multimodal and formats image blocks, tool 
     };
   };
 
-  const userImg = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  const userImg =
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
   const toolImg = 'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
 
   await llm._generate(
@@ -876,6 +888,7 @@ test('Studio agent discovery paginates past 100 agents and never matches a non-S
   const studioMain = {
     id: 'agent_studio_main_owned',
     name: '庄严设计助手',
+    instructions: `owned ${STUDIO_AGENT_OWNER_MARKERS['zyb-design']}`,
     tools: [...STUDIO_AGENT_TOOLS],
   };
   const page2Agents = [studioMain];
@@ -888,12 +901,25 @@ test('Studio agent discovery paginates past 100 agents and never matches a non-S
   });
 
   assert.equal(allAgents.length, 101);
-  assert.equal(isStudioOwnedAgent(page1Agents[0], '庄严设计助手'), false);
-  assert.equal(isStudioOwnedAgent(studioMain, '庄严设计助手'), true);
+  assert.equal(isStudioOwnedAgent(page1Agents[0], 'zyb-design'), false);
+  assert.equal(isStudioOwnedAgent(studioMain, 'zyb-design'), true);
 
-  const matched = findStudioOwnedAgent(allAgents, '庄严设计助手');
+  const matched = findStudioOwnedAgent(allAgents, 'zyb-design');
   assert.equal(matched?.id, 'agent_studio_main_owned');
 
   // 若仅有同名非 Studio 智能体，必须返回 null 以便新建而非覆盖
-  assert.equal(findStudioOwnedAgent(page1Agents, '庄严设计助手'), null);
+  assert.equal(findStudioOwnedAgent(page1Agents, 'zyb-design'), null);
+  assert.throws(
+    () =>
+      findStudioOwnedAgent([studioMain, { ...studioMain, id: 'agent_duplicate' }], 'zyb-design'),
+    /Multiple Studio agents/,
+  );
+  assert.throws(
+    () => findStudioOwnedAgent(page1Agents, 'zyb-design', page1Agents[0].id),
+    /ownership marker/,
+  );
+  await assert.rejects(
+    collectPaginatedAgents(async () => ({ data: [], has_more: true, after: null })),
+    /Incomplete Studio agent pagination/,
+  );
 });

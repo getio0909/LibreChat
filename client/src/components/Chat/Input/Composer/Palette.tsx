@@ -1001,9 +1001,7 @@ function Palette({
                   />
                 )}
                 <span className="flex min-w-0 flex-1 flex-col justify-center">
-                  <span className="truncate">
-                    {formatGeneratedImageFilename(file.filename, localize)}
-                  </span>
+                  <span className="truncate">{formatGeneratedImageFilename(file, localize)}</span>
                   <span className="text-text-secondary truncate text-xs">
                     {formatFileDate(file)}
                   </span>

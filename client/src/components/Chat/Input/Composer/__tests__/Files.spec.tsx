@@ -1,5 +1,6 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
+import { FileContext } from 'librechat-data-provider';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { TFile } from 'librechat-data-provider';
 import FileGrid from '../Files';
@@ -166,11 +167,12 @@ describe('FileGrid', () => {
         file_id: '11111111-2222-4333-8444-555555555555',
         filename: rawGeneratedFilename,
         type: 'image/png',
+        context: FileContext.image_generation,
       }),
     ];
 
     const { onAttach } = renderGrid();
-    const expectedNeutralName = 'com_ui_generated_image_filename:V1StGXR8.png';
+    const expectedNeutralName = 'com_ui_generated_image_filename:11111111.png';
     expect(screen.getByText(expectedNeutralName)).toBeInTheDocument();
     expect(screen.queryByText(/gemini_image_gen/i)).not.toBeInTheDocument();
     expect(

@@ -17,6 +17,7 @@ import {
   collectBranchImageCandidateIds,
   collectConversationBranchImageFiles,
 } from './imageContext';
+import { deriveStudioStorageUserId } from '~/utils/studioIdentity';
 
 describe('buildImageToolContext', () => {
   it('returns empty string when imageFiles is empty', () => {
@@ -293,6 +294,73 @@ describe('resolveGeminiReferenceImages', () => {
     const bridgeB = deriveStudioBridgeFileId(userB, kbId);
     expect(bridgeA).not.toBe(bridgeB);
     expect(deriveStudioBridgeFileId(userA, kbId)).toBe(bridgeA);
+    expect(deriveStudioBridgeFileId(userA, kbId, 'tenant-a')).not.toBe(
+      deriveStudioBridgeFileId(userA, kbId, 'tenant-b'),
+    );
+    expect(deriveStudioStorageUserId(userA, null)).toBe(userA);
+    expect(deriveStudioStorageUserId(userA, 'tenant-a')).not.toBe(
+      deriveStudioStorageUserId(userA, 'tenant-b'),
+    );
+  });
+
+  it('rejects supplied and fetched Files from another tenant and isolates Studio image jobs', async () => {
+    const tenantA = 'tenant-a';
+    const tenantB = 'tenant-b';
+    const tenantAId = deriveStudioBridgeFileId(userA, imgId, tenantA);
+    const tenantAFile: GeminiReferenceFileRecord = {
+      file_id: tenantAId,
+      filepath: '/images/tenant-a.png',
+      source: 'local',
+      type: 'image/png',
+      user: userA,
+      tenantId: tenantA,
+      width: 32,
+      height: 32,
+    };
+    const getDownloadStream = jest.fn(async () =>
+      (async function* () {
+        yield imgBytes;
+      })(),
+    );
+    const getFiles = jest.fn(async () => [tenantAFile]);
+    const foreignFile = await resolveGeminiReferenceImages({
+      imageFiles: [tenantAFile],
+      image_ids: [tenantAId],
+      req: { user: { id: userA, tenantId: tenantB } },
+      getFiles,
+      getStrategyFunctions: () => ({ getDownloadStream }),
+    });
+    expect(foreignFile.ok).toBe(false);
+    expect(getFiles).toHaveBeenCalledWith(
+      expect.objectContaining({ user: userA, tenantId: tenantB }),
+      {},
+      {},
+    );
+    expect(getDownloadStream).not.toHaveBeenCalled();
+
+    const tenantAJob = path.join(
+      dataDir,
+      'users',
+      deriveStudioStorageUserId(userA, tenantA),
+      'jobs',
+      imgId,
+    );
+    fs.mkdirSync(tenantAJob, { recursive: true });
+    fs.writeFileSync(
+      path.join(tenantAJob, 'receipt.json'),
+      JSON.stringify({ state: 'saved', file: 'original.png' }),
+    );
+    fs.writeFileSync(path.join(tenantAJob, 'original.png'), imgBytes);
+    const crossTenantImage = await resolveGeminiReferenceImages({
+      image_ids: [imgId],
+      req: { user: { id: userA, tenantId: tenantB } },
+      dataDir,
+      getFiles: async () => [],
+      saveBase64Image: jest.fn(),
+      getStrategyFunctions: () => ({ getDownloadStream }),
+    });
+    expect(crossTenantImage.ok).toBe(false);
+    expect(getDownloadStream).not.toHaveBeenCalled();
   });
 
   it('bridges search_knowledge kb_<16-hex> into an authorized LibreChat File record and returns inlineData', async () => {
@@ -734,9 +802,32 @@ describe('processToolImageArtifacts', () => {
     };
 
     let savedBuffer: Buffer | null = null;
-    const createFile = jest.fn(async (data: Record<string, unknown>) => ({
-      ...(data as unknown as GeminiReferenceFileRecord),
-    }));
+    const uploadImageBuffer = jest.fn(
+      async ({
+        metadata,
+      }: {
+        metadata: {
+          buffer: Buffer;
+          file_id: string;
+          filename: string;
+          type: string;
+          width: number;
+          height: number;
+          bytes: number;
+        };
+      }) => {
+        savedBuffer = metadata.buffer;
+        return {
+          file_id: metadata.file_id,
+          filepath: `/images/${userA}/${metadata.file_id}-${metadata.filename}`,
+          filename: metadata.filename,
+          type: metadata.type,
+          width: metadata.width,
+          height: metadata.height,
+          bytes: metadata.bytes,
+        };
+      },
+    );
     const onFileSaved = jest.fn();
     const artifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
 
@@ -746,13 +837,7 @@ describe('processToolImageArtifacts', () => {
       metadata: { run_id: 'run-1', thread_id: 'thread-1', provider: 'google' },
       artifactPromises,
       dataDir,
-      createFile,
-      getStrategyFunctions: () => ({
-        saveBuffer: async ({ userId, fileName, buffer }) => {
-          savedBuffer = buffer;
-          return `/images/${userId}/${fileName}`;
-        },
-      }),
+      uploadImageBuffer,
       buildMetadata: (file) => ({ ...file, messageId: 'run-1', conversationId: 'thread-1' }),
       onFileSaved,
     });
@@ -763,6 +848,9 @@ describe('processToolImageArtifacts', () => {
     expect(savedBuffer!.length).toBe(canonicalLargePng.length);
     expect(savedBuffer!.equals(canonicalLargePng)).toBe(true);
     expect(onFileSaved).toHaveBeenCalledTimes(1);
+    expect(uploadImageBuffer).toHaveBeenCalledWith(
+      expect.objectContaining({ resize: false, context: FileContext.image_generation }),
+    );
   });
 
   it('scrubs generated_image_id and clears artifact.file_ids when image persistence fails', async () => {
@@ -801,5 +889,55 @@ describe('processToolImageArtifacts', () => {
     expect(output.artifact.file_ids).toEqual([]);
     expect(String(output.content)).toContain('IMAGE_PERSISTENCE_FAILED');
     expect(String(output.content)).not.toContain(unpersistedId);
+  });
+
+  it('withholds every attachment when a later Studio variant fails to publish', async () => {
+    const ids = ['img_11111111111111111111111111111111', 'img_22222222222222222222222222222222'];
+    for (const id of ids) {
+      const jobDir = path.join(dataDir, 'users', userA, 'jobs', id);
+      fs.mkdirSync(jobDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(jobDir, 'receipt.json'),
+        JSON.stringify({ state: 'saved', file: 'original.png' }),
+      );
+      fs.writeFileSync(path.join(jobDir, 'original.png'), Buffer.from('canonical-original'));
+    }
+    const output = {
+      name: 'compare_materials_mcp_zyb_studio',
+      content: JSON.stringify({ variants: ids.map((image_id) => ({ image_id })) }),
+      artifact: {
+        content: ids.map(() => ({
+          type: 'image_url',
+          image_url: { url: 'data:image/jpeg;base64,cHJldmlldw==' },
+        })),
+        file_ids: [...ids],
+      },
+    };
+    const uploadImageBuffer = jest
+      .fn()
+      .mockImplementationOnce(async ({ metadata }) => ({
+        file_id: metadata.file_id,
+        filepath: `/images/${metadata.file_id}.png`,
+      }))
+      .mockRejectedValueOnce(new Error('disk failure'));
+    const onFileSaved = jest.fn();
+    const artifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
+    const published = await processToolImageArtifacts({
+      output,
+      req: { user: { id: userA }, config: {} },
+      artifactPromises,
+      dataDir,
+      uploadImageBuffer,
+      buildMetadata: (file) => file,
+      onFileSaved,
+      logger: { error: jest.fn() },
+    });
+    expect(published).toBe(false);
+    expect(uploadImageBuffer).toHaveBeenCalledTimes(2);
+    expect(onFileSaved).not.toHaveBeenCalled();
+    expect(await Promise.all(artifactPromises)).toEqual([null]);
+    expect(output.content).toContain('IMAGE_PERSISTENCE_FAILED');
+    expect(JSON.stringify(output)).not.toMatch(/img_111111|img_222222/);
+    expect(output.artifact.file_ids).toEqual([]);
   });
 });

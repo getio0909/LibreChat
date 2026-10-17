@@ -77,6 +77,7 @@ from .regions import (
 from .store import (
     ResolvedImage,
     allocate_studio_job,
+    bind_studio_principal,
     ensure_safe_subpath,
     normalize_conversation_id,
     read_bytes_no_follow,
@@ -1311,6 +1312,13 @@ def create_app(
                     auth_user_id = validate_user_id(
                         request.headers.get("x-librechat-user-id")
                     )
+                    raw_user_id = validate_user_id(
+                        request.headers.get("x-librechat-raw-user-id")
+                        or auth_user_id
+                    )
+                    bind_studio_principal(
+                        active_settings, auth_user_id, raw_user_id
+                    )
                     resolved_internal = resolve_image(
                         active_settings, auth_user_id, token, kb_index=kb_index
                     )
@@ -1603,6 +1611,12 @@ def create_app(
             raw_user_id = request.headers.get("x-librechat-user-id")
             try:
                 user_id = validate_user_id(raw_user_id)
+                original_user_id = validate_user_id(
+                    request.headers.get("x-librechat-raw-user-id") or user_id
+                )
+                bind_studio_principal(
+                    active_settings, user_id, original_user_id
+                )
             except ValueError:
                 response = JSONResponse({"error": "Forbidden"}, status_code=403)
                 await response(scope, receive, send)

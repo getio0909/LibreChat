@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import hashlib
 import io
 import json
 import os
@@ -16,6 +17,7 @@ from deploy.studio.app import create_app
 from deploy.studio.config import StudioSettings, load_rules, load_settings
 from deploy.studio.images import (
     GEMINI_MODEL,
+    MAX_RESPONSE_BYTES,
     NATIVE,
     GenerationUncertain,
     build_edit_prompt,
@@ -35,7 +37,12 @@ from deploy.studio.models3d import (
     parse_seed3d_query_response,
     sign_file_token,
 )
-from deploy.studio.store import resolve_image
+from deploy.studio.store import (
+    bind_studio_principal,
+    resolve_image,
+    user_librechat_images_dir,
+    user_studio_dir,
+)
 
 # 测试固定常量定义
 VALID_TOKEN = "a" * 64
@@ -43,6 +50,66 @@ VALID_SIGNING_KEY = "f" * 64
 USER_A = "65f00000000000000000000a"
 USER_B = "65f00000000000000000000b"
 FIXTURE_KB_TEMPLATE = Path(__file__).resolve().parent / "fixtures" / "kb"
+
+
+def test_response_budget_covers_supported_4k_rgba_png() -> None:
+    assert MAX_RESPONSE_BYTES > ((4096 * 4096 * 4 + 2) // 3) * 4
+
+
+def test_scoped_studio_principal_blocks_cross_tenant_image_reads(
+    studio_env: StudioSettings,
+) -> None:
+    image_id = "img_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    image_bytes = _make_image_bytes(fmt="PNG")
+    principal_a = hashlib.sha256(
+        json.dumps(
+            ["studio-user-v1", "tenant-a", USER_A], separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()[:24]
+    principal_b = hashlib.sha256(
+        json.dumps(
+            ["studio-user-v1", "tenant-b", USER_A], separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()[:24]
+    bind_studio_principal(studio_env, principal_a, USER_A)
+    assert user_librechat_images_dir(studio_env, principal_a) == Path(
+        studio_env.librechat_images_dir
+    ) / USER_A
+    job_dir = user_studio_dir(studio_env, principal_a, create=True) / "jobs" / image_id
+    job_dir.mkdir(parents=True)
+    (job_dir / "receipt.json").write_text(
+        json.dumps({"state": "saved", "file": "original.png"}), encoding="utf-8"
+    )
+    (job_dir / "original.png").write_bytes(image_bytes)
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            for principal, expected_status in ((principal_a, 200), (principal_b, 404)):
+                response = await client.get(
+                    f"/files/{image_id}",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": principal,
+                        "X-LibreChat-Raw-User-ID": USER_A,
+                    },
+                )
+                assert response.status_code == expected_status
+                if expected_status == 200:
+                    assert response.content == image_bytes
+            mismatch = await client.get(
+                f"/files/{image_id}",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": principal_a,
+                    "X-LibreChat-Raw-User-ID": USER_B,
+                },
+            )
+            assert mismatch.status_code == 404
+
+    asyncio.run(_run())
 
 
 # 构造Gemini Nano Banana 2.1生图响应JSON辅助函数

@@ -236,6 +236,7 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
   # 分页拉取全部可见智能体列表，避免超过单页 100 条上限时漏检既有 Studio 智能体并产生重复创建。
   printf '{"data":[]}\n' > "$stage/agents-list.json"
   agents_cursor=''
+  declare -A seen_agent_cursors=()
   for (( page_idx = 0; page_idx < 50; page_idx++ )); do
     agents_url='http://127.0.0.1:3080/api/agents?limit=100'
     if [[ -n "$agents_cursor" ]]; then
@@ -244,77 +245,82 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
     curl --fail --silent --show-error \
       -H "Authorization: Bearer $admin_token" \
       -o "$stage/agents-page.json" "$agents_url"
+    jq -e '(.data | type == "array") and (.has_more | type == "boolean")' \
+      "$stage/agents-page.json" >/dev/null || {
+      echo 'Studio agent listing returned an invalid page.' >&2
+      exit 1
+    }
     jq -s '{data: ((.[0].data // []) + (.[1].data // []))}' \
       "$stage/agents-list.json" "$stage/agents-page.json" > "$stage/agents-list.json.tmp"
     mv "$stage/agents-list.json.tmp" "$stage/agents-list.json"
     has_more=$(jq -r 'if .has_more == true then "true" else "false" end' "$stage/agents-page.json")
     next_cursor=$(jq -r '.after // empty' "$stage/agents-page.json")
-    if [[ "$has_more" != "true" || -z "$next_cursor" || "$next_cursor" == "$agents_cursor" ]]; then
+    if [[ "$has_more" != "true" ]]; then
       break
     fi
+    if [[ -z "$next_cursor" || -n "${seen_agent_cursors[$next_cursor]:-}" ]]; then
+      echo 'Studio agent listing returned incomplete pagination.' >&2
+      exit 1
+    fi
+    seen_agent_cursors[$next_cursor]=1
     agents_cursor=$next_cursor
   done
+  if [[ "$has_more" == "true" ]]; then
+    echo 'Studio agent listing exceeded the pagination limit.' >&2
+    exit 1
+  fi
 
   is_studio_owned_agent_file() {
     local candidate_file=$1
-    jq -e '
+    local owner_marker=$2
+    jq -e --arg marker "$owner_marker" '
       (.id | type == "string" and test("^agent_[A-Za-z0-9_-]+$"))
-      and ((.tools // []) | (index("gemini_image_gen") != null and index("sys__all__sys_mcp_zyb_studio") != null))
+      and (.instructions | type == "string" and endswith($marker))
     ' "$candidate_file" >/dev/null 2>&1
   }
 
   resolve_existing_studio_agent_id() {
     local placeholder=$1
-    local agent_name=$2
+    local owner_marker=$2
     local persisted_id
     persisted_id=$(jq -r --arg k "$placeholder" '.[$k] // empty' "$stage/studio-agent-ids.json")
     if [[ "$persisted_id" =~ ^agent_[A-Za-z0-9_-]+$ ]]; then
       if jq -e --arg id "$persisted_id" '(.data // []) | map(select(.id == $id)) | length > 0' "$stage/agents-list.json" >/dev/null 2>&1; then
-        jq -c --arg id "$persisted_id" '(.data // []) | map(select(.id == $id)) | .[0]' "$stage/agents-list.json" > "$stage/agent-candidate.json"
-        if is_studio_owned_agent_file "$stage/agent-candidate.json"; then
+        curl --fail --silent --show-error \
+          -H "Authorization: Bearer $admin_token" \
+          -o "$stage/agent-expanded.json" "http://127.0.0.1:3080/api/agents/$persisted_id/expanded" || return 1
+        if is_studio_owned_agent_file "$stage/agent-expanded.json" "$owner_marker"; then
           printf '%s' "$persisted_id"
           return 0
         fi
-      fi
-      if curl --fail --silent --show-error \
-        -H "Authorization: Bearer $admin_token" \
-        -o "$stage/agent-expanded.json" "http://127.0.0.1:3080/api/agents/$persisted_id/expanded" 2>/dev/null; then
-        if is_studio_owned_agent_file "$stage/agent-expanded.json"; then
-          printf '%s' "$persisted_id"
-          return 0
-        fi
+        echo 'Persisted Studio agent ID has no matching ownership marker.' >&2
+        return 1
       fi
     fi
 
-    local candidate_id
+    local candidate_id matched_id=''
     while IFS= read -r candidate_id; do
       [[ -z "$candidate_id" ]] && continue
-      jq -c --arg id "$candidate_id" '(.data // []) | map(select(.id == $id)) | .[0]' "$stage/agents-list.json" > "$stage/agent-candidate.json"
-      if is_studio_owned_agent_file "$stage/agent-candidate.json"; then
-        printf '%s' "$candidate_id"
-        return 0
-      fi
-      if jq -e '((.tools // []) | length) == 0' "$stage/agent-candidate.json" >/dev/null 2>&1; then
-        if curl --fail --silent --show-error \
-          -H "Authorization: Bearer $admin_token" \
-          -o "$stage/agent-expanded.json" "http://127.0.0.1:3080/api/agents/$candidate_id/expanded" 2>/dev/null; then
-          if is_studio_owned_agent_file "$stage/agent-expanded.json"; then
-            printf '%s' "$candidate_id"
-            return 0
-          fi
+      curl --fail --silent --show-error \
+        -H "Authorization: Bearer $admin_token" \
+        -o "$stage/agent-expanded.json" "http://127.0.0.1:3080/api/agents/$candidate_id/expanded" || return 1
+      if is_studio_owned_agent_file "$stage/agent-expanded.json" "$owner_marker"; then
+        if [[ -n "$matched_id" ]]; then
+          echo 'Multiple Studio agents carry the same ownership marker.' >&2
+          return 1
         fi
+        matched_id=$candidate_id
       fi
-    done < <(jq -r --arg name "$agent_name" '(.data // []) | map(select(.name == $name)) | .[].id // empty' "$stage/agents-list.json")
-    return 0
+    done < <(jq -r '(.data // []) | .[].id // empty' "$stage/agents-list.json")
+    printf '%s' "$matched_id"
   }
 
   provision_studio_agent() {
     local placeholder=$1
     local payload_file=$2
-    local agent_name
-    agent_name=$(jq -r '.name' "$payload_file")
+    local owner_marker=$3
     local existing_id
-    existing_id=$(resolve_existing_studio_agent_id "$placeholder" "$agent_name")
+    existing_id=$(resolve_existing_studio_agent_id "$placeholder" "$owner_marker")
     if [[ -n "$existing_id" ]]; then
       curl --fail --silent --show-error -X PATCH \
         -H "Authorization: Bearer $admin_token" \
@@ -328,11 +334,12 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
         --data-binary @"$payload_file" \
         -o "$stage/agent-saved.json" http://127.0.0.1:3080/api/agents
     fi
-    if ! jq -e '
+    if ! jq -e --arg marker "$owner_marker" '
       (.id | type == "string" and test("^agent_[A-Za-z0-9_-]+$"))
       and (._id | type == "string" and length >= 1)
       and (.tools | index("gemini_image_gen") != null)
       and (.tools | index("sys__all__sys_mcp_zyb_studio") != null)
+      and (.instructions | endswith($marker))
     ' "$stage/agent-saved.json" >/dev/null; then
       printf 'Studio agent provisioning verification failed for %s.\n' "$agent_name" >&2
       exit 1
@@ -351,12 +358,14 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
     mv "$stage/studio-agent-ids.json.tmp" "$stage/studio-agent-ids.json"
   }
 
-  jq -n --arg instructions "$design_instructions" '{
+  main_owner_marker='<!-- librechat-studio-owner:zyb-design:v1 -->'
+  fast_owner_marker='<!-- librechat-studio-owner:zyb-design-fast:v1 -->'
+  jq -n --arg instructions "$design_instructions" --arg marker "$main_owner_marker" '{
     name: "庄严设计助手",
     description: "寺院装饰、石材大板、家具与展位概念设计主力助手",
     provider: "google",
     model: "gemini-4-argon",
-    instructions: $instructions,
+    instructions: ($instructions + "\n\n" + $marker),
     tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
     model_parameters: {
       thinking: true,
@@ -365,21 +374,21 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
       maxOutputTokens: 65536
     }
   }' > "$stage/agent-main.json"
-  provision_studio_agent 'agent___STUDIO_AGENT_ID_MAIN__' "$stage/agent-main.json"
+  provision_studio_agent 'agent___STUDIO_AGENT_ID_MAIN__' "$stage/agent-main.json" "$main_owner_marker"
 
-  jq -n --arg instructions "$design_instructions" '{
+  jq -n --arg instructions "$design_instructions" --arg marker "$fast_owner_marker" '{
     name: "庄严设计助手 · 快速",
     description: "快速响应的概念设计与图像改图助手",
     provider: "OpenRouter",
     model: "anthropic/claude-haiku-5.5",
-    instructions: $instructions,
+    instructions: ($instructions + "\n\n" + $marker),
     tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
     model_parameters: {
       maxContextTokens: 200000,
       max_tokens: 32000
     }
   }' > "$stage/agent-fast.json"
-  provision_studio_agent 'agent___STUDIO_AGENT_ID_FAST__' "$stage/agent-fast.json"
+  provision_studio_agent 'agent___STUDIO_AGENT_ID_FAST__' "$stage/agent-fast.json" "$fast_owner_marker"
 
   if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; then
     echo 'Unresolved Studio agent placeholders remain in librechat.yaml.' >&2

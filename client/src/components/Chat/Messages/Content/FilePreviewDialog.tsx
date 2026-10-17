@@ -40,6 +40,7 @@ interface FilePreviewDialogProps {
   pageRelevance?: Record<number, number>;
   fileType?: string;
   fileSource?: string;
+  fileContext?: TFile['context'];
   fileSize?: number;
   deliveryPath?: TFile['llmDeliveryPath'];
   /** Where focus returns on close when the dialog is opened without a trigger. */
@@ -104,6 +105,7 @@ export default function FilePreviewDialog({
   pageRelevance,
   fileType,
   fileSource,
+  fileContext,
   fileSize,
   deliveryPath,
   triggerRef,
@@ -144,7 +146,7 @@ export default function FilePreviewDialog({
   const [isCopied, setIsCopied] = useState(false);
 
   const previewKind = showExtractedText ? false : getPreviewKind(fileName, fileType, fileSource);
-  const downloadFilename = getDownloadFilename(fileName, fileId, fileSource);
+  const downloadFilename = getDownloadFilename(fileName, fileId, fileSource, fileContext, fileType);
   const displayedText = showExtractedText ? (extractedPreview?.text ?? null) : fileContent;
   const isLoading =
     (!showExtractedText && loading) ||

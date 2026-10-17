@@ -1,4 +1,10 @@
 const { Tools, StepEvents } = require('librechat-data-provider');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const sharp = require('sharp');
+const { CallToolResultSchema } = require('@modelcontextprotocol/sdk/types.js');
 
 // Mock all dependencies before requiring the module
 jest.mock('nanoid', () => ({
@@ -102,6 +108,7 @@ jest.mock('~/server/services/Tools/credentials', () => ({
 
 jest.mock('~/server/services/Files/process', () => ({
   saveBase64Image: jest.fn(),
+  uploadImageBuffer: jest.fn(),
 }));
 
 describe('resumable event generation fencing', () => {
@@ -1894,4 +1901,174 @@ describe('createToolEndCallback image persistence barrier', () => {
     expect(output.content).toContain('IMAGE_PERSISTENCE_FAILED');
     expect(output.content).not.toContain('unpersisted-uuid-999');
   });
+});
+
+describe('Studio MCP image publication through the parser and tool callback', () => {
+  let userId;
+  const tenantId = 'tenant-a';
+  const imageId = 'img_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  let studioDataDir;
+  let previousDataDir;
+
+  beforeEach(() => {
+    userId = crypto.randomBytes(12).toString('hex');
+    previousDataDir = process.env.STUDIO_DATA_DIR;
+    studioDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-mcp-publication-'));
+    process.env.STUDIO_DATA_DIR = studioDataDir;
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    if (previousDataDir === undefined) {
+      delete process.env.STUDIO_DATA_DIR;
+    } else {
+      process.env.STUDIO_DATA_DIR = previousDataDir;
+    }
+    fs.rmSync(studioDataDir, { recursive: true, force: true });
+  });
+
+  async function parsedEditOutput(canonicalBytes) {
+    const { formatToolContent } = require('../../../../../packages/api/src/mcp/parsers.ts');
+    const {
+      deriveStudioStorageUserId,
+    } = require('../../../../../packages/api/src/utils/studioIdentity.ts');
+    const scopedUserId = deriveStudioStorageUserId(userId, tenantId);
+    const jobDir = path.join(studioDataDir, 'users', scopedUserId, 'jobs', imageId);
+    fs.mkdirSync(jobDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(jobDir, 'receipt.json'),
+      JSON.stringify({ state: 'saved', file: 'original.png' }),
+    );
+    fs.writeFileSync(path.join(jobDir, 'original.png'), canonicalBytes);
+    const preview = Buffer.from('lossy-preview-only');
+    const result = CallToolResultSchema.parse({
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            id: imageId,
+            image_id: imageId,
+            before_url: `/files/kb_1234567890abcdef`,
+          }),
+        },
+        {
+          type: 'resource',
+          resource: {
+            uri: `ui://zyb_studio/compare/${imageId}`,
+            mimeType: 'text/html',
+            text: `<html><body>${imageId}</body></html>`,
+          },
+        },
+        { type: 'image', mimeType: 'image/jpeg', data: preview.toString('base64') },
+      ],
+      isError: false,
+    });
+    const [content, artifact] = formatToolContent(result, 'google', {
+      mcpApps: { enabled: true, legacyHtmlEnabled: true },
+    });
+    return {
+      name: 'edit_region_mcp_zyb_studio',
+      tool_call_id: 'call-studio-edit',
+      content,
+      artifact,
+    };
+  }
+
+  it('stores the lossless original as the canonical File and reuses its exact bytes', async () => {
+    const canonicalBytes = await sharp(crypto.randomBytes(4096 * 2048 * 4), {
+      raw: { width: 4096, height: 2048, channels: 4 },
+    })
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+    expect(canonicalBytes.length).toBeGreaterThan(25 * 1024 * 1024);
+    const output = await parsedEditOutput(canonicalBytes);
+    expect(output.content).toContain('UI Resource Markers Available');
+    expect(output.artifact[Tools.ui_resources]).toBeDefined();
+    const { uploadImageBuffer, saveBase64Image } = require('~/server/services/Files/process');
+    let savedBytes;
+    uploadImageBuffer.mockImplementation(async ({ metadata, resize, context, req }) => {
+      expect(resize).toBe(false);
+      expect(context).toBe('image_generation');
+      expect(req.user.tenantId).toBe(tenantId);
+      savedBytes = Buffer.from(metadata.buffer);
+      return {
+        file_id: metadata.file_id,
+        filepath: `/images/${userId}/${metadata.file_id}-${metadata.filename}`,
+        filename: metadata.filename,
+        type: metadata.type,
+        source: 'local',
+        context,
+        user: userId,
+        tenantId,
+        width: metadata.width,
+        height: metadata.height,
+        bytes: metadata.bytes,
+      };
+    });
+    const artifactPromises = [];
+    const callback = require('../callbacks').createToolEndCallback({
+      req: { user: { id: userId, tenantId }, config: {} },
+      res: { headersSent: false, writableEnded: false },
+      artifactPromises,
+    });
+    await callback({ output }, { run_id: 'run-1', thread_id: 'thread-1', provider: 'google' });
+    const attachments = await Promise.all(artifactPromises);
+    const file = attachments.find((item) => item?.file_id);
+    expect(uploadImageBuffer).toHaveBeenCalledTimes(1);
+    expect(saveBase64Image).not.toHaveBeenCalled();
+    expect(uploadImageBuffer.mock.calls[0][0].resize).toBe(false);
+    expect(savedBytes.equals(canonicalBytes)).toBe(true);
+    expect(file.bytes).toBe(canonicalBytes.length);
+    expect(file.width).toBe(4096);
+    expect(file.height).toBe(2048);
+    expect(file.type).toBe('image/png');
+    expect(output.artifact.file_ids).toEqual([file.file_id]);
+    expect(attachments.some((item) => item?.type === Tools.ui_resources)).toBe(true);
+
+    const { resolveGeminiReferenceImages } = jest.requireActual('@librechat/api');
+    const reused = await resolveGeminiReferenceImages({
+      imageFiles: [file],
+      image_ids: [file.file_id],
+      req: { user: { id: userId, tenantId }, config: {} },
+      getStrategyFunctions: () => ({
+        getDownloadStream: async () =>
+          (async function* () {
+            yield savedBytes;
+          })(),
+      }),
+    });
+    expect(reused.ok).toBe(true);
+    expect(Buffer.from(reused.value[0].inlineData.data, 'base64').equals(canonicalBytes)).toBe(
+      true,
+    );
+  });
+
+  it.each(['createToolEndCallback', 'createResponsesToolEndCallback'])(
+    '%s hides all Studio IDs and the UI resource when original publication fails',
+    async (factoryName) => {
+      const output = await parsedEditOutput(Buffer.from('canonical-original'));
+      const { uploadImageBuffer } = require('~/server/services/Files/process');
+      const { writeAttachmentEvent } = require('@librechat/api');
+      uploadImageBuffer.mockRejectedValue(new Error('disk full: secret path'));
+      const res = { headersSent: true, writableEnded: false, write: jest.fn() };
+      const artifactPromises = [];
+      const callback = require('../callbacks')[factoryName]({
+        req: { user: { id: userId, tenantId }, config: {} },
+        res,
+        tracker: { nextSequence: jest.fn().mockReturnValue(1) },
+        artifactPromises,
+      });
+      await callback({ output }, { run_id: 'run-1', thread_id: 'thread-1', provider: 'google' });
+      expect(output.isError).toBe(true);
+      expect(output.content).toBe(
+        'Image persistence failed (code: IMAGE_PERSISTENCE_FAILED). The generated image could not be saved.',
+      );
+      expect(JSON.stringify(output)).not.toMatch(/img_aaaaaaaa|kb_1234567890abcdef|secret path/);
+      expect(output.artifact.file_ids).toEqual([]);
+      expect(output.artifact[Tools.ui_resources]).toBeUndefined();
+      expect(await Promise.all(artifactPromises)).toEqual([null]);
+      expect(res.write).not.toHaveBeenCalled();
+      expect(writeAttachmentEvent).not.toHaveBeenCalled();
+    },
+  );
 });

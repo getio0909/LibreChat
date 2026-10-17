@@ -10,6 +10,7 @@ import {
   processOpenIDPlaceholders,
   OpenIDReauthRequiredError,
 } from './oidc';
+import { deriveStudioStorageUserId } from './studioIdentity';
 import { getAdminApiKeyHeader } from '~/mcp/headers';
 
 /**
@@ -53,7 +54,7 @@ const ALLOWED_USER_FIELDS = [
 ] as const;
 
 type AllowedUserField = (typeof ALLOWED_USER_FIELDS)[number];
-type SafeUser = Pick<IUser, AllowedUserField>;
+type SafeUser = Pick<IUser, AllowedUserField> & { studioPrincipal?: string };
 
 /**
  * Encodes a string value to be safe for HTTP headers.
@@ -137,6 +138,14 @@ export function createSafeUser(
     safeUser.id = typeof _id === 'string' ? _id : _id?.toString?.();
   }
 
+  if (safeUser.id) {
+    // 工作台专用占位符只暴露派生身份，不将原始租户编号加入通用用户字段
+    safeUser.studioPrincipal = deriveStudioStorageUserId(
+      String(safeUser.id),
+      user.tenantId ?? null,
+    );
+  }
+
   if ('federatedTokens' in user) {
     safeUser.federatedTokens = user.federatedTokens;
   }
@@ -161,7 +170,7 @@ const OPENID_PLACEHOLDER_NAMES = `LIBRECHAT_OPENID_(?:${OPENID_TOKEN_FIELDS.join
  */
 const RESOLVABLE_PLACEHOLDER_PATTERN = new RegExp(
   [
-    `LIBRECHAT_USER_(?:${ALLOWED_USER_FIELDS.map((field) => field.toUpperCase()).join('|')})`,
+    `LIBRECHAT_USER_(?:${ALLOWED_USER_FIELDS.map((field) => field.toUpperCase()).join('|')})|LIBRECHAT_STUDIO_PRINCIPAL`,
     `LIBRECHAT_BODY_(?:${ALLOWED_BODY_FIELDS.map((field) => field.toUpperCase()).join('|')})`,
     OPENID_PLACEHOLDER_NAMES,
   ]
@@ -218,6 +227,11 @@ function processUserPlaceholders(
 ): string {
   if (!user || typeof value !== 'string') {
     return value;
+  }
+
+  const studioPrincipal = (user as SafeUser).studioPrincipal;
+  if (studioPrincipal) {
+    value = value.replace(/\{\{LIBRECHAT_STUDIO_PRINCIPAL\}\}/g, studioPrincipal);
   }
 
   for (const field of ALLOWED_USER_FIELDS) {

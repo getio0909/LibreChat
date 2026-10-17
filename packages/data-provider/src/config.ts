@@ -3843,8 +3843,8 @@ export type TToolCallPreviewsConfig = z.infer<typeof toolCallPreviewsConfigSchem
 // 参考图与桥接图像引用的资源上限默认配置
 export const imageReferenceDefaults = {
   maxItems: 14,
-  maxImageBytes: 25 * 1024 * 1024,
-  maxTotalBytes: 64 * 1024 * 1024,
+  maxImageBytes: 128 * 1024 * 1024,
+  maxTotalBytes: 256 * 1024 * 1024,
   remoteTimeoutMs: 10_000,
 } as const;
 
@@ -3855,7 +3855,7 @@ export const imageReferencesConfigSchema = z
       .number()
       .int()
       .min(1_024)
-      .max(100 * 1024 * 1024)
+      .max(256 * 1024 * 1024)
       .default(imageReferenceDefaults.maxImageBytes),
     maxTotalBytes: z
       .number()

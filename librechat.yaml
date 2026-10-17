@@ -28,14 +28,15 @@ interface:
 # 普通内置生图（gemini_image_gen）仅需完整像素分辨率与无损 PNG 重编码，无需额外保存字节级一致的原始响应流；
 # 局部重绘（edit_region）的像素级一致与透明通道保证由 Studio 原生 PNG 合成文件与原图归档承担。
 fileConfig:
+  serverFileSizeLimit: 128
   imageGeneration:
     percentage: 100
   endpoints:
     google: &image-files
       disabled: false
       fileLimit: 10
-      fileSizeLimit: 25
-      totalSizeLimit: 100
+      fileSizeLimit: 128
+      totalSizeLimit: 256
       supportedMimeTypes:
         - '^image/(jpeg|jpg|png|webp|gif)$'
     OpenRouter: *image-files
@@ -172,5 +173,6 @@ mcpServers:
     # 覆盖三维模型轮询（最长 480s）与多石材并发对比生图（最长 240s），设为 900s（900,000ms）
     timeout: 900000
     headers:
-      X-LibreChat-User-ID: '{{LIBRECHAT_USER_ID}}'
+      X-LibreChat-User-ID: '{{LIBRECHAT_STUDIO_PRINCIPAL}}'
+      X-LibreChat-Raw-User-ID: '{{LIBRECHAT_USER_ID}}'
       X-Studio-Token: '${STUDIO_SHARED_TOKEN}'
