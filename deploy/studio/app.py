@@ -40,7 +40,7 @@ from .images import (
     build_stone_replacements,
     comparison_target,
     encode_display_image,
-    generate_seedream,
+    generate_image_with_provider,
     neutralize_stone_names,
     normalize_reference,
     normalize_reference_with_size,
@@ -414,6 +414,10 @@ STUDIO_TOOLS: list[types.Tool] = [
 ]
 
 
+# 默认暂停对外提供的三维模型生成工具名称集合（仅当enable_3d开启时启用）
+THREE_D_TOOL_NAMES: frozenset[str] = frozenset({"create_3d_model", "check_3d_model"})
+
+
 # 汇总显式传入的带标记知识库资产警告信息（按编号去重）
 def _collect_flag_warnings(items: list[ResolvedImage]) -> list[str]:
     warnings: list[str] = []
@@ -443,7 +447,7 @@ def _get_active_context(mcp_server: Server) -> RequestContext:
     return ctx
 
 
-# 构建并绑定MCP底层Server与十个设计工具处理器
+# 构建并绑定MCP底层Server与设计工具处理器
 def build_mcp_server(
     settings: StudioSettings,
     rules: StudioRules,
@@ -473,10 +477,12 @@ def build_mcp_server(
     )
     active_segmenter = segmenter or OnnxSamSegmenter()
 
-    # 注册tools/list处理器，返回固定扁平Schema的工具列表
+    # 注册tools/list处理器，返回固定扁平Schema的工具列表（默认隐藏3D工具，仅当enable_3d开启时提供）
     @mcp_server.list_tools()
     async def handle_list_tools() -> list[types.Tool]:
-        return STUDIO_TOOLS
+        if settings.enable_3d:
+            return STUDIO_TOOLS
+        return [tool for tool in STUDIO_TOOLS if tool.name not in THREE_D_TOOL_NAMES]
 
     # 组装三维模型生成完成或进行中的MCP返回结构（含JSON摘要、Three.js UI资源与源图像）
     def _format_3d_model_tool_result(
@@ -601,6 +607,11 @@ def build_mcp_server(
                 user_studio_dir(settings, user_id, create=True),
                 kb_root,
             )
+
+            if name in THREE_D_TOOL_NAMES and not settings.enable_3d:
+                raise ValueError(
+                    f"Tool '{name}' is disabled because 3D model generation is on hold"
+                )
 
             if name == "list_images":
                 limit = int(args.get("limit", 20))
@@ -749,14 +760,15 @@ def build_mcp_server(
 
                 async with limiter.acquire(user_id):
                     img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_seedream(
+                    gen_result = await generate_image_with_provider(
                         settings,
                         full_prompt,
                         ref_uris,
                         size=size,
                         aspect=aspect,
                         destination=job_dir,
-                        transport=ark_transport,
+                        ark_transport=ark_transport,
+                        gemini_transport=gemini_transport,
                     )
 
                 display_bytes, display_mime = encode_display_image(
@@ -843,7 +855,7 @@ def build_mcp_server(
 
                 async with limiter.acquire(user_id):
                     img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_seedream(
+                    gen_result = await generate_image_with_provider(
                         settings,
                         full_prompt,
                         all_uris,
@@ -851,7 +863,8 @@ def build_mcp_server(
                         aspect="source",
                         source_size=base_size,
                         destination=job_dir,
-                        transport=ark_transport,
+                        ark_transport=ark_transport,
+                        gemini_transport=gemini_transport,
                     )
 
                 display_bytes, display_mime = encode_display_image(
@@ -973,7 +986,7 @@ def build_mcp_server(
                     try:
                         async with limiter.acquire(user_id):
                             img_id, job_dir = allocate_studio_job(settings, user_id)
-                            result = await generate_seedream(
+                            result = await generate_image_with_provider(
                                 settings,
                                 full_prompt,
                                 all_uris,
@@ -981,7 +994,8 @@ def build_mcp_server(
                                 aspect="source",
                                 source_size=base_size,
                                 destination=job_dir,
-                                transport=ark_transport,
+                                ark_transport=ark_transport,
+                                gemini_transport=gemini_transport,
                             )
                         return {"id": img_id, **result}, None, False
                     except GenerationUncertain as exc:
@@ -1146,14 +1160,15 @@ def build_mcp_server(
                         try:
                             async with limiter.acquire(user_id):
                                 img_id, job_dir = allocate_studio_job(settings, user_id)
-                                result = await generate_seedream(
+                                result = await generate_image_with_provider(
                                     settings,
                                     full_prompt,
                                     ref_uris,
                                     size=size,
                                     aspect=aspect,
                                     destination=job_dir,
-                                    transport=ark_transport,
+                                    ark_transport=ark_transport,
+                                    gemini_transport=gemini_transport,
                                 )
                             return {"id": img_id, **result}, None
                         except (ValueError, TypeError, RuntimeError, OSError) as exc:
@@ -1439,7 +1454,7 @@ def build_mcp_server(
 
                 async with limiter.acquire(user_id):
                     img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_seedream(
+                    gen_result = await generate_image_with_provider(
                         settings,
                         full_prompt,
                         all_uris,
@@ -1455,7 +1470,8 @@ def build_mcp_server(
                             "proof": confirmed_proof,
                         },
                         destination=job_dir,
-                        transport=ark_transport,
+                        ark_transport=ark_transport,
+                        gemini_transport=gemini_transport,
                     )
 
                 display_bytes, display_mime = encode_display_image(

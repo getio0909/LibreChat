@@ -5,8 +5,16 @@ import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 # 默认密钥配置文件路径、规则数据目录与共享令牌64位十六进制正则
 DEFAULT_SETTINGS_PATH = Path("/run/secrets/studio.json")
@@ -50,8 +58,11 @@ class StudioSettings(BaseModel):
     file_signing_key: str
     public_base_url: str = "https://dev.xuqian.io"
     file_token_ttl_seconds: int = Field(default=86400, ge=60, le=604800)
+    image_provider: Literal["gemini", "seedream"] = "gemini"
+    gemini_image_model: str = "gemini-nano-banana-2.1"
+    enable_3d: bool = False
     gemini_api_key: str
-    ark_api_key: str
+    ark_api_key: str = ""
     seedream_model: str = "doubao-seedream-5-0-pro-260628"
     seed3d_model: str = "doubao-seed3d-2-0-260328"
     planner_model: str = "gemini-4-argon"
@@ -95,8 +106,8 @@ class StudioSettings(BaseModel):
             raise ValueError("public_base_url must be a valid http(s) base URL")
         return cleaned
 
-    # 校验API密钥不包含空白字符且非空
-    @field_validator("gemini_api_key", "ark_api_key")
+    # 校验必填API密钥不包含空白字符且非空
+    @field_validator("gemini_api_key")
     @classmethod
     def _validate_secret(cls, value: str) -> str:
         cleaned = value.strip()
@@ -105,6 +116,30 @@ class StudioSettings(BaseModel):
                 "Secret configuration value must be a non-empty string without whitespace"
             )
         return cleaned
+
+    # 校验可选ARK密钥：为空时允许缺省，非空时禁止包含空白字符
+    @field_validator("ark_api_key")
+    @classmethod
+    def _validate_optional_ark_secret(cls, value: str) -> str:
+        if value == "":
+            return ""
+        cleaned = value.strip()
+        if not cleaned or any(ch.isspace() for ch in cleaned):
+            raise ValueError(
+                "Secret configuration value must be a non-empty string without whitespace"
+            )
+        return cleaned
+
+    # 当启用seedream生图或enable_3d时要求提供有效的ark_api_key
+    @model_validator(mode="after")
+    def _validate_provider_requirements(self) -> "StudioSettings":
+        if (
+            self.image_provider == "seedream" or self.enable_3d
+        ) and not self.ark_api_key:
+            raise ValueError(
+                "ark_api_key is required when image_provider is 'seedream' or enable_3d is true"
+            )
+        return self
 
 
 # 从受保护的JSON文件加载工作台运行配置
