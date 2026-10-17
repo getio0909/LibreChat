@@ -24,6 +24,7 @@ import type { MCPOptions } from 'librechat-data-provider';
 import type { IUser } from '@librechat/data-schemas';
 import type { Socket } from 'net';
 import { applyRequestHeaders, hasCustomUserVars, getMissingCustomUserVars } from '~/mcp/utils';
+import { deriveStudioStorageUserId } from '~/utils/studioIdentity';
 import { getUserApiKeyVariable } from '~/mcp/registry/binding';
 import { MCPConnection } from '~/mcp/connection';
 import { processMCPEnv } from '~/utils/env';
@@ -208,6 +209,37 @@ describe('dbSourced header security – integration', () => {
     await server.close();
     delete process.env.SECRET_DB_URL;
     delete process.env.INTERNAL_API_KEY;
+  });
+
+  it('sends a tenant-scoped Studio principal from a raw user on real list and tool calls', async () => {
+    const userId = '65f0000000000000000000a1';
+    const rawUser = createTestUser({ id: userId, tenantId: 'tenant-a' });
+    const options: MCPOptions = {
+      type: 'streamable-http',
+      url: server.url,
+      headers: { 'X-LibreChat-User-ID': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' },
+    };
+    const resolved = processMCPEnv({ options, user: rawUser });
+    const headers = 'headers' in resolved ? resolved.headers || {} : {};
+    const expected = deriveStudioStorageUserId(userId, 'tenant-a');
+    expect(headers['X-LibreChat-User-ID']).toBe(expected);
+    const other = processMCPEnv({
+      options,
+      user: createTestUser({ id: userId, tenantId: 'tenant-b' }),
+    });
+    expect('headers' in other && other.headers?.['X-LibreChat-User-ID']).not.toBe(expected);
+
+    conn = new MCPConnection({
+      serverName: 'studio-raw-user',
+      serverConfig: resolved,
+      useSSRFProtection: false,
+    });
+    conn.setRequestHeaders(headers);
+    await conn.connect();
+    await conn.fetchTools();
+    expect(server.getLastHeaders()['x-librechat-user-id']).toBe(expected);
+    await conn.client.callTool({ name: 'echo', arguments: {} });
+    expect(server.getLastHeaders()['x-librechat-user-id']).toBe(expected);
   });
 
   it('does not send a saved key to a new URL even when old field names are injected', async () => {

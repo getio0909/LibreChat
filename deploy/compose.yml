@@ -69,6 +69,10 @@ services:
     mem_limit: 3g
     environment:
       STUDIO_SETTINGS_FILE: /run/secrets/studio.json
+      # auto在无AVX主机限制PyTorch与oneDNN为安全CPU内核；safe强制限制，native保留原生调度。
+      STUDIO_SEGMENT_CPU_CAPABILITY: ${STUDIO_SEGMENT_CPU_CAPABILITY:-auto}
+      # 子进程预热与单次分割的等待上限（秒）；超时仅停用分割，不退出工作台。
+      STUDIO_SEGMENT_WORKER_TIMEOUT_SECONDS: ${STUDIO_SEGMENT_WORKER_TIMEOUT_SECONDS:-90}
     volumes:
       - ./studio.json:/run/secrets/studio.json:ro
       - images:/librechat/images:ro
@@ -82,7 +86,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 180s
 
   mongodb:
     image: mongo:8.0.20

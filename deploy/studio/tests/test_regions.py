@@ -6,7 +6,9 @@ import json
 import os
 import random
 import re
+import resource
 import shutil
+import signal
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -46,6 +48,10 @@ from deploy.studio.regions import (
     verify_editor_token,
     verify_onnx_model_dir,
     verify_sam2_model_dir,
+)
+from deploy.studio.segment_worker import (
+    SupervisedSegmenter,
+    _use_safe_isa,
 )
 from deploy.studio.store import resolve_image
 
@@ -107,6 +113,104 @@ def studio_env(tmp_path: Path) -> StudioSettings:
     secret_file.write_text(json.dumps(secret_data), encoding="utf-8")
     secret_file.chmod(0o600)
     return load_settings(secret_file)
+
+
+# 模拟首次预热时子进程非法指令退出，下一次预热与请求成功
+def _crash_first_warmup(connection: Any, model_dir: str, safe_isa: bool) -> None:
+    del safe_isa
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    marker = Path(model_dir) / "first-warmup-crashed"
+    command, _ = connection.recv()
+    assert command == "warmup"
+    if not marker.exists():
+        marker.touch()
+        os.kill(os.getpid(), signal.SIGILL)
+    connection.send(("ok", None))
+    command, _ = connection.recv()
+    assert command == "segment"
+    connection.send(("ok", {"version": 1, "shapes": [], "selected_pixels": 100}))
+    connection.close()
+
+
+# 模拟已预热的分割子进程在点选时非法指令退出
+def _crash_during_segment(connection: Any, model_dir: str, safe_isa: bool) -> None:
+    del model_dir, safe_isa
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    command, _ = connection.recv()
+    assert command == "warmup"
+    connection.send(("ok", None))
+    command, _ = connection.recv()
+    assert command == "segment"
+    os.kill(os.getpid(), signal.SIGILL)
+
+
+def test_segment_cpu_capability_auto_preserves_avx_hosts() -> None:
+    assert _use_safe_isa("auto", "flags : sse4_1 sse4_2 avx avx2") is False
+    assert _use_safe_isa("auto", "flags : sse4_1 sse4_2") is True
+    assert _use_safe_isa("auto", "flags : avx avx2\nflags : sse4_1") is True
+    assert _use_safe_isa("auto", "unknown : value") is True
+    assert _use_safe_isa("safe", "flags : avx") is True
+    assert _use_safe_isa("native", "flags : sse4_1") is False
+    with pytest.raises(ValueError, match="STUDIO_SEGMENT_CPU_CAPABILITY"):
+        _use_safe_isa("unsupported")
+
+
+def test_segment_worker_recovers_from_first_warmup_sigill(tmp_path: Path) -> None:
+    supervisor = SupervisedSegmenter(
+        model_dir=tmp_path,
+        cpu_capability="safe",
+        timeout_seconds=5,
+        worker_target=_crash_first_warmup,
+    )
+    try:
+        assert supervisor.start() is True
+        assert supervisor.ready() is True
+        assert supervisor.segment(tmp_path / "image.png", [{"x": 500, "y": 500}])[
+            "selected_pixels"
+        ] == 100
+    finally:
+        supervisor.close()
+
+
+def test_segment_sigill_returns_503_without_stopping_studio(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    supervisor = SupervisedSegmenter(
+        model_dir=tmp_path,
+        cpu_capability="safe",
+        timeout_seconds=5,
+        worker_target=_crash_during_segment,
+    )
+    image_id = "33333333-4444-5555-6666-777777777777"
+    image_path = studio_env.librechat_images_dir / USER_A / f"{image_id}__seg.png"
+    image_path.parent.mkdir(parents=True, exist_ok=True)
+    save_exact(Image.new("RGB", (200, 160), (100, 120, 140)), image_path)
+    image_sha = hashlib.sha256(image_path.read_bytes()).hexdigest()
+    token, _ = sign_editor_token(studio_env, USER_A, image_id, image_sha)
+    app = create_app(settings=studio_env, rules=load_rules(), segmenter=supervisor)
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            response = await client.post(
+                f"/files/{token}",
+                json={
+                    "action": "segment",
+                    "points": [{"x": 500, "y": 500, "label": 1}],
+                },
+            )
+            assert response.status_code == 503
+            assert response.json() == {"error": "Segmentation is unavailable"}
+            health = await client.get("/health")
+            assert health.status_code == 200
+
+    try:
+        asyncio.run(_run())
+        assert supervisor.ready() is False
+    finally:
+        supervisor.close()
 
 
 # 校验矩形、多边形、画笔涂抹选区的布尔加减光栅化及非法选区拒绝逻辑
@@ -991,6 +1095,25 @@ def test_real_sam2_hiera_tiny_smoke_if_available(tmp_path: Path) -> None:
     # 中心亮块像素被选中，四角背景像素未被选中
     assert mask.getpixel((128, 128)) == 255
     assert mask.getpixel((8, 8)) == 0
+
+    # 用同一套真实权重核验隔离子进程预热及安全CPU模式下的点选结果
+    supervisor = SupervisedSegmenter(
+        model_dir=verified_dir,
+        cpu_capability="safe",
+        timeout_seconds=90,
+    )
+    try:
+        assert supervisor.start() is True
+        worker_out = supervisor.segment(
+            sample_path, [{"x": 500, "y": 500, "label": 1}]
+        )
+        worker_mask = mask_for(
+            {"version": 1, "shapes": worker_out["shapes"]}, (256, 256)
+        )
+        assert worker_mask.getpixel((128, 128)) == 255
+        assert worker_mask.getpixel((8, 8)) == 0
+    finally:
+        supervisor.close()
 
 
 # 回归测试（Finding #1）：调色板P模式含tRNS透明像素的PNG底图经局部合回后，选区外RGBA四通道（含Alpha）100%一致

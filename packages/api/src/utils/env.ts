@@ -229,9 +229,16 @@ function processUserPlaceholders(
     return value;
   }
 
-  const studioPrincipal = (user as SafeUser).studioPrincipal;
-  if (studioPrincipal) {
-    value = value.replace(/\{\{LIBRECHAT_STUDIO_PRINCIPAL\}\}/g, studioPrincipal);
+  if (value.includes('{{LIBRECHAT_STUDIO_PRINCIPAL}}')) {
+    const rawId = user.id || user._id?.toString();
+    const studioPrincipal =
+      rawId && user.tenantId
+        ? deriveStudioStorageUserId(String(rawId), user.tenantId)
+        : (user as SafeUser).studioPrincipal ||
+          (rawId ? deriveStudioStorageUserId(String(rawId)) : undefined);
+    if (studioPrincipal) {
+      value = value.replace(/\{\{LIBRECHAT_STUDIO_PRINCIPAL\}\}/g, studioPrincipal);
+    }
   }
 
   for (const field of ALLOWED_USER_FIELDS) {

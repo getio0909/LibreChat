@@ -81,6 +81,7 @@ from .regions import (
     verify_editor_token,
     verify_image_token,
 )
+from .segment_worker import SegmentationUnavailable, SupervisedSegmenter
 from .store import (
     ResolvedImage,
     allocate_studio_job,
@@ -336,7 +337,7 @@ def build_mcp_server(
     *,
     kb_index: KnowledgeBaseIndex | None = None,
     model_manager: ModelJobManager | None = None,
-    segmenter: OnnxSamSegmenter | None = None,
+    segmenter: OnnxSamSegmenter | SupervisedSegmenter | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Server:
@@ -356,7 +357,7 @@ def build_mcp_server(
         limiter,
         ark_transport=ark_transport,
     )
-    active_segmenter = segmenter or OnnxSamSegmenter()
+    active_segmenter = segmenter if segmenter is not None else SupervisedSegmenter()
 
     # 注册tools/list处理器，返回固定扁平Schema的工具列表（默认隐藏3D工具，仅当enable_3d开启时提供）
     @mcp_server.list_tools()
@@ -1208,7 +1209,7 @@ def create_app(
     settings: StudioSettings | None = None,
     rules: StudioRules | None = None,
     *,
-    segmenter: OnnxSamSegmenter | None = None,
+    segmenter: OnnxSamSegmenter | SupervisedSegmenter | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Starlette:
@@ -1227,7 +1228,7 @@ def create_app(
         limiter,
         ark_transport=ark_transport,
     )
-    active_segmenter = segmenter or OnnxSamSegmenter()
+    active_segmenter = segmenter if segmenter is not None else SupervisedSegmenter()
     mcp_server = build_mcp_server(
         active_settings,
         active_rules,
@@ -1258,9 +1259,13 @@ def create_app(
         app_instance.state.session_manager = manager
         async with manager.run():
             try:
+                if segmenter is None:
+                    await asyncio.to_thread(active_segmenter.start)
                 yield
             finally:
                 await model_manager.shutdown()
+                if segmenter is None:
+                    await asyncio.to_thread(active_segmenter.close)
                 app_instance.state.session_manager = None
 
     # 健康检查端点处理函数
@@ -1547,6 +1552,12 @@ def create_app(
                         return JSONResponse(
                             seg_out,
                             status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except SegmentationUnavailable:
+                        return JSONResponse(
+                            {"error": "Segmentation is unavailable"},
+                            status_code=503,
                             headers=_signed_file_cors_headers(),
                         )
                     except (ValueError, RuntimeError, OSError) as exc:

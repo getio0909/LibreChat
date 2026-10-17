@@ -521,7 +521,7 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   try {
     const resolved = processMCPEnv({
       options: studioServer,
-      user: { id: 'user-123', studioPrincipal: 'user-123' },
+      user: { id: 'user-123' },
       body: { conversationId: 'conv-456' },
     });
     assert.deepEqual(resolved.headers, {
@@ -611,12 +611,21 @@ test('deploy/compose.yml configures hardened studio service, IPv6 network, and a
   assert.deepEqual(studio.cap_drop, ['ALL']);
   assert.deepEqual(studio.security_opt, ['no-new-privileges:true']);
   assert.equal(studio.mem_limit, '3g');
+  assert.equal(
+    studio.environment.STUDIO_SEGMENT_CPU_CAPABILITY,
+    '${STUDIO_SEGMENT_CPU_CAPABILITY:-auto}',
+  );
+  assert.equal(
+    studio.environment.STUDIO_SEGMENT_WORKER_TIMEOUT_SECONDS,
+    '${STUDIO_SEGMENT_WORKER_TIMEOUT_SECONDS:-90}',
+  );
   assert.deepEqual(studio.ports, ['127.0.0.1:8000:8000']);
   assert.doesNotMatch(rawCompose, /STUDIO_PORT/);
   assert.ok(studio.volumes.includes('./studio.json:/run/secrets/studio.json:ro'));
   assert.ok(studio.volumes.includes('images:/librechat/images:ro'));
   assert.ok(studio.volumes.includes('studio-data:/data'));
   assert.ok(studio.healthcheck, 'studio healthcheck must be defined');
+  assert.equal(studio.healthcheck.start_period, '180s');
 
   const api = services.api;
   assert.equal(api.environment.ENDPOINTS, 'agents,custom,google');

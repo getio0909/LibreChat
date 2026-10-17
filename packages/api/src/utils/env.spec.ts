@@ -512,6 +512,37 @@ describe('resolveHeaders', () => {
     expect(tenantA).not.toHaveProperty('tenantId');
   });
 
+  it('resolves Studio principals from raw request users and lean users', () => {
+    const userId = '65f0000000000000000000a1';
+    const tenantA = createTestUser({ id: userId, tenantId: 'tenant-a' });
+    const tenantB = createTestUser({ id: userId, tenantId: 'tenant-b' });
+    const headers = { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' };
+    const principalA = resolveHeaders({ headers, user: tenantA })['X-Studio-Principal'];
+
+    expect(principalA).toBe(
+      resolveHeaders({ headers, user: createSafeUser(tenantA) })['X-Studio-Principal'],
+    );
+    expect(principalA).not.toBe(resolveHeaders({ headers, user: tenantB })['X-Studio-Principal']);
+    expect(principalA).not.toContain('tenant-a');
+    expect(
+      resolveHeaders({
+        headers,
+        user: Object.assign(tenantA, { studioPrincipal: 'stale-principal' }),
+      })['X-Studio-Principal'],
+    ).toBe(principalA);
+    expect(resolveHeaders({ headers, user: { id: userId } })['X-Studio-Principal']).toBe(userId);
+    expect(
+      resolveHeaders({ headers, user: { _id: tenantA._id, tenantId: 'tenant-a' } })[
+        'X-Studio-Principal'
+      ],
+    ).toBe(
+      resolveHeaders({
+        headers,
+        user: { id: tenantA._id.toString(), tenantId: 'tenant-a' },
+      })['X-Studio-Principal'],
+    );
+  });
+
   it('should handle multiple placeholders in one value', () => {
     const user = { id: 'abc', email: 'me@example.com' };
     const headers = {
