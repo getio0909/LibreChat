@@ -243,15 +243,6 @@ export async function loadAddedAgent(
   if (ephemeralAgent?.ask_user_question === true || modelSpec?.askUserQuestion === true) {
     tools.push(ASK_USER_QUESTION_TOOL_NAME);
   }
-  // 保持与主临时智能体加载逻辑一致，将 modelSpec.preset.tools 中的内置工具同步注入附加会话智能体
-  if (Array.isArray(modelSpec?.preset?.tools)) {
-    for (const presetTool of modelSpec.preset.tools) {
-      const toolKey = typeof presetTool === 'string' ? presetTool : presetTool?.pluginKey;
-      if (typeof toolKey === 'string' && toolKey.length > 0 && !tools.includes(toolKey)) {
-        tools.push(toolKey);
-      }
-    }
-  }
 
   const addedServers = new Set<string>();
   for (const mcpServer of mcpServers) {

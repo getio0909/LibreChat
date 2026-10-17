@@ -16,10 +16,17 @@ const {
   buildMCPImageToolContext,
   applyModelSpecPreset,
   initializeAgent,
-  loadEphemeralAgent,
+  loadAgent,
+  loadToolDefinitions,
   requiresEphemeralUserConnection,
   isChatSelectableMCPServer,
 } = require('@librechat/api');
+const {
+  STUDIO_AGENT_PLACEHOLDERS,
+  STUDIO_AGENT_PROVIDERS,
+  STUDIO_AGENT_TOOLS,
+  buildStudioAgentDefinitions,
+} = require('./studio-agents.cjs');
 
 const rawYaml = fs.readFileSync('librechat.yaml', 'utf8');
 const parsedYaml = yaml.load(rawYaml);
@@ -79,8 +86,10 @@ test('librechat.yaml passes LibreChat configSchema validation', () => {
   );
 });
 
-test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5', () => {
+test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5 via saved Studio agents', () => {
   const config = configSchema.parse(parsedYaml);
+  assert.equal(config.interface.agents.use, true);
+  assert.equal(config.endpoints.agents.disableBuilder, true);
   assert.equal(config.modelSpecs.enforce, true);
   assert.equal(config.modelSpecs.prioritize, true);
   assert.equal(config.modelSpecs.list.length, 2);
@@ -90,7 +99,8 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
   assert.equal(defaultSpec.default, true);
   assert.equal(defaultSpec.iconURL, '/assets/zybc-seal.svg');
   assert.equal(defaultSpec.hideBadgeRow, true);
-  assert.equal(defaultSpec.preset.endpoint, 'google');
+  assert.equal(defaultSpec.preset.endpoint, 'agents');
+  assert.equal(defaultSpec.preset.agent_id, STUDIO_AGENT_PLACEHOLDERS['zyb-design']);
   assert.equal(defaultSpec.preset.model, 'gemini-4-argon');
   assert.equal(defaultSpec.preset.iconURL, '/assets/zybc-seal.svg');
   assert.equal(defaultSpec.preset.thinking, true);
@@ -121,7 +131,8 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
   assert.equal(fastSpec.default, false);
   assert.equal(fastSpec.iconURL, '/assets/zybc-seal.svg');
   assert.equal(fastSpec.hideBadgeRow, true);
-  assert.equal(fastSpec.preset.endpoint, 'OpenRouter');
+  assert.equal(fastSpec.preset.endpoint, 'agents');
+  assert.equal(fastSpec.preset.agent_id, STUDIO_AGENT_PLACEHOLDERS['zyb-design-fast']);
   assert.equal(fastSpec.preset.model, 'anthropic/claude-haiku-5.5');
   assert.equal(fastSpec.preset.iconURL, '/assets/zybc-seal.svg');
   assert.equal(fastSpec.preset.maxContextTokens, 200000);
@@ -144,6 +155,9 @@ test('default spec is Gemini 4 Argon High and fast spec is OpenRouter Haiku 5.5'
 
 test('both modelSpecs compute large effective context budgets via initializeAgent and never collapse to 1024', async () => {
   const config = configSchema.parse(parsedYaml);
+  const studioAgentDefs = new Map(
+    buildStudioAgentDefinitions(config).map((entry) => [entry.placeholder, entry.agent]),
+  );
   const previousGoogleKey = process.env.GOOGLE_KEY;
   const previousOpenRouterKey = process.env.OPENROUTER_API_KEY;
   process.env.GOOGLE_KEY = 'fixture-google-key';
@@ -178,8 +192,7 @@ test('both modelSpecs compute large effective context budgets via initializeAgen
 
     for (const spec of config.modelSpecs.list) {
       const endpoint = spec.preset.endpoint;
-      const endpointType =
-        endpoint === EModelEndpoint.google ? EModelEndpoint.google : EModelEndpoint.custom;
+      const endpointType = EModelEndpoint.agents;
       const { parsedBody } = applyModelSpecPreset({
         modelSpec: spec,
         parsedBody: { spec: spec.name },
@@ -190,27 +203,34 @@ test('both modelSpecs compute large effective context budgets via initializeAgen
       const {
         spec: _s,
         iconURL: _i,
-        agent_id: _a,
+        agent_id,
         chatProjectId: _c,
         ...model_parameters
       } = parsedBody;
-      const agent = {
-        id: EModelEndpoint.agents,
-        name: spec.label,
-        provider: endpoint,
-        model: spec.preset.model,
-        instructions: spec.preset.promptPrefix,
-        tools: [],
-        model_parameters,
-      };
+      const agent = await loadAgent(
+        {
+          req: { user: { id: 'user-1' }, config: appConfig, body: {} },
+          spec: spec.name,
+          agent_id,
+          endpoint,
+          model_parameters,
+        },
+        {
+          getAgent: async ({ id }) => structuredClone(studioAgentDefs.get(id) ?? null),
+          getMCPServerTools: async () => ({}),
+        },
+      );
+      assert.ok(agent, `loadAgent must resolve saved Studio agent for ${spec.name}`);
+      assert.equal(agent.provider, STUDIO_AGENT_PROVIDERS[spec.name]);
+
       const initialized = await initializeAgent(
         {
           req: { user: { id: 'user-1' }, config: appConfig, body: {} },
           res: {},
           agent,
           loadTools,
-          endpointOption: { endpoint, endpointType, model_parameters },
-          allowedProviders: new Set([endpoint, 'google', 'openAI', 'custom']),
+          endpointOption: { endpoint, endpointType, model_parameters: {} },
+          allowedProviders: new Set([agent.provider, 'google', 'openAI', 'custom', 'OpenRouter']),
           isInitialAgent: true,
         },
         db,
@@ -257,33 +277,70 @@ test('both modelSpecs compute large effective context budgets via initializeAgen
   }
 });
 
-test('only zyb_studio is attached alongside built-in gemini_image_gen and no CAD servers or prompts remain', async () => {
+test('saved Studio agents carry gemini_image_gen and sys__all__sys_mcp_zyb_studio and no CAD servers or prompts remain', async () => {
   const config = configSchema.parse(parsedYaml);
   assert.deepEqual(Object.keys(config.mcpServers), ['zyb_studio']);
+  const studioAgentDefs = new Map(
+    buildStudioAgentDefinitions(config).map((entry) => [entry.placeholder, entry.agent]),
+  );
+  const mockMcpTools = {
+    select_region_mcp_zyb_studio: {
+      function: { name: 'select_region_mcp_zyb_studio', description: 'select', parameters: {} },
+    },
+    edit_region_mcp_zyb_studio: {
+      function: { name: 'edit_region_mcp_zyb_studio', description: 'edit', parameters: {} },
+    },
+    search_library_mcp_zyb_studio: {
+      function: { name: 'search_library_mcp_zyb_studio', description: 'search', parameters: {} },
+    },
+    compare_materials_mcp_zyb_studio: {
+      function: { name: 'compare_materials_mcp_zyb_studio', description: 'compare', parameters: {} },
+    },
+    create_3d_model_mcp_zyb_studio: {
+      function: { name: 'create_3d_model_mcp_zyb_studio', description: '3d', parameters: {} },
+    },
+    check_3d_model_mcp_zyb_studio: {
+      function: { name: 'check_3d_model_mcp_zyb_studio', description: 'check3d', parameters: {} },
+    },
+  };
+
   for (const spec of config.modelSpecs.list) {
-    assert.deepEqual(spec.mcpServers, ['zyb_studio']);
-    assert.deepEqual(spec.preset.tools, ['gemini_image_gen']);
-    const loadedAgent = await loadEphemeralAgent(
+    assert.equal(spec.preset.endpoint, 'agents');
+    assert.equal(spec.preset.agent_id, STUDIO_AGENT_PLACEHOLDERS[spec.name]);
+    const loadedAgent = await loadAgent(
       {
         req: { user: { id: 'user-1' }, config: { modelSpecs: config.modelSpecs }, body: {} },
         spec: spec.name,
+        agent_id: spec.preset.agent_id,
         endpoint: spec.preset.endpoint,
         model_parameters: { model: spec.preset.model },
       },
       {
-        getAgent: async () => null,
-        getMCPServerTools: async () => ({
-          select_region_mcp_zyb_studio: {},
-          edit_region_mcp_zyb_studio: {},
-          search_library_mcp_zyb_studio: {},
-          compare_materials_mcp_zyb_studio: {},
-          create_3d_model_mcp_zyb_studio: {},
-          check_3d_model_mcp_zyb_studio: {},
-        }),
+        getAgent: async ({ id }) => structuredClone(studioAgentDefs.get(id) ?? null),
+        getMCPServerTools: async () => mockMcpTools,
       },
     );
-    assert.ok(loadedAgent.tools.includes('gemini_image_gen'));
-    assert.ok(loadedAgent.tools.includes('select_region_mcp_zyb_studio'));
+    assert.ok(loadedAgent);
+    assert.deepEqual(loadedAgent.tools, [...STUDIO_AGENT_TOOLS]);
+
+    const { toolDefinitions } = await loadToolDefinitions(
+      {
+        userId: 'user-1',
+        agentId: loadedAgent.id,
+        tools: loadedAgent.tools,
+        mcpServerNames: ['zyb_studio'],
+        rawServerNames: ['zyb_studio'],
+      },
+      {
+        getOrFetchMCPServerTools: async (_userId, serverName) =>
+          serverName === 'zyb_studio' ? mockMcpTools : null,
+        isBuiltInTool: (toolName) => toolName === 'gemini_image_gen',
+      },
+    );
+    const resolvedNames = toolDefinitions.map((def) => def.name);
+    assert.ok(resolvedNames.includes('gemini_image_gen'));
+    assert.ok(resolvedNames.includes('select_region_mcp_zyb_studio'));
+    assert.ok(resolvedNames.includes('edit_region_mcp_zyb_studio'));
   }
   assert.doesNotMatch(rawYaml, LEGACY_CAD_PATTERN);
   assert.doesNotMatch(rawCompose, LEGACY_CAD_PATTERN);
@@ -445,11 +502,11 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   }
 });
 
-test('fileConfig permits image uploads on both google and OpenRouter endpoints', () => {
+test('fileConfig permits image uploads on agents, google, and OpenRouter endpoints', () => {
   const config = configSchema.parse(parsedYaml);
   const merged = mergeFileConfig(config.fileConfig);
 
-  for (const endpoint of ['google', 'OpenRouter']) {
+  for (const endpoint of ['agents', 'google', 'OpenRouter']) {
     const endpointConfig = getEndpointFileConfig({
       fileConfig: merged,
       endpoint,
@@ -497,7 +554,7 @@ test('deploy/compose.yml configures hardened studio service, IPv6 network, and a
   assert.ok(studio.healthcheck, 'studio healthcheck must be defined');
 
   const api = services.api;
-  assert.equal(api.environment.ENDPOINTS, 'custom,google');
+  assert.equal(api.environment.ENDPOINTS, 'agents,custom,google');
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
   assert.equal(
     api.environment.GEMINI_IMAGE_MODEL,

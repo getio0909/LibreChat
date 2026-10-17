@@ -166,6 +166,7 @@ fi
 "${closed_compose[@]}" ps
 
 # 按顺序创建首个管理员和普通用户，密码通过标准输入传递给现有账户工具。
+admin_token=''
 for account in admin user; do
   email=$(jq -r --arg account "$account" '.[$account].email' "$stage/accounts.json")
   username=$(jq -r --arg account "$account" '.[$account].username' "$stage/accounts.json")
@@ -186,13 +187,129 @@ for account in admin user; do
   expected_role=USER
   if [[ "$account" == admin ]]; then
     expected_role=ADMIN
+    admin_token=$(jq -r '.token // empty' "$stage/login.json")
   fi
   if ! jq -e --arg role "$expected_role" '.user.role == $role' "$stage/login.json" >/dev/null; then
     printf 'Default %s account role verification failed.\n' "$account" >&2
     exit 1
   fi
 done
-# 账户和角色验证通过后恢复用户配置的注册设置。
-"${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
+
+# 幂等创建或更新 Studio 持久化智能体（挂载 gemini_image_gen 与 zyb_studio MCP 工具），授权普通用户只读使用，并将生成的 agent_id 注入 librechat.yaml。
+if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; then
+  if [[ -z "$admin_token" ]]; then
+    echo 'Admin token missing for Studio agent provisioning.' >&2
+    exit 1
+  fi
+  design_instructions=$(awk '
+    /promptPrefix: &designPromptPrefix \|-/ { in_block=1; next }
+    in_block {
+      if ($0 ~ /^          /) {
+        sub(/^          /, "")
+        lines = (lines == "" ? $0 : lines "\n" $0)
+      } else if ($0 ~ /^[[:space:]]*$/) {
+        lines = lines "\n"
+      } else {
+        exit
+      }
+    }
+    END { printf "%s", lines }
+  ' "$stage/librechat.yaml")
+  if [[ -z "$design_instructions" ]]; then
+    echo 'Failed to extract Studio design instructions from librechat.yaml.' >&2
+    exit 1
+  fi
+
+  printf '%s' '{"USE":true,"CREATE":false,"SHARE":false,"SHARE_PUBLIC":false}' | \
+    curl --fail --silent --show-error -X PUT \
+      -H "Authorization: Bearer $admin_token" \
+      -H 'Content-Type: application/json' \
+      --data-binary @- \
+      -o "$stage/role-agents.json" http://127.0.0.1:3080/api/roles/USER/agents
+
+  curl --fail --silent --show-error \
+    -H "Authorization: Bearer $admin_token" \
+    -o "$stage/agents-list.json" 'http://127.0.0.1:3080/api/agents?limit=100'
+
+  provision_studio_agent() {
+    local placeholder=$1
+    local payload_file=$2
+    local agent_name
+    agent_name=$(jq -r '.name' "$payload_file")
+    local existing_id
+    existing_id=$(jq -r --arg name "$agent_name" '(.data // []) | map(select(.name == $name)) | .[0].id // empty' "$stage/agents-list.json")
+    if [[ -n "$existing_id" ]]; then
+      curl --fail --silent --show-error -X PATCH \
+        -H "Authorization: Bearer $admin_token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @"$payload_file" \
+        -o "$stage/agent-saved.json" "http://127.0.0.1:3080/api/agents/$existing_id"
+    else
+      curl --fail --silent --show-error -X POST \
+        -H "Authorization: Bearer $admin_token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @"$payload_file" \
+        -o "$stage/agent-saved.json" http://127.0.0.1:3080/api/agents
+    fi
+    if ! jq -e '
+      (.id | type == "string" and test("^agent_[A-Za-z0-9_-]+$"))
+      and (._id | type == "string" and length >= 1)
+      and (.tools | index("gemini_image_gen") != null)
+      and (.tools | index("sys__all__sys_mcp_zyb_studio") != null)
+    ' "$stage/agent-saved.json" >/dev/null; then
+      printf 'Studio agent provisioning verification failed for %s.\n' "$agent_name" >&2
+      exit 1
+    fi
+    local resolved_id resolved_oid
+    resolved_id=$(jq -r '.id' "$stage/agent-saved.json")
+    resolved_oid=$(jq -r '._id' "$stage/agent-saved.json")
+    printf '%s' '{"public":true,"publicAccessRoleId":"agent_viewer","updated":[{"type":"role","id":"USER","accessRoleId":"agent_viewer"}],"removed":[]}' | \
+      curl --fail --silent --show-error -X PUT \
+        -H "Authorization: Bearer $admin_token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @- \
+        -o "$stage/agent-perms.json" "http://127.0.0.1:3080/api/permissions/agent/$resolved_oid"
+    sed -i "s|$placeholder|$resolved_id|g" "$stage/librechat.yaml"
+  }
+
+  jq -n --arg instructions "$design_instructions" '{
+    name: "庄严设计助手",
+    description: "寺院装饰、石材大板、家具与展位概念设计主力助手",
+    provider: "google",
+    model: "gemini-4-argon",
+    instructions: $instructions,
+    tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
+    model_parameters: {
+      thinking: true,
+      thinkingLevel: "high",
+      maxContextTokens: 200000,
+      maxOutputTokens: 65536
+    }
+  }' > "$stage/agent-main.json"
+  provision_studio_agent 'agent___STUDIO_AGENT_ID_MAIN__' "$stage/agent-main.json"
+
+  jq -n --arg instructions "$design_instructions" '{
+    name: "庄严设计助手 · 快速",
+    description: "快速响应的概念设计与图像改图助手",
+    provider: "OpenRouter",
+    model: "anthropic/claude-haiku-5.5",
+    instructions: $instructions,
+    tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
+    model_parameters: {
+      maxContextTokens: 200000,
+      max_tokens: 32000
+    }
+  }' > "$stage/agent-fast.json"
+  provision_studio_agent 'agent___STUDIO_AGENT_ID_FAST__' "$stage/agent-fast.json"
+
+  if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; then
+    echo 'Unresolved Studio agent placeholders remain in librechat.yaml.' >&2
+    exit 1
+  fi
+  install -m 600 "$stage/librechat.yaml" "$deploy_root/librechat.yaml"
+fi
+
+# 账户、智能体和角色验证通过后恢复用户配置的注册设置并加载解析后的 librechat.yaml。
+"${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240
 rm -f -- "$gate"
 echo 'Development deployment passed health checks.'

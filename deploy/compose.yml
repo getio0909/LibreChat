@@ -14,7 +14,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3080
       NODE_ENV: production
-      ENDPOINTS: custom,google
+      ENDPOINTS: agents,custom,google
       GOOGLE_MODELS: gemini-4-argon
       GEMINI_IMAGE_MODEL: ${GEMINI_IMAGE_MODEL:-gemini-nano-banana-2.1}
       MONGO_URI: mongodb://mongodb:27017/LibreChat

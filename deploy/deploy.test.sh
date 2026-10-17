@@ -60,13 +60,82 @@ EOF
 cat > "$work/bin/curl" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-while [[ "$1" != -o ]]; do shift; done
-output=$2
-email=$(jq -r .email)
-if [[ "$DEPLOY_TEST_FAILURE" == login ]]; then exit 22; fi
-role=USER
-if [[ "$email" == admin@example.test && "$DEPLOY_TEST_FAILURE" != role ]]; then role=ADMIN; fi
-jq -n --arg role "$role" '{user: {role: $role}}' > "$output"
+method=GET
+output=''
+data=''
+url=''
+auth=''
+while (( $# > 0 )); do
+  case "$1" in
+    -X) method=$2; shift 2 ;;
+    -o) output=$2; shift 2 ;;
+    -H)
+      if [[ "$2" == Authorization:* ]]; then
+        auth=$2
+      fi
+      shift 2
+      ;;
+    --data-binary) data=$2; shift 2 ;;
+    http://*) url=$1; shift ;;
+    *) shift ;;
+  esac
+done
+body=''
+if [[ "$data" == @- ]]; then
+  body=$(cat)
+elif [[ "$data" == @* ]]; then
+  body=$(cat "${data#@}")
+fi
+case "$url" in
+  */api/auth/login)
+    email=$(jq -r .email <<< "$body")
+    if [[ "$DEPLOY_TEST_FAILURE" == login ]]; then exit 22; fi
+    role=USER
+    if [[ "$email" == admin@example.test && "$DEPLOY_TEST_FAILURE" != role ]]; then role=ADMIN; fi
+    jq -n --arg role "$role" '{token: "mock-jwt-token", user: {role: $role}}' > "$output"
+    ;;
+  */api/roles/USER/agents)
+    test "$method" = PUT
+    test "$auth" = "Authorization: Bearer mock-jwt-token"
+    jq -e '.USE == true and .CREATE == false and .SHARE == false and .SHARE_PUBLIC == false' <<< "$body" >/dev/null
+    printf 'api:PUT:/api/roles/USER/agents\n' >> "$DEPLOY_TEST_LOG"
+    printf '%s\n' "$body" > "$output"
+    ;;
+  */api/agents\?limit=100)
+    test "$method" = GET
+    test "$auth" = "Authorization: Bearer mock-jwt-token"
+    if [[ -n "${DEPLOY_TEST_AGENTS_DB:-}" && -f "$DEPLOY_TEST_AGENTS_DB" ]]; then
+      cp "$DEPLOY_TEST_AGENTS_DB" "$output"
+    else
+      printf '{"data":[]}\n' > "$output"
+    fi
+    ;;
+  */api/agents|*/api/agents/*)
+    test "$auth" = "Authorization: Bearer mock-jwt-token"
+    name=$(jq -r .name <<< "$body")
+    jq -e '(.instructions | length > 20) and (.tools == ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"])' <<< "$body" >/dev/null
+    if [[ "$name" == "庄严设计助手" ]]; then
+      agent_id="agent_studio_main_id"
+      oid="670000000000000000000001"
+    else
+      agent_id="agent_studio_fast_id"
+      oid="670000000000000000000002"
+    fi
+    printf 'api:%s:%s:%s\n' "$method" "${url#http://127.0.0.1:3080}" "$agent_id" >> "$DEPLOY_TEST_LOG"
+    jq --arg id "$agent_id" --arg oid "$oid" '. + {id: $id, _id: $oid}' <<< "$body" > "$output"
+    ;;
+  */api/permissions/agent/*)
+    test "$method" = PUT
+    test "$auth" = "Authorization: Bearer mock-jwt-token"
+    jq -e '.public == true and .publicAccessRoleId == "agent_viewer" and (.updated[0] == {type:"role",id:"USER",accessRoleId:"agent_viewer"})' <<< "$body" >/dev/null
+    printf 'api:PUT:%s\n' "${url#http://127.0.0.1:3080}" >> "$DEPLOY_TEST_LOG"
+    printf '{"ok":true}\n' > "$output"
+    ;;
+  *)
+    echo "Unexpected curl URL: $url" >&2
+    exit 1
+    ;;
+esac
 EOF
 cat > "$work/bin/chown" <<'EOF'
 #!/usr/bin/env bash
@@ -85,7 +154,7 @@ printf '{"shared_token":"%s","file_signing_key":"%s","public_base_url":"https://
   "$(printf 'a%.0s' {1..64})" "$(printf 'c%.0s' {1..64})" > "$work/previous/studio.json"
 
 printf 'new compose\n' > "$work/bundle/compose.yml"
-printf 'new config\n' > "$work/bundle/librechat.yaml"
+cp "$source_dir/../librechat.yaml" "$work/bundle/librechat.yaml"
 cp "$work/previous/.env" "$work/bundle/.env"
 printf 'LIBRECHAT_IMAGE=ghcr.io/getio0909/librechat-dev@sha256:%s\nSTUDIO_IMAGE=ghcr.io/getio0909/librechat-studio:sha-next@sha256:%s\n' \
   "$(printf '1%.0s' {1..64})" "$(printf '2%.0s' {1..64})" > "$work/bundle/image.env"
@@ -95,9 +164,16 @@ printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-# 重部署成功时应更新 studio.json 中的新配置，但保留服务器已持久化的 file_signing_key。
-mkdir -p "$work/redeployed"
-cp "$work/bundle/compose.yml" "$work/bundle/librechat.yaml" "$work/bundle/.env" "$work/bundle/image.env" "$work/redeployed/"
+printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手"},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速"}]}' > "$work/existing-agents.json"
+
+# 首次部署与重部署成功后，librechat.yaml 中的占位符应被替换为解析后的持久化 agent_id。
+mkdir -p "$work/expected-first" "$work/redeployed"
+cp "$work/bundle/compose.yml" "$work/bundle/.env" "$work/bundle/image.env" "$work/bundle/studio.json" "$work/expected-first/"
+sed -e 's/agent___STUDIO_AGENT_ID_MAIN__/agent_studio_main_id/g' \
+    -e 's/agent___STUDIO_AGENT_ID_FAST__/agent_studio_fast_id/g' \
+    "$work/bundle/librechat.yaml" > "$work/expected-first/librechat.yaml"
+
+cp "$work/bundle/compose.yml" "$work/expected-first/librechat.yaml" "$work/bundle/.env" "$work/bundle/image.env" "$work/redeployed/"
 jq --arg key "$(printf 'c%.0s' {1..64})" '.file_signing_key = $key' "$work/bundle/studio.json" > "$work/redeployed/studio.json"
 
 for scenario in none health command login role final first-none first-login first-role; do
@@ -107,6 +183,9 @@ for scenario in none health command login role final first-none first-login firs
   if [[ "$scenario" != first-* ]]; then
     cp "$work/previous/"* "$work/previous/.env" "$root/"
     chmod 600 "$root/"* "$root/.env"
+    export DEPLOY_TEST_AGENTS_DB="$work/existing-agents.json"
+  else
+    unset DEPLOY_TEST_AGENTS_DB
   fi
   : > "$DEPLOY_TEST_LOG"
   export DEPLOY_TEST_FAILURE="$failure"
@@ -122,12 +201,20 @@ for scenario in none health command login role final first-none first-login firs
   elif [[ "$failure" == none ]]; then
     test "$status" = 0
     if [[ "$scenario" == first-none ]]; then
-      expected="$work/bundle"
+      expected="$work/expected-first"
       expected_signing_key="$(printf 'd%.0s' {1..64})"
+      grep -q '^api:POST:/api/agents:agent_studio_main_id$' "$DEPLOY_TEST_LOG"
+      grep -q '^api:POST:/api/agents:agent_studio_fast_id$' "$DEPLOY_TEST_LOG"
     else
       expected="$work/redeployed"
       expected_signing_key="$(printf 'c%.0s' {1..64})"
+      grep -q '^api:PATCH:/api/agents/agent_studio_main_id:agent_studio_main_id$' "$DEPLOY_TEST_LOG"
+      grep -q '^api:PATCH:/api/agents/agent_studio_fast_id:agent_studio_fast_id$' "$DEPLOY_TEST_LOG"
     fi
+    grep -q '^api:PUT:/api/roles/USER/agents$' "$DEPLOY_TEST_LOG"
+    grep -q '^api:PUT:/api/permissions/agent/670000000000000000000001$' "$DEPLOY_TEST_LOG"
+    grep -q '^api:PUT:/api/permissions/agent/670000000000000000000002$' "$DEPLOY_TEST_LOG"
+    ! grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$root/librechat.yaml"
     grep -q '^up:false:.*11111111' "$DEPLOY_TEST_LOG"
     test -f "$root/.file_signing_key"
     test "$(stat -c '%a' "$root/.file_signing_key")" = 600
@@ -159,6 +246,7 @@ jq --arg token "$(printf 'e%.0s' {1..64})" --arg key "$(printf 'f%.0s' {1..64})"
   '.shared_token = $token | .file_signing_key = $key' "$work/bundle/studio.json" > "$work/bundle2/studio.json"
 tar -czf "$work/bundle2.tgz" -C "$work/bundle2" .
 export DEPLOY_TEST_FAILURE=none
+export DEPLOY_TEST_AGENTS_DB="$work/existing-agents.json"
 SSH_ORIGINAL_COMMAND="deploy $work/first-none" bash "$work/deploy.sh" "$work/first-none" \
   < "$work/bundle2.tgz" > "$work/output.log" 2>&1
 test "$(jq -r '.shared_token' "$work/first-none/studio.json")" = "$(printf 'e%.0s' {1..64})"

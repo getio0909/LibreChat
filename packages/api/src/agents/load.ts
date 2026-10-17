@@ -31,10 +31,7 @@ import { synthesizeIntentToolOptions } from '~/agents/intent';
 import { getCustomEndpointConfig } from '~/app/config';
 
 const { mcp_all, mcp_delimiter } = Constants;
-type ModelParametersWithPromptPrefix = AgentModelParameters & {
-  promptPrefix?: string | null;
-  tools?: unknown;
-};
+type ModelParametersWithPromptPrefix = AgentModelParameters & { promptPrefix?: string | null };
 
 export interface LoadAgentDeps {
   /** Resolves the agent without its `versions` history; `version` carries the count. */
@@ -130,15 +127,6 @@ export async function loadEphemeralAgent(
   if (ephemeralAgent?.ask_user_question === true || modelSpec?.askUserQuestion === true) {
     tools.push(ASK_USER_QUESTION_TOOL_NAME);
   }
-  // 将 modelSpec.preset.tools 中声明的内置工具（如 gemini_image_gen）合并到临时智能体工具列表，使无需预建持久化 Agent 即可同时启用内置工具与 MCP 服务
-  if (Array.isArray(modelSpec?.preset?.tools)) {
-    for (const presetTool of modelSpec.preset?.tools) {
-      const toolKey = typeof presetTool === 'string' ? presetTool : presetTool?.pluginKey;
-      if (typeof toolKey === 'string' && toolKey.length > 0 && !tools.includes(toolKey)) {
-        tools.push(toolKey);
-      }
-    }
-  }
 
   const addedServers = new Set<string>();
   if (mcpServers.size > 0) {
@@ -167,11 +155,8 @@ export async function loadEphemeralAgent(
   }
 
   const requestPromptPrefix = req.body?.promptPrefix;
-  const {
-    promptPrefix: modelPromptPrefix,
-    tools: _presetTools,
-    ...safeModelParameters
-  } = model_parameters as ModelParametersWithPromptPrefix;
+  const { promptPrefix: modelPromptPrefix, ...safeModelParameters } =
+    model_parameters as ModelParametersWithPromptPrefix;
   const instructions =
     typeof modelPromptPrefix === 'string' ? modelPromptPrefix : requestPromptPrefix;
 
