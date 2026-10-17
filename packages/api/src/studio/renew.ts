@@ -9,6 +9,7 @@ type RenewRequest = {
   mcpUrl?: string;
   sharedToken?: string;
   fetchImpl?: typeof fetch;
+  getAdmittedServers: () => Promise<Record<string, unknown>>;
 };
 
 type RenewResponse = { status: number; body: Record<string, unknown> };
@@ -31,6 +32,15 @@ export async function renewStudioLinks(input: RenewRequest): Promise<RenewRespon
   }
   if (!/^[A-Za-z0-9_-]{1,512}\.[a-f0-9]{64}$/.test(input.token)) {
     return { status: 400, body: { error: 'Invalid Studio token' } };
+  }
+  try {
+    const admittedServers = await input.getAdmittedServers();
+    if (!admittedServers?.zyb_studio) {
+      return { status: 403, body: { error: 'Studio access is unavailable' } };
+    }
+  } catch {
+    logger.warn('[StudioRenew] Studio admission lookup failed');
+    return { status: 503, body: { error: 'Studio renewal is unavailable' } };
   }
   if (!input.mcpUrl || !input.sharedToken) {
     logger.error('[StudioRenew] Studio connection is not configured');

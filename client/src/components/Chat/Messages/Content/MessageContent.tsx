@@ -4,12 +4,12 @@ import { Alert, DelayedRender } from '@librechat/client';
 import { Constants, parseThinkingContent } from 'librechat-data-provider';
 import type { TMessage } from 'librechat-data-provider';
 import type { TMessageContentProps, TDisplayProps } from '~/common';
-import { useMessageContext, useOptionalMessagesOperations } from '~/Providers';
 import useSmoothStreaming from '~/hooks/Messages/useSmoothStreaming';
 import Error from '~/components/Messages/Content/Error';
 import ToolCallLimitNotice from './ToolCallLimitNotice';
 import { cn, unwrapLegacyUIPromptText } from '~/utils';
 import CollapsibleText from './Parts/CollapsibleText';
+import { useMessageContext } from '~/Providers';
 import EmptyText from './Parts/EmptyText';
 import MarkdownLite from './MarkdownLite';
 import EditMessage from './EditMessage';
@@ -92,15 +92,10 @@ export const ErrorMessage = ({
 
 export const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: TDisplayProps) => {
   const { isSubmitting = false, isLatestMessage = false } = useMessageContext();
-  const { getMessages } = useOptionalMessagesOperations();
   const enableUserMsgMarkdown = useRecoilValue(store.enableUserMsgMarkdown);
   const collapseLongUserMessages = useRecoilValue(store.collapseLongUserMessages);
   const smoothStreaming = useSmoothStreaming();
-  const displayText = useMemo(
-    () =>
-      isCreatedByUser ? unwrapLegacyUIPromptText(text, { message, messages: getMessages() }) : text,
-    [isCreatedByUser, text, message, getMessages],
-  );
+  const displayText = isCreatedByUser ? unwrapLegacyUIPromptText(text, { message }) : text;
 
   // The word fade itself indicates streaming, so the trailing block cursor
   // only shows when the fade is unavailable (setting off or reduced motion).

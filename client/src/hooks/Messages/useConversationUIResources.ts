@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { Tools } from 'librechat-data-provider';
 import type { TAttachment, UIResource } from 'librechat-data-provider';
-import { buildMessageToolServerLookup, stampVerifiedResourceServerName } from '~/utils/studio';
 import { useOptionalMessagesOperations } from '~/Providers';
 import store from '~/store';
 
@@ -26,9 +25,7 @@ export function useConversationUIResources(
   return useMemo(() => {
     const map = new Map<string, UIResource>();
     const messages = getMessages();
-    const serverLookup = buildMessageToolServerLookup(messages);
-
-    const collectResources = (attachments?: TAttachment[], fallbackMessageId?: string) => {
+    const collectResources = (attachments?: TAttachment[]) => {
       attachments
         ?.filter((attachment) => attachment?.type === Tools.ui_resources)
         .forEach((attachment) => {
@@ -36,15 +33,7 @@ export function useConversationUIResources(
           if (Array.isArray(resources)) {
             resources.forEach((resource) => {
               if (resource?.resourceId) {
-                map.set(
-                  resource.resourceId,
-                  stampVerifiedResourceServerName(
-                    resource,
-                    attachment,
-                    serverLookup,
-                    fallbackMessageId,
-                  ),
-                );
+                map.set(resource.resourceId, resource);
               }
             });
           }
@@ -53,7 +42,7 @@ export function useConversationUIResources(
 
     // Collect from messages (works in both main app and share view)
     messages?.forEach((message) => {
-      collectResources(message.attachments, message.messageId);
+      collectResources(message.attachments);
     });
 
     // Collect from in-flight messages (Recoil state during streaming - only when we have a conversationId)

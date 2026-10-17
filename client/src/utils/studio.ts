@@ -1,11 +1,5 @@
 import { atom, createStore } from 'jotai';
-import { ContentTypes, Tools, splitToolCallName } from 'librechat-data-provider';
-import type {
-  TAttachment,
-  TMessage,
-  TMessageContentParts,
-  UIResource,
-} from 'librechat-data-provider';
+import type { TMessage, UIResource } from 'librechat-data-provider';
 
 const UI_DRAFT_STORAGE_KEY = 'zyb_studio_ui_drafts_v2';
 
@@ -49,23 +43,26 @@ export const studioUIStore = createStore();
 export const studioSelectionDraftsAtom = atom<Record<string, unknown>>({});
 export const studioRenewedLinksAtom = atom<Record<string, StudioRenewedResourceLinks>>({});
 
-// 解析资源所属的MCP服务名称，优先采用宿主显式传入的服务身份
+// 只采用服务端从已认证工具目标写入的身份，旧附件缺失该字段时保持来源包装
 export function resolveStudioServerName(
-  resource?: Pick<UIResource, 'serverName'> | null,
+  resource?: { serverName?: string; verifiedServerName?: unknown } | null,
   explicitServerName?: string | null,
 ): string {
-  if (typeof explicitServerName === 'string' && explicitServerName.trim()) {
-    return explicitServerName.trim();
-  }
-  if (typeof resource?.serverName === 'string' && resource.serverName.trim()) {
-    return resource.serverName.trim();
+  const verified = resource?.verifiedServerName;
+  if (
+    typeof verified === 'string' &&
+    verified.trim() &&
+    resource?.serverName === verified &&
+    (!explicitServerName || explicitServerName.trim() === verified)
+  ) {
+    return verified;
   }
   return '';
 }
 
 // 校验UIResource是否同时具备zyb_studio服务身份与ui://zyb_studio/资源URI前缀
 export function isStudioUIResource(
-  resource?: Pick<UIResource, 'uri' | 'serverName'> | null,
+  resource?: { uri: string; serverName?: string; verifiedServerName?: unknown } | null,
   explicitServerName?: string | null,
 ): boolean {
   if (!resource || typeof resource.uri !== 'string') {
@@ -80,91 +77,6 @@ export function isStudioUIResource(
 
 function isStudioModelUri(uri: string): boolean {
   return uri.startsWith(STUDIO_MODEL_PREFIX) || uri.startsWith(STUDIO_MODEL3D_PREFIX);
-}
-
-function extractToolCallPartInfo(
-  part: TMessageContentParts | undefined,
-): { id: string; serverName: string } | null {
-  if (!part || part.type !== ContentTypes.TOOL_CALL) {
-    return null;
-  }
-  const toolCall = part[ContentTypes.TOOL_CALL];
-  if (!toolCall) {
-    return null;
-  }
-  let rawName = '';
-  if ('name' in toolCall && typeof toolCall.name === 'string') {
-    rawName = toolCall.name;
-  } else if ('function' in toolCall && typeof toolCall.function?.name === 'string') {
-    rawName = toolCall.function.name;
-  }
-  if (!rawName) {
-    return null;
-  }
-  const [, serverName] = splitToolCallName(rawName, [STUDIO_SERVER_NAME]);
-  return {
-    id: typeof toolCall.id === 'string' ? toolCall.id : '',
-    serverName: serverName ?? '',
-  };
-}
-
-// 从会话消息的tool_call分片构建权威MCP服务身份索引，防止非Studio服务伪造serverName或URI
-export function buildMessageToolServerLookup(messages?: TMessage[] | null): {
-  byToolCallId: Map<string, string>;
-  byMessageId: Map<string, string>;
-} {
-  const byToolCallId = new Map<string, string>();
-  const byMessageId = new Map<string, string>();
-  if (!Array.isArray(messages)) {
-    return { byToolCallId, byMessageId };
-  }
-  for (const message of messages) {
-    if (!message || !Array.isArray(message.content)) {
-      continue;
-    }
-    const messageServers = new Set<string>();
-    for (const part of message.content) {
-      const info = extractToolCallPartInfo(part);
-      if (!info) {
-        continue;
-      }
-      messageServers.add(info.serverName);
-      if (info.id) {
-        byToolCallId.set(info.id, info.serverName);
-      }
-    }
-    if (message.messageId && messageServers.size === 1) {
-      const [singleServer] = Array.from(messageServers);
-      byMessageId.set(message.messageId, singleServer);
-    }
-  }
-  return { byToolCallId, byMessageId };
-}
-
-// 根据宿主消息中的权威tool_call记录为UIResource绑定或覆写serverName
-export function stampVerifiedResourceServerName(
-  resource: UIResource,
-  attachment: TAttachment,
-  lookup: { byToolCallId: Map<string, string>; byMessageId: Map<string, string> },
-  fallbackMessageId?: string,
-): UIResource {
-  const toolCallId = typeof attachment.toolCallId === 'string' ? attachment.toolCallId : '';
-  const messageId =
-    (typeof attachment.messageId === 'string' && attachment.messageId) || fallbackMessageId || '';
-  const authoritativeServer =
-    (toolCallId ? lookup.byToolCallId.get(toolCallId) : undefined) ??
-    (messageId ? lookup.byMessageId.get(messageId) : undefined);
-  if (authoritativeServer === undefined) {
-    return resource;
-  }
-  const normalizedServer = authoritativeServer || undefined;
-  if (resource.serverName === normalizedServer) {
-    return resource;
-  }
-  return {
-    ...resource,
-    serverName: normalizedServer,
-  };
 }
 
 function readSessionDraftMap(): Record<string, unknown> {
@@ -441,108 +353,12 @@ function formatLocalTimestampDisplay(isoText: string): string {
   return `${parsed.getFullYear()}-${pad2(parsed.getMonth() + 1)}-${pad2(parsed.getDate())} ${pad2(parsed.getHours())}:${pad2(parsed.getMinutes())}`;
 }
 
-// 匹配旧版MCP-UI自动包裹的英文提示模板及未标注语言的三重反引号围栏（曾导致被highlight.js误判为wasm代码块）
-const LEGACY_UI_PROMPT_WRAPPER_RE =
-  /^The user clicked a button in an embedded UI Resource,\s*and we got a message of type `prompt`\.[\s\S]*?```(?:[a-zA-Z0-9_-]*)\n([\s\S]*?)\n```[\s\S]*$/;
-
-// 严格匹配智印工坊选区编辑器的确认选区消息载荷（sel_<hex> + 底图UUID或img_<hex>）
-const STUDIO_CONFIRMED_SELECTION_PROMPT_RE =
-  /^已确认选区\s+(sel_[0-9a-f]{16,64})（底图\s+([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|img_[0-9a-f]{12,64})）(?:。|，请执行局部修改：[^\r\n]+)$/i;
-
-function hasConfirmedStudioSelectionOrigin(
-  imageId: string,
-  context?: StudioLegacyPromptContext,
-): boolean {
-  if (!context) {
-    return false;
-  }
-  if (typeof context.serverName === 'string' && context.serverName.trim() === STUDIO_SERVER_NAME) {
-    return true;
-  }
-  if (!Array.isArray(context.messages) || context.messages.length === 0) {
-    return false;
-  }
-
-  const lookup = buildMessageToolServerLookup(context.messages);
-  const expectedUri = `${STUDIO_SELECTION_PREFIX}${imageId}`;
-  let hasStudioOrigin = false;
-  let hasSpoofedSelectionUri = false;
-
-  for (const srv of lookup.byToolCallId.values()) {
-    if (srv === STUDIO_SERVER_NAME) {
-      hasStudioOrigin = true;
-    }
-  }
-  for (const srv of lookup.byMessageId.values()) {
-    if (srv === STUDIO_SERVER_NAME) {
-      hasStudioOrigin = true;
-    }
-  }
-
-  for (const msg of context.messages) {
-    if (!msg || !Array.isArray(msg.attachments)) {
-      continue;
-    }
-    for (const attachment of msg.attachments) {
-      if (attachment?.type !== Tools.ui_resources) {
-        continue;
-      }
-      const resources = attachment[Tools.ui_resources];
-      if (!Array.isArray(resources)) {
-        continue;
-      }
-      for (const rawResource of resources) {
-        if (!rawResource) {
-          continue;
-        }
-        const stamped = stampVerifiedResourceServerName(
-          rawResource,
-          attachment,
-          lookup,
-          msg.messageId,
-        );
-        if (stamped.uri === expectedUri) {
-          if (stamped.serverName === STUDIO_SERVER_NAME) {
-            hasStudioOrigin = true;
-          } else {
-            hasSpoofedSelectionUri = true;
-          }
-        }
-      }
-    }
-  }
-
-  const parentId = context.message?.parentMessageId;
-  if (parentId && lookup.byMessageId.has(parentId)) {
-    if (lookup.byMessageId.get(parentId) !== STUDIO_SERVER_NAME) {
-      return false;
-    }
-  }
-
-  return hasStudioOrigin && !hasSpoofedSelectionUri;
-}
-
-// 仅在确认属于智印工坊选区消息时，剥离历史落库的英文MCP-UI包装文本与代码块围栏
+// 历史消息没有绑定当前选区编号的可信来源记录，保留上游来源包装
 export function unwrapLegacyUIPromptText(
   text: string,
-  context?: StudioLegacyPromptContext,
+  _context?: StudioLegacyPromptContext,
 ): string {
-  if (typeof text !== 'string' || !text.includes('embedded UI Resource')) {
-    return text;
-  }
-  const match = LEGACY_UI_PROMPT_WRAPPER_RE.exec(text.trim());
-  const inner = match?.[1]?.trim();
-  if (!inner) {
-    return text;
-  }
-  const selectionMatch = STUDIO_CONFIRMED_SELECTION_PROMPT_RE.exec(inner);
-  if (!selectionMatch?.[2]) {
-    return text;
-  }
-  if (!hasConfirmedStudioSelectionOrigin(selectionMatch[2], context)) {
-    return text;
-  }
-  return inner;
+  return text;
 }
 
 export function upgradePersistedStudioHtml(
@@ -550,12 +366,16 @@ export function upgradePersistedStudioHtml(
   uri?: string | null,
   renewedLinks?: StudioRenewedResourceLinks,
   serverName?: string | null,
+  verifiedServerName?: string | null,
 ): string {
   if (
     typeof html !== 'string' ||
     !html ||
     typeof uri !== 'string' ||
-    !isStudioUIResource({ uri, serverName: serverName ?? undefined }, serverName)
+    !isStudioUIResource(
+      { uri, serverName: serverName ?? undefined, verifiedServerName },
+      serverName,
+    )
   ) {
     return html;
   }
@@ -610,15 +430,15 @@ export function upgradePersistedStudioHtml(
   if (renewedLinks.beforeUrl) {
     const safeBeforeJson = JSON.stringify(renewedLinks.beforeUrl);
     next = next.replace(
-      /const\s+BEFORE_URL\s*=\s*"(?:\\.|[^"\\])*";/,
-      `const BEFORE_URL = ${safeBeforeJson};`,
+      /const\s+((?:INITIAL_)?BEFORE_URL)\s*=\s*"(?:\\.|[^"\\])*";/g,
+      (_match, name: string) => `const ${name} = ${safeBeforeJson};`,
     );
   }
   if (renewedLinks.afterUrl) {
     const safeAfterJson = JSON.stringify(renewedLinks.afterUrl);
     next = next.replace(
-      /const\s+AFTER_URL\s*=\s*"(?:\\.|[^"\\])*";/,
-      `const AFTER_URL = ${safeAfterJson};`,
+      /const\s+((?:INITIAL_)?AFTER_URL)\s*=\s*"(?:\\.|[^"\\])*";/g,
+      (_match, name: string) => `const ${name} = ${safeAfterJson};`,
     );
   }
   if (renewedLinks.modelUrl) {
@@ -702,8 +522,10 @@ export async function renewStudioResourceLinks(
       ? payload.editorUrl
       : embeddedEditorUrl;
   } else if (resourceUri.startsWith(STUDIO_COMPARE_PREFIX)) {
-    const embeddedAfterUrl = extractConstString(html, 'AFTER_URL');
-    const embeddedBeforeUrl = extractConstString(html, 'BEFORE_URL');
+    const embeddedAfterUrl =
+      extractConstString(html, 'INITIAL_AFTER_URL') || extractConstString(html, 'AFTER_URL');
+    const embeddedBeforeUrl =
+      extractConstString(html, 'INITIAL_BEFORE_URL') || extractConstString(html, 'BEFORE_URL');
     referencePreviewUrl = embeddedAfterUrl || embeddedBeforeUrl;
     endpointUrl = isValidStudioSignedUrl(payload.afterUrl, embeddedAfterUrl, 'img:')
       ? payload.afterUrl
@@ -736,8 +558,14 @@ export async function renewStudioResourceLinks(
         model_id: payload.modelId,
         editor_url: endpointUrl,
         preview_url: referencePreviewUrl || payload.previewUrl,
-        before_url: extractConstString(html, 'BEFORE_URL') || payload.beforeUrl,
-        after_url: extractConstString(html, 'AFTER_URL') || payload.afterUrl,
+        before_url:
+          extractConstString(html, 'INITIAL_BEFORE_URL') ||
+          extractConstString(html, 'BEFORE_URL') ||
+          payload.beforeUrl,
+        after_url:
+          extractConstString(html, 'INITIAL_AFTER_URL') ||
+          extractConstString(html, 'AFTER_URL') ||
+          payload.afterUrl,
         model_url: extractEmbeddedModelUrl(html) || payload.modelUrl,
       }),
     });

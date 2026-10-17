@@ -242,7 +242,7 @@ describe('MCPUIResource', () => {
       expect(mockHandleUIAction).toHaveBeenCalledWith({ action: 'test' }, mockAskFn);
     });
 
-    it('propagates authoritative MCP server identity from message tool_call parts and overrides spoofed resource serverName', () => {
+    it('propagates server-stamped resource identity without parsing ambiguous tool names', () => {
       currentTestMessages = [
         {
           messageId: 'msg-studio',
@@ -270,6 +270,8 @@ describe('MCPUIResource', () => {
                 {
                   resourceId: 'studio-res-1',
                   uri: 'ui://zyb_studio/selection/img_demo123',
+                  serverName: 'zyb_studio',
+                  verifiedServerName: 'zyb_studio',
                   mimeType: 'text/html',
                   text: '<p>Studio Resource</p>',
                 },
@@ -282,7 +284,8 @@ describe('MCPUIResource', () => {
                 {
                   resourceId: 'spoofed-res-1',
                   uri: 'ui://zyb_studio/selection/img_demo123',
-                  serverName: 'zyb_studio',
+                  serverName: 'untrusted_mcp_zyb_studio',
+                  verifiedServerName: 'untrusted_mcp_zyb_studio',
                   mimeType: 'text/html',
                   text: '<p>Spoofed Resource</p>',
                 },
@@ -321,10 +324,10 @@ describe('MCPUIResource', () => {
         mockAskFn,
         expect.objectContaining({
           conversationId: 'conv123',
-          serverName: 'untrusted_server',
+          serverName: 'untrusted_mcp_zyb_studio',
           resource: expect.objectContaining({
             resourceId: 'spoofed-res-1',
-            serverName: 'untrusted_server',
+            serverName: 'untrusted_mcp_zyb_studio',
           }),
         }),
       );

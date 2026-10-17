@@ -6,6 +6,7 @@ const base = {
   body: { action: 'renew', image_id: 'image-1', owner: 'forged-owner' },
   mcpUrl: 'http://studio:8000/mcp',
   sharedToken: 'shared-secret',
+  getAdmittedServers: async () => ({ zyb_studio: { url: 'http://studio:8000/mcp' } }),
 };
 
 test('renewal forwards only authenticated tenant scoped owner identity', async () => {
@@ -43,4 +44,42 @@ test('renewal fails closed for an unauthenticated user and a denied Studio owner
   expect((await renewStudioLinks({ ...base, user: null, fetchImpl })).status).toBe(401);
   expect(fetchImpl).not.toHaveBeenCalled();
   expect((await renewStudioLinks({ ...base, user: { id: 'user-a' }, fetchImpl })).status).toBe(403);
+});
+
+test('renewal stops before proxying when Studio is removed from current MCP admission', async () => {
+  const fetchImpl = Object.assign(jest.fn(), { preconnect: jest.fn() });
+  const user = { id: '65f0000000000000000000a1' };
+  expect(
+    (
+      await renewStudioLinks({
+        ...base,
+        user,
+        fetchImpl,
+        getAdmittedServers: async () => ({ another_server: {} }),
+      })
+    ).status,
+  ).toBe(403);
+  expect(
+    (
+      await renewStudioLinks({
+        ...base,
+        user,
+        fetchImpl,
+        getAdmittedServers: async () => ({ zyb_studio: undefined }),
+      })
+    ).status,
+  ).toBe(403);
+  expect(
+    (
+      await renewStudioLinks({
+        ...base,
+        user,
+        fetchImpl,
+        getAdmittedServers: async () => {
+          throw new Error('database unavailable');
+        },
+      })
+    ).status,
+  ).toBe(503);
+  expect(fetchImpl).not.toHaveBeenCalled();
 });

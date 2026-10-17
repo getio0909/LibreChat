@@ -3060,6 +3060,7 @@ describe('MCP Routes', () => {
     process.env.STUDIO_MCP_URL = 'http://studio:8000/mcp';
     process.env.STUDIO_SHARED_TOKEN = 'a'.repeat(64);
     currentUser = { id: '65f0000000000000000000a1', role: 'user' };
+    mockResolveAllMcpConfigs.mockResolvedValue({ zyb_studio: { url: 'http://studio:8000/mcp' } });
     try {
       const response = await request(app)
         .post(`/api/mcp/studio/renew/${token}`)
@@ -3076,6 +3077,31 @@ describe('MCP Routes', () => {
       else process.env.STUDIO_MCP_URL = originalUrl;
       if (originalSecret === undefined) delete process.env.STUDIO_SHARED_TOKEN;
       else process.env.STUDIO_SHARED_TOKEN = originalSecret;
+    }
+  });
+
+  it('rejects Studio renewal after MCP admission is revoked and applies both per-user limiters', async () => {
+    currentUser = { id: '65f0000000000000000000a1', role: 'user' };
+    mockResolveAllMcpConfigs.mockReset().mockResolvedValue({});
+    const routeLayer = mcpRouter.stack.find(
+      (layer) => layer.route?.path === '/studio/renew/:token',
+    );
+    expect(routeLayer.route.stack[1].handle).toBe(
+      require('~/server/middleware/limiters/mcpAppAdmissionLimiter'),
+    );
+    expect(routeLayer.route.stack[3].handle).toBe(
+      require('~/server/middleware/limiters/mcpAppResourceLimiter'),
+    );
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(new Response('{}'));
+    try {
+      const response = await request(app).post(
+        `/api/mcp/studio/renew/${'a'.repeat(40)}.${'b'.repeat(64)}`,
+      );
+      expect(response.status).toBe(403);
+      expect(mockResolveAllMcpConfigs).toHaveBeenCalledWith(currentUser.id, currentUser);
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      fetchMock.mockRestore();
     }
   });
 

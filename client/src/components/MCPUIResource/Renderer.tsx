@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
 import {
@@ -14,6 +14,7 @@ import type { TAskFunction } from '~/common';
 import {
   buildStudioDraftKey,
   buildStudioResourceKey,
+  isStudioUIResource,
   loadUIDraft,
   studioRenewedLinksAtom,
   studioUIStore,
@@ -22,6 +23,7 @@ import {
 import { useOptionalMessagesConversation } from '~/Providers/MessagesViewContext';
 import { useMCPAppsHost } from '~/Providers/MCPAppsPolicyContext';
 import { handleUIAction } from '~/utils';
+import { useLocalize } from '~/hooks';
 
 type LegacyRendererProps = ComponentProps<typeof LegacyUIResourceRenderer>;
 
@@ -66,8 +68,14 @@ export default function UIResourceRenderer({
   ...props
 }: UIResourceRendererProps) {
   const { policy, userId } = useMCPAppsHost();
+  const localize = useLocalize();
+  const [deniedResourceId, setDeniedResourceId] = useState<string | null>(null);
   const { conversationId } = useOptionalMessagesConversation();
   const isSupported = Boolean(policy?.legacyHtmlEnabled) && isSupportedUIResource(resource);
+  const legacyStudioCard =
+    resource.uri.startsWith('ui://zyb_studio/') &&
+    (!resource.serverName || resource.serverName === 'zyb_studio') &&
+    !isStudioUIResource(resource, resource.serverName);
 
   const resourceKey = useMemo(
     () =>
@@ -95,6 +103,9 @@ export default function UIResourceRenderer({
         nextResource.uri,
         renewedLinks,
         nextResource.serverName,
+        typeof nextResource.verifiedServerName === 'string'
+          ? nextResource.verifiedServerName
+          : undefined,
       );
     }
     return nextResource;
@@ -128,7 +139,7 @@ export default function UIResourceRenderer({
         rawType === 'ui-draft-load' ||
         rawType === 'ui-link-renew'
       ) {
-        return handleUIAction(result, NOOP_ASK, {
+        const response = await handleUIAction(result, NOOP_ASK, {
           userId,
           conversationId,
           serverName: resource.serverName,
@@ -136,10 +147,22 @@ export default function UIResourceRenderer({
           store: studioUIStore,
           renewFetcher: renewThroughHost as typeof fetch,
         });
+        if (
+          rawType === 'ui-link-renew' &&
+          response?.status === 'rejected' &&
+          (response.reason === 'http_403' ||
+            (legacyStudioCard && response.reason === 'unauthenticated_or_invalid_resource'))
+        ) {
+          console.warn('[StudioRenew] Stored card renewal was denied; reopen the Studio view');
+          setDeniedResourceId(resource.resourceId);
+        } else if (rawType === 'ui-link-renew' && response?.status === 'renewed') {
+          setDeniedResourceId(null);
+        }
+        return response;
       }
       return onUIAction?.(result);
     },
-    [onUIAction, userId, conversationId, resource],
+    [onUIAction, userId, conversationId, resource, legacyStudioCard],
   );
 
   if (!safeResource) {
@@ -147,12 +170,22 @@ export default function UIResourceRenderer({
   }
 
   return (
-    <LegacyUIResourceRenderer
-      {...props}
-      resource={safeResource}
-      onUIAction={scopedOnUIAction}
-      htmlProps={safeHtmlProps}
-      supportedContentTypes={['rawHtml']}
-    />
+    <>
+      <LegacyUIResourceRenderer
+        {...props}
+        resource={safeResource}
+        onUIAction={scopedOnUIAction}
+        htmlProps={safeHtmlProps}
+        supportedContentTypes={['rawHtml']}
+      />
+      {(legacyStudioCard || deniedResourceId === resource.resourceId) && (
+        <p
+          role="alert"
+          className="bg-status-warning-subtle text-text-primary mt-2 rounded px-3 py-2 text-sm"
+        >
+          {localize('com_ui_studio_reopen_card')}
+        </p>
+      )}
+    </>
   );
 }

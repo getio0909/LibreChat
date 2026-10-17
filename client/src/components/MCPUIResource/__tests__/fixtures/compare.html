@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>局部修改前后对比（400×300）</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f4ef;
+    --panel: #ffffff;
+    --border: rgba(36, 32, 26, 0.15);
+    --text: #231f1a;
+    --muted: #655e54;
+    --accent: #2563eb;
+    --ok: #15803d;
+    --stage-bg: #18181b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171614;
+      --panel: #22201c;
+      --border: rgba(245, 242, 235, 0.15);
+      --text: #f5f2eb;
+      --muted: #a69f93;
+      --accent: #3b82f6;
+      --ok: #22c55e;
+      --stage-bg: #101013;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .compare-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
+  }
+  .top-row, .ctrl-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .title-text {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .verify-badge {
+    font-size: 12px;
+    color: var(--ok);
+    font-weight: 600;
+  }
+  .controls {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  button {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  label.diff-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .slider-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stage-box {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    background: var(--stage-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+  .stage-box canvas {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
+  .meta-line {
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="compare-wrap" id="compareRoot" data-image-id="img_after123" data-base-id="img_demo123" data-selection-id="sel_0123456789abcdef">
+  <div class="top-row">
+    <span class="title-text">局部重绘效果对比（400×300）</span>
+    <span class="verify-badge">✓ 选区外像素 100% 原样保留（0 像素改动 · 选区 120 像素）</span>
+  </div>
+  <div class="ctrl-row">
+    <div class="controls">
+      <button type="button" id="toggleBeforeBtn" aria-pressed="false">对比修改前</button>
+      <label class="diff-toggle">
+        <input type="checkbox" id="diffCheck" />
+        <span>标出明显色差</span>
+      </label>
+      <label class="slider-wrap" id="sliderWrap">
+        <span>修改前</span>
+        <input type="range" id="splitRange" min="0" max="100" value="50" />
+        <span>修改后</span>
+      </label>
+      <button type="button" id="compareRenewBtn" hidden>刷新预览链接</button>
+    </div>
+    <span class="meta-line">画幅 400×300 · <span id="compareExpiresBadge" data-expires="2030-01-01T00:00:00Z">有效期至 2029-12-31 16:00</span></span>
+  </div>
+  <div class="stage-box" id="stageBox">
+    <canvas id="compareCanvas"></canvas>
+  </div>
+</div>
+<script>
+(function() {
+  const INITIAL_BEFORE_URL = "/files/aW1nOnVzZXJfMToxODkzNDU2MDAwOmltZ19kZW1vMTIz.cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+  const INITIAL_AFTER_URL = "/files/aW1nOnVzZXJfMToxODkzNDU2MDAwOmltZ19hZnRlcjEyMw.dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+  let currentBeforeUrl = INITIAL_BEFORE_URL;
+  let currentAfterUrl = INITIAL_AFTER_URL;
+  const IMAGE_ID = "img_after123";
+  const BASE_ID = "img_demo123";
+  const RESOURCE_URI = 'ui://zyb_studio/compare/' + IMAGE_ID;
+  const SESSION_NONCE = (() => {
+    const buf = new Uint32Array(4);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(buf);
+      return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+    }
+    return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+  })();
+  let reqCounter = 0;
+  let pendingRenewRequestId = null;
+  let renderDataReceived = false;
+
+  const root = document.getElementById('compareRoot');
+  const canvas = document.getElementById('compareCanvas');
+  const toggleBeforeBtn = document.getElementById('toggleBeforeBtn');
+  const diffCheck = document.getElementById('diffCheck');
+  const splitRange = document.getElementById('splitRange');
+  const sliderWrap = document.getElementById('sliderWrap');
+  const compareRenewBtn = document.getElementById('compareRenewBtn');
+  const compareExpiresBadge = document.getElementById('compareExpiresBadge');
+
+  function nextRequestId(prefix) {
+    reqCounter += 1;
+    return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+  }
+
+  function isValidRenewedCompareUrl(candidateUrl, referenceUrl) {
+    if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+    try {
+      const cand = new URL(candidateUrl, window.location.href);
+      if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+      const ref = new URL(referenceUrl || INITIAL_AFTER_URL, window.location.href);
+      if (cand.origin !== ref.origin) return false;
+      const match = cand.pathname.match(/\/(?:studio-files|files)\/([A-Za-z0-9_-]+)\.([0-9a-f]{64})$/);
+      if (!match) return false;
+      const b64 = match[1].replace(/-/g, '+').replace(/_/g, '/');
+      const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+      const decoded = atob(b64 + pad);
+      return decoded.startsWith('img:');
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  function formatLocalExpiry(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (Number.isNaN(d.getTime())) return String(isoStr).replace('T', ' ').replace(/Z$/, '');
+    const pad = (n) => String(n).padStart(2, '0');
+    return (
+      d.getFullYear() +
+      '-' +
+      pad(d.getMonth() + 1) +
+      '-' +
+      pad(d.getDate()) +
+      ' ' +
+      pad(d.getHours()) +
+      ':' +
+      pad(d.getMinutes())
+    );
+  }
+
+  if (compareExpiresBadge && compareExpiresBadge.dataset.expires) {
+    const formatted = formatLocalExpiry(compareExpiresBadge.dataset.expires);
+    if (formatted) {
+      compareExpiresBadge.textContent = '有效期至 ' + formatted;
+    }
+  }
+
+  let showBeforeOnly = false;
+  let showDiff = false;
+  let splitRatio = 0.5;
+  let diffImageData = null;
+
+  const beforeImg = new Image();
+  const afterImg = new Image();
+  beforeImg.crossOrigin = 'anonymous';
+  afterImg.crossOrigin = 'anonymous';
+  let loadedCount = 0;
+
+  function notifyHostSize() {
+    const h = Math.max(480, Math.ceil(root.getBoundingClientRect().height + 16));
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'ui-size-change', payload: { height: h } }, '*');
+    }
+  }
+
+  function buildDiffOverlay(w, h) {
+    const a = document.createElement('canvas');
+    const b = document.createElement('canvas');
+    a.width = b.width = w;
+    a.height = b.height = h;
+    const actx = a.getContext('2d');
+    const bctx = b.getContext('2d');
+    actx.filter = bctx.filter = 'blur(1.5px)';
+    actx.drawImage(beforeImg, 0, 0, w, h);
+    bctx.drawImage(afterImg, 0, 0, w, h);
+    const beforeData = actx.getImageData(0, 0, w, h).data;
+    const afterFrame = bctx.getImageData(0, 0, w, h);
+    const out = afterFrame.data;
+    const changed = new Uint8Array(w * h);
+
+    for (let p = 0, i = 0; p < changed.length; p += 1, i += 4) {
+      const d = Math.max(
+        Math.abs(beforeData[i] - out[i]),
+        Math.abs(beforeData[i + 1] - out[i + 1]),
+        Math.abs(beforeData[i + 2] - out[i + 2])
+      );
+      if (d > 36) changed[p] = 1;
+    }
+
+    const cleanFrame = canvas.getContext('2d');
+    cleanFrame.drawImage(afterImg, 0, 0, w, h);
+    const clean = cleanFrame.getImageData(0, 0, w, h);
+    const dst = clean.data;
+
+    for (let y = 1; y < h - 1; y += 1) {
+      for (let x = 1; x < w - 1; x += 1) {
+        const p = y * w + x;
+        if (!changed[p]) continue;
+        const neighbors = changed[p - 1] + changed[p + 1] + changed[p - w] + changed[p + w];
+        if (neighbors < 3) continue;
+        const i = p * 4;
+        dst[i] = Math.round(dst[i] * 0.3 + 255 * 0.7);
+        dst[i + 1] = Math.round(dst[i + 1] * 0.3);
+        dst[i + 2] = Math.round(dst[i + 2] * 0.3);
+      }
+    }
+    return clean;
+  }
+
+  function render() {
+    if (loadedCount < 2) return;
+    const natW = afterImg.naturalWidth || 400;
+    const natH = afterImg.naturalHeight || 300;
+    const scale = Math.min(1, 1400 / Math.max(natW, natH));
+    const w = Math.max(1, Math.round(natW * scale));
+    const h = Math.max(1, Math.round(natH * scale));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      diffImageData = null;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+
+    if (showBeforeOnly) {
+      ctx.drawImage(beforeImg, 0, 0, w, h);
+      return;
+    }
+    if (showDiff) {
+      if (!diffImageData) {
+        diffImageData = buildDiffOverlay(w, h);
+      }
+      ctx.putImageData(diffImageData, 0, 0);
+      return;
+    }
+
+    ctx.drawImage(afterImg, 0, 0, w, h);
+    const splitX = Math.round(w * splitRatio);
+    if (splitX > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, splitX, h);
+      ctx.clip();
+      ctx.drawImage(beforeImg, 0, 0, w, h);
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(splitX, 0);
+    ctx.lineTo(splitX, h);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function onImageLoaded() {
+    loadedCount += 1;
+    if (loadedCount >= 2) {
+      if (compareRenewBtn) compareRenewBtn.hidden = true;
+      render();
+      notifyHostSize();
+    }
+  }
+
+  function onImageError() {
+    if (compareRenewBtn) compareRenewBtn.hidden = false;
+    notifyHostSize();
+  }
+
+  beforeImg.addEventListener('load', onImageLoaded);
+  afterImg.addEventListener('load', onImageLoaded);
+  beforeImg.addEventListener('error', onImageError);
+  afterImg.addEventListener('error', onImageError);
+
+  function applyRenewedCompareLinks(links) {
+    if (!links || typeof links !== 'object') return false;
+    const nextBefore = links.beforeUrl || links.before_url;
+    const nextAfter = links.afterUrl || links.after_url;
+    if (!isValidRenewedCompareUrl(nextBefore, INITIAL_BEFORE_URL)) return false;
+    if (!isValidRenewedCompareUrl(nextAfter, INITIAL_AFTER_URL)) return false;
+    currentBeforeUrl = nextBefore;
+    currentAfterUrl = nextAfter;
+    loadedCount = 0;
+    diffImageData = null;
+    beforeImg.src = currentBeforeUrl;
+    afterImg.src = currentAfterUrl;
+    const nextExpires = links.expiresAt || links.expires_at;
+    if (nextExpires && compareExpiresBadge) {
+      compareExpiresBadge.dataset.expires = nextExpires;
+      compareExpiresBadge.textContent = '有效期至 ' + formatLocalExpiry(nextExpires);
+    }
+    if (compareRenewBtn) compareRenewBtn.hidden = true;
+    return true;
+  }
+
+  async function renewCompareDirectly() {
+    try {
+      const res = await fetch(currentAfterUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'renew',
+          resource_uri: RESOURCE_URI,
+          image_id: IMAGE_ID,
+          base_id: BASE_ID,
+          before_url: currentBeforeUrl,
+          after_url: currentAfterUrl
+        })
+      });
+      const rawText = await res.text();
+      let data = {};
+      if (rawText) {
+        try {
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        } catch (_e) {}
+      }
+      if (res.ok && applyRenewedCompareLinks(data)) {
+        return true;
+      }
+    } catch (_err) {}
+    return false;
+  }
+
+  if (compareRenewBtn) {
+    compareRenewBtn.addEventListener('click', async () => {
+      if (window.parent && window.parent !== window) {
+        pendingRenewRequestId = nextRequestId('renew-compare');
+        window.parent.postMessage({
+          type: 'ui-link-renew',
+          messageId: pendingRenewRequestId,
+          payload: {
+            resourceUri: RESOURCE_URI,
+            imageId: IMAGE_ID,
+            baseId: BASE_ID,
+            sessionNonce: SESSION_NONCE,
+            beforeUrl: currentBeforeUrl,
+            afterUrl: currentAfterUrl
+          }
+        }, '*');
+      }
+      await renewCompareDirectly();
+    });
+  }
+
+  window.addEventListener('message', (ev) => {
+    if (!window.parent || window.parent === window || ev.source !== window.parent) return;
+    if (!ev.data || typeof ev.data !== 'object') return;
+    const msgType = ev.data.type;
+    const payload = ev.data.payload || {};
+    if (msgType === 'ui-lifecycle-iframe-render-data' && !renderDataReceived) {
+      renderDataReceived = true;
+      const renderData = payload.renderData || payload;
+      if (renderData && typeof renderData === 'object') {
+        applyRenewedCompareLinks(renderData.renewedLinks || renderData);
+      }
+      return;
+    }
+    if (msgType === 'ui-message-response' && ev.data.messageId && ev.data.messageId === pendingRenewRequestId) {
+      pendingRenewRequestId = null;
+      const resp = payload.response || payload;
+      if (!resp || typeof resp !== 'object') return;
+      if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+      applyRenewedCompareLinks(resp);
+    }
+  });
+
+  toggleBeforeBtn.addEventListener('click', () => {
+    showBeforeOnly = !showBeforeOnly;
+    toggleBeforeBtn.setAttribute('aria-pressed', showBeforeOnly ? 'true' : 'false');
+    toggleBeforeBtn.textContent = showBeforeOnly ? '返回修改后' : '对比修改前';
+    if (showBeforeOnly) {
+      showDiff = false;
+      diffCheck.checked = false;
+    }
+    sliderWrap.style.opacity = (showBeforeOnly || showDiff) ? '0.45' : '1';
+    render();
+  });
+
+  diffCheck.addEventListener('change', () => {
+    showDiff = diffCheck.checked;
+    if (showDiff) {
+      showBeforeOnly = false;
+      toggleBeforeBtn.setAttribute('aria-pressed', 'false');
+      toggleBeforeBtn.textContent = '对比修改前';
+    }
+    sliderWrap.style.opacity = (showBeforeOnly || showDiff) ? '0.45' : '1';
+    render();
+  });
+
+  splitRange.addEventListener('input', () => {
+    splitRatio = (Number(splitRange.value) || 50) / 100;
+    showBeforeOnly = false;
+    showDiff = false;
+    toggleBeforeBtn.setAttribute('aria-pressed', 'false');
+    toggleBeforeBtn.textContent = '对比修改前';
+    diffCheck.checked = false;
+    sliderWrap.style.opacity = '1';
+    render();
+  });
+
+  window.addEventListener('resize', notifyHostSize);
+  if (typeof ResizeObserver !== 'undefined' && root) {
+    new ResizeObserver(() => {
+      notifyHostSize();
+    }).observe(root);
+  }
+  beforeImg.src = currentBeforeUrl;
+  afterImg.src = currentAfterUrl;
+  notifyHostSize();
+})();
+</script>
+</body>
+</html>

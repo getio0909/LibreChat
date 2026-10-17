@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>三维视觉预览（约 1,000 面）</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg-top: #f6f4ef;
+    --bg-bottom: #e8e4dc;
+    --panel-bg: rgba(255, 255, 255, 0.88);
+    --panel-border: rgba(36, 32, 26, 0.14);
+    --text-main: #231f1a;
+    --text-muted: #655e54;
+    --accent: #7a5c38;
+    --accent-hover: #5e4528;
+    --btn-bg: rgba(255, 255, 255, 0.92);
+    --danger: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-top: #23211d;
+      --bg-bottom: #151412;
+      --panel-bg: rgba(32, 30, 27, 0.88);
+      --panel-border: rgba(255, 255, 255, 0.14);
+      --text-main: #f3efe8;
+      --text-muted: #aba398;
+      --accent: #c59b6d;
+      --accent-hover: #d7b286;
+      --btn-bg: rgba(44, 41, 37, 0.92);
+      --danger: #f97066;
+    }
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  html, body {
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: transparent;
+    color: var(--text-main);
+    overflow: hidden;
+  }
+  .viewer-shell {
+    position: relative;
+    width: 100%;
+    height: 440px;
+    border-radius: 12px;
+    border: 1px solid var(--panel-border);
+    background: radial-gradient(circle at 50% 35%, var(--bg-top), var(--bg-bottom));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    user-select: none;
+  }
+  @media (max-width: 480px) {
+    .viewer-shell {
+      height: 360px;
+      border-radius: 10px;
+    }
+  }
+  #canvas-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    outline: none;
+  }
+  .top-bar, .bottom-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    pointer-events: none;
+  }
+  .badge {
+    pointer-events: auto;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(8px);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+  }
+  .badge-muted {
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+  .controls-group {
+    pointer-events: auto;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn {
+    appearance: none;
+    border: 1px solid var(--panel-border);
+    background: var(--btn-bg);
+    color: var(--text-main);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 32px;
+    transition: border-color 0.15s ease, transform 0.1s ease;
+  }
+  .btn:hover {
+    border-color: var(--accent);
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: transparent;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+    background: var(--panel-bg);
+    backdrop-filter: blur(6px);
+  }
+  .overlay[hidden] {
+    display: none !important;
+  }
+  .progress-track {
+    width: min(220px, 75vw);
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(122, 92, 56, 0.2);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 12%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.15s ease;
+  }
+  .status-text {
+    font-size: 13px;
+    color: var(--text-main);
+  }
+  .error-text {
+    font-size: 13px;
+    color: var(--danger);
+    max-width: 320px;
+    line-height: 1.4;
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+  <div class="viewer-shell" id="viewer-shell" data-model-id="mdl_demo123" role="region" aria-label="三维模型交互预览">
+    <div id="canvas-container"></div>
+
+    <div class="top-bar">
+      <div class="badge">
+        <span>三维视觉模型</span>
+        <span class="badge-muted">约 1,000 面 · 0.00 MB</span>
+      </div>
+      <div class="controls-group">
+        <button type="button" class="btn" id="reset-btn" aria-label="重置相机视角">重置视角</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="loading-state" role="status" aria-live="polite">
+      <div class="status-text" id="progress-label">正在加载三维模型...</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="error-state" role="alert" hidden>
+      <div class="error-text" id="error-message">三维模型加载失败，请点击重试或刷新预览链接。</div>
+      <div class="controls-group">
+        <button type="button" class="btn" id="retry-btn">重新加载</button>
+        <button type="button" class="btn btn-primary" id="renew-btn">刷新预览链接</button>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="badge badge-muted">
+        拖拽旋转 · 滚轮/双指缩放 · 右键平移 · 仅供视觉预览（非工程制造模型）
+      </div>
+      <div class="badge badge-muted" id="model-expires-badge" data-expires="2030-01-01T00:00:00Z" title="预览链接本地有效时间">
+        有效期至 2029-12-31 16:00
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const INITIAL_MODEL_URL = "/files/dXNlcl8xOjE4OTM0NTYwMDA6bWRsX2RlbW8xMjM.eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+    const MODEL_URL = INITIAL_MODEL_URL;
+    let currentModelUrl = INITIAL_MODEL_URL;
+    const MODEL_ID = "mdl_demo123";
+    const RESOURCE_URI = 'ui://zyb_studio/model/' + MODEL_ID;
+    const SESSION_NONCE = (() => {
+      const buf = new Uint32Array(4);
+      if (window.crypto && window.crypto.getRandomValues) {
+        window.crypto.getRandomValues(buf);
+        return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+      }
+      return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+    })();
+    let reqCounter = 0;
+    let pendingRenewRequestId = null;
+    let renderDataReceived = false;
+
+    const shell = document.getElementById('viewer-shell');
+    const container = document.getElementById('canvas-container');
+    const loadingEl = document.getElementById('loading-state');
+    const progressFill = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-label');
+    const errorEl = document.getElementById('error-state');
+    const errorMsgEl = document.getElementById('error-message');
+    const resetBtn = document.getElementById('reset-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const renewBtn = document.getElementById('renew-btn');
+    const expiresBadge = document.getElementById('model-expires-badge');
+
+    function nextRequestId(prefix) {
+      reqCounter += 1;
+      return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+    }
+
+    function isValidRenewedModelUrl(candidateUrl) {
+      if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+      try {
+        const cand = new URL(candidateUrl, window.location.href);
+        if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+        const ref = new URL(INITIAL_MODEL_URL, window.location.href);
+        if (cand.origin !== ref.origin) return false;
+        return /\/(?:studio-files|files)\/[A-Za-z0-9_-]+\.[0-9a-f]{64}$/.test(cand.pathname);
+      } catch (_e) {
+        return false;
+      }
+    }
+
+    function formatLocalExpiry(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      if (Number.isNaN(d.getTime())) return String(isoStr).replace('T', ' ').replace(/Z$/, '');
+      const pad = (n) => String(n).padStart(2, '0');
+      return (
+        d.getFullYear() +
+        '-' +
+        pad(d.getMonth() + 1) +
+        '-' +
+        pad(d.getDate()) +
+        ' ' +
+        pad(d.getHours()) +
+        ':' +
+        pad(d.getMinutes())
+      );
+    }
+
+    if (expiresBadge && expiresBadge.dataset.expires) {
+      const formatted = formatLocalExpiry(expiresBadge.dataset.expires);
+      if (formatted) {
+        expiresBadge.textContent = '有效期至 ' + formatted;
+      }
+    }
+
+    function notifyHostSize() {
+      const height = Math.ceil(shell.getBoundingClientRect().height);
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'ui-size-change', payload: { height } }, '*');
+      }
+    }
+    notifyHostSize();
+    window.addEventListener('resize', notifyHostSize);
+
+    function showError(msg) {
+      loadingEl.hidden = true;
+      errorEl.hidden = false;
+      errorMsgEl.textContent = msg || '三维模型加载失败，请检查网络或点击“刷新预览链接”重新获取。';
+    }
+
+    let loadModelFn = null;
+
+    function applyRenewedModelLinks(candidate) {
+      if (!candidate || typeof candidate !== 'object') return false;
+      if (candidate.modelId && candidate.modelId !== MODEL_ID) return false;
+      const nextUrl = candidate.modelUrl || candidate.model_url || candidate.signedUrl || candidate.signed_url;
+      if (!isValidRenewedModelUrl(nextUrl)) return false;
+      currentModelUrl = nextUrl;
+      const nextExpires = candidate.expiresAt || candidate.expires_at;
+      if (nextExpires && expiresBadge) {
+        expiresBadge.dataset.expires = nextExpires;
+        expiresBadge.textContent = '有效期至 ' + formatLocalExpiry(nextExpires);
+      }
+      if (typeof loadModelFn === 'function') {
+        loadModelFn();
+      }
+      return true;
+    }
+
+    async function renewModelDirectly() {
+      try {
+        const res = await fetch(currentModelUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'renew',
+            resource_uri: RESOURCE_URI,
+            model_url: currentModelUrl
+          })
+        });
+        const rawText = await res.text();
+        let data = {};
+        if (rawText) {
+          try {
+            const parsed = JSON.parse(rawText);
+            if (parsed && typeof parsed === 'object') data = parsed;
+          } catch (_e) {}
+        }
+        if (res.ok && applyRenewedModelLinks(data)) {
+          return true;
+        }
+      } catch (_err) {}
+      return false;
+    }
+
+    if (renewBtn) {
+      renewBtn.addEventListener('click', async () => {
+        errorMsgEl.textContent = '正在刷新三维模型预览链接，请稍候…';
+        if (window.parent && window.parent !== window) {
+          pendingRenewRequestId = nextRequestId('renew-3d');
+          window.parent.postMessage({
+            type: 'ui-link-renew',
+            messageId: pendingRenewRequestId,
+            payload: {
+              resourceUri: RESOURCE_URI,
+              modelId: MODEL_ID,
+              sessionNonce: SESSION_NONCE,
+              modelUrl: currentModelUrl
+            }
+          }, '*');
+        }
+        const ok = await renewModelDirectly();
+        if (!ok && (!window.parent || window.parent === window)) {
+          errorMsgEl.textContent = '预览链接刷新失败，请稍后重试。';
+        }
+      });
+    }
+
+    window.addEventListener('message', (ev) => {
+      if (!window.parent || window.parent === window || ev.source !== window.parent) return;
+      if (!ev.data || typeof ev.data !== 'object') return;
+      const msgType = ev.data.type;
+      const payload = ev.data.payload || {};
+      if (msgType === 'ui-lifecycle-iframe-render-data' && !renderDataReceived) {
+        renderDataReceived = true;
+        const renderData = payload.renderData || payload;
+        if (renderData && typeof renderData === 'object') {
+          applyRenewedModelLinks(renderData.renewedLinks || renderData);
+        }
+        return;
+      }
+      if (msgType === 'ui-message-response' && ev.data.messageId && ev.data.messageId === pendingRenewRequestId) {
+        pendingRenewRequestId = null;
+        const resp = payload.response || payload;
+        if (!resp || typeof resp !== 'object') return;
+        if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+        applyRenewedModelLinks(resp);
+      }
+    });
+
+    try {
+      const THREE = await import('three');
+      const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+      const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+      const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(container.clientWidth || 640, container.clientHeight || 400);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const pmremGenerator = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
+      const hemiLight = new THREE.HemisphereLight(0xfffbf2, 0x4b453c, 0.85);
+      hemiLight.position.set(0, 10, 0);
+      scene.add(hemiLight);
+
+      const keyLight = new THREE.DirectionalLight(0xfff7e8, 1.65);
+      keyLight.position.set(4, 8, 5);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 1024;
+      keyLight.shadow.mapSize.height = 1024;
+      keyLight.shadow.bias = -0.0005;
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0xdce6f7, 0.65);
+      rimLight.position.set(-5, 4, -5);
+      scene.add(rimLight);
+
+      const shadowPlane = new THREE.Mesh(
+        new THREE.PlaneGeometry(20, 20),
+        new THREE.ShadowMaterial({ opacity: 0.24 })
+      );
+      shadowPlane.rotation.x = -Math.PI / 2;
+      shadowPlane.position.y = 0;
+      shadowPlane.receiveShadow = true;
+      scene.add(shadowPlane);
+
+      const camera = new THREE.PerspectiveCamera(
+        40,
+        (container.clientWidth || 640) / (container.clientHeight || 400),
+        0.01,
+        100
+      );
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.enablePan = true;
+      controls.enableZoom = true;
+
+      const defaultView = {
+        pos: new THREE.Vector3(2.2, 1.5, 2.6),
+        target: new THREE.Vector3(0, 0.45, 0),
+      };
+      camera.position.copy(defaultView.pos);
+      controls.target.copy(defaultView.target);
+      controls.update();
+
+      let currentModel = null;
+      const loader = new GLTFLoader();
+      loader.setCrossOrigin('anonymous');
+
+      function fitCameraToModel(object3d) {
+        const box = new THREE.Box3().setFromObject(object3d);
+        if (box.isEmpty()) return;
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+        const scale = 1.6 / maxDim;
+        object3d.scale.setScalar(scale);
+
+        const scaledBox = new THREE.Box3().setFromObject(object3d);
+        const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+        const scaledSize = scaledBox.getSize(new THREE.Vector3());
+        object3d.position.x += -scaledCenter.x;
+        object3d.position.z += -scaledCenter.z;
+        object3d.position.y += -scaledBox.min.y;
+
+        const radius = Math.max(scaledSize.length() * 0.5, 0.4);
+        const fovRad = THREE.MathUtils.degToRad(camera.fov);
+        const distance = (radius / Math.sin(fovRad / 2)) * 1.12;
+        defaultView.target.set(0, scaledSize.y * 0.45, 0);
+        defaultView.pos.set(distance * 0.68, scaledSize.y * 0.65 + distance * 0.35, distance * 0.82);
+
+        camera.near = Math.max(distance / 100, 0.005);
+        camera.far = Math.max(distance * 25, 50);
+        camera.updateProjectionMatrix();
+
+        controls.minDistance = radius * 0.35;
+        controls.maxDistance = distance * 4.5;
+        controls.maxPolarAngle = Math.PI * 0.495;
+        camera.position.copy(defaultView.pos);
+        controls.target.copy(defaultView.target);
+        controls.update();
+      }
+
+      function loadModel() {
+        errorEl.hidden = true;
+        loadingEl.hidden = false;
+        progressFill.style.width = '12%';
+        progressLabel.textContent = '正在加载三维模型...';
+
+        loader.load(
+          currentModelUrl,
+          (gltf) => {
+            if (currentModel) {
+              scene.remove(currentModel);
+            }
+            currentModel = gltf.scene;
+            currentModel.traverse((node) => {
+              if (node.isMesh) {
+                node.castShadow = true;
+                node.receiveShadow = true;
+              }
+            });
+            scene.add(currentModel);
+            fitCameraToModel(currentModel);
+            loadingEl.hidden = true;
+            notifyHostSize();
+          },
+          (event) => {
+            if (event && event.total > 0) {
+              const pct = Math.min(100, Math.max(5, Math.round((event.loaded / event.total) * 100)));
+              progressFill.style.width = pct + '%';
+              progressLabel.textContent = '正在加载三维模型... ' + pct + '%';
+            }
+          },
+          () => {
+            showError('三维模型加载失败或签名下载链接已过期，请点击“刷新预览链接”或使用对话消息中的 GLB 下载链接。');
+          }
+        );
+      }
+      loadModelFn = loadModel;
+
+      resetBtn.addEventListener('click', () => {
+        camera.position.copy(defaultView.pos);
+        controls.target.copy(defaultView.target);
+        controls.update();
+      });
+      retryBtn.addEventListener('click', loadModel);
+
+      const resizeObserver = new ResizeObserver(() => {
+        const w = container.clientWidth || 640;
+        const h = container.clientHeight || 400;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+        notifyHostSize();
+      });
+      resizeObserver.observe(container);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+      loadModel();
+    } catch (err) {
+      showError('浏览器三维渲染组件初始化失败，请使用对话消息中的 GLB 下载链接查看。');
+    }
+  </script>
+</body>
+</html>

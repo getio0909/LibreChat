@@ -1407,16 +1407,24 @@ router.post(
  */
 router.get('/sandbox', serveMCPSandbox);
 
-router.post('/studio/renew/:token', requireJwtAuth, checkMCPUsePermissions, async (req, res) => {
-  const result = await renewStudioLinks({
-    token: req.params.token,
-    body: req.body,
-    user: req.user,
-    tenantId: req.tenantId ?? getTenantId(),
-    mcpUrl: process.env.STUDIO_MCP_URL,
-    sharedToken: process.env.STUDIO_SHARED_TOKEN,
-  });
-  res.status(result.status).json(result.body);
-});
+router.post(
+  '/studio/renew/:token',
+  requireJwtAuth,
+  mcpAppAdmissionLimiter,
+  checkMCPUsePermissions,
+  mcpAppResourceLimiter,
+  async (req, res) => {
+    const result = await renewStudioLinks({
+      token: req.params.token,
+      body: req.body,
+      user: req.user,
+      tenantId: req.tenantId ?? getTenantId(),
+      mcpUrl: process.env.STUDIO_MCP_URL,
+      sharedToken: process.env.STUDIO_SHARED_TOKEN,
+      getAdmittedServers: () => resolveAllMcpConfigs(req.user.id, req.user),
+    });
+    res.status(result.status).json(result.body);
+  },
+);
 
 module.exports = router;

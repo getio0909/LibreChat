@@ -1503,6 +1503,7 @@
   "com_ui_zoom_out": "缩小",
   "com_ui_generated_image_filename": "设计图-{{0}}",
   "com_ui_mcp_server_zyb_studio": "设计工坊",
+  "com_ui_studio_reopen_card": "这张设计工坊卡片已无法刷新。请让设计助手重新打开选区编辑器或预览器。",
   "com_ui_tool_name_search_library": "检索素材图库",
   "com_ui_tool_name_compare_materials": "打开素材对比面板",
   "com_ui_tool_name_select_region": "打开局部圈选画布",

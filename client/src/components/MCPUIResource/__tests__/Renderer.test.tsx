@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { request } from 'librechat-data-provider';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
@@ -17,6 +19,7 @@ import {
 } from '~/utils';
 import { MCPAppsPolicyProvider } from '~/Providers/MCPAppsPolicyContext';
 import { MessagesViewContext } from '~/Providers/MessagesViewContext';
+import zhHans from '~/locales/zh-Hans/translation.json';
 import UIResourceRenderer from '../Renderer';
 
 const actualMcpUi = jest.requireActual('@mcp-ui/client') as typeof import('@mcp-ui/client');
@@ -30,6 +33,14 @@ jest.mock('@mcp-ui/client', () => ({
 const mockLegacyRenderer = LegacyUIResourceRenderer as jest.MockedFunction<
   typeof LegacyUIResourceRenderer
 >;
+
+const generatedHtml = (name: string) =>
+  readFileSync(join(__dirname, 'fixtures', `${name}.html`), 'utf8');
+
+const generatedUrl = (html: string, name: string): string => {
+  const literal = new RegExp(`const\\s+${name}\\s*=\\s*("[^"]+")`).exec(html)?.[1];
+  return literal ? (JSON.parse(literal) as string) : '';
+};
 
 // 构造符合真实签名路径结构的测试令牌URL（包含img:、edt:或3D模型令牌结构与64位十六进制签名）
 function makeSignedStudioUrl(
@@ -211,6 +222,7 @@ describe('UIResourceRenderer', () => {
       resourceId: 'selection-1',
       uri: 'ui://zyb_studio/selection/img_demo123',
       serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
       mimeType: 'text/html',
       text: `<script>const SIGNED_URL = "${editorUrl1}";</script>`,
     };
@@ -218,6 +230,7 @@ describe('UIResourceRenderer', () => {
       resourceId: 'selection-2',
       uri: 'ui://zyb_studio/selection/img_demo123',
       serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
       mimeType: 'text/html',
       text: `<script>const SIGNED_URL = "${editorUrl2}";</script>`,
     };
@@ -438,6 +451,7 @@ describe('UIResourceRenderer', () => {
       'ui://zyb_studio/selection/img_demo123',
       undefined,
       'zyb_studio',
+      'zyb_studio',
     );
     expect(upgraded).toContain('<span class="title">只改局部 · 选区编辑器（1264×848）</span>');
     expect(upgraded).not.toContain('f21a1a8e-106f-4d88-96a8-53cf8298e3db');
@@ -447,6 +461,7 @@ describe('UIResourceRenderer', () => {
       resourceId: 'selection-live-1',
       uri: 'ui://zyb_studio/selection/img_demo123',
       serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
       mimeType: 'text/html',
       text: persistedLegacyHtml,
     };
@@ -586,6 +601,7 @@ describe('UIResourceRenderer', () => {
       resourceId: 'model-live-1',
       uri: 'ui://zyb_studio/model/mdl_demo123',
       serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
       mimeType: 'text/html',
       text: modelHtml,
     };
@@ -725,6 +741,7 @@ describe('UIResourceRenderer', () => {
         'ui://zyb_studio/model3d/mdl_demo123',
         { modelUrl: newModelUrl, expiresAt: '2026-04-17T13:00:00Z' },
         'zyb_studio',
+        'zyb_studio',
       );
       expect(upgradedLegacyModel).toContain(`const MODEL_URL = "${newModelUrl}";`);
       expect(upgradedLegacyModel).toContain('const EXPIRES_AT = "2026-04-17T13:00:00Z";');
@@ -733,7 +750,208 @@ describe('UIResourceRenderer', () => {
     }
   });
 
-  it('preserves upstream provenance wrapper for non-Studio prompt actions and unwraps only confirmed Studio selection messages', async () => {
+  it.each(['selection', 'compare', 'model'])(
+    'renews and remounts the %s card using HTML from the real Studio builder',
+    async (kind) => {
+      const html = generatedHtml(kind);
+      const scenarios = {
+        selection: { uri: 'ui://zyb_studio/selection/img_demo123', endpointName: 'SIGNED_URL' },
+        compare: { uri: 'ui://zyb_studio/compare/img_after123', endpointName: 'INITIAL_AFTER_URL' },
+        model: { uri: 'ui://zyb_studio/model/mdl_demo123', endpointName: 'INITIAL_MODEL_URL' },
+      };
+      const { uri, endpointName } = scenarios[kind as keyof typeof scenarios];
+      const oldEndpoint = generatedUrl(html, endpointName);
+      expect(oldEndpoint).toMatch(/^\/files\//);
+      const newEditor = makeSignedStudioUrl('edt', 'img_demo123', 'f', window.location.origin);
+      const newPreview = makeSignedStudioUrl('img', 'img_demo123', 'e', window.location.origin);
+      const newBefore = makeSignedStudioUrl('img', 'img_demo123', 'a', window.location.origin);
+      const newAfter = makeSignedStudioUrl('img', 'img_after123', 'b', window.location.origin);
+      const newModel = makeSignedStudioUrl('model', 'mdl_demo123', 'f', window.location.origin);
+      const renewedByKind = {
+        selection: { editor_url: newEditor, preview_url: newPreview },
+        compare: { before_url: newBefore, after_url: newAfter },
+        model: { model_url: newModel },
+      };
+      const renewed = renewedByKind[kind as keyof typeof renewedByKind];
+      const fetchMock = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ status: 'renewed', ...renewed }),
+      });
+      const fetchSpy = jest.spyOn(request, 'authenticatedFetch').mockImplementation(fetchMock);
+      const resource: UIResource = {
+        resourceId: `generated-${kind}`,
+        uri,
+        serverName: 'zyb_studio',
+        verifiedServerName: 'zyb_studio',
+        mimeType: 'text/html',
+        text: html,
+      };
+
+      try {
+        const mounted = renderEnabled(<UIResourceRenderer resource={resource} />);
+        const firstProps = mockLegacyRenderer.mock.lastCall?.[0];
+        expect(firstProps).toBeDefined();
+        await act(async () => {
+          await firstProps?.onUIAction?.({
+            type: 'ui-link-renew',
+            payload: { resourceUri: uri },
+          } as unknown as UIActionResult);
+        });
+        expect(fetchMock).toHaveBeenCalledWith(
+          `/api/mcp/studio/renew/${oldEndpoint.split('/').pop()}`,
+          expect.objectContaining({ method: 'POST' }),
+        );
+        const body = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body);
+        if (kind === 'selection') {
+          expect(body).toMatchObject({
+            editor_url: oldEndpoint,
+            preview_url: generatedUrl(html, 'PREVIEW_URL'),
+          });
+        } else if (kind === 'compare') {
+          expect(body).toMatchObject({
+            before_url: generatedUrl(html, 'INITIAL_BEFORE_URL'),
+            after_url: oldEndpoint,
+          });
+        } else {
+          expect(body).toMatchObject({ model_url: oldEndpoint });
+        }
+
+        mounted.unmount();
+        renderEnabled(<UIResourceRenderer resource={resource} />);
+        const remountedProps = mockLegacyRenderer.mock.lastCall?.[0];
+        const remountedHtml = (remountedProps?.resource as UIResource | undefined)?.text ?? '';
+        if (kind === 'selection') {
+          expect(remountedHtml).toContain(`const SIGNED_URL = "${newEditor}";`);
+          expect(remountedHtml).toContain(`const PREVIEW_URL = "${newPreview}";`);
+        } else if (kind === 'compare') {
+          expect(remountedHtml).toContain(`const INITIAL_BEFORE_URL = "${newBefore}";`);
+          expect(remountedHtml).toContain(`const INITIAL_AFTER_URL = "${newAfter}";`);
+        } else {
+          expect(remountedHtml).toContain(`const INITIAL_MODEL_URL = "${newModel}";`);
+        }
+        const expectedLinks = {
+          selection: { editorUrl: newEditor, previewUrl: newPreview },
+          compare: { beforeUrl: newBefore, afterUrl: newAfter },
+          model: { modelUrl: newModel },
+        };
+        expect(remountedProps?.htmlProps?.iframeRenderData?.renewedLinks).toMatchObject(
+          expectedLinks[kind as keyof typeof expectedLinks],
+        );
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    },
+  );
+
+  it('renews and rewrites older comparison cards with BEFORE_URL and AFTER_URL', async () => {
+    const oldBefore = makeSignedStudioUrl('img', 'img_demo123', 'a', window.location.origin);
+    const oldAfter = makeSignedStudioUrl('img', 'img_after123', 'b', window.location.origin);
+    const newBefore = makeSignedStudioUrl('img', 'img_demo123', 'c', window.location.origin);
+    const newAfter = makeSignedStudioUrl('img', 'img_after123', 'd', window.location.origin);
+    const resource: UIResource = {
+      resourceId: 'legacy-compare',
+      uri: 'ui://zyb_studio/compare/img_after123',
+      serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
+      mimeType: 'text/html',
+      text: `<script>const BEFORE_URL = "${oldBefore}"; const AFTER_URL = "${oldAfter}";</script>`,
+    };
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ before_url: newBefore, after_url: newAfter }),
+    });
+    const fetchSpy = jest.spyOn(request, 'authenticatedFetch').mockImplementation(fetchMock);
+    try {
+      const mounted = renderEnabled(<UIResourceRenderer resource={resource} />);
+      const props = mockLegacyRenderer.mock.lastCall?.[0];
+      await act(async () => {
+        await props?.onUIAction?.({
+          type: 'ui-link-renew',
+          payload: { resourceUri: resource.uri },
+        } as unknown as UIActionResult);
+      });
+      expect(fetchMock).toHaveBeenCalledWith(
+        `/api/mcp/studio/renew/${oldAfter.split('/').pop()}`,
+        expect.objectContaining({ method: 'POST' }),
+      );
+      const posted = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body);
+      expect(posted).toMatchObject({ before_url: oldBefore, after_url: oldAfter });
+      mounted.unmount();
+      renderEnabled(<UIResourceRenderer resource={resource} />);
+      const remounted = mockLegacyRenderer.mock.lastCall?.[0]?.resource as UIResource | undefined;
+      expect(remounted?.text).toContain(`const BEFORE_URL = "${newBefore}";`);
+      expect(remounted?.text).toContain(`const AFTER_URL = "${newAfter}";`);
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
+  it('shows a recovery path when an older Studio card cannot renew its raw owner token', async () => {
+    const html = generatedHtml('selection');
+    const fetchSpy = jest
+      .spyOn(request, 'authenticatedFetch')
+      .mockResolvedValue({ ok: false, status: 403 } as Response);
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const resource: UIResource = {
+      resourceId: 'legacy-raw-owner',
+      uri: 'ui://zyb_studio/selection/img_demo123',
+      serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
+      mimeType: 'text/html',
+      text: html,
+    };
+    try {
+      renderEnabled(<UIResourceRenderer resource={resource} />);
+      const props = mockLegacyRenderer.mock.lastCall?.[0];
+      await act(async () => {
+        await props?.onUIAction?.({
+          type: 'ui-link-renew',
+          payload: { resourceUri: resource.uri },
+        } as unknown as UIActionResult);
+      });
+      expect(screen.getByRole('alert')).toHaveTextContent('Ask the assistant to reopen');
+      expect(zhHans.com_ui_studio_reopen_card).toContain('重新打开选区编辑器');
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[StudioRenew] Stored card renewal was denied; reopen the Studio view',
+      );
+    } finally {
+      fetchSpy.mockRestore();
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('shows recovery immediately for a pre-provenance Studio card without forwarding renewal', async () => {
+    const fetchSpy = jest.spyOn(request, 'authenticatedFetch');
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const resource: UIResource = {
+      resourceId: 'legacy-no-server-proof',
+      uri: 'ui://zyb_studio/selection/img_demo123',
+      mimeType: 'text/html',
+      text: generatedHtml('selection'),
+    };
+    try {
+      renderEnabled(<UIResourceRenderer resource={resource} />);
+      expect(screen.getByRole('alert')).toHaveTextContent('Ask the assistant to reopen');
+      const props = mockLegacyRenderer.mock.lastCall?.[0];
+      await act(async () => {
+        await props?.onUIAction?.({
+          type: 'ui-link-renew',
+          payload: { resourceUri: resource.uri },
+        } as unknown as UIActionResult);
+      });
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[StudioRenew] Stored card renewal was denied; reopen the Studio view',
+      );
+    } finally {
+      fetchSpy.mockRestore();
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('preserves historical provenance wrappers and sends verified Studio prompts as clean Chinese', async () => {
     const ask = jest.fn();
     const chinesePrompt =
       '已确认选区 sel_807d4455d1784369a3cc8525（底图 f21a1a8e-106f-4d88-96a8-53cf8298e3db），请执行局部修改：将台面改为汉白玉';
@@ -777,6 +995,23 @@ describe('UIResourceRenderer', () => {
       'The user clicked a button in an embedded UI Resource, and we got a message of type `prompt`.',
     );
 
+    ask.mockClear();
+    await handleUIAction(
+      { type: 'prompt', payload: { prompt: chinesePrompt } } as UIActionResult,
+      ask,
+      {
+        serverName: 'zyb_studio',
+        resource: {
+          resourceId: 'suffix-spoof',
+          uri: 'ui://zyb_studio/selection/f21a1a8e-106f-4d88-96a8-53cf8298e3db',
+          serverName: 'zyb_studio',
+          verifiedServerName: 'untrusted_mcp_zyb_studio',
+          text: '<p>claimed Studio</p>',
+        },
+      },
+    );
+    expect(ask.mock.calls[0][0].text).toContain('embedded UI Resource');
+
     // 2. 已认证的zyb_studio服务资源直接提交纯中文指令，避免无语言围栏触发wasm语法高亮标签
     ask.mockClear();
     await handleUIAction(
@@ -791,6 +1026,7 @@ describe('UIResourceRenderer', () => {
           resourceId: 'studio-sel-1',
           uri: 'ui://zyb_studio/selection/f21a1a8e-106f-4d88-96a8-53cf8298e3db',
           serverName: 'zyb_studio',
+          verifiedServerName: 'zyb_studio',
           mimeType: 'text/html',
           text: '<p>Studio Selection</p>',
         },
@@ -801,7 +1037,7 @@ describe('UIResourceRenderer', () => {
     expect(ask.mock.calls[0][0].text).not.toContain('embedded UI Resource');
     expect(ask.mock.calls[0][0].text).not.toContain('```');
 
-    // 3. 历史消息剥离仅对经过确认的Studio选区消息生效，绝不改写非Studio消息或伪造选区文本
+    // 3. 历史消息没有绑定选区编号的可信来源记录，必须保留包装文本
     const wrapPrompt = (inner: string) =>
       [
         'The user clicked a button in an embedded UI Resource, and we got a message of type `prompt`.',
@@ -844,7 +1080,7 @@ describe('UIResourceRenderer', () => {
       }),
     ).toBe(legacyStudioWrapped);
 
-    // 具有确认的zyb_studio工具调用或服务身份的历史Studio选区消息正常剥离包装
+    // 同一会话中的Studio调用没有证明这条用户消息的选区编号来源，必须保留上游包装
     expect(
       unwrapLegacyUIPromptText(legacyStudioWrapped, {
         message: { parentMessageId: 'msg-studio' } as never,
@@ -863,7 +1099,7 @@ describe('UIResourceRenderer', () => {
           } as never,
         ],
       }),
-    ).toBe(chinesePrompt);
+    ).toBe(legacyStudioWrapped);
     expect(unwrapLegacyUIPromptText('普通用户提问文本', { serverName: 'zyb_studio' })).toBe(
       '普通用户提问文本',
     );

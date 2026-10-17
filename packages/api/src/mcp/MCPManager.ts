@@ -2186,17 +2186,15 @@ Please follow these instructions when using tools from the respective MCP server
           formatToolContent(
             toolResult,
             provider,
-            appCompatible
-              ? {
-                  serverName,
-                  toolName,
-                  resourceUri: resourceMeta?.uri,
-                  resolvedAppResource,
-                  serverBinding,
-                  toolArgs: toolArguments,
-                  mcpApps: admittedMCPApps,
-                }
-              : { mcpApps: admittedMCPApps },
+            {
+              serverName,
+              toolName,
+              toolArgs: toolArguments,
+              mcpApps: admittedMCPApps,
+              ...(appCompatible
+                ? { resourceUri: resourceMeta?.uri, resolvedAppResource, serverBinding }
+                : {}),
+            },
           ),
           toolResult?.isError === true,
         );
