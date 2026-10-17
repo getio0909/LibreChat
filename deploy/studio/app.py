@@ -796,8 +796,11 @@ def build_mcp_server(
                     settings, user_id, image_id, kb_index=active_kb
                 )
                 base_sha256 = hashlib.sha256(resolved.path.read_bytes()).hexdigest()
-                preview_token, _ = sign_image_token(settings, user_id, resolved.id)
+                preview_token, preview_exp_ts = sign_image_token(
+                    settings, user_id, resolved.id
+                )
                 preview_url = build_signed_file_url(settings, preview_token)
+                preview_expires_at = format_utc_timestamp(preview_exp_ts)
                 editor_token, exp_ts = sign_editor_token(
                     settings, user_id, resolved.id, base_sha256
                 )
@@ -808,6 +811,8 @@ def build_mcp_server(
                     image_id=resolved.id,
                     signed_url=editor_url,
                     expires_at=expires_at,
+                    preview_url=preview_url,
+                    preview_expires_at=preview_expires_at,
                     width=resolved.width,
                     height=resolved.height,
                     segment_ready=seg_ready,
@@ -822,6 +827,7 @@ def build_mcp_server(
                         "sam2_hiera_tiny" if seg_ready else "manual_tools_only"
                     ),
                     "preview_url": preview_url,
+                    "preview_expires_at": preview_expires_at,
                     "expires_at": expires_at,
                     "message": (
                         "Inline selection editor is ready. Draw or refine the selection in the UI "

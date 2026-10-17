@@ -53,6 +53,8 @@ class StudioSettings(BaseModel):
     file_signing_key: str
     public_base_url: str = "https://dev.xuqian.io"
     file_token_ttl_seconds: int = Field(default=86400, ge=60, le=604800)
+    preview_token_ttl_seconds: int = Field(default=604800, ge=300, le=2592000)
+    editor_token_ttl_seconds: int = Field(default=900, ge=60, le=900)
     image_provider: Literal["gemini", "seedream"] = "gemini"
     gemini_image_model: str = "gemini-nano-banana-2.1"
     enable_3d: bool = False

@@ -16,6 +16,7 @@ import {
 } from './disclosure';
 import { useLocalize, useProgress, useExpandCollapse, useLazyCollapseBody } from '~/hooks';
 import { ToolIcon, getToolIconType, isError, hasRenderableOutput } from './ToolOutput';
+import { getMCPServerDisplayLabel, getMCPToolDisplayLabel } from '~/utils/toolLabels';
 import { cn, getToolDisplayLabel, logger, openInNewTab } from '~/utils';
 import { isToolCallPreparing, useToolPreparation } from './preparation';
 import { useMCPIconMap, useMCPServerNames } from '~/hooks/MCP';
@@ -130,7 +131,9 @@ export default function ToolCall({
        *  above, so re-parsing it would classify an MCP function that happens to
        *  share a built-in's name (`read_file`, `set_memory`) as that native
        *  tool and show, and announce, an unrelated label. */
-      isMCPToolCall ? function_name : getToolDisplayLabel(function_name, localize, mcpServerNames),
+      isMCPToolCall
+        ? getMCPToolDisplayLabel(function_name, localize)
+        : getToolDisplayLabel(function_name, localize, mcpServerNames),
     [function_name, isMCPToolCall, localize, mcpServerNames],
   );
   const mcpIconMap = useMCPIconMap();
@@ -332,7 +335,9 @@ export default function ToolCall({
       return errorLine;
     }
     if (isMCPToolCall && mcpServerName) {
-      return localize('com_ui_via_server', { 0: mcpServerName });
+      return localize('com_ui_via_server', {
+        0: getMCPServerDisplayLabel(mcpServerName, localize),
+      });
     }
     if (domain && domain.length !== Constants.ENCODED_DOMAIN_LENGTH) {
       return localize('com_ui_via_server', { 0: domain });

@@ -169,4 +169,16 @@ describe('OutputRenderer', () => {
     ).toBe(true);
     expect(isError('Error: something went wrong, then it recovered')).toBe(false);
   });
+
+  it('replaces vendor-specific image generation boilerplate with a localized vendor-neutral key', () => {
+    render(
+      <OutputRenderer
+        text={
+          "Gemini displayed an image. All generated images are already plainly visible, so don't repeat the descriptions."
+        }
+      />,
+    );
+    expect(screen.getByText('com_ui_image_gen_displayed')).toBeInTheDocument();
+    expect(screen.queryByText(/gemini/i)).not.toBeInTheDocument();
+  });
 });

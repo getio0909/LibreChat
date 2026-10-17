@@ -19,6 +19,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps, ImageStat
 
 from .config import StudioSettings
+from .models3d import format_display_timestamp
 from .store import (
     ensure_safe_subpath,
     read_bytes_no_follow,
@@ -1416,14 +1417,32 @@ def sign_image_token(
     image_id: str,
     *,
     expires_at: int | None = None,
+    ttl_seconds: int | None = None,
 ) -> tuple[str, int]:
     uid = validate_user_id(user_id)
     cleaned_img = _validate_token_image_id(image_id)
-    exp = (
-        int(expires_at)
-        if expires_at is not None
-        else int(time.time()) + int(settings.file_token_ttl_seconds)
-    )
+    if expires_at is not None:
+        exp = int(expires_at)
+    else:
+        fields_set = getattr(settings, "model_fields_set", set())
+        if ttl_seconds is not None:
+            raw_ttl = int(ttl_seconds)
+        elif "preview_token_ttl_seconds" in fields_set:
+            raw_ttl = int(settings.preview_token_ttl_seconds)
+        elif "file_token_ttl_seconds" in fields_set:
+            raw_ttl = int(settings.file_token_ttl_seconds)
+        else:
+            raw_ttl = max(
+                int(settings.file_token_ttl_seconds),
+                int(
+                    getattr(
+                        settings,
+                        "preview_token_ttl_seconds",
+                        settings.file_token_ttl_seconds,
+                    )
+                ),
+            )
+        exp = int(time.time()) + max(60, raw_ttl)
     payload_raw = f"img:{uid}:{exp}:{cleaned_img}".encode()
     payload_b64 = base64.urlsafe_b64encode(payload_raw).decode("ascii").rstrip("=")
     key_bytes = bytes.fromhex(settings.file_signing_key)
@@ -1515,11 +1534,22 @@ def sign_editor_token(
     if expires_at is not None:
         exp = int(expires_at)
     else:
-        raw_ttl = (
-            int(ttl_seconds)
-            if ttl_seconds is not None
-            else int(settings.file_token_ttl_seconds)
-        )
+        fields_set = getattr(settings, "model_fields_set", set())
+        if ttl_seconds is not None:
+            raw_ttl = int(ttl_seconds)
+        elif "editor_token_ttl_seconds" in fields_set:
+            raw_ttl = int(settings.editor_token_ttl_seconds)
+        else:
+            raw_ttl = min(
+                int(settings.file_token_ttl_seconds),
+                int(
+                    getattr(
+                        settings,
+                        "editor_token_ttl_seconds",
+                        EDITOR_TOKEN_MAX_TTL_SECONDS,
+                    )
+                ),
+            )
         effective_ttl = max(1, min(raw_ttl, EDITOR_TOKEN_MAX_TTL_SECONDS))
         exp = int(time.time()) + effective_ttl
     payload_raw = f"edt:{uid}:{exp}:{cleaned_sha}:{token_nonce}:{cleaned_img}".encode()
@@ -1606,10 +1636,23 @@ def build_selection_editor_html(
     width: int,
     height: int,
     segment_ready: bool = False,
+    preview_url: str | None = None,
+    preview_expires_at: str | None = None,
 ) -> str:
     safe_image_id = html.escape(image_id, quote=True)
+    effective_preview_url = preview_url if preview_url else signed_url
+    effective_preview_expires = (
+        preview_expires_at if preview_expires_at else expires_at
+    )
     safe_expires = html.escape(expires_at, quote=True)
+    safe_preview_expires = html.escape(effective_preview_expires, quote=True)
+    human_expires = html.escape(
+        format_display_timestamp(effective_preview_expires), quote=True
+    )
     safe_url_js = json.dumps(signed_url)
+    safe_preview_url_js = json.dumps(effective_preview_url)
+    safe_expires_js = json.dumps(expires_at)
+    safe_preview_expires_js = json.dumps(effective_preview_expires)
     safe_image_id_js = json.dumps(image_id)
     segment_ready_js = "true" if segment_ready else "false"
     default_tool = "point" if segment_ready else "rect"
@@ -1625,7 +1668,7 @@ def build_selection_editor_html(
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>局部选区编辑器 - {safe_image_id}</title>
+<title>局部选区编辑器（{width}×{height}）</title>
 <style>
   :root {{
     color-scheme: light dark;
@@ -1791,10 +1834,10 @@ def build_selection_editor_html(
 </style>
 </head>
 <body>
-<div class="editor-wrap" id="editorRoot">
+<div class="editor-wrap" id="editorRoot" data-image-id="{safe_image_id}">
   <div class="header-row">
-    <span class="title-badge">只改局部 · 选区编辑器（底图：{safe_image_id} · {width}×{height}）</span>
-    <span class="meta-badge">蓝色半透明区域将被修改，选区外像素 100% 原样保留 · 有效期至 {safe_expires}</span>
+    <span class="title-badge">只改局部 · 选区编辑器（{width}×{height}）</span>
+    <span class="meta-badge">蓝色半透明区域将被修改，选区外像素 100% 原样保留 · <span id="expiresBadge" data-expires="{safe_preview_expires}" data-editor-expires="{safe_expires}" data-preview-expires="{safe_preview_expires}">有效期至 {human_expires}</span></span>
   </div>
   <div class="toolbar-row">
     <div class="btn-group" role="group" aria-label="选区工具">
@@ -1831,14 +1874,24 @@ def build_selection_editor_html(
   <div class="footer-row">
     <div class="status-line" id="statusText">正在加载底图...</div>
     <input type="text" class="instruction-input" id="instructionInput" placeholder="选填：输入局部修改要求（如：把选区内的台面换成白玉兰大理石）" />
+    <button type="button" id="renewBtn" hidden>重新获取链接</button>
     <button type="button" class="primary-btn" id="confirmBtn" disabled>确认选区</button>
   </div>
 </div>
 <script>
 (function() {{
   const SIGNED_URL = {safe_url_js};
+  const PREVIEW_URL = {safe_preview_url_js};
   const IMAGE_ID = {safe_image_id_js};
+  const EDITOR_EXPIRES_AT = {safe_expires_js};
+  const PREVIEW_EXPIRES_AT = {safe_preview_expires_js};
   const SEGMENT_READY = {segment_ready_js};
+  const DRAFT_KEY = 'zyb_studio:selection:' + IMAGE_ID;
+  let currentEditorUrl = SIGNED_URL;
+  let currentPreviewUrl = PREVIEW_URL || SIGNED_URL;
+  let editorExpiresIso = EDITOR_EXPIRES_AT;
+  let previewExpiresIso = PREVIEW_EXPIRES_AT || EDITOR_EXPIRES_AT;
+
   const state = {{
     tool: {default_tool_js},
     op: 'add',
@@ -1851,7 +1904,10 @@ def build_selection_editor_html(
     draft: null,
     activeMaskPixels: 0,
     confirmedId: null,
-    busy: false
+    busy: false,
+    triedEditorFallback: false,
+    autoRenewSent: false,
+    lastDraftUpdatedAt: 0
   }};
 
   const root = document.getElementById('editorRoot');
@@ -1861,6 +1917,7 @@ def build_selection_editor_html(
   const canvas = document.getElementById('overlayCanvas');
   const statusText = document.getElementById('statusText');
   const confirmBtn = document.getElementById('confirmBtn');
+  const renewBtn = document.getElementById('renewBtn');
   const undoBtn = document.getElementById('undoBtn');
   const clearBtn = document.getElementById('clearBtn');
   const fitBtn = document.getElementById('fitBtn');
@@ -1868,15 +1925,187 @@ def build_selection_editor_html(
   const brushRadius = document.getElementById('brushRadius');
   const brushVal = document.getElementById('brushVal');
   const instructionInput = document.getElementById('instructionInput');
+  const expiresBadge = document.getElementById('expiresBadge');
+
+  function formatLocalExpiry(isoStr) {{
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (Number.isNaN(d.getTime())) return String(isoStr).replace('T', ' ').replace(/Z$/, '');
+    const pad = (n) => String(n).padStart(2, '0');
+    return (
+      d.getFullYear() +
+      '-' +
+      pad(d.getMonth() + 1) +
+      '-' +
+      pad(d.getDate()) +
+      ' ' +
+      pad(d.getHours()) +
+      ':' +
+      pad(d.getMinutes())
+    );
+  }}
+
+  function refreshExpiryBadge() {{
+    if (!expiresBadge) return;
+    const targetIso = previewExpiresIso || editorExpiresIso;
+    const formatted = formatLocalExpiry(targetIso);
+    if (formatted) {{
+      expiresBadge.textContent = '有效期至 ' + formatted;
+    }}
+  }}
+  refreshExpiryBadge();
 
   function notifyHostSize() {{
     const h = Math.max(540, Math.ceil(root.getBoundingClientRect().height + 16));
-    window.parent.postMessage({{ type: 'ui-size-change', payload: {{ height: h }} }}, '*');
+    if (window.parent && window.parent !== window) {{
+      window.parent.postMessage({{ type: 'ui-size-change', payload: {{ height: h }} }}, '*');
+    }}
   }}
 
   function setStatus(text, kind) {{
     statusText.textContent = text;
     statusText.className = 'status-line' + (kind ? ' ' + kind : '');
+  }}
+
+  function buildDraftSnapshot() {{
+    return {{
+      version: 1,
+      imageId: IMAGE_ID,
+      tool: state.tool,
+      op: state.op,
+      brushRadius: state.brushRadius,
+      zoom: state.zoom,
+      shapes: state.shapes.slice(),
+      baseShapes: state.baseShapes ? state.baseShapes.slice() : [],
+      points: state.points.slice(),
+      pointOp: state.pointOp,
+      instruction: instructionInput ? instructionInput.value : '',
+      confirmedId: state.confirmedId,
+      updatedAt: state.lastDraftUpdatedAt || Date.now()
+    }};
+  }}
+
+  function persistDraftState() {{
+    state.lastDraftUpdatedAt = Date.now();
+    const snapshot = buildDraftSnapshot();
+    try {{
+      window.name = JSON.stringify({{ draftKey: DRAFT_KEY, draft: snapshot }});
+    }} catch (_e) {{}}
+    if (window.parent && window.parent !== window) {{
+      window.parent.postMessage({{
+        type: 'ui-draft-save',
+        payload: {{
+          draftKey: DRAFT_KEY,
+          imageId: IMAGE_ID,
+          draft: snapshot
+        }}
+      }}, '*');
+    }}
+  }}
+
+  function applyDraftSnapshot(draft) {{
+    if (!draft || typeof draft !== 'object' || draft.imageId !== IMAGE_ID) return false;
+    const incomingTs = Number(draft.updatedAt) || 0;
+    if (state.lastDraftUpdatedAt > 0 && incomingTs > 0 && incomingTs < state.lastDraftUpdatedAt) {{
+      return false;
+    }}
+    if (typeof draft.tool === 'string' && (draft.tool !== 'point' || SEGMENT_READY)) {{
+      state.tool = draft.tool;
+    }}
+    if (draft.op === 'add' || draft.op === 'subtract') {{
+      state.op = draft.op;
+    }}
+    if (Number.isFinite(Number(draft.brushRadius))) {{
+      state.brushRadius = Math.max(4, Math.min(100, Number(draft.brushRadius)));
+      brushRadius.value = String(state.brushRadius);
+      brushVal.textContent = String(state.brushRadius);
+    }}
+    if (Number.isFinite(Number(draft.zoom)) && Number(draft.zoom) > 0) {{
+      state.zoom = Number(draft.zoom);
+    }}
+    if (Array.isArray(draft.shapes)) {{
+      state.shapes = draft.shapes.slice();
+    }}
+    if (Array.isArray(draft.baseShapes)) {{
+      state.baseShapes = draft.baseShapes.slice();
+    }}
+    if (Array.isArray(draft.points)) {{
+      state.points = draft.points.slice();
+    }}
+    if (draft.pointOp === 'add' || draft.pointOp === 'subtract') {{
+      state.pointOp = draft.pointOp;
+    }}
+    if (typeof draft.instruction === 'string' && instructionInput) {{
+      instructionInput.value = draft.instruction;
+    }}
+    state.confirmedId = typeof draft.confirmedId === 'string' ? draft.confirmedId : null;
+    state.lastDraftUpdatedAt = incomingTs || Date.now();
+    try {{
+      window.name = JSON.stringify({{ draftKey: DRAFT_KEY, draft: buildDraftSnapshot() }});
+    }} catch (_e) {{}}
+    syncStageLayout();
+    if (state.shapes.length > 0 && !state.confirmedId) {{
+      setStatus('已恢复未确认的选区草稿，可继续调整或点击“确认选区”。', '');
+    }}
+    return true;
+  }}
+
+  function applyRenewedLinks(links) {{
+    if (!links || typeof links !== 'object') return false;
+    if (links.imageId && links.imageId !== IMAGE_ID) return false;
+    let updated = false;
+    const nextEditor = links.editorUrl || links.signedUrl;
+    const nextPreview = links.previewUrl || nextEditor;
+    if (typeof nextEditor === 'string' && nextEditor) {{
+      currentEditorUrl = nextEditor;
+      updated = true;
+    }}
+    if (typeof nextPreview === 'string' && nextPreview) {{
+      currentPreviewUrl = nextPreview;
+      if (!baseImg.complete || baseImg.naturalWidth === 0 || baseImg.src !== currentPreviewUrl) {{
+        baseImg.src = currentPreviewUrl;
+      }}
+      updated = true;
+    }}
+    if (typeof links.expiresAt === 'string' && links.expiresAt) {{
+      editorExpiresIso = links.expiresAt;
+    }}
+    if (typeof links.previewExpiresAt === 'string' && links.previewExpiresAt) {{
+      previewExpiresIso = links.previewExpiresAt;
+    }}
+    if (updated) {{
+      refreshExpiryBadge();
+      if (renewBtn) renewBtn.hidden = true;
+      setStatus('已更新选区链接，可继续框选或点击“确认选区”。', '');
+    }}
+    return updated;
+  }}
+
+  function requestLinkRenewal(mode) {{
+    persistDraftState();
+    if (renewBtn) renewBtn.hidden = false;
+    if (!window.parent || window.parent === window) return;
+    if (mode === 'tool') {{
+      window.parent.postMessage({{
+        type: 'tool',
+        messageId: 'renew-tool-' + Date.now(),
+        payload: {{
+          toolName: 'select_region',
+          params: {{ image_id: IMAGE_ID }}
+        }}
+      }}, '*');
+      setStatus('已向设计助手请求刷新选区链接，新卡片就绪后将自动恢复当前选区草稿…', '');
+    }} else {{
+      window.parent.postMessage({{
+        type: 'ui-link-renew',
+        messageId: 'renew-check-' + Date.now(),
+        payload: {{
+          toolName: 'select_region',
+          params: {{ image_id: IMAGE_ID }},
+          imageId: IMAGE_ID
+        }}
+      }}, '*');
+    }}
   }}
 
   function clampCoord(v) {{
@@ -2060,7 +2289,7 @@ def build_selection_editor_html(
     setStatus('正在识别点选区域...', '');
     updateToolbarUI();
     try {{
-      const res = await fetch(SIGNED_URL, {{
+      const res = await fetch(currentEditorUrl, {{
         method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
         body: JSON.stringify({{
@@ -2074,10 +2303,14 @@ def build_selection_editor_html(
       }});
       const data = await res.json();
       if (!res.ok) {{
+        if (res.status === 401 || res.status === 403 || res.status === 409 || res.status === 410) {{
+          if (renewBtn) renewBtn.hidden = false;
+        }}
         throw new Error(data.error || '点选识别未成功，请改用框选、套索或画笔');
       }}
       state.shapes = data.shapes || [];
       state.confirmedId = null;
+      persistDraftState();
       setStatus('已识别选区，可继续点选微调，或切换到画笔/框选修边，完成后点击“确认选区”。', '');
     }} catch (err) {{
       state.points.pop();
@@ -2098,6 +2331,7 @@ def build_selection_editor_html(
     state.draft = null;
     state.points = [];
     state.confirmedId = null;
+    persistDraftState();
     setStatus('已添加多边形选区，可继续加选/减选或点击“确认选区”。', '');
     renderOverlay();
   }}
@@ -2187,6 +2421,7 @@ def build_selection_editor_html(
         state.shapes.push({{ type: 'rect', op: draft.op, points: [{{ x: x1, y: y1 }}, {{ x: x2, y: y2 }}] }});
         state.points = [];
         state.confirmedId = null;
+        persistDraftState();
         setStatus('已更新选区，完成后请点击“确认选区”。', '');
       }}
     }} else if (draft.type === 'stroke' && draft.points.length >= 1) {{
@@ -2198,6 +2433,7 @@ def build_selection_editor_html(
       }});
       state.points = [];
       state.confirmedId = null;
+      persistDraftState();
       setStatus('已更新画笔选区，完成后请点击“确认选区”。', '');
     }}
     renderOverlay();
@@ -2215,6 +2451,7 @@ def build_selection_editor_html(
       state.tool = btn.dataset.tool;
       state.draft = null;
       state.points = [];
+      persistDraftState();
       renderOverlay();
     }});
   }});
@@ -2222,6 +2459,7 @@ def build_selection_editor_html(
   document.querySelectorAll('[data-op]').forEach(btn => {{
     btn.addEventListener('click', () => {{
       state.op = btn.dataset.op;
+      persistDraftState();
       renderOverlay();
     }});
   }});
@@ -2229,12 +2467,14 @@ def build_selection_editor_html(
   document.querySelectorAll('[data-zoom]').forEach(btn => {{
     btn.addEventListener('click', () => {{
       state.zoom = Number(btn.dataset.zoom) || 1;
+      persistDraftState();
       syncStageLayout();
     }});
   }});
 
   fitBtn.addEventListener('click', () => {{
     state.zoom = 1;
+    persistDraftState();
     syncStageLayout();
   }});
 
@@ -2243,7 +2483,14 @@ def build_selection_editor_html(
   brushRadius.addEventListener('input', () => {{
     state.brushRadius = Number(brushRadius.value) || 22;
     brushVal.textContent = String(state.brushRadius);
+    persistDraftState();
   }});
+
+  if (instructionInput) {{
+    instructionInput.addEventListener('input', () => {{
+      persistDraftState();
+    }});
+  }}
 
   undoBtn.addEventListener('click', () => {{
     if (state.draft) {{
@@ -2259,6 +2506,7 @@ def build_selection_editor_html(
       state.shapes.pop();
     }}
     state.confirmedId = null;
+    persistDraftState();
     renderOverlay();
   }});
 
@@ -2268,9 +2516,16 @@ def build_selection_editor_html(
     state.points = [];
     state.draft = null;
     state.confirmedId = null;
+    persistDraftState();
     setStatus('已清空选区，请重新框选、套索或涂抹需要修改的局部区域。', '');
     renderOverlay();
   }});
+
+  if (renewBtn) {{
+    renewBtn.addEventListener('click', () => {{
+      requestLinkRenewal('tool');
+    }});
+  }}
 
   confirmBtn.addEventListener('click', async () => {{
     if (!hasAdditiveShape() || state.busy) return;
@@ -2278,7 +2533,7 @@ def build_selection_editor_html(
     setStatus('正在保存并校验选区凭据...', '');
     updateToolbarUI();
     try {{
-      const res = await fetch(SIGNED_URL, {{
+      const res = await fetch(currentEditorUrl, {{
         method: 'POST',
         headers: {{ 'Content-Type': 'application/json' }},
         body: JSON.stringify({{
@@ -2288,12 +2543,22 @@ def build_selection_editor_html(
       }});
       const data = await res.json();
       if (!res.ok) {{
+        if (res.status === 401 || res.status === 403 || res.status === 409 || res.status === 410) {{
+          if (renewBtn) renewBtn.hidden = false;
+          persistDraftState();
+          throw new Error(
+            (data.error || '当前选区编辑凭证已过期或已使用') + '，请点击“重新获取链接”刷新后继续（选区草稿已保留）'
+          );
+        }}
         throw new Error(data.error || '选区确认失败，请检查选区范围后重试');
       }}
       state.confirmedId = data.selection_id;
+      statusText.dataset.selectionId = data.selection_id || '';
+      persistDraftState();
       const note = (instructionInput.value || '').trim();
+      const pxCount = (data.proof && data.proof.selected_pixels) || 0;
       setStatus(
-        '已确认选区：' + data.selection_id + '（选中 ' + (data.proof && data.proof.selected_pixels || 0) + ' 像素）',
+        '已确认选区（选中 ' + pxCount.toLocaleString('zh-CN') + ' 像素），已向设计助手发送局部修改请求',
         'ok'
       );
       const promptMsg = note
@@ -2312,18 +2577,81 @@ def build_selection_editor_html(
     }}
   }});
 
+  window.addEventListener('message', (ev) => {{
+    if (!ev.data || typeof ev.data !== 'object') return;
+    const msgType = ev.data.type;
+    const payload = ev.data.payload || {{}};
+    if (msgType === 'ui-lifecycle-iframe-render-data') {{
+      const renderData = payload.renderData || payload;
+      if (renderData && typeof renderData === 'object') {{
+        const draftMap = renderData.drafts || {{}};
+        const candidateDraft = renderData.selectionDraft || draftMap[DRAFT_KEY] || renderData.draft;
+        if (candidateDraft) applyDraftSnapshot(candidateDraft);
+        if (renderData.renewedLinks) {{
+          applyRenewedLinks(renderData.renewedLinks[IMAGE_ID] || renderData.renewedLinks);
+        }} else if (renderData.previewUrl || renderData.editorUrl) {{
+          applyRenewedLinks(renderData);
+        }}
+      }}
+    }} else if (msgType === 'ui-message-response' || msgType === 'ui-draft-restore' || msgType === 'ui-link-renewed') {{
+      const resp = payload.response || payload;
+      if (resp && typeof resp === 'object') {{
+        if (resp.draft) applyDraftSnapshot(resp.draft);
+        if (resp.previewUrl || resp.editorUrl || resp.signedUrl) applyRenewedLinks(resp);
+      }}
+    }}
+  }});
+
   baseImg.addEventListener('load', () => {{
+    if (renewBtn && Date.now() < new Date(editorExpiresIso).getTime()) {{
+      renewBtn.hidden = true;
+    }}
     syncStageLayout();
-    setStatus('请在图上框选、套索或画笔涂抹要修改的局部区域，蓝色区域外将保持原样，完成后点击“确认选区”。', '');
+    if (state.shapes.length > 0 && !state.confirmedId) {{
+      setStatus('已恢复未确认的选区草稿，可继续调整或点击“确认选区”。', '');
+    }} else if (!state.confirmedId) {{
+      setStatus('请在图上框选、套索或画笔涂抹要修改的局部区域，蓝色区域外将保持原样，完成后点击“确认选区”。', '');
+    }}
     notifyHostSize();
   }});
   baseImg.addEventListener('error', () => {{
-    setStatus('底图加载失败或签名链接已过期，请重新发起选区操作。', 'err');
+    if (!state.triedEditorFallback && currentEditorUrl && baseImg.src !== currentEditorUrl) {{
+      state.triedEditorFallback = true;
+      baseImg.src = currentEditorUrl;
+      return;
+    }}
+    if (renewBtn) renewBtn.hidden = false;
+    setStatus('底图预览链接已过期，请点击“重新获取链接”刷新后继续操作（当前选区草稿已保留）。', 'err');
+    if (!state.autoRenewSent) {{
+      state.autoRenewSent = true;
+      requestLinkRenewal('check');
+    }}
     notifyHostSize();
   }});
 
+  try {{
+    if (window.name && window.name.startsWith('{{')) {{
+      const parsedName = JSON.parse(window.name);
+      if (parsedName && parsedName.draftKey === DRAFT_KEY && parsedName.draft) {{
+        applyDraftSnapshot(parsedName.draft);
+      }}
+    }}
+  }} catch (_e) {{}}
+
+  if (window.parent && window.parent !== window) {{
+    window.parent.postMessage({{ type: 'ui-lifecycle-iframe-ready' }}, '*');
+    window.parent.postMessage({{
+      type: 'ui-draft-load',
+      messageId: 'draft-load-' + IMAGE_ID,
+      payload: {{
+        draftKey: DRAFT_KEY,
+        imageId: IMAGE_ID
+      }}
+    }}, '*');
+  }}
+
   window.addEventListener('resize', syncStageLayout);
-  baseImg.src = SIGNED_URL;
+  baseImg.src = currentPreviewUrl;
   updateToolbarUI();
   notifyHostSize();
 }})();
@@ -2349,15 +2677,17 @@ def build_compare_viewer_html(
     safe_base_id = html.escape(base_id, quote=True)
     safe_sel_id = html.escape(selection_id, quote=True)
     safe_expires = html.escape(expires_at, quote=True)
+    human_expires = html.escape(format_display_timestamp(expires_at), quote=True)
     before_url_js = json.dumps(before_url)
     after_url_js = json.dumps(after_url)
+    base_id_js = json.dumps(base_id)
 
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>局部修改前后对比 - {safe_image_id}</title>
+<title>局部修改前后对比（{width}×{height}）</title>
 <style>
   :root {{
     color-scheme: light dark;
@@ -2475,9 +2805,9 @@ def build_compare_viewer_html(
 </style>
 </head>
 <body>
-<div class="compare-wrap" id="compareRoot">
+<div class="compare-wrap" id="compareRoot" data-image-id="{safe_image_id}" data-base-id="{safe_base_id}" data-selection-id="{safe_sel_id}">
   <div class="top-row">
-    <span class="title-text">局部重绘对比（结果：{safe_image_id} · 底图：{safe_base_id} · 选区：{safe_sel_id}）</span>
+    <span class="title-text">局部重绘效果对比（{width}×{height}）</span>
     <span class="verify-badge">✓ 选区外像素 100% 原样保留（0 像素改动 · 选区 {selected_pixels:,} 像素）</span>
   </div>
   <div class="ctrl-row">
@@ -2492,8 +2822,9 @@ def build_compare_viewer_html(
         <input type="range" id="splitRange" min="0" max="100" value="50" />
         <span>修改后</span>
       </label>
+      <button type="button" id="compareRenewBtn" hidden>刷新预览链接</button>
     </div>
-    <span class="meta-line">尺寸 {width}×{height} · 链接有效期至 {safe_expires}</span>
+    <span class="meta-line">画幅 {width}×{height} · <span id="compareExpiresBadge" data-expires="{safe_expires}">有效期至 {human_expires}</span></span>
   </div>
   <div class="stage-box" id="stageBox">
     <canvas id="compareCanvas"></canvas>
@@ -2501,14 +2832,42 @@ def build_compare_viewer_html(
 </div>
 <script>
 (function() {{
-  const BEFORE_URL = {before_url_js};
-  const AFTER_URL = {after_url_js};
+  let currentBeforeUrl = {before_url_js};
+  let currentAfterUrl = {after_url_js};
+  const BASE_ID = {base_id_js};
   const root = document.getElementById('compareRoot');
   const canvas = document.getElementById('compareCanvas');
   const toggleBeforeBtn = document.getElementById('toggleBeforeBtn');
   const diffCheck = document.getElementById('diffCheck');
   const splitRange = document.getElementById('splitRange');
   const sliderWrap = document.getElementById('sliderWrap');
+  const compareRenewBtn = document.getElementById('compareRenewBtn');
+  const compareExpiresBadge = document.getElementById('compareExpiresBadge');
+
+  function formatLocalExpiry(isoStr) {{
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (Number.isNaN(d.getTime())) return String(isoStr).replace('T', ' ').replace(/Z$/, '');
+    const pad = (n) => String(n).padStart(2, '0');
+    return (
+      d.getFullYear() +
+      '-' +
+      pad(d.getMonth() + 1) +
+      '-' +
+      pad(d.getDate()) +
+      ' ' +
+      pad(d.getHours()) +
+      ':' +
+      pad(d.getMinutes())
+    );
+  }}
+
+  if (compareExpiresBadge && compareExpiresBadge.dataset.expires) {{
+    const formatted = formatLocalExpiry(compareExpiresBadge.dataset.expires);
+    if (formatted) {{
+      compareExpiresBadge.textContent = '有效期至 ' + formatted;
+    }}
+  }}
 
   let showBeforeOnly = false;
   let showDiff = false;
@@ -2523,7 +2882,9 @@ def build_compare_viewer_html(
 
   function notifyHostSize() {{
     const h = Math.max(480, Math.ceil(root.getBoundingClientRect().height + 16));
-    window.parent.postMessage({{ type: 'ui-size-change', payload: {{ height: h }} }}, '*');
+    if (window.parent && window.parent !== window) {{
+      window.parent.postMessage({{ type: 'ui-size-change', payload: {{ height: h }} }}, '*');
+    }}
   }}
 
   function buildDiffOverlay(w, h) {{
@@ -2619,14 +2980,37 @@ def build_compare_viewer_html(
 
   function onImageLoaded() {{
     loadedCount += 1;
-    if (loadedCount === 2) {{
+    if (loadedCount >= 2) {{
+      if (compareRenewBtn) compareRenewBtn.hidden = true;
       render();
       notifyHostSize();
     }}
   }}
 
+  function onImageError() {{
+    if (compareRenewBtn) compareRenewBtn.hidden = false;
+    notifyHostSize();
+  }}
+
   beforeImg.addEventListener('load', onImageLoaded);
   afterImg.addEventListener('load', onImageLoaded);
+  beforeImg.addEventListener('error', onImageError);
+  afterImg.addEventListener('error', onImageError);
+
+  if (compareRenewBtn) {{
+    compareRenewBtn.addEventListener('click', () => {{
+      if (window.parent && window.parent !== window) {{
+        window.parent.postMessage({{
+          type: 'tool',
+          messageId: 'renew-compare-' + Date.now(),
+          payload: {{
+            toolName: 'select_region',
+            params: {{ image_id: BASE_ID }}
+          }}
+        }}, '*');
+      }}
+    }});
+  }}
 
   toggleBeforeBtn.addEventListener('click', () => {{
     showBeforeOnly = !showBeforeOnly;
@@ -2662,8 +3046,8 @@ def build_compare_viewer_html(
     render();
   }});
 
-  beforeImg.src = BEFORE_URL;
-  afterImg.src = AFTER_URL;
+  beforeImg.src = currentBeforeUrl;
+  afterImg.src = currentAfterUrl;
   notifyHostSize();
 }})();
 </script>

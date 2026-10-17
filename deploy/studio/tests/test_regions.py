@@ -562,8 +562,8 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             assert ui_res["mimeType"] == "text/html"
             editor_html = ui_res["text"]
 
-            # 验证TextContent中的preview_url不具备编辑器权限，而EmbeddedResource内嵌专用edt:令牌
-            assert summary["preview_url"] not in editor_html
+            # 验证TextContent中的preview_url不具备编辑器写权限，且EmbeddedResource同时内嵌长效只读preview_url与短效单次edt:令牌
+            assert summary["preview_url"] in editor_html
             url_match = re.search(
                 r"https://dev\.xuqian\.io/studio-files/([A-Za-z0-9_.-]+)",
                 editor_html,
@@ -2471,3 +2471,202 @@ def test_playwright_sandboxed_selection_editor_null_origin_cors_subtract_and_pro
     finally:
         server.should_exit = True
         server_thread.join(timeout=5.0)
+
+
+# 回归测试（Round 5B Defect #5 & #8）：长效只读预览链接（默认7天可配）+ 短效单次edt:写令牌分离 + 中文友好标题与本地时间格式 + 过期后续期链路
+def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
+    studio_env: StudioSettings,
+) -> None:
+    import time
+    from playwright.sync_api import sync_playwright
+    from deploy.studio.models3d import build_model_viewer_html, sign_file_token
+    from deploy.studio.regions import build_compare_viewer_html
+
+    # 1. 验证默认preview_token_ttl_seconds为7天（604800秒），editor_token_ttl_seconds为900秒且支持配置覆盖
+    assert studio_env.preview_token_ttl_seconds == 604800
+    assert studio_env.editor_token_ttl_seconds == 900
+
+    now_ts = int(time.time())
+    _, default_img_exp = sign_image_token(studio_env, USER_A, "img_0123456789abcdef0123456789abcdef")
+    assert 604700 <= (default_img_exp - now_ts) <= 604810
+
+    custom_env = studio_env.model_copy(
+        update={"preview_token_ttl_seconds": 1_209_600, "editor_token_ttl_seconds": 300}
+    )
+    _, custom_img_exp = sign_image_token(custom_env, USER_A, "img_0123456789abcdef0123456789abcdef")
+    assert 1_209_500 <= (custom_img_exp - now_ts) <= 1_209_610
+
+    _, default_mdl_exp = sign_file_token(studio_env, USER_A, "mdl_0123456789abcdef0123456789abcdef")
+    assert 604700 <= (default_mdl_exp - now_ts) <= 604810
+
+    # 2. 验证选区编辑器、前后对比器、三维预览器的可见标题栏与时间标签均为中文友好格式，不裸露UUID、img_/sel_/mdl_哈希与UTC T...Z后缀
+    raw_uuid = "5c1f3502-710c-4a0d-b53d-022d265884a1"
+    raw_img_id = "img_b2cb4f9b7fd2c6aa5c4d218cb0a50ba0"
+    raw_sel_id = "sel_1963faae2d3a8e56e57b1b30eb0c4d4a"
+    raw_mdl_id = "mdl_1963faae2d3a8e56e57b1b30eb0c4d4a"
+    raw_utc = "2026-10-18T09:55:56Z"
+
+    base_img = Image.new("RGB", (320, 200), (140, 130, 120))
+    buf = io.BytesIO()
+    base_img.save(buf, format="PNG")
+    valid_preview_uri = "data:image/png;base64," + base64.b64encode(
+        buf.getvalue()
+    ).decode("ascii")
+    expired_editor_url = "http://127.0.0.1:9/studio-files/expired_edt_token"
+
+    editor_html = build_selection_editor_html(
+        image_id=raw_uuid,
+        signed_url=expired_editor_url,
+        expires_at=raw_utc,
+        preview_url=valid_preview_uri,
+        preview_expires_at="2026-10-25T09:55:56Z",
+        width=1264,
+        height=848,
+        segment_ready=False,
+    )
+    compare_html = build_compare_viewer_html(
+        image_id=raw_img_id,
+        base_id=raw_uuid,
+        selection_id=raw_sel_id,
+        before_url=valid_preview_uri,
+        after_url=valid_preview_uri,
+        expires_at=raw_utc,
+        width=1264,
+        height=848,
+        selected_pixels=8420,
+    )
+    model_html = build_model_viewer_html(
+        model_id=raw_mdl_id,
+        signed_url="https://dev.xuqian.io/studio-files/tok",
+        expires_at=raw_utc,
+        faces=100_000,
+        file_size=2_097_152,
+    )
+
+    assert f"底图：{raw_uuid}" not in editor_html
+    assert f"结果：{raw_img_id}" not in compare_html
+    assert f"选区：{raw_sel_id}" not in compare_html
+    assert f"- {raw_mdl_id}</title>" not in model_html
+    assert f"有效期至 {raw_utc}" not in editor_html
+    assert f"有效期至 {raw_utc}" not in compare_html
+    assert f"有效期至 {raw_utc}" not in model_html
+
+    # 3. 在Playwright中验证：即使短效edt:写链接已失效，baseImg仍通过长效preview_url正常加载；且可通过renewBtn向宿主请求新链接并热更新；同时验证跨断点remount草稿恢复
+    host_html = """<!DOCTYPE html>
+<html><body>
+  <iframe id="ed" sandbox="allow-scripts" style="width:760px;height:640px;border:0"></iframe>
+  <script>
+    window.__draftStore = {};
+    window.__renewToolRequests = [];
+    window.addEventListener('message', (ev) => {
+      if (!ev.data || typeof ev.data !== 'object') return;
+      const { type, messageId, payload } = ev.data;
+      if (type === 'ui-draft-save' && payload && payload.draftKey) {
+        window.__draftStore[payload.draftKey] = payload.draft;
+      } else if (type === 'ui-draft-load' && payload && payload.draftKey) {
+        const saved = window.__draftStore[payload.draftKey] || null;
+        const frame = document.getElementById('ed');
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.postMessage({
+            type: 'ui-message-response',
+            messageId: messageId,
+            payload: { response: { draft: saved } }
+          }, '*');
+        }
+      } else if (type === 'tool' && payload && payload.toolName === 'select_region') {
+        window.__renewToolRequests.push(payload);
+      }
+    });
+  </script>
+</body></html>"""
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            executable_path="/usr/bin/chromium",
+            headless=True,
+        )
+        try:
+            page = browser.new_page(viewport={"width": 840, "height": 720})
+            page.set_content(host_html)
+            page.eval_on_selector(
+                "#ed",
+                "(el, html) => { el.srcdoc = html; }",
+                editor_html,
+            )
+            frame = page.frame_locator("#ed")
+            frame.locator("#confirmBtn").wait_for(state="visible")
+            page.wait_for_timeout(150)
+
+            # 验证标题栏与有效期显示不包含内部UUID或UTC T...Z后缀，且底图通过preview_url成功加载
+            header_texts = frame.locator(".header-row").inner_text()
+            assert "只改局部 · 选区编辑器（1264×848）" in header_texts
+            assert raw_uuid not in header_texts
+            assert "T09:55:56Z" not in header_texts
+            img_loaded = frame.locator("#baseImg").evaluate(
+                "(img) => img.complete && img.naturalWidth === 320"
+            )
+            assert img_loaded is True
+
+            # 绘制未确认选区并填写说明文字
+            canvas_box = frame.locator("#overlayCanvas").bounding_box()
+            assert canvas_box is not None
+            cx, cy, cw, ch = (
+                canvas_box["x"],
+                canvas_box["y"],
+                canvas_box["width"],
+                canvas_box["height"],
+            )
+            page.mouse.move(cx + cw * 0.2, cy + ch * 0.2)
+            page.mouse.down()
+            page.mouse.move(cx + cw * 0.7, cy + ch * 0.7, steps=5)
+            page.mouse.up()
+            frame.locator("#instructionInput").fill("局部石材替换为汉白玉")
+
+            assert frame.locator("#confirmBtn").is_disabled() is False
+
+            # 模拟移动端/桌面端断点切换导致iframe卸载并重新挂载（remount）
+            page.evaluate(
+                """(html) => {
+                    const oldFrame = document.getElementById('ed');
+                    const parent = oldFrame.parentElement;
+                    oldFrame.remove();
+                    const nextFrame = document.createElement('iframe');
+                    nextFrame.id = 'ed';
+                    nextFrame.setAttribute('sandbox', 'allow-scripts');
+                    nextFrame.style.cssText = 'width:390px;height:640px;border:0';
+                    nextFrame.srcdoc = html;
+                    parent.appendChild(nextFrame);
+                }""",
+                editor_html,
+            )
+            remounted = page.frame_locator("#ed")
+            remounted.locator("#confirmBtn").wait_for(state="visible")
+            page.wait_for_timeout(200)
+
+            # 验证重新挂载后未确认选区与说明文字已自动恢复，确认按钮保持可用
+            restored_state = remounted.locator("#overlayCanvas").evaluate(
+                """(canvas) => {
+                    const ctx = canvas.getContext('2d');
+                    const sample = ctx.getImageData(Math.round(canvas.width * 0.45), Math.round(canvas.height * 0.45), 1, 1).data;
+                    return {
+                        alpha: sample[3],
+                        confirmDisabled: document.getElementById('confirmBtn').disabled,
+                        instruction: document.getElementById('instructionInput').value,
+                        status: document.getElementById('statusText').textContent
+                    };
+                }"""
+            )
+            assert restored_state["alpha"] > 60
+            assert restored_state["confirmDisabled"] is False
+            assert restored_state["instruction"] == "局部石材替换为汉白玉"
+            assert "已恢复未确认的选区草稿" in restored_state["status"]
+
+            # 触发续期按钮，验证向宿主发送标准MCP UI tool请求
+            remounted.locator("#renewBtn").evaluate("(btn) => { btn.hidden = false; btn.click(); }")
+            page.wait_for_timeout(100)
+            renew_reqs = page.evaluate("() => window.__renewToolRequests")
+            assert len(renew_reqs) == 1
+            assert renew_reqs[0]["toolName"] == "select_region"
+            assert renew_reqs[0]["params"]["image_id"] == raw_uuid
+        finally:
+            browser.close()
