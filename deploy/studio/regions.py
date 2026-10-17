@@ -2114,7 +2114,8 @@ def build_selection_editor_html(
 
   function applyDraftSnapshot(draft) {{
     if (!draft || typeof draft !== 'object' || draft.imageId !== IMAGE_ID) return false;
-    if (draft.editorCapability && draft.editorCapability !== EDITOR_CAPABILITY) return false;
+    // 宿主按会话与资源隔离草稿，续期后的签名可以与草稿旧签名不同。
+    if (draft.resourceUri && draft.resourceUri !== RESOURCE_URI) return false;
     const incomingTs = Number(draft.updatedAt) || 0;
     if (state.lastDraftUpdatedAt > 0 && incomingTs > 0 && incomingTs < state.lastDraftUpdatedAt) {{
       return false;

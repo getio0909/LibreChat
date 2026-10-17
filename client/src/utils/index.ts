@@ -70,7 +70,7 @@ export { default as createChatSearchParams, processValidSettings } from './creat
 export { getThemeFromEnv } from './getThemeFromEnv';
 import {
   buildStudioDraftKey,
-  extractStudioEditorCapability,
+  extractCurrentStudioEditorCapability,
   extractStudioSelectionImageId,
   isStudioUIResource,
   loadUIDraft,
@@ -158,6 +158,7 @@ export const extractContent = (
 function verifyStudioSelectionContext(
   payload: Record<string, unknown>,
   context?: StudioUIActionContext,
+  requireCapability = false,
 ):
   | {
       ok: true;
@@ -190,26 +191,24 @@ function verifyStudioSelectionContext(
   ) {
     return { ok: false, reason: 'image_id_mismatch' };
   }
-  const expectedCapability = extractStudioEditorCapability(context.resource);
+  const expectedCapability = extractCurrentStudioEditorCapability(context.resource);
   const providedCapability =
     typeof payload.editorCapability === 'string' ? payload.editorCapability.trim() : '';
-  if (
-    providedCapability &&
-    expectedCapability !== 'default' &&
-    providedCapability !== expectedCapability
-  ) {
+  if (!expectedCapability) {
+    return { ok: false, reason: 'invalid_current_capability' };
+  }
+  if (requireCapability && !providedCapability) {
+    return { ok: false, reason: 'missing_capability' };
+  }
+  if (providedCapability && providedCapability !== expectedCapability) {
     return { ok: false, reason: 'capability_mismatch' };
   }
-  const effectiveCapability =
-    expectedCapability !== 'default'
-      ? expectedCapability
-      : providedCapability || expectedCapability;
-  const draftKey = buildStudioDraftKey(context, effectiveCapability);
+  const draftKey = buildStudioDraftKey(context);
   if (!draftKey) {
     return { ok: false, reason: 'invalid_draft_scope' };
   }
   if (typeof payload.draftKey === 'string' && payload.draftKey.trim()) {
-    const expectedIframeKey = `zyb_studio:selection:${resourceImageId}:${effectiveCapability}`;
+    const expectedIframeKey = `zyb_studio:selection:${resourceImageId}:${expectedCapability}`;
     if (payload.draftKey.trim() !== draftKey && payload.draftKey.trim() !== expectedIframeKey) {
       return { ok: false, reason: 'draft_key_mismatch' };
     }
@@ -217,7 +216,7 @@ function verifyStudioSelectionContext(
   return {
     ok: true,
     draftKey,
-    editorCapability: effectiveCapability,
+    editorCapability: expectedCapability,
     sessionNonce: typeof payload.sessionNonce === 'string' ? payload.sessionNonce : undefined,
   };
 }
@@ -234,7 +233,7 @@ export const handleUIAction = async (
   };
   if (rawAction?.type === 'ui-draft-save') {
     const payload = rawAction.payload ?? {};
-    const verified = verifyStudioSelectionContext(payload, context);
+    const verified = verifyStudioSelectionContext(payload, context, true);
     if (!verified.ok) {
       return { status: 'rejected', reason: verified.reason };
     }

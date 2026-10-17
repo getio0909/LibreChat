@@ -215,7 +215,7 @@ describe('UIResourceRenderer', () => {
     expect(mockLegacyRenderer).not.toHaveBeenCalled();
   });
 
-  it('keeps resource and htmlProps references stable across breakpoint re-renders and scopes Jotai drafts by user, conversation, and editor capability', async () => {
+  it('keeps resource and htmlProps references stable across breakpoint re-renders and scopes Jotai drafts by user, conversation, and resource', async () => {
     const editorUrl1 = makeSignedStudioUrl('edt', 'img_demo123', '1');
     const editorUrl2 = makeSignedStudioUrl('edt', 'img_demo123', '2');
     const resource1: UIResource = {
@@ -258,8 +258,9 @@ describe('UIResourceRenderer', () => {
       resource: resource1,
     });
     expect(expectedKey1).toContain(
-      'user-1:convo-1:img_demo123:selection-1:111111111111111111111111',
+      'user-1:convo-1:ui://zyb_studio/selection/img_demo123:selection-1:img_demo123',
     );
+    expect(expectedKey1).not.toContain('1'.repeat(24));
     expect(
       buildStudioDraftKey({
         userId: 'user-1',
@@ -354,6 +355,22 @@ describe('UIResourceRenderer', () => {
       instruction: '只改中间山峰轮廓',
     });
 
+    const missingCapability = await handleUIAction(
+      {
+        type: 'ui-draft-save',
+        payload: { imageId: 'img_demo123', draft: { instruction: '未验证的草稿' } },
+      } as unknown as UIActionResult,
+      ask,
+      {
+        userId: 'user-1',
+        conversationId: 'convo-1',
+        serverName: 'zyb_studio',
+        resource: resource1,
+      },
+    );
+    expect(missingCapability).toEqual({ status: 'rejected', reason: 'missing_capability' });
+    expect(loadUIDraft(expectedKey1)).toEqual({ tool: 'rect', instruction: '只改中间山峰轮廓' });
+
     // 不同用户、不同会话或同一图片的第二张选区编辑器卡片均无法读取第一张编辑器的草稿
     const user2Load = await handleUIAction(
       {
@@ -369,6 +386,23 @@ describe('UIResourceRenderer', () => {
       },
     );
     expect(user2Load).toEqual(expect.objectContaining({ status: 'loaded', draft: undefined }));
+
+    const otherConversationLoad = await handleUIAction(
+      {
+        type: 'ui-draft-load',
+        payload: { imageId: 'img_demo123' },
+      } as unknown as UIActionResult,
+      ask,
+      {
+        userId: 'user-1',
+        conversationId: 'convo-2',
+        serverName: 'zyb_studio',
+        resource: resource1,
+      },
+    );
+    expect(otherConversationLoad).toEqual(
+      expect.objectContaining({ status: 'loaded', draft: undefined }),
+    );
 
     const secondEditorLoad = await handleUIAction(
       {
@@ -750,6 +784,137 @@ describe('UIResourceRenderer', () => {
     }
   });
 
+  it('keeps an expired selection draft through host renewal and remount without accepting the old capability or another scope', async () => {
+    mockLegacyRenderer.mockImplementation((props) => actualMcpUi.UIResourceRenderer(props));
+
+    const html = generatedHtml('selection').replaceAll(
+      '2030-01-01T00:00:00Z',
+      '2020-01-01T00:00:00Z',
+    );
+    const resource: UIResource = {
+      resourceId: 'selection-renewed-1',
+      uri: 'ui://zyb_studio/selection/img_demo123',
+      serverName: 'zyb_studio',
+      verifiedServerName: 'zyb_studio',
+      mimeType: 'text/html',
+      text: html,
+    };
+    const newEditorUrl = makeSignedStudioUrl('edt', 'img_demo123', 'c', window.location.origin);
+    const newPreviewUrl = makeSignedStudioUrl('img', 'img_demo123', 'd', window.location.origin);
+    const oldCapability = 'a'.repeat(24);
+    const newCapability = 'c'.repeat(24);
+    const draft = {
+      version: 1,
+      imageId: 'img_demo123',
+      resourceUri: resource.uri,
+      editorCapability: oldCapability,
+      tool: 'rect',
+      shapes: [
+        {
+          type: 'rect',
+          points: [
+            { x: 200, y: 200 },
+            { x: 700, y: 700 },
+          ],
+        },
+      ],
+      instruction: '局部石材替换为汉白玉',
+      updatedAt: 1,
+    };
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () =>
+        JSON.stringify({
+          status: 'renewed',
+          editor_url: newEditorUrl,
+          preview_url: newPreviewUrl,
+          expires_at: '2031-01-01T00:00:00Z',
+          preview_expires_at: '2031-01-08T00:00:00Z',
+        }),
+    });
+    const fetchSpy = jest.spyOn(request, 'authenticatedFetch').mockImplementation(fetchMock);
+
+    try {
+      const mounted = renderEnabled(<UIResourceRenderer resource={resource} />);
+      const firstProps = mockLegacyRenderer.mock.lastCall?.[0];
+      expect(firstProps).toBeDefined();
+      await act(async () => {
+        expect(
+          await firstProps?.onUIAction?.({
+            type: 'ui-draft-save',
+            payload: {
+              draftKey: `zyb_studio:selection:img_demo123:${oldCapability}`,
+              imageId: 'img_demo123',
+              resourceUri: resource.uri,
+              editorCapability: oldCapability,
+              draft,
+            },
+          } as unknown as UIActionResult),
+        ).toEqual(expect.objectContaining({ status: 'saved' }));
+        await firstProps?.onUIAction?.({
+          type: 'ui-link-renew',
+          payload: {
+            resourceUri: resource.uri,
+            editorCapability: oldCapability,
+            editorUrl: generatedUrl(html, 'SIGNED_URL'),
+          },
+        } as unknown as UIActionResult);
+      });
+      expect(fetchMock).toHaveBeenCalledWith(
+        `/api/mcp/studio/renew/${generatedUrl(html, 'SIGNED_URL').split('/').pop()}`,
+        expect.objectContaining({ method: 'POST' }),
+      );
+
+      mounted.unmount();
+      const remounted = renderEnabled(<UIResourceRenderer resource={resource} />);
+      const currentProps = mockLegacyRenderer.mock.lastCall?.[0];
+      const currentHtml = (currentProps?.resource as UIResource | undefined)?.text ?? '';
+      expect(currentHtml).toContain(`const SIGNED_URL = "${newEditorUrl}";`);
+      expect(currentHtml).toContain('const EDITOR_EXPIRES_AT = "2031-01-01T00:00:00Z";');
+      expect(currentProps?.htmlProps?.iframeRenderData?.selectionDraft).toEqual(draft);
+
+      const restored = await currentProps?.onUIAction?.({
+        type: 'ui-draft-load',
+        payload: {
+          draftKey: `zyb_studio:selection:img_demo123:${newCapability}`,
+          imageId: 'img_demo123',
+          resourceUri: resource.uri,
+          editorCapability: newCapability,
+        },
+      } as unknown as UIActionResult);
+      expect(restored).toEqual(
+        expect.objectContaining({ status: 'loaded', editorCapability: newCapability, draft }),
+      );
+
+      const staleWrite = await currentProps?.onUIAction?.({
+        type: 'ui-draft-save',
+        payload: { imageId: 'img_demo123', editorCapability: oldCapability, draft: null },
+      } as unknown as UIActionResult);
+      expect(staleWrite).toEqual({ status: 'rejected', reason: 'capability_mismatch' });
+      expect(currentProps?.htmlProps?.iframeRenderData?.selectionDraft).toEqual(draft);
+      remounted.unmount();
+
+      const otherConversation = renderEnabled(<UIResourceRenderer resource={resource} />, {
+        conversationId: 'convo-2',
+      });
+      expect(
+        mockLegacyRenderer.mock.lastCall?.[0].htmlProps?.iframeRenderData?.selectionDraft,
+      ).toBeUndefined();
+      otherConversation.unmount();
+
+      const otherResource = renderEnabled(
+        <UIResourceRenderer resource={{ ...resource, resourceId: 'selection-renewed-2' }} />,
+      );
+      expect(
+        mockLegacyRenderer.mock.lastCall?.[0].htmlProps?.iframeRenderData?.selectionDraft,
+      ).toBeUndefined();
+      otherResource.unmount();
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
   it.each(['selection', 'compare', 'model'])(
     'renews and remounts the %s card using HTML from the real Studio builder',
     async (kind) => {
@@ -767,10 +932,17 @@ describe('UIResourceRenderer', () => {
       const newBefore = makeSignedStudioUrl('img', 'img_demo123', 'a', window.location.origin);
       const newAfter = makeSignedStudioUrl('img', 'img_after123', 'b', window.location.origin);
       const newModel = makeSignedStudioUrl('model', 'mdl_demo123', 'f', window.location.origin);
+      const expiresAt = '2031-01-01T00:00:00Z';
+      const previewExpiresAt = '2031-01-08T00:00:00Z';
       const renewedByKind = {
-        selection: { editor_url: newEditor, preview_url: newPreview },
-        compare: { before_url: newBefore, after_url: newAfter },
-        model: { model_url: newModel },
+        selection: {
+          editor_url: newEditor,
+          preview_url: newPreview,
+          expires_at: expiresAt,
+          preview_expires_at: previewExpiresAt,
+        },
+        compare: { before_url: newBefore, after_url: newAfter, expires_at: expiresAt },
+        model: { model_url: newModel, expires_at: expiresAt },
       };
       const renewed = renewedByKind[kind as keyof typeof renewedByKind];
       const fetchMock = jest.fn().mockResolvedValue({
@@ -824,11 +996,18 @@ describe('UIResourceRenderer', () => {
         if (kind === 'selection') {
           expect(remountedHtml).toContain(`const SIGNED_URL = "${newEditor}";`);
           expect(remountedHtml).toContain(`const PREVIEW_URL = "${newPreview}";`);
+          expect(remountedHtml).toContain(`const EDITOR_EXPIRES_AT = "${expiresAt}";`);
+          expect(remountedHtml).toContain(`const PREVIEW_EXPIRES_AT = "${previewExpiresAt}";`);
+          expect(remountedHtml).toContain(`data-editor-expires="${expiresAt}"`);
+          expect(remountedHtml).toContain(`data-preview-expires="${previewExpiresAt}"`);
+          expect(remountedHtml).toContain(`data-expires="${previewExpiresAt}"`);
         } else if (kind === 'compare') {
           expect(remountedHtml).toContain(`const INITIAL_BEFORE_URL = "${newBefore}";`);
           expect(remountedHtml).toContain(`const INITIAL_AFTER_URL = "${newAfter}";`);
+          expect(remountedHtml).toContain(`id="compareExpiresBadge" data-expires="${expiresAt}"`);
         } else {
           expect(remountedHtml).toContain(`const INITIAL_MODEL_URL = "${newModel}";`);
+          expect(remountedHtml).toContain(`id="model-expires-badge" data-expires="${expiresAt}"`);
         }
         const expectedLinks = {
           selection: { editorUrl: newEditor, previewUrl: newPreview },

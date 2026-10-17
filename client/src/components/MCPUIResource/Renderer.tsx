@@ -143,7 +143,7 @@ export default function UIResourceRenderer({
           userId,
           conversationId,
           serverName: resource.serverName,
-          resource,
+          resource: safeResource ?? resource,
           store: studioUIStore,
           renewFetcher: renewThroughHost as typeof fetch,
         });
@@ -162,7 +162,7 @@ export default function UIResourceRenderer({
       }
       return onUIAction?.(result);
     },
-    [onUIAction, userId, conversationId, resource, legacyStudioCard],
+    [onUIAction, userId, conversationId, resource, safeResource, legacyStudioCard],
   );
 
   if (!safeResource) {

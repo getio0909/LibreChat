@@ -2835,7 +2835,7 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
     # 3. 启动真实Starlette/uvicorn测试服务端，验证：
     # - Finding 1：短效edt:写令牌过期返回404纯文本时，点击确认选区不抛SyntaxError，自动揭示#renewBtn并保留选区草稿
     # - Finding 2：点击#renewBtn及#compareRenewBtn通过ui-link-renew及POST /files/<token> (action="renew")就地刷新链接，不触发select_region新对话轮次，刷新后即可成功确认选区；已消耗的edt:令牌禁止再次renew
-    # - Finding 3：不同编辑器实例（不同SIGNED_URL能力签名）的DRAFT_KEY严格隔离，不会跨实例串草稿
+    # - Finding 3：宿主按会话与资源隔离草稿；同一资源续期后签名改变仍可恢复草稿
     # - Finding 4：非window.parent来源、错误requestId/sessionNonce、跨源或只读img:伪造editorUrl均被拒绝
     import socket
     import threading
@@ -2935,10 +2935,18 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
   <iframe id="cmp" sandbox="allow-scripts" style="width:760px;height:520px;border:0"></iframe>
   <script>
     window.__draftStore = {};
+    window.__conversationId = 'conversation-1';
+    window.__resourceId = 'selection-1';
     window.__renewRequests = [];
     window.__toolRequests = [];
     window.__promptMessages = [];
     window.__sizeChanges = [];
+    const draftScope = (payload) => [
+      window.__conversationId,
+      window.__resourceId,
+      payload.resourceUri,
+      payload.imageId
+    ].join(':');
     window.addEventListener('message', (ev) => {
       if (!ev.data || typeof ev.data !== 'object') return;
       const { type, messageId, payload } = ev.data;
@@ -2949,12 +2957,9 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
           edEl.style.height = payload.height + 'px';
         }
       } else if (type === 'ui-draft-save' && payload && payload.draftKey) {
-        window.__draftStore[payload.draftKey] = {
-          editorCapability: payload.editorCapability,
-          draft: payload.draft
-        };
+        window.__draftStore[draftScope(payload)] = payload.draft;
       } else if (type === 'ui-draft-load' && payload && payload.draftKey) {
-        const record = window.__draftStore[payload.draftKey] || null;
+        const draft = window.__draftStore[draftScope(payload)] || null;
         if (ev.source && typeof ev.source.postMessage === 'function') {
           ev.source.postMessage({
             type: 'ui-message-response',
@@ -2962,8 +2967,8 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
             payload: {
               response: {
                 sessionNonce: payload.sessionNonce,
-                editorCapability: record ? record.editorCapability : payload.editorCapability,
-                draft: record ? record.draft : null
+                editorCapability: payload.editorCapability,
+                draft: draft
               }
             }
           }, '*');
@@ -3145,8 +3150,14 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
                 assert len(page.evaluate("() => window.__promptMessages")) == 0
 
                 # Finding 2：点击“重新获取链接”，通过ui-link-renew与POST /files/<token> (action="renew")就地刷新写令牌，不触发任何type="tool"新轮次
-                remounted.locator("#renewBtn").click()
+                with page.expect_response(
+                    lambda response: response.request.method == "POST"
+                    and response.url == real_expired_editor_url
+                ) as renewal_response:
+                    remounted.locator("#renewBtn").click()
                 page.wait_for_timeout(350)
+                renewed_payload = renewal_response.value.json()
+                assert renewed_payload["status"] == "renewed"
                 renew_reqs = page.evaluate("() => window.__renewRequests")
                 tool_reqs = page.evaluate("() => window.__toolRequests")
                 assert len(renew_reqs) >= 1
@@ -3166,8 +3177,46 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
                 assert "已更新选区链接" in after_renew["status"]
                 assert after_renew["instruction"] == "局部石材替换为汉白玉"
 
-                # 刷新后再次点击确认选区，写操作成功完成并向宿主发送prompt消息
-                remounted.locator("#confirmBtn").click()
+                # 用服务端新签名生成续期后的真实编辑器HTML，模拟宿主替换srcdoc导致的重新挂载。
+                renewed_editor_html = build_selection_editor_html(
+                    image_id=raw_uuid,
+                    signed_url=renewed_payload["editor_url"],
+                    expires_at=renewed_payload["expires_at"],
+                    preview_url=renewed_payload["preview_url"],
+                    preview_expires_at=renewed_payload["preview_expires_at"],
+                    width=1264,
+                    height=848,
+                    segment_ready=False,
+                )
+                page.eval_on_selector(
+                    "#ed", "(el, html) => { el.srcdoc = html; }", renewed_editor_html
+                )
+                renewed_frame = page.frame_locator("#ed")
+                renewed_frame.locator("#confirmBtn").wait_for(state="visible")
+                page.wait_for_timeout(250)
+                renewed_state = renewed_frame.locator("#overlayCanvas").evaluate(
+                    """(canvas) => {
+                        const ctx = canvas.getContext('2d');
+                        const sample = ctx.getImageData(Math.round(canvas.width * 0.45), Math.round(canvas.height * 0.45), 1, 1).data;
+                        return {
+                            alpha: sample[3],
+                            confirmDisabled: document.getElementById('confirmBtn').disabled,
+                            renewHidden: document.getElementById('renewBtn').hidden,
+                            instruction: document.getElementById('instructionInput').value,
+                            editorExpires: document.getElementById('expiresBadge').dataset.editorExpires,
+                            previewExpires: document.getElementById('expiresBadge').dataset.previewExpires
+                        };
+                    }"""
+                )
+                assert renewed_state["alpha"] > 60
+                assert renewed_state["confirmDisabled"] is False
+                assert renewed_state["renewHidden"] is True
+                assert renewed_state["instruction"] == "局部石材替换为汉白玉"
+                assert renewed_state["editorExpires"] == renewed_payload["expires_at"]
+                assert renewed_state["previewExpires"] == renewed_payload["preview_expires_at"]
+
+                # 重新挂载后通过新edt:写令牌确认选区并向宿主发送prompt消息。
+                renewed_frame.locator("#confirmBtn").click()
                 page.wait_for_timeout(300)
                 prompts = page.evaluate("() => window.__promptMessages")
                 assert len(prompts) == 1
@@ -3188,7 +3237,8 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
                 )
                 assert consumed_renew_status == 409
 
-                # Finding 3：挂载同一张图片的第二个独立编辑器实例（不同SIGNED_URL nonce），验证草稿严格隔离，不恢复第一个实例的选区与说明文字
+                # 另一会话与另一资源即使用同一图片也不能读取当前资源的草稿。
+                page.evaluate("() => { window.__conversationId = 'conversation-2'; }")
                 page.eval_on_selector(
                     "#ed",
                     "(el, html) => { el.srcdoc = html; }",
@@ -3205,6 +3255,22 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
                 )
                 assert second_state["confirmDisabled"] is True
                 assert second_state["instruction"] == ""
+
+                page.evaluate(
+                    "() => { window.__conversationId = 'conversation-1'; window.__resourceId = 'selection-2'; }"
+                )
+                page.eval_on_selector(
+                    "#ed", "(el, html) => { el.srcdoc = html; }", second_editor_html
+                )
+                page.wait_for_timeout(200)
+                other_resource_state = second_frame.locator("#editorRoot").evaluate(
+                    """() => ({
+                        confirmDisabled: document.getElementById('confirmBtn').disabled,
+                        instruction: document.getElementById('instructionInput').value
+                    })"""
+                )
+                assert other_resource_state["confirmDisabled"] is True
+                assert other_resource_state["instruction"] == ""
 
                 # 验证对比视图#compareRenewBtn同样通过ui-link-renew与POST /files/<token> (action="renew")就地刷新前后对比图，不调用select_region
                 page.eval_on_selector(

@@ -190,8 +190,7 @@ export function extractStudioEditorCapability(
   resource?: Pick<UIResource, 'resourceId' | 'text' | 'uri'> | null,
   explicitCapability?: string,
 ): string {
-  const signedUrl = extractConstString(resource?.text, 'SIGNED_URL');
-  const fromHtml = extractTokenSignaturePrefix(signedUrl);
+  const fromHtml = extractCurrentStudioEditorCapability(resource);
   if (fromHtml) {
     return fromHtml;
   }
@@ -202,6 +201,15 @@ export function extractStudioEditorCapability(
     return resource.resourceId.trim();
   }
   return 'default';
+}
+
+export function extractCurrentStudioEditorCapability(
+  resource?: Pick<UIResource, 'text'> | null,
+): string {
+  const signedUrl = extractConstString(resource?.text, 'SIGNED_URL');
+  return isValidStudioSignedUrl(signedUrl, signedUrl, 'edt:')
+    ? extractTokenSignaturePrefix(signedUrl)
+    : '';
 }
 
 export function extractStudioSelectionImageId(uri: string | undefined | null): string {
@@ -215,45 +223,43 @@ function extractEmbeddedModelUrl(html: string | undefined): string {
   return extractConstString(html, 'INITIAL_MODEL_URL') || extractConstString(html, 'MODEL_URL');
 }
 
-export function buildStudioDraftKey(
-  context: StudioUIActionContext,
-  explicitCapability?: string,
-): string {
+export function buildStudioDraftKey(context: StudioUIActionContext): string {
   const userId = typeof context.userId === 'string' ? context.userId.trim() : '';
+  const conversationId =
+    typeof context.conversationId === 'string' ? context.conversationId.trim() : '';
   const resource = context.resource;
   const imageId = extractStudioSelectionImageId(resource?.uri);
-  if (!userId || !resource || !imageId || !isStudioUIResource(resource, context.serverName)) {
+  const resourceId = typeof resource?.resourceId === 'string' ? resource.resourceId.trim() : '';
+  if (
+    !userId ||
+    !conversationId ||
+    !resourceId ||
+    !resource ||
+    !imageId ||
+    !isStudioUIResource(resource, context.serverName)
+  ) {
     return '';
   }
-  const conversationScope =
-    typeof context.conversationId === 'string' && context.conversationId.trim()
-      ? context.conversationId.trim()
-      : 'active';
-  const resourceScope =
-    typeof resource.resourceId === 'string' && resource.resourceId.trim()
-      ? resource.resourceId.trim()
-      : 'resource';
-  const capabilityScope = extractStudioEditorCapability(resource, explicitCapability);
-  return `zyb_studio:selection:${userId}:${conversationScope}:${imageId}:${resourceScope}:${capabilityScope}`;
+  return `zyb_studio:selection:${userId}:${conversationId}:${resource.uri}:${resourceId}:${imageId}`;
 }
 
 export function buildStudioResourceKey(context: StudioUIActionContext): string {
   const userId = typeof context.userId === 'string' ? context.userId.trim() : '';
+  const conversationId =
+    typeof context.conversationId === 'string' ? context.conversationId.trim() : '';
   const resource = context.resource;
   const uri = typeof resource?.uri === 'string' ? resource.uri.trim() : '';
-  if (!userId || !resource || !isStudioUIResource(resource, context.serverName)) {
+  const resourceId = typeof resource?.resourceId === 'string' ? resource.resourceId.trim() : '';
+  if (
+    !userId ||
+    !conversationId ||
+    !resourceId ||
+    !resource ||
+    !isStudioUIResource(resource, context.serverName)
+  ) {
     return '';
   }
-  const conversationScope =
-    typeof context.conversationId === 'string' && context.conversationId.trim()
-      ? context.conversationId.trim()
-      : 'active';
-  const resourceScope =
-    typeof resource.resourceId === 'string' && resource.resourceId.trim()
-      ? resource.resourceId.trim()
-      : 'resource';
-  const capabilityScope = extractStudioEditorCapability(resource);
-  return `zyb_studio:resource:${userId}:${conversationScope}:${uri}:${resourceScope}:${capabilityScope}`;
+  return `zyb_studio:resource:${userId}:${conversationId}:${uri}:${resourceId}`;
 }
 
 export function saveUIDraft(
@@ -351,6 +357,18 @@ function formatLocalTimestampDisplay(isoText: string): string {
   }
   const pad2 = (n: number) => String(n).padStart(2, '0');
   return `${parsed.getFullYear()}-${pad2(parsed.getMonth() + 1)}-${pad2(parsed.getDate())} ${pad2(parsed.getHours())}:${pad2(parsed.getMinutes())}`;
+}
+
+function replaceExpiryAttribute(html: string, name: string, isoText: string): string {
+  const encoded = isoText
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  return html.replace(
+    new RegExp(`(\\b${name}=")[^"]*(")`, 'g'),
+    (_match, start: string, end: string) => `${start}${encoded}${end}`,
+  );
 }
 
 // 历史消息没有绑定当前选区编号的可信来源记录，保留上游来源包装
@@ -458,10 +476,15 @@ export function upgradePersistedStudioHtml(
       /const\s+EXPIRES_AT\s*=\s*"(?:\\.|[^"\\])*";/,
       `const EXPIRES_AT = ${safeExpiresJson};`,
     );
-    next = next.replace(
-      /(id="model-expires-badge"\s+data-expires=")[^"]*(")/,
-      `$1${renewedLinks.expiresAt.replace(/"/g, '&quot;')}$2`,
-    );
+    if (uri.startsWith(STUDIO_SELECTION_PREFIX)) {
+      next = next.replace(
+        /const\s+EDITOR_EXPIRES_AT\s*=\s*"(?:\\.|[^"\\])*";/,
+        `const EDITOR_EXPIRES_AT = ${safeExpiresJson};`,
+      );
+      next = replaceExpiryAttribute(next, 'data-editor-expires', renewedLinks.expiresAt);
+    } else {
+      next = replaceExpiryAttribute(next, 'data-expires', renewedLinks.expiresAt);
+    }
   }
   if (renewedLinks.previewExpiresAt) {
     const safePreviewExpiresJson = JSON.stringify(renewedLinks.previewExpiresAt);
@@ -469,6 +492,10 @@ export function upgradePersistedStudioHtml(
       /const\s+PREVIEW_EXPIRES_AT\s*=\s*"(?:\\.|[^"\\])*";/,
       `const PREVIEW_EXPIRES_AT = ${safePreviewExpiresJson};`,
     );
+    if (uri.startsWith(STUDIO_SELECTION_PREFIX)) {
+      next = replaceExpiryAttribute(next, 'data-preview-expires', renewedLinks.previewExpiresAt);
+      next = replaceExpiryAttribute(next, 'data-expires', renewedLinks.previewExpiresAt);
+    }
   }
 
   return next;
