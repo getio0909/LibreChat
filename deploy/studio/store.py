@@ -33,6 +33,10 @@ IMAGE_PRODUCING_TOOLS: frozenset[str] = frozenset(
         "edit_region",
         "finish_region_edit",
         "compare_materials",
+        # 保留已下线旧产图工具名称，确保历史已保存的 LibreChat File UUID 仍能正常解析读取
+        "generate_image",
+        "edit_image",
+        "design_concepts",
     }
 )
 LIBRECHAT_TOOL_OUTPUT_RE = re.compile(r"^([A-Za-z0-9_.-]+?)_img_([A-Za-z0-9_-]+)$")

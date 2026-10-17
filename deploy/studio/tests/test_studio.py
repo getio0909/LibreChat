@@ -4507,6 +4507,21 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
 
     producing_specs = [
         (
+            "20000011-1111-2222-3333-444444444444",
+            "generate_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-lg1",
+            2,
+        ),
+        (
+            "20000012-1111-2222-3333-444444444444",
+            "edit_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-lg2",
+            4,
+        ),
+        (
+            "20000013-1111-2222-3333-444444444444",
+            "design_concepts_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-lg3",
+            6,
+        ),
+        (
             "20000001-1111-2222-3333-444444444444",
             "gemini_image_gen_img_V1StGXR8_Z5jdHi6B-gn1",
             10,
