@@ -175,4 +175,5 @@ mcpServers:
     headers:
       X-LibreChat-User-ID: '{{LIBRECHAT_STUDIO_PRINCIPAL}}'
       X-LibreChat-Raw-User-ID: '{{LIBRECHAT_USER_ID}}'
+      X-LibreChat-Conversation-ID: '{{LIBRECHAT_BODY_CONVERSATIONID}}'
       X-Studio-Token: '${STUDIO_SHARED_TOKEN}'

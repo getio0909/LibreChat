@@ -28,6 +28,13 @@ from .config import (
     load_rules,
     load_settings,
 )
+from .comparisons import (
+    comparison_guard,
+    comparison_job_dir,
+    comparison_job_id,
+    comparison_key,
+    saved_comparison_result,
+)
 from .images import (
     MAX_EDIT_REFERENCES,
     MAX_REFERENCES,
@@ -240,6 +247,10 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "maxItems": 3,
                     "description": "要对比的石材名称或别名列表（1-3款）",
                 },
+                "idempotency_key": {
+                    "type": "string",
+                    "description": "仅在明确要求对相同底图、部位和石材重新生成一组结果时填写新的请求编号；普通调用和重试请省略",
+                },
             },
             "required": ["base_id", "target", "materials"],
         },
@@ -287,6 +298,9 @@ STUDIO_TOOLS: list[types.Tool] = [
 
 # 默认暂停对外提供的三维模型生成工具名称集合（仅当enable_3d开启时启用）
 THREE_D_TOOL_NAMES: frozenset[str] = frozenset({"create_3d_model", "check_3d_model"})
+
+# 三张预览图须同时留在LibreChat四MiB MCP响应上限与四十万字符模型投影预算内。
+MAX_COMPARISON_PREVIEW_BYTES = 80 * 1024
 
 
 # 汇总显式传入的带标记知识库资产警告信息（按编号去重）
@@ -579,6 +593,10 @@ def build_mcp_server(
                 if size not in NATIVE:
                     raise ValueError("Invalid size parameter")
 
+                request_key = args.get("idempotency_key", "")
+                if not isinstance(request_key, str) or len(request_key) > 128:
+                    raise ValueError("idempotency_key must be a string of at most 128 characters")
+
                 # 先解析所有请求的石材名称/别名与无标记样图，拒绝自动选用带标记样图；若某石材无可用样图则报错
                 resolved_materials = []
                 all_resolved_assets: list[ResolvedImage] = []
@@ -617,6 +635,22 @@ def build_mcp_server(
                 base_uri, base_size = normalize_reference_with_size(
                     base_resolved.path, allowed_roots
                 )
+                key = comparison_key(
+                    conversation_id=ctx.conversation_id,
+                    base_id=base_resolved.id,
+                    base_sha256=hashlib.sha256(base_resolved.path.read_bytes()).hexdigest(),
+                    target=target,
+                    material_ids=[mat_obj.id for _, mat_obj, _ in resolved_materials],
+                    sample_fingerprints=[
+                        [
+                            f"{sample.id}:{hashlib.sha256(sample.path.read_bytes()).hexdigest()}"
+                            for sample in samples
+                        ]
+                        for _, _, samples in resolved_materials
+                    ],
+                    size=size,
+                    request_key=request_key,
+                )
 
                 # 对target中可能出现的任何石材商业名称做中性化处理，再生成Mac标准替换说明
                 generic_stone_map = {
@@ -631,10 +665,15 @@ def build_mcp_server(
                 )
 
                 async def _render_material_variant(
+                    index: int,
                     req_name: str,
                     mat_obj: Any,
                     sample_images: list[ResolvedImage],
                 ) -> tuple[dict[str, Any] | None, str | None, bool]:
+                    img_id = comparison_job_id(key, index)
+                    previous = saved_comparison_result(settings, user_id, img_id)
+                    if previous is not None:
+                        return previous
                     variant_refs = [
                         {
                             "id": sample_img.id,
@@ -655,7 +694,7 @@ def build_mcp_server(
                     all_uris = [base_uri, *sample_uris]
                     try:
                         async with limiter.acquire(user_id):
-                            img_id, job_dir = allocate_studio_job(settings, user_id)
+                            job_dir = comparison_job_dir(settings, user_id, img_id)
                             result = await generate_image_with_provider(
                                 settings,
                                 full_prompt,
@@ -673,12 +712,13 @@ def build_mcp_server(
                     except (ValueError, TypeError, RuntimeError, OSError) as exc:
                         return None, str(exc), False
 
-                rendered_variants = await asyncio.gather(
-                    *(
-                        _render_material_variant(req_name, mat_obj, sample_images)
-                        for req_name, mat_obj, sample_images in resolved_materials
+                async with comparison_guard(settings, user_id, key):
+                    rendered_variants = await asyncio.gather(
+                        *(
+                            _render_material_variant(index, req_name, mat_obj, sample_images)
+                            for index, (req_name, mat_obj, sample_images) in enumerate(resolved_materials)
+                        )
                     )
-                )
 
                 variants_out: list[dict[str, Any]] = []
                 image_blocks: list[types.ImageContent] = []
@@ -706,7 +746,7 @@ def build_mcp_server(
                             f"{img_res['width']}x{img_res['height']}"
                         )
                         disp_bytes, disp_mime = encode_display_image(
-                            img_res["raw_bytes"]
+                            img_res["raw_bytes"], max_bytes=MAX_COMPARISON_PREVIEW_BYTES
                         )
                         image_blocks.append(
                             types.ImageContent(
@@ -715,6 +755,7 @@ def build_mcp_server(
                                 mimeType=disp_mime,
                             )
                         )
+                        variant_entry["preview_image_index"] = len(image_blocks)
                     elif err_text:
                         variant_entry["error"] = err_text
                         if is_uncertain:
@@ -729,6 +770,8 @@ def build_mcp_server(
                     "variants": variants_out,
                     "comparisons": variants_out,
                     "count": len(image_blocks),
+                    "idempotency_key": key,
+                    "image_context": "Preview images follow the successful variants in order. Inspect each image before describing its colors or edited parts; the named material is not visual evidence.",
                     "warnings": warnings,
                 }
                 if any_uncertain:

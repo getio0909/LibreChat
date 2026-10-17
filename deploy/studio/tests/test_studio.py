@@ -800,6 +800,197 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
     asyncio.run(_run())
 
 
+# 三款大图对比必须低于MCP响应上限，预览供模型辨认，且同一请求跨并发与重启只计费一次。
+def test_compare_materials_bounded_previews_and_durable_idempotency(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e1111111-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    raw_png = io.BytesIO()
+    Image.frombytes("RGB", (1100, 1100), os.urandom(1100 * 1100 * 3)).save(
+        raw_png, format="PNG", compress_level=0
+    )
+    canonical = raw_png.getvalue()
+    assert len(canonical) > 3 * 1024 * 1024
+    paid_calls = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal paid_calls
+        paid_calls += 1
+        return httpx.Response(
+            200, json=_gemini_image_response(canonical, mime_type="image/png")
+        )
+
+    def _app():
+        return create_app(
+            settings=studio_env,
+            rules=load_rules(),
+            gemini_transport=httpx.MockTransport(_gemini_handler),
+        )
+
+    headers = {
+        "X-Studio-Token": VALID_TOKEN,
+        "X-LibreChat-User-ID": USER_A,
+        "X-LibreChat-Conversation-ID": "11111111-2222-3333-4444-555555555555",
+    }
+    arguments = {
+        "base_id": base_id,
+        "target": "供桌台面",
+        "materials": ["敦煌金", "金镶玉", "蓝金灰"],
+    }
+
+    async def _call(client: httpx.AsyncClient, args: dict[str, Any]) -> httpx.Response:
+        return await client.post(
+            "/mcp",
+            headers=headers,
+            json={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "tools/call",
+                "params": {"name": "compare_materials", "arguments": args},
+            },
+        )
+
+    async def _run() -> None:
+        app = _app()
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            first, simultaneous_retry = await asyncio.gather(
+                _call(client, arguments), _call(client, arguments)
+            )
+            assert paid_calls == 3
+            for response in (first, simultaneous_retry):
+                assert response.status_code == 200
+                assert len(response.content) < 4 * 1024 * 1024
+                result = response.json()["result"]
+                assert result["isError"] is False
+                assert len(result["content"]) == 4
+                payload = json.loads(result["content"][0]["text"])
+                assert payload["count"] == 3
+                assert "Inspect each image" in payload["image_context"]
+                assert [v["preview_image_index"] for v in payload["variants"]] == [
+                    1,
+                    2,
+                    3,
+                ]
+                assert len({v["image_id"] for v in payload["variants"]}) == 3
+                for variant, block in zip(payload["variants"], result["content"][1:]):
+                    assert block["type"] == "image"
+                    assert len(base64.b64decode(block["data"])) <= 80 * 1024
+                    saved = (
+                        studio_env.data_dir
+                        / "users"
+                        / USER_A
+                        / "jobs"
+                        / variant["image_id"]
+                        / "original.png"
+                    )
+                    assert saved.read_bytes() == canonical
+            assert first.json()["result"]["content"][0]["text"] == simultaneous_retry.json()["result"]["content"][0]["text"]
+
+        restarted = _app()
+        async with (
+            restarted.router.lifespan_context(restarted),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=restarted),
+                base_url="http://studio:8000",
+            ) as client,
+        ):
+            retry = await _call(client, arguments)
+            assert retry.json()["result"]["isError"] is False
+            assert paid_calls == 3
+            fresh = await _call(client, {**arguments, "idempotency_key": "new-render"})
+            assert fresh.json()["result"]["isError"] is False
+            assert paid_calls == 6
+            old_payload = json.loads(first.json()["result"]["content"][0]["text"])
+            new_payload = json.loads(fresh.json()["result"]["content"][0]["text"])
+            assert old_payload["idempotency_key"] != new_payload["idempotency_key"]
+
+    asyncio.run(_run())
+
+
+# 已保存变体与计费状态不确定的变体都不能因同参数重试而再次发起付费请求。
+def test_compare_materials_partial_result_retry_does_not_rebill(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e2222222-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    paid_calls = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal paid_calls
+        paid_calls += 1
+        if paid_calls == 2:
+            raise httpx.ReadTimeout("simulated timeout after dispatch")
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+    request_body = {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "method": "tools/call",
+        "params": {
+            "name": "compare_materials",
+            "arguments": {
+                "base_id": base_id,
+                "target": "供桌台面",
+                "materials": ["敦煌金", "金镶玉"],
+            },
+        },
+    }
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            responses = []
+            for _ in range(2):
+                responses.append(
+                    await client.post(
+                        "/mcp",
+                        headers={
+                            "X-Studio-Token": VALID_TOKEN,
+                            "X-LibreChat-User-ID": USER_A,
+                        },
+                        json=request_body,
+                    )
+                )
+            assert paid_calls == 2
+            first = responses[0].json()["result"]
+            retry = responses[1].json()["result"]
+            for result in (first, retry):
+                assert result["isError"] is False
+                assert len(result["content"]) == 2
+                payload = json.loads(result["content"][0]["text"])
+                assert payload["count"] == 1
+                assert payload["variants"][0]["image_id"].startswith("img_")
+                assert payload["variants"][1]["state"] == "uncertain"
+                assert "may have been billed" in payload["variants"][1]["error"]
+            first_payload = json.loads(first["content"][0]["text"])
+            retry_payload = json.loads(retry["content"][0]["text"])
+            assert first_payload["variants"][0]["image_id"] == retry_payload["variants"][0]["image_id"]
+
+    asyncio.run(_run())
+
+
 # 校验每用户并发信号量限制与MCP超时uncertain错误提示及4xx拒绝状态
 def test_concurrency_cap_and_mcp_error_states(
     studio_env: StudioSettings, tmp_path: Path

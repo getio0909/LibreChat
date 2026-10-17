@@ -303,6 +303,72 @@ describe('resolveGeminiReferenceImages', () => {
     );
   });
 
+  it('loads kb_ and img_ bytes from the resolved MCP URL when the API has no Studio volume', async () => {
+    const fetchImpl = Object.assign(
+      jest.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        expect(url).toMatch(/^http:\/\/studio:8000\/files\/(?:kb_|img_)/);
+        expect(init?.headers).toEqual({
+          'X-Studio-Token': 'fixture-token',
+          'X-LibreChat-User-ID': userA,
+          'X-LibreChat-Raw-User-ID': userA,
+        });
+        const isKb = url.endsWith(kbId);
+        return new Response(isKb ? kbBytes : imgBytes, {
+          headers: { 'content-type': isKb ? 'image/jpeg' : 'image/png' },
+        });
+      }),
+      { preconnect: jest.fn() },
+    );
+    const saved = new Map<string, Buffer>();
+    const saveBase64Image = jest.fn(async (dataUrl: string, options: { file_id: string }) => {
+      saved.set(options.file_id, Buffer.from(dataUrl.split(',')[1], 'base64'));
+      return {
+        file_id: options.file_id,
+        filepath: options.file_id,
+        source: 'local',
+        type: dataUrl.startsWith('data:image/jpeg') ? 'image/jpeg' : 'image/png',
+        user: userA,
+      };
+    });
+    const req = {
+      user: { id: userA },
+      config: {
+        mcpConfig: {
+          zyb_studio: {
+            url: 'http://studio:8000/mcp',
+            headers: { 'X-Studio-Token': 'fixture-token' },
+          },
+        },
+      },
+    };
+    const result = await resolveGeminiReferenceImages({
+      image_ids: [kbId, imgId],
+      req,
+      kbRoot: path.join(tmpRoot, 'missing-kb'),
+      dataDir: path.join(tmpRoot, 'missing-data'),
+      getFiles: async () => [],
+      saveBase64Image,
+      getStrategyFunctions: () => ({
+        getDownloadStream: async (_req, filepath) =>
+          (async function* () {
+            yield saved.get(filepath) ?? Buffer.alloc(0);
+          })(),
+      }),
+      fetchImpl,
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({
+      ok: true,
+      value: [
+        { inlineData: { mimeType: 'image/jpeg', data: kbBytes.toString('base64') } },
+        { inlineData: { mimeType: 'image/png', data: imgBytes.toString('base64') } },
+      ],
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(saveBase64Image).toHaveBeenCalledTimes(2);
+  });
+
   it('rejects supplied and fetched Files from another tenant and isolates Studio image jobs', async () => {
     const tenantA = 'tenant-a';
     const tenantB = 'tenant-b';
@@ -851,6 +917,59 @@ describe('processToolImageArtifacts', () => {
     expect(uploadImageBuffer).toHaveBeenCalledWith(
       expect.objectContaining({ resize: false, context: FileContext.image_generation }),
     );
+  });
+
+  it('publishes every comparison variant as a separate canonical File', async () => {
+    const ids = ['img_11111111111111111111111111111111', 'img_22222222222222222222222222222222'];
+    const originals = ids.map((_, index) => Buffer.from(`canonical-png-${index}`));
+    for (const [index, id] of ids.entries()) {
+      const jobDir = path.join(dataDir, 'users', userA, 'jobs', id);
+      fs.mkdirSync(jobDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(jobDir, 'receipt.json'),
+        JSON.stringify({ state: 'saved', file: 'original.png' }),
+      );
+      fs.writeFileSync(path.join(jobDir, 'original.png'), originals[index]);
+    }
+    const output = {
+      name: 'compare_materials_mcp_zyb_studio',
+      content: JSON.stringify({
+        variants: ids.map((image_id, index) => ({ image_id, preview_image_index: index + 1 })),
+      }),
+      artifact: {
+        content: ids.map((_, index) => ({
+          type: 'image_url',
+          image_url: {
+            url: `data:image/jpeg;base64,${Buffer.from(`preview-${index}`).toString('base64')}`,
+          },
+        })),
+        file_ids: [] as string[],
+      },
+    };
+    const uploadImageBuffer = jest.fn(async ({ metadata }) => ({
+      file_id: metadata.file_id,
+      filepath: `/images/${metadata.file_id}.png`,
+      filename: metadata.filename,
+      type: metadata.type,
+    }));
+    const artifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
+    const onFileSaved = jest.fn();
+    const published = await processToolImageArtifacts({
+      output,
+      req: { user: { id: userA }, config: {} },
+      artifactPromises,
+      dataDir,
+      uploadImageBuffer,
+      buildMetadata: (file) => file,
+      onFileSaved,
+    });
+    expect(published).toBe(true);
+    expect(uploadImageBuffer).toHaveBeenCalledTimes(2);
+    expect(uploadImageBuffer.mock.calls.map(([call]) => call.metadata.buffer)).toEqual(originals);
+    expect(output.artifact.file_ids).toHaveLength(2);
+    expect(new Set(output.artifact.file_ids).size).toBe(2);
+    expect(await Promise.all(artifactPromises)).toHaveLength(2);
+    expect(onFileSaved).toHaveBeenCalledTimes(2);
   });
 
   it('scrubs generated_image_id and clears artifact.file_ids when image persistence fails', async () => {

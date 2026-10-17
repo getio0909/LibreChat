@@ -681,11 +681,17 @@ async function loadStudioReferenceBytes({
   }
 
   // 当 api 与 studio 分处不同容器时，通过配置的 zyb_studio 内部地址与共享令牌按用户身份拉取原图字节
-  const studioMcpConfig = req?.config?.mcpServers?.zyb_studio;
+  const requestServer = req?.config?.mcpConfig?.zyb_studio;
+  const configUrl = requestServer && 'url' in requestServer ? requestServer.url : undefined;
+  const configHeaders =
+    requestServer && 'headers' in requestServer ? requestServer.headers : undefined;
+  const legacyServer = req?.config?.mcpServers?.zyb_studio;
   const rawMcpUrl =
-    studioMcpConfig?.url || process.env.STUDIO_MCP_URL || process.env.STUDIO_URL || '';
+    configUrl || legacyServer?.url || process.env.STUDIO_MCP_URL || process.env.STUDIO_URL || '';
   const sharedToken =
-    resolveTemplateEnvValue(studioMcpConfig?.headers?.['X-Studio-Token']) ||
+    resolveTemplateEnvValue(
+      configHeaders?.['X-Studio-Token'] ?? legacyServer?.headers?.['X-Studio-Token'],
+    ) ||
     (process.env.STUDIO_SHARED_TOKEN || '').trim() ||
     (settings.shared_token || '').trim();
 
