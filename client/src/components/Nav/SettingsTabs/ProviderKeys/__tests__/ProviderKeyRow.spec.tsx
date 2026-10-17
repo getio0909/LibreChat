@@ -22,6 +22,10 @@ describe('ProviderKeyRow', () => {
     await initializeI18n();
   });
 
+  beforeEach(async () => {
+    await changeLanguageSafely('en');
+  });
+
   afterEach(async () => {
     await changeLanguageSafely('en');
   });

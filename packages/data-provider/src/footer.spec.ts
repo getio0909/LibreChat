@@ -6,6 +6,17 @@ describe('hasConfiguredFooter', () => {
     expect(hasConfiguredFooter({ customFooter: '[Docs](https://example.com)' })).toBe(true);
   });
 
+  it('uses the interface footer when no top-level footer is configured', () => {
+    expect(hasConfiguredFooter({ interface: { customFooter: 'Operator policy' } })).toBe(true);
+    expect(hasConfiguredFooter({ interface: { customFooter: '   ' } })).toBe(false);
+  });
+
+  it('preserves an explicitly blank top-level footer over the interface footer', () => {
+    expect(
+      hasConfiguredFooter({ customFooter: '', interface: { customFooter: 'Operator policy' } }),
+    ).toBe(false);
+  });
+
   it('is false for a deployment that configured none of it', () => {
     expect(hasConfiguredFooter()).toBe(false);
     expect(hasConfiguredFooter(null)).toBe(false);

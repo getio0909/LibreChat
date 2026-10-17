@@ -773,16 +773,16 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.ok(pythonSetup, 'CI checks must set up Python');
   assert.equal(pythonSetup.with['python-version'], '3.13');
   assert.ok(
-    checkSteps.some((step) => step.run && step.run.includes('pytest deploy/studio')),
-    'CI checks must run pytest deploy/studio',
+    checkSteps.some((step) => step.run && step.run.includes('python -m pytest deploy/studio')),
+    'CI checks must import studio from the repository root via python -m pytest',
   );
   assert.ok(
     checkSteps.some((step) => step.run && step.run.includes('python knowledge/tools/validate.py')),
     'CI checks must run python knowledge/tools/validate.py',
   );
   assert.ok(
-    checkSteps.some((step) => step.run && step.run.includes('pytest knowledge/tests')),
-    'CI checks must run pytest knowledge/tests',
+    checkSteps.some((step) => step.run && step.run.includes('python -m pytest knowledge/tests')),
+    'CI checks must run knowledge tests via python -m pytest',
   );
   assert.ok(
     checkSteps.some((step) => step.run && step.run.includes('node --test deploy/*.test.cjs')),

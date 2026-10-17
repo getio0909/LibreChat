@@ -47,10 +47,10 @@ jobs:
       - name: Verify studio service and deployment configuration
         run: |
           node --test deploy/*.test.cjs
-          pip install -r deploy/studio/requirements.txt jsonschema pytest
+          python -m pip install -r deploy/studio/requirements.txt jsonschema pytest
           python knowledge/tools/validate.py
-          pytest knowledge/tests
-          pytest deploy/studio
+          python -m pytest knowledge/tests
+          python -m pytest deploy/studio
       - name: Check changed code
         env:
           CI_BASE: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD^' }}

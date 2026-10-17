@@ -80,12 +80,12 @@ function Footer({ className, startupConfig, configuredOnly = false }: FooterProp
   );
 
   // 优先读取顶层 customFooter，未配置时回退至 interface.customFooter，隐藏默认版本页脚。
-  const configuredFooter =
-    typeof config?.customFooter === 'string'
-      ? config.customFooter
-      : typeof config?.interface?.customFooter === 'string'
-        ? config.interface.customFooter
-        : null;
+  let configuredFooter: string | null = null;
+  if (typeof config?.customFooter === 'string') {
+    configuredFooter = config.customFooter;
+  } else if (typeof config?.interface?.customFooter === 'string') {
+    configuredFooter = config.interface.customFooter;
+  }
   /** The generic disclaimer is the part a conversation drops; the operator's own footer is not. */
   const genericFooter = configuredOnly
     ? ''
@@ -155,7 +155,7 @@ function Footer({ className, startupConfig, configuredOnly = false }: FooterProp
              rather than the brighter `text-secondary`: the underline carries the
              affordance, and a link that outshines its own sentence puts the
              emphasis back where this change takes it from. */
-          'text-text-muted md:px-15 absolute bottom-0 left-0 right-0 hidden items-center justify-center gap-2 px-2 py-2 text-center text-xs sm:flex'
+          'text-text-muted absolute right-0 bottom-0 left-0 hidden items-center justify-center gap-2 px-2 py-2 text-center text-xs sm:flex md:px-15'
         }
       >
         {footerElements.map((contentRender, index) => {
