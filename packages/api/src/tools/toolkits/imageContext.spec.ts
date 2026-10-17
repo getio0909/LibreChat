@@ -6,7 +6,7 @@ import type { GeminiReferenceFileRecord } from './imageContext';
 import {
   buildImageToolContext,
   buildMCPImageToolContext,
-   isStudioReferenceId,
+  isStudioReferenceId,
   deriveStudioBridgeFileId,
   resolveGeminiReferenceImages,
   collectBranchImageCandidateIds,
@@ -260,7 +260,10 @@ describe('resolveGeminiReferenceImages', () => {
 
     fs.mkdirSync(path.join(kbRoot, 'records'), { recursive: true });
     fs.mkdirSync(path.join(kbRoot, 'assets', 'ref2048'), { recursive: true });
-    fs.writeFileSync(path.join(kbRoot, 'records', '0123456789abcdef.yaml'), 'id: 0123456789abcdef\n');
+    fs.writeFileSync(
+      path.join(kbRoot, 'records', '0123456789abcdef.yaml'),
+      'id: 0123456789abcdef\n',
+    );
     fs.writeFileSync(path.join(kbRoot, 'assets', 'ref2048', '0123456789abcdef.jpg'), kbBytes);
 
     const userAJobDir = path.join(dataDir, 'users', userA, 'jobs', imgId);
@@ -485,4 +488,3 @@ describe('resolveGeminiReferenceImages', () => {
     }
   });
 });
-

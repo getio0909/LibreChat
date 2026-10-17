@@ -230,9 +230,7 @@ describe('loadAgentTools — MCP image context', () => {
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
         '`gemini_image_gen.image_ids`',
       );
-      expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
-        '`select_region.image_id`',
-      );
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`select_region.image_id`');
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`edit_region.base_id`');
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
         '`compare_materials.base_id`',

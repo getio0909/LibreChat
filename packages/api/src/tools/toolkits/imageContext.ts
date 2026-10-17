@@ -393,6 +393,10 @@ export interface ResolveGeminiReferenceImagesParams {
     sortOptions?: Record<string, unknown>,
     selectFields?: Record<string, unknown>,
   ) => Promise<GeminiReferenceFileRecord[] | null | undefined>;
+  createFile?: (
+    data: Record<string, unknown>,
+    disableTTL?: boolean,
+  ) => Promise<GeminiReferenceFileRecord | null | undefined>;
   saveBase64Image?: (
     url: string,
     options: {
@@ -404,6 +408,12 @@ export interface ResolveGeminiReferenceImagesParams {
     },
   ) => Promise<GeminiReferenceFileRecord | null | undefined>;
   getStrategyFunctions?: (source: string) => {
+    saveBuffer?: (params: {
+      userId: string;
+      fileName: string;
+      buffer: Buffer;
+      tenantId?: string | null;
+    }) => Promise<string>;
     getDownloadStream?: (
       req: GeminiReferenceRequestContext | undefined,
       filepath: string,
@@ -562,12 +572,12 @@ async function loadStudioReferenceBytes({
         if (receipt.state === 'saved' && ALLOWED_STUDIO_ORIGINAL_FILES.has(fileField)) {
           const origBuf = readSafeFileUnderRoot(path.join(jobDir, fileField), userRoot);
           if (origBuf && origBuf.length > 0) {
-            const mimeType =
-              fileField === 'original.png'
-                ? 'image/png'
-                : fileField === 'original.webp'
-                  ? 'image/webp'
-                  : 'image/jpeg';
+            let mimeType = 'image/jpeg';
+            if (fileField === 'original.png') {
+              mimeType = 'image/png';
+            } else if (fileField === 'original.webp') {
+              mimeType = 'image/webp';
+            }
             return { buffer: origBuf, mimeType };
           }
         }
@@ -612,12 +622,14 @@ async function loadStudioReferenceBytes({
       .split(';')[0]
       .trim()
       .toLowerCase();
-    const mimeType =
-      contentType === 'image/png' || contentType === 'image/webp' || contentType === 'image/jpeg'
-        ? contentType
-        : normalizedId.startsWith('kb_')
-          ? 'image/jpeg'
-          : 'image/png';
+    let mimeType = normalizedId.startsWith('kb_') ? 'image/jpeg' : 'image/png';
+    if (
+      contentType === 'image/png' ||
+      contentType === 'image/webp' ||
+      contentType === 'image/jpeg'
+    ) {
+      mimeType = contentType;
+    }
     const arrayBuf = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuf);
     if (buffer.length === 0) {
@@ -640,6 +652,7 @@ export async function resolveGeminiReferenceImages({
   dataDir,
   settingsFile,
   getFiles,
+  createFile,
   saveBase64Image,
   getStrategyFunctions,
   fetchImpl,
@@ -717,7 +730,7 @@ export async function resolveGeminiReferenceImages({
     }
   }
 
-  // 对尚未存在 File 记录的 kb_ 与 img_ 引用，按当前用户权限加载原图并复用 saveBase64Image 创建正式 LibreChat File 记录
+  // 对尚未存在 File 记录的 kb_ 与 img_ 引用，按当前用户权限加载原图并复用 LibreChat 文件存储与 createFile 创建正式 File 记录
   const bridgedCache = new Map<string, GeminiReferenceFileRecord>();
   for (let i = 0; i < image_ids.length; i++) {
     if (orderedFiles[i]) {
@@ -734,7 +747,10 @@ export async function resolveGeminiReferenceImages({
       orderedFiles[i] = cached;
       continue;
     }
-    if (typeof saveBase64Image !== 'function') {
+    const canSaveViaBase64 = typeof saveBase64Image === 'function';
+    const canSaveViaStrategy =
+      typeof createFile === 'function' && typeof getStrategyFunctions === 'function';
+    if (!canSaveViaBase64 && !canSaveViaStrategy) {
       continue;
     }
     const loaded = await loadStudioReferenceBytes({
@@ -750,7 +766,7 @@ export async function resolveGeminiReferenceImages({
       continue;
     }
     const bridgedFileId = deriveStudioBridgeFileId(effectiveUserId, normalizedId);
-    const dataUrl = `data:${loaded.mimeType};base64,${loaded.buffer.toString('base64')}`;
+    const baseFilename = `studio_ref_${normalizedId}_img_${bridgedFileId.slice(0, 8)}`;
     const effectiveReq: GeminiReferenceRequestContext = {
       ...req,
       user: {
@@ -760,13 +776,53 @@ export async function resolveGeminiReferenceImages({
       config: req?.config ?? {},
     };
     try {
-      const savedFile = await saveBase64Image(dataUrl, {
-        req: effectiveReq,
-        file_id: bridgedFileId,
-        filename: `studio_ref_${normalizedId}_img_${bridgedFileId.slice(0, 8)}`,
-        endpoint: 'agents',
-        context: FileContext.image_generation,
-      });
+      let savedFile: GeminiReferenceFileRecord | null | undefined;
+      if (canSaveViaBase64 && saveBase64Image) {
+        const dataUrl = `data:${loaded.mimeType};base64,${loaded.buffer.toString('base64')}`;
+        savedFile = await saveBase64Image(dataUrl, {
+          req: effectiveReq,
+          file_id: bridgedFileId,
+          filename: baseFilename,
+          endpoint: 'agents',
+          context: FileContext.image_generation,
+        });
+      } else if (canSaveViaStrategy && createFile && getStrategyFunctions) {
+        const source = fileStrategy || 'local';
+        const { saveBuffer } = getStrategyFunctions(source);
+        if (typeof saveBuffer === 'function') {
+          let ext = 'png';
+          if (loaded.mimeType === 'image/jpeg') {
+            ext = 'jpg';
+          } else if (loaded.mimeType === 'image/webp') {
+            ext = 'webp';
+          }
+          const fullFilename = `${bridgedFileId}-${baseFilename}.${ext}`;
+          const filepath = await saveBuffer({
+            userId: effectiveUserId,
+            fileName: fullFilename,
+            buffer: loaded.buffer,
+            tenantId: req?.user?.tenantId,
+          });
+          if (filepath) {
+            savedFile = await createFile(
+              {
+                type: loaded.mimeType,
+                source,
+                context: FileContext.image_generation,
+                file_id: bridgedFileId,
+                filepath,
+                filename: fullFilename,
+                user: effectiveUserId,
+                bytes: loaded.buffer.length,
+                width: 1024,
+                height: 1024,
+                tenantId: req?.user?.tenantId,
+              },
+              true,
+            );
+          }
+        }
+      }
       if (savedFile?.filepath) {
         orderedFiles[i] = savedFile;
         bridgedCache.set(normalizedId, savedFile);
@@ -860,4 +916,3 @@ export async function resolveGeminiReferenceImages({
 
   return { ok: true, value: inlineDataArray };
 }
-

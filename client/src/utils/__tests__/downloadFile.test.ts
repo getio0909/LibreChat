@@ -200,4 +200,3 @@ describe('getCodeBlockFilename', () => {
     expect(getCodeBlockFilename('../../etc/passwd')).toBe('code.txt');
   });
 });
-

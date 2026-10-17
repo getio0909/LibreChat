@@ -14,8 +14,7 @@ const {
   resolveGeminiReferenceImages,
 } = require('@librechat/api');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
-const { saveBase64Image } = require('~/server/services/Files/process');
-const { spendTokens, getFiles } = require('~/models');
+const { spendTokens, getFiles, createFile } = require('~/models');
 
 /**
  * Configure proxy support for Google APIs
@@ -272,7 +271,7 @@ function createGeminiImageTool(fields = {}) {
           userId,
           fileStrategy,
           getFiles,
-          saveBase64Image,
+          createFile,
           getStrategyFunctions,
         });
         if (!referenceResult.ok) {

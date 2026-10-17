@@ -163,8 +163,14 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
 
     fs.mkdirSync(path.join(kbRoot, 'records'), { recursive: true });
     fs.mkdirSync(path.join(kbRoot, 'assets', 'ref2048'), { recursive: true });
-    fs.writeFileSync(path.join(kbRoot, 'records', '0123456789abcdef.yaml'), 'id: 0123456789abcdef\n');
-    fs.writeFileSync(path.join(kbRoot, 'assets', 'ref2048', '0123456789abcdef.jpg'), sampleJpgBuffer);
+    fs.writeFileSync(
+      path.join(kbRoot, 'records', '0123456789abcdef.yaml'),
+      'id: 0123456789abcdef\n',
+    );
+    fs.writeFileSync(
+      path.join(kbRoot, 'assets', 'ref2048', '0123456789abcdef.jpg'),
+      sampleJpgBuffer,
+    );
 
     const jobDir = path.join(dataDir, 'users', userA, 'jobs', imgId);
     fs.mkdirSync(jobDir, { recursive: true });
@@ -208,8 +214,18 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
       })),
     }));
 
+    const createFileMock = jest.fn(async (data) => {
+      const existing = fileStore.get(data.file_id);
+      const record = { ...data };
+      if (existing) {
+        existing.record = record;
+      }
+      return record;
+    });
+
     jest.doMock('~/models', () => ({
       spendTokens: jest.fn(),
+      createFile: createFileMock,
       getFiles: jest.fn(async (filter) => {
         const ids = filter?.file_id?.$in ?? [];
         return ids
@@ -218,31 +234,17 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
       }),
     }));
 
-    const saveBase64ImageMock = jest.fn(async (dataUrl, options) => {
-      const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
-      const mimeType = match?.[1] ?? 'image/png';
-      const buffer = Buffer.from(match?.[2] ?? '', 'base64');
-      const filepath = `/images/${options.req?.user?.id}/${options.filename}`;
-      const record = {
-        file_id: options.file_id,
-        filepath,
-        type: mimeType,
-        source: 'local',
-        filename: options.filename,
-        user: options.req?.user?.id,
-        width: 16,
-        height: 16,
-      };
-      fileStore.set(options.file_id, { record, bytes: buffer });
-      return record;
-    });
-
-    jest.doMock('~/server/services/Files/process', () => ({
-      saveBase64Image: saveBase64ImageMock,
-    }));
-
     jest.doMock('~/server/services/Files/strategies', () => ({
       getStrategyFunctions: jest.fn(() => ({
+        saveBuffer: jest.fn(async ({ userId, fileName, buffer }) => {
+          const filepath = `/images/${userId}/${fileName}`;
+          const fileId = fileName.slice(0, 36);
+          fileStore.set(fileId, {
+            record: { file_id: fileId, filepath, user: userId },
+            bytes: buffer,
+          });
+          return filepath;
+        }),
         getDownloadStream: jest.fn(async (_req, filepath) => {
           for (const entry of fileStore.values()) {
             if (entry.record.filepath === filepath) {
@@ -265,11 +267,11 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
       req: { user: { id: activeUserId }, config: {} },
     });
 
-    return { toolInstance, generateContentMock, saveBase64ImageMock };
+    return { toolInstance, generateContentMock, createFileMock };
   }
 
   it('bridges kb_<16-hex> and owned img_<32-hex> and sends inlineData to Gemini generateContent', async () => {
-    const { toolInstance, generateContentMock, saveBase64ImageMock } = setupToolForUser(userA);
+    const { toolInstance, generateContentMock, createFileMock } = setupToolForUser(userA);
 
     await toolInstance.func(
       {
@@ -282,11 +284,9 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
       { configurable: { thread_id: 'conv-1' } },
     );
 
-    expect(saveBase64ImageMock).toHaveBeenCalledTimes(2);
-    expect(saveBase64ImageMock.mock.calls[0][1].file_id).toBe(deriveStudioBridgeFileId(userA, kbId));
-    expect(saveBase64ImageMock.mock.calls[1][1].file_id).toBe(
-      deriveStudioBridgeFileId(userA, imgId),
-    );
+    expect(createFileMock).toHaveBeenCalledTimes(2);
+    expect(createFileMock.mock.calls[0][0].file_id).toBe(deriveStudioBridgeFileId(userA, kbId));
+    expect(createFileMock.mock.calls[1][0].file_id).toBe(deriveStudioBridgeFileId(userA, imgId));
     expect(generateContentMock).toHaveBeenCalledTimes(1);
     const callArg = generateContentMock.mock.calls[0][0];
     expect(callArg.contents).toEqual([
@@ -340,4 +340,3 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
     expect(contentResult[0].text).toContain('unresolved-id-999');
   });
 });
-
