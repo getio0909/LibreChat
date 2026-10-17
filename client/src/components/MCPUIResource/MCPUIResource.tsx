@@ -26,12 +26,18 @@ export function MCPUIResource(props: MCPUIResourceProps) {
   const { conversationId } = useOptionalMessagesConversation();
 
   const conversationResourceMap = useConversationUIResources(conversationId ?? undefined);
-  const onUIAction = useCallback(
-    async (result: UIActionResult) => handleUIAction(result, ask),
-    [ask],
-  );
-
   const uiResource = conversationResourceMap.get(resourceId ?? '');
+  const onUIAction = useCallback(
+    async (result: UIActionResult) =>
+      uiResource?.serverName
+        ? handleUIAction(result, ask, {
+            conversationId,
+            serverName: uiResource.serverName,
+            resource: uiResource,
+          })
+        : handleUIAction(result, ask),
+    [ask, conversationId, uiResource],
+  );
 
   if (!uiResource) {
     return (

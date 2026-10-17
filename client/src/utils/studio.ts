@@ -1,11 +1,19 @@
 import { atom, createStore } from 'jotai';
-import type { UIResource } from 'librechat-data-provider';
+import { ContentTypes, Tools, splitToolCallName } from 'librechat-data-provider';
+import type {
+  TAttachment,
+  TMessage,
+  TMessageContentParts,
+  UIResource,
+} from 'librechat-data-provider';
 
 const UI_DRAFT_STORAGE_KEY = 'zyb_studio_ui_drafts_v2';
 
+export const STUDIO_SERVER_NAME = 'zyb_studio';
 const STUDIO_RESOURCE_PREFIX = 'ui://zyb_studio/';
 const STUDIO_SELECTION_PREFIX = 'ui://zyb_studio/selection/';
 const STUDIO_COMPARE_PREFIX = 'ui://zyb_studio/compare/';
+const STUDIO_MODEL_PREFIX = 'ui://zyb_studio/model/';
 const STUDIO_MODEL3D_PREFIX = 'ui://zyb_studio/model3d/';
 
 const SIGNED_FILE_PATH_RE = /^\/(?:studio-)?files\/([A-Za-z0-9_-]+\.[0-9a-f]{64})$/;
@@ -25,14 +33,139 @@ export interface StudioRenewedResourceLinks {
 export interface StudioUIActionContext {
   userId?: string | null;
   conversationId?: string | null;
+  serverName?: string | null;
   resource?: UIResource | null;
   store?: ReturnType<typeof createStore>;
   renewFetcher?: typeof fetch;
 }
 
+export interface StudioLegacyPromptContext {
+  serverName?: string | null;
+  message?: TMessage | null;
+  messages?: TMessage[] | null;
+}
+
 export const studioUIStore = createStore();
 export const studioSelectionDraftsAtom = atom<Record<string, unknown>>({});
 export const studioRenewedLinksAtom = atom<Record<string, StudioRenewedResourceLinks>>({});
+
+// 解析资源所属的MCP服务名称，优先采用宿主显式传入的服务身份
+export function resolveStudioServerName(
+  resource?: Pick<UIResource, 'serverName'> | null,
+  explicitServerName?: string | null,
+): string {
+  if (typeof explicitServerName === 'string' && explicitServerName.trim()) {
+    return explicitServerName.trim();
+  }
+  if (typeof resource?.serverName === 'string' && resource.serverName.trim()) {
+    return resource.serverName.trim();
+  }
+  return '';
+}
+
+// 校验UIResource是否同时具备zyb_studio服务身份与ui://zyb_studio/资源URI前缀
+export function isStudioUIResource(
+  resource?: Pick<UIResource, 'uri' | 'serverName'> | null,
+  explicitServerName?: string | null,
+): boolean {
+  if (!resource || typeof resource.uri !== 'string') {
+    return false;
+  }
+  const uri = resource.uri.trim();
+  if (!uri.startsWith(STUDIO_RESOURCE_PREFIX)) {
+    return false;
+  }
+  return resolveStudioServerName(resource, explicitServerName) === STUDIO_SERVER_NAME;
+}
+
+function isStudioModelUri(uri: string): boolean {
+  return uri.startsWith(STUDIO_MODEL_PREFIX) || uri.startsWith(STUDIO_MODEL3D_PREFIX);
+}
+
+function extractToolCallPartInfo(
+  part: TMessageContentParts | undefined,
+): { id: string; serverName: string } | null {
+  if (!part || part.type !== ContentTypes.TOOL_CALL) {
+    return null;
+  }
+  const toolCall = part[ContentTypes.TOOL_CALL];
+  if (!toolCall) {
+    return null;
+  }
+  let rawName = '';
+  if ('name' in toolCall && typeof toolCall.name === 'string') {
+    rawName = toolCall.name;
+  } else if ('function' in toolCall && typeof toolCall.function?.name === 'string') {
+    rawName = toolCall.function.name;
+  }
+  if (!rawName) {
+    return null;
+  }
+  const [, serverName] = splitToolCallName(rawName, [STUDIO_SERVER_NAME]);
+  return {
+    id: typeof toolCall.id === 'string' ? toolCall.id : '',
+    serverName: serverName ?? '',
+  };
+}
+
+// 从会话消息的tool_call分片构建权威MCP服务身份索引，防止非Studio服务伪造serverName或URI
+export function buildMessageToolServerLookup(messages?: TMessage[] | null): {
+  byToolCallId: Map<string, string>;
+  byMessageId: Map<string, string>;
+} {
+  const byToolCallId = new Map<string, string>();
+  const byMessageId = new Map<string, string>();
+  if (!Array.isArray(messages)) {
+    return { byToolCallId, byMessageId };
+  }
+  for (const message of messages) {
+    if (!message || !Array.isArray(message.content)) {
+      continue;
+    }
+    const messageServers = new Set<string>();
+    for (const part of message.content) {
+      const info = extractToolCallPartInfo(part);
+      if (!info) {
+        continue;
+      }
+      messageServers.add(info.serverName);
+      if (info.id) {
+        byToolCallId.set(info.id, info.serverName);
+      }
+    }
+    if (message.messageId && messageServers.size === 1) {
+      const [singleServer] = Array.from(messageServers);
+      byMessageId.set(message.messageId, singleServer);
+    }
+  }
+  return { byToolCallId, byMessageId };
+}
+
+// 根据宿主消息中的权威tool_call记录为UIResource绑定或覆写serverName
+export function stampVerifiedResourceServerName(
+  resource: UIResource,
+  attachment: TAttachment,
+  lookup: { byToolCallId: Map<string, string>; byMessageId: Map<string, string> },
+  fallbackMessageId?: string,
+): UIResource {
+  const toolCallId = typeof attachment.toolCallId === 'string' ? attachment.toolCallId : '';
+  const messageId =
+    (typeof attachment.messageId === 'string' && attachment.messageId) || fallbackMessageId || '';
+  const authoritativeServer =
+    (toolCallId ? lookup.byToolCallId.get(toolCallId) : undefined) ??
+    (messageId ? lookup.byMessageId.get(messageId) : undefined);
+  if (authoritativeServer === undefined) {
+    return resource;
+  }
+  const normalizedServer = authoritativeServer || undefined;
+  if (resource.serverName === normalizedServer) {
+    return resource;
+  }
+  return {
+    ...resource,
+    serverName: normalizedServer,
+  };
+}
 
 function readSessionDraftMap(): Record<string, unknown> {
   if (typeof window === 'undefined' || !window.sessionStorage) {
@@ -166,6 +299,10 @@ export function extractStudioSelectionImageId(uri: string | undefined | null): s
   return uri.slice(STUDIO_SELECTION_PREFIX.length).split(/[?#]/)[0].trim();
 }
 
+function extractEmbeddedModelUrl(html: string | undefined): string {
+  return extractConstString(html, 'INITIAL_MODEL_URL') || extractConstString(html, 'MODEL_URL');
+}
+
 export function buildStudioDraftKey(
   context: StudioUIActionContext,
   explicitCapability?: string,
@@ -173,7 +310,7 @@ export function buildStudioDraftKey(
   const userId = typeof context.userId === 'string' ? context.userId.trim() : '';
   const resource = context.resource;
   const imageId = extractStudioSelectionImageId(resource?.uri);
-  if (!userId || !resource || !imageId) {
+  if (!userId || !resource || !imageId || !isStudioUIResource(resource, context.serverName)) {
     return '';
   }
   const conversationScope =
@@ -192,7 +329,7 @@ export function buildStudioResourceKey(context: StudioUIActionContext): string {
   const userId = typeof context.userId === 'string' ? context.userId.trim() : '';
   const resource = context.resource;
   const uri = typeof resource?.uri === 'string' ? resource.uri.trim() : '';
-  if (!userId || !uri.startsWith(STUDIO_RESOURCE_PREFIX)) {
+  if (!userId || !resource || !isStudioUIResource(resource, context.serverName)) {
     return '';
   }
   const conversationScope =
@@ -200,7 +337,7 @@ export function buildStudioResourceKey(context: StudioUIActionContext): string {
       ? context.conversationId.trim()
       : 'active';
   const resourceScope =
-    typeof resource?.resourceId === 'string' && resource.resourceId.trim()
+    typeof resource.resourceId === 'string' && resource.resourceId.trim()
       ? resource.resourceId.trim()
       : 'resource';
   const capabilityScope = extractStudioEditorCapability(resource);
@@ -308,28 +445,117 @@ function formatLocalTimestampDisplay(isoText: string): string {
 const LEGACY_UI_PROMPT_WRAPPER_RE =
   /^The user clicked a button in an embedded UI Resource,\s*and we got a message of type `prompt`\.[\s\S]*?```(?:[a-zA-Z0-9_-]*)\n([\s\S]*?)\n```[\s\S]*$/;
 
-// 剥离历史会话中已落库的英文MCP-UI包装文本与代码块围栏，使气泡展示纯中文确认选区内容
-export function unwrapLegacyUIPromptText(text: string): string {
+// 严格匹配智印工坊选区编辑器的确认选区消息载荷（sel_<hex> + 底图UUID或img_<hex>）
+const STUDIO_CONFIRMED_SELECTION_PROMPT_RE =
+  /^已确认选区\s+(sel_[0-9a-f]{16,64})（底图\s+([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|img_[0-9a-f]{12,64})）(?:。|，请执行局部修改：[^\r\n]+)$/i;
+
+function hasConfirmedStudioSelectionOrigin(
+  imageId: string,
+  context?: StudioLegacyPromptContext,
+): boolean {
+  if (!context) {
+    return false;
+  }
+  if (typeof context.serverName === 'string' && context.serverName.trim() === STUDIO_SERVER_NAME) {
+    return true;
+  }
+  if (!Array.isArray(context.messages) || context.messages.length === 0) {
+    return false;
+  }
+
+  const lookup = buildMessageToolServerLookup(context.messages);
+  const expectedUri = `${STUDIO_SELECTION_PREFIX}${imageId}`;
+  let hasStudioOrigin = false;
+  let hasSpoofedSelectionUri = false;
+
+  for (const srv of lookup.byToolCallId.values()) {
+    if (srv === STUDIO_SERVER_NAME) {
+      hasStudioOrigin = true;
+    }
+  }
+  for (const srv of lookup.byMessageId.values()) {
+    if (srv === STUDIO_SERVER_NAME) {
+      hasStudioOrigin = true;
+    }
+  }
+
+  for (const msg of context.messages) {
+    if (!msg || !Array.isArray(msg.attachments)) {
+      continue;
+    }
+    for (const attachment of msg.attachments) {
+      if (attachment?.type !== Tools.ui_resources) {
+        continue;
+      }
+      const resources = attachment[Tools.ui_resources];
+      if (!Array.isArray(resources)) {
+        continue;
+      }
+      for (const rawResource of resources) {
+        if (!rawResource) {
+          continue;
+        }
+        const stamped = stampVerifiedResourceServerName(
+          rawResource,
+          attachment,
+          lookup,
+          msg.messageId,
+        );
+        if (stamped.uri === expectedUri) {
+          if (stamped.serverName === STUDIO_SERVER_NAME) {
+            hasStudioOrigin = true;
+          } else {
+            hasSpoofedSelectionUri = true;
+          }
+        }
+      }
+    }
+  }
+
+  const parentId = context.message?.parentMessageId;
+  if (parentId && lookup.byMessageId.has(parentId)) {
+    if (lookup.byMessageId.get(parentId) !== STUDIO_SERVER_NAME) {
+      return false;
+    }
+  }
+
+  return hasStudioOrigin && !hasSpoofedSelectionUri;
+}
+
+// 仅在确认属于智印工坊选区消息时，剥离历史落库的英文MCP-UI包装文本与代码块围栏
+export function unwrapLegacyUIPromptText(
+  text: string,
+  context?: StudioLegacyPromptContext,
+): string {
   if (typeof text !== 'string' || !text.includes('embedded UI Resource')) {
     return text;
   }
   const match = LEGACY_UI_PROMPT_WRAPPER_RE.exec(text.trim());
-  if (match?.[1]) {
-    return match[1].trim();
+  const inner = match?.[1]?.trim();
+  if (!inner) {
+    return text;
   }
-  return text;
+  const selectionMatch = STUDIO_CONFIRMED_SELECTION_PROMPT_RE.exec(inner);
+  if (!selectionMatch?.[2]) {
+    return text;
+  }
+  if (!hasConfirmedStudioSelectionOrigin(selectionMatch[2], context)) {
+    return text;
+  }
+  return inner;
 }
 
 export function upgradePersistedStudioHtml(
   html: string,
   uri?: string | null,
   renewedLinks?: StudioRenewedResourceLinks,
+  serverName?: string | null,
 ): string {
   if (
     typeof html !== 'string' ||
     !html ||
     typeof uri !== 'string' ||
-    !uri.startsWith(STUDIO_RESOURCE_PREFIX)
+    !isStudioUIResource({ uri, serverName: serverName ?? undefined }, serverName)
   ) {
     return html;
   }
@@ -398,6 +624,10 @@ export function upgradePersistedStudioHtml(
   if (renewedLinks.modelUrl) {
     const safeModelJson = JSON.stringify(renewedLinks.modelUrl);
     next = next.replace(
+      /const\s+INITIAL_MODEL_URL\s*=\s*"(?:\\.|[^"\\])*";/,
+      `const INITIAL_MODEL_URL = ${safeModelJson};`,
+    );
+    next = next.replace(
       /const\s+MODEL_URL\s*=\s*"(?:\\.|[^"\\])*";/,
       `const MODEL_URL = ${safeModelJson};`,
     );
@@ -407,6 +637,10 @@ export function upgradePersistedStudioHtml(
     next = next.replace(
       /const\s+EXPIRES_AT\s*=\s*"(?:\\.|[^"\\])*";/,
       `const EXPIRES_AT = ${safeExpiresJson};`,
+    );
+    next = next.replace(
+      /(id="model-expires-badge"\s+data-expires=")[^"]*(")/,
+      `$1${renewedLinks.expiresAt.replace(/"/g, '&quot;')}$2`,
     );
   }
   if (renewedLinks.previewExpiresAt) {
@@ -435,7 +669,7 @@ export async function renewStudioResourceLinks(
   const userId = typeof context.userId === 'string' ? context.userId.trim() : '';
   const resource = context.resource;
   const resourceUri = typeof resource?.uri === 'string' ? resource.uri.trim() : '';
-  if (!userId || !resource || !resourceUri.startsWith(STUDIO_RESOURCE_PREFIX)) {
+  if (!userId || !resource || !isStudioUIResource(resource, context.serverName)) {
     return { status: 'rejected', reason: 'unauthenticated_or_invalid_resource' };
   }
   if (
@@ -474,8 +708,8 @@ export async function renewStudioResourceLinks(
     endpointUrl = isValidStudioSignedUrl(payload.afterUrl, embeddedAfterUrl, 'img:')
       ? payload.afterUrl
       : embeddedAfterUrl;
-  } else if (resourceUri.startsWith(STUDIO_MODEL3D_PREFIX)) {
-    const embeddedModelUrl = extractConstString(html, 'MODEL_URL');
+  } else if (isStudioModelUri(resourceUri)) {
+    const embeddedModelUrl = extractEmbeddedModelUrl(html);
     referencePreviewUrl = embeddedModelUrl;
     endpointUrl = isValidStudioSignedUrl(payload.modelUrl, embeddedModelUrl, 'model:')
       ? payload.modelUrl
@@ -504,7 +738,7 @@ export async function renewStudioResourceLinks(
         preview_url: referencePreviewUrl || payload.previewUrl,
         before_url: extractConstString(html, 'BEFORE_URL') || payload.beforeUrl,
         after_url: extractConstString(html, 'AFTER_URL') || payload.afterUrl,
-        model_url: extractConstString(html, 'MODEL_URL') || payload.modelUrl,
+        model_url: extractEmbeddedModelUrl(html) || payload.modelUrl,
       }),
     });
     if (!response.ok) {
@@ -548,7 +782,10 @@ export async function renewStudioResourceLinks(
       renewed.afterUrl = candidateAfterUrl;
     }
 
-    const candidateModelUrl = data.modelUrl ?? data.model_url;
+    const candidateModelUrl =
+      data.modelUrl ??
+      data.model_url ??
+      (isStudioModelUri(resourceUri) ? (data.signedUrl ?? data.signed_url) : undefined);
     if (
       referencePreviewUrl &&
       isValidStudioSignedUrl(candidateModelUrl, referencePreviewUrl, 'model:')

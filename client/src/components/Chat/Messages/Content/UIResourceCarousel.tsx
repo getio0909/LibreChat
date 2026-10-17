@@ -27,6 +27,16 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
     async (result: UIActionResult) => handleUIAction(result, ask),
     [ask],
   );
+  const handleResourceUIAction = useCallback(
+    async (result: UIActionResult, resource: UIResource) =>
+      resource.serverName
+        ? handleUIAction(result, ask, {
+            serverName: resource.serverName,
+            resource,
+          })
+        : onUIAction(result),
+    [ask, onUIAction],
+  );
   const supportedUIResources = React.useMemo(
     () => uiResources.filter(isSupportedUIResource),
     [uiResources],
@@ -69,10 +79,11 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
   }
 
   if (supportedUIResources.length === 1) {
+    const singleResource = supportedUIResources[0];
     return (
       <UIResourceRenderer
-        resource={supportedUIResources[0]}
-        onUIAction={onUIAction}
+        resource={singleResource}
+        onUIAction={(result) => handleResourceUIAction(result, singleResource)}
         htmlProps={AUTO_RESIZE_HTML_PROPS}
       />
     );
@@ -120,7 +131,7 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
 
           return (
             <div
-              key={uiResource.uri || uiResource.resourceId || index}
+              key={uiResource.resourceId || uiResource.uri || index}
               className="animate-in fade-in-0 slide-in-from-bottom-5 shrink-0 transform-gpu transition-all duration-300 ease-out"
               style={{
                 width: `${width}px`,
@@ -131,7 +142,7 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
               <div className="flex h-full flex-col">
                 <UIResourceRenderer
                   resource={uiResource}
-                  onUIAction={onUIAction}
+                  onUIAction={(result) => handleResourceUIAction(result, uiResource)}
                   htmlProps={AUTO_RESIZE_HTML_PROPS}
                 />
               </div>
