@@ -380,6 +380,16 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
       `Expected <= 380 Chinese characters, got ${chineseChars}`,
     );
     assert.ok(prefix.length <= 520, `Expected <= 520 total characters, got ${prefix.length}`);
+    for (const domainRule of [
+      '物体数量',
+      '空间位置关系',
+      '宗教符号',
+      '文化身份',
+      '资料依据',
+      '可制造工艺',
+    ]) {
+      assert.ok(prefix.includes(domainRule), `promptPrefix must retain domain rule: ${domainRule}`);
+    }
     for (const toolName of [
       'gemini_image_gen',
       'select_region',
