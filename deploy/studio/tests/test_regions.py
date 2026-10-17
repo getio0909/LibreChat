@@ -1544,9 +1544,23 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             assert err_payload["state"] == "recoverable"
             assert err_payload["recoverable"] is True
             assert "may have been billed" in err_payload["error"]
-            assert "finish_region_edit" in err_payload["error"]
+            assert "edit_region" in err_payload["error"]
+            assert "finish_region_edit" not in err_payload["error"]
             job_id = err_payload["job_id"]
             assert job_id.startswith("img_")
+
+            # 校验 tools/list 公开的工具面包含 edit_region 且其 schema 声明了 job_id
+            tools_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={"jsonrpc": "2.0", "id": 420, "method": "tools/list", "params": {}},
+            )
+            assert tools_res.status_code == 200
+            discovered_tools = {
+                t["name"]: t for t in tools_res.json()["result"]["tools"]
+            }
+            assert "edit_region" in discovered_tools
+            assert "job_id" in discovered_tools["edit_region"]["inputSchema"]["properties"]
 
             job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / job_id
             assert (job_dir / "crop.png").is_file()
@@ -1560,7 +1574,7 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             assert receipt_data["state"] == "recoverable"
             assert resolve_image(studio_env, USER_A, "@latest").id == upload_id
 
-            # 3. 恢复原底图字节后，调用 finish_region_edit(job_id) 直接用已保存的 crop.png 完成回贴，不触发第二次供应商请求
+            # 3. 恢复原底图字节后，调用公开工具 edit_region(job_id=...) 直接用已保存的 crop.png 完成回贴，不触发第二次供应商请求
             base_file.write_bytes(original_base_bytes)
             recover_res = await client.post(
                 "/mcp",
@@ -1570,7 +1584,7 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
                     "id": 43,
                     "method": "tools/call",
                     "params": {
-                        "name": "finish_region_edit",
+                        "name": "edit_region",
                         "arguments": {"job_id": job_id},
                     },
                 },

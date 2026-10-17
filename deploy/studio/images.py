@@ -891,7 +891,7 @@ async def generate_seedream(
             raise GenerationUncertain(
                 f"Paid local crop was saved for job {job_id}, but local composite failed ({exc}); "
                 f"the request may have been billed and no automatic retry was performed. "
-                f"Call finish_region_edit with job_id='{job_id}' to composite the saved crop without a new paid call.",
+                f"Call edit_region with job_id='{job_id}' to composite the saved crop without a new paid call.",
                 job_id=job_id,
                 state="recoverable",
             ) from exc
@@ -1315,7 +1315,7 @@ async def generate_gemini(
             raise GenerationUncertain(
                 f"Paid local crop was saved for job {job_id}, but local composite failed ({exc}); "
                 f"the request may have been billed and no automatic retry was performed. "
-                f"Call finish_region_edit with job_id='{job_id}' to composite the saved crop without a new paid call.",
+                f"Call edit_region with job_id='{job_id}' to composite the saved crop without a new paid call.",
                 job_id=job_id,
                 state="recoverable",
             ) from exc
