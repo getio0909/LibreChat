@@ -646,9 +646,12 @@ async def generate_seedream(
     }
 
     try:
+        # 设定10秒连接超时以加速双栈回退；任何未发送请求字节的ConnectError/ConnectTimeout均标记为failed且未计费
         async with httpx.AsyncClient(
             transport=transport,
-            timeout=httpx.Timeout(float(settings.seedream_timeout_seconds)),
+            timeout=httpx.Timeout(
+                float(settings.seedream_timeout_seconds), connect=10.0
+            ),
             follow_redirects=False,
         ) as client:
             response = await client.post(url, json=body, headers=headers)
@@ -656,6 +659,24 @@ async def generate_seedream(
     except asyncio.CancelledError:
         _mark_uncertain(destination, record)
         raise
+    except (httpx.ConnectError, httpx.ConnectTimeout):
+        record.update(
+            state="failed",
+            billed=False,
+            error_code="connect_error",
+            finished=time.time(),
+        )
+        try:
+            write_receipt(destination, record)
+        except OSError:
+            pass
+        connect_err = RuntimeError(
+            "Image generation service connection failed before request dispatch "
+            "(the request was not billed); no automatic retry was performed"
+        )
+        connect_err.state = "failed"  # type: ignore[attr-defined]
+        connect_err.billed = False  # type: ignore[attr-defined]
+        raise connect_err from None
     except (httpx.TimeoutException, TimeoutError, httpx.HTTPError, OSError):
         _mark_uncertain(destination, record)
         raise GenerationUncertain(uncertain_msg) from None

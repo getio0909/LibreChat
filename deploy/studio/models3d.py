@@ -1054,14 +1054,9 @@ class ModelJobManager:
             return cleaned
         return None
 
-    # 创建访问火山方舟3D任务接口的HTTP客户端
+    # 创建访问火山方舟3D任务接口的HTTP客户端（总超时60秒、连接超时10秒以加速双栈回退）
     def _build_client(self) -> httpx.AsyncClient:
-        timeout = httpx.Timeout(
-            connect=30.0,
-            read=60.0,
-            write=60.0,
-            pool=30.0,
-        )
+        timeout = httpx.Timeout(60.0, connect=10.0)
         return httpx.AsyncClient(
             transport=self._ark_transport,
             timeout=timeout,
@@ -1380,6 +1375,25 @@ class ModelJobManager:
                             job_id=model_id,
                             state="uncertain",
                         ) from None
+                    except (httpx.ConnectError, httpx.ConnectTimeout) as exc:
+                        # 连接阶段尚未发送任何请求字节，直接归类为failed且未计费（不产生uncertain警告）
+                        _transition_model_receipt(
+                            model_dir,
+                            receipt,
+                            "failed",
+                            best_effort=True,
+                            finished=time.time(),
+                            billed=False,
+                            error_code="connect_error",
+                        )
+                        connect_err = RuntimeError(
+                            "3D model generation service connection failed before request dispatch "
+                            "(the request was not billed); no automatic retry was performed"
+                        )
+                        connect_err.state = "failed"  # type: ignore[attr-defined]
+                        connect_err.billed = False  # type: ignore[attr-defined]
+                        connect_err.job_id = model_id  # type: ignore[attr-defined]
+                        raise connect_err from exc
                     except (
                         httpx.TimeoutException,
                         httpx.TransportError,
@@ -1517,6 +1531,18 @@ class ModelJobManager:
 
         if state == "failed":
             self._release_job_lease(uid, mid)
+            if (
+                receipt.get("billed") is False
+                or receipt.get("error_code") == "connect_error"
+            ):
+                connect_err = RuntimeError(
+                    "3D model generation service connection failed before request dispatch "
+                    "(the request was not billed); no automatic retry was performed"
+                )
+                connect_err.state = "failed"  # type: ignore[attr-defined]
+                connect_err.billed = False  # type: ignore[attr-defined]
+                connect_err.job_id = mid  # type: ignore[attr-defined]
+                raise connect_err
             raise GenerationUncertain(
                 "3D model generation task failed; the request may have been billed. Do not automatically resubmit.",
                 job_id=mid,

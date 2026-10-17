@@ -137,13 +137,20 @@ async def plan_concepts(
     }
 
     try:
+        # 设定10秒连接超时以加速IPv4不可达时的IPv6回退，并区分派发前连接失败与派发后读取超时
         async with httpx.AsyncClient(
             transport=transport,
-            timeout=httpx.Timeout(float(settings.planner_timeout_seconds)),
+            timeout=httpx.Timeout(
+                float(settings.planner_timeout_seconds), connect=10.0
+            ),
             follow_redirects=False,
         ) as client:
             response = await client.post(url, json=body, headers=headers)
             raw_bytes = response.content
+    except (httpx.ConnectError, httpx.ConnectTimeout):
+        raise RuntimeError(
+            "Concept planning service connection failed before request dispatch (the request was not billed); no automatic retry was performed"
+        ) from None
     except (httpx.TimeoutException, TimeoutError):
         raise RuntimeError(
             "Concept planning timed out; no automatic retry was performed"

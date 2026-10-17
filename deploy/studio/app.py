@@ -1187,6 +1187,16 @@ def build_mcp_server(
             )
         except (ValueError, TypeError, RuntimeError, OSError) as exc:
             err_payload = {"error": str(exc)}
+            exc_state = getattr(exc, "state", None)
+            if isinstance(exc_state, str) and exc_state:
+                err_payload["state"] = exc_state
+            exc_billed = getattr(exc, "billed", None)
+            if isinstance(exc_billed, bool):
+                err_payload["billed"] = exc_billed
+            exc_job_id = getattr(exc, "job_id", None)
+            if isinstance(exc_job_id, str) and exc_job_id:
+                err_payload["job_id"] = exc_job_id
+                err_payload["model_id"] = exc_job_id
             return types.CallToolResult(
                 content=[
                     types.TextContent(
