@@ -693,3 +693,19 @@ test('gemini-4-argon is recognized as multimodal and formats image blocks, tool 
   });
 });
 
+test('zh-Hans locale translates designer-visible Projects sidebar and upstream model error strings', () => {
+  // 校验简体中文语言包覆盖项目侧栏与上游模型错误提示键
+  const zhTranslation = JSON.parse(
+    fs.readFileSync('client/src/locales/zh-Hans/translation.json', 'utf8'),
+  );
+  assert.equal(zhTranslation.com_ui_projects, '项目');
+  assert.equal(zhTranslation.com_ui_project, '项目');
+  assert.equal(zhTranslation.com_ui_create_project, '创建项目');
+  assert.equal(zhTranslation.com_ui_new_chat_in_project, '在 {{name}} 中新建对话');
+  assert.equal(zhTranslation.com_error_upstream_model, '模型服务暂时无法完成此请求。');
+  assert.equal(
+    zhTranslation.com_error_upstream_model_status,
+    '模型服务暂时无法完成此请求（状态码 {{0}}）。',
+  );
+});
+
