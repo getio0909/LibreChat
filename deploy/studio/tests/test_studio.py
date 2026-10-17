@@ -5594,3 +5594,87 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
 
     asyncio.run(_run())
 
+
+# 校验search_library对「须弥座石雕参考」等多词复合中文查询的分词、停用词剔除、加权排序及缩略图kb_<id>标注
+def test_search_library_chinese_multi_term_tokenization_ranking_and_thumbnail_labels(
+    studio_env: StudioSettings,
+) -> None:
+    real_kb_root = Path(__file__).resolve().parents[3] / "knowledge"
+    assert (real_kb_root / "catalog" / "materials.yaml").is_file()
+    real_index = load_kb_index(real_kb_root)
+
+    # 1. 验证口语停用词（参考、图片、找几张、从资料库）被剔除且复合词切分为实词词元
+    assert real_index._tokenize_query("「须弥座石雕参考」") == ["须弥座", "石雕"]
+    assert real_index._tokenize_query("从资料库找几张须弥座石雕参考图片") == [
+        "须弥座",
+        "石雕",
+    ]
+    assert real_index._tokenize_query("汉白玉莲花柱础参考") == [
+        "汉白玉",
+        "莲花",
+        "柱础",
+    ]
+
+    # 2. 在真实knowledge/记录上检索「须弥座石雕参考」及E2E多词查询，验证非空且按字段权重排序
+    hits_xumizuo = real_index.search("「须弥座石雕参考」", limit=6)
+    assert len(hits_xumizuo) == 6
+    hit_ids = [r.kb_id for r in hits_xumizuo]
+    assert "kb_9ffe71e1ee8bd6e7" in hit_ids
+    assert "kb_db8c9deb470a3da2" in hit_ids
+    assert "kb_b22027a7c44dd495" in hit_ids
+    for rec in hits_xumizuo:
+        assert not rec.is_flagged
+        assert "须弥座" in rec.search_all
+        assert "石雕" in rec.search_all
+
+    # 多词部分命中回退：如“须弥座 石雕 深青灰”与“须弥座 束腰 浮雕 石座”不再返回0条结果
+    hits_grey = real_index.search("须弥座 石雕 深青灰", limit=8)
+    assert len(hits_grey) >= 4
+    hits_waist = real_index.search("须弥座 束腰 浮雕 石座", role="造型", limit=8)
+    assert len(hits_waist) >= 4
+    assert any(r.kb_id == "kb_f462f55696238fbd" for r in hits_waist)
+
+    # 3. 通过MCP端到端调用search_library，验证工具文本中显式包含每张缩略图对应的kb_<id>标签
+    real_env = studio_env.model_copy(update={"kb_root": real_kb_root})
+    app = create_app(settings=real_env, rules=load_rules())
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 901,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "search_library",
+                        "arguments": {
+                            "query": "「须弥座石雕参考」",
+                            "limit": 4,
+                        },
+                    },
+                },
+            )
+            assert res.status_code == 200
+            result = res.json()["result"]
+            assert result.get("isError") is False
+            blocks = result["content"]
+            tool_text = blocks[0]["text"]
+            payload = json.loads(tool_text)
+            assert payload["count"] == 4
+            assert len(blocks) == 1 + 4
+            assert len(payload["thumbnails"]) == 4
+            assert len(payload["thumbnail_labels"]) == 4
+            for idx, item in enumerate(payload["results"], start=1):
+                assert item["id"].startswith("kb_")
+                assert item["thumbnail_index"] == idx
+                assert item["id"] in item["thumbnail_label"]
+                assert payload["thumbnails"][idx - 1]["id"] == item["id"]
+                assert item["id"] in payload["thumbnail_labels"][idx - 1]
+                assert item["thumbnail_label"] in tool_text
+
+    asyncio.run(_run())
+

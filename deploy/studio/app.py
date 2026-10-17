@@ -577,9 +577,10 @@ def build_mcp_server(
                 )
                 result_items: list[dict[str, Any]] = []
                 thumb_blocks: list[types.ImageContent] = []
+                thumbnail_entries: list[dict[str, Any]] = []
                 emitted_records = []
                 for rec in matched:
-                    result_items.append(rec.to_search_dict())
+                    item_dict = rec.to_search_dict()
                     if (
                         rec.thumb512_path.is_file()
                         and not rec.thumb512_path.is_symlink()
@@ -593,13 +594,31 @@ def build_mcp_server(
                             )
                         )
                         emitted_records.append(rec)
+                        thumb_idx = len(thumb_blocks)
+                        thumb_label = f"图{thumb_idx}: {rec.kb_id} ({rec.title_zh})"
+                        item_dict["thumbnail_index"] = thumb_idx
+                        item_dict["thumbnail_label"] = thumb_label
+                        thumbnail_entries.append(
+                            {
+                                "index": thumb_idx,
+                                "id": rec.kb_id,
+                                "title": rec.title_zh,
+                                "label": thumb_label,
+                            }
+                        )
+                    result_items.append(item_dict)
                 record_search_previews(settings, user_id, emitted_records)
 
+                # 在工具返回的JSON文本中显式标注每张缩略图序号对应的kb_<id>
                 search_payload = {
                     "results": result_items,
                     "items": result_items,
                     "count": len(result_items),
                     "query": query.strip(),
+                    "thumbnails": thumbnail_entries,
+                    "thumbnail_labels": [
+                        entry["label"] for entry in thumbnail_entries
+                    ],
                 }
                 return types.CallToolResult(
                     content=[

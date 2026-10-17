@@ -32,6 +32,371 @@ LIBRARY_REGIONS: tuple[str, ...] = (
 ASSET_ID_RE = re.compile(r"^[0-9a-f]{16}$")
 KB_ID_RE = re.compile(r"^kb_([0-9a-f]{16})$")
 TOKEN_RE = re.compile(r"[a-z0-9]+|[\u4e00-\u9fff]+")
+CJK_ONLY_RE = re.compile(r"^[\u4e00-\u9fff]+$")
+
+# 检索查询中应剔除的常见口语前缀、后缀与停用词
+QUERY_STOP_PHRASES: tuple[str, ...] = (
+    "帮我找几张",
+    "帮我找一些",
+    "帮我找一张",
+    "帮我找",
+    "从资料库",
+    "资料库里",
+    "资料库",
+    "知识库",
+    "请提供",
+    "找几张",
+    "找一张",
+    "找一些",
+    "找几个",
+    "来几张",
+    "来一张",
+    "搜一下",
+    "查一下",
+    "看几张",
+    "参考图片",
+    "参考图像",
+    "参考素材",
+    "参考案例",
+    "参考图",
+    "参考照",
+    "风格参考",
+    "造型参考",
+    "材质参考",
+    "纹样参考",
+    "设计参考",
+    "设计案例",
+    "设计方案",
+    "效果图",
+    "高清图",
+    "示意图",
+    "样本图",
+    "相关的",
+    "类似的",
+    "有关的",
+)
+QUERY_STOP_WORDS: frozenset[str] = frozenset(
+    {
+        *QUERY_STOP_PHRASES,
+        "参考",
+        "图片",
+        "图像",
+        "照片",
+        "图库",
+        "素材",
+        "案例",
+        "样图",
+        "样本",
+        "大图",
+        "高清",
+        "效果",
+        "方案",
+        "设计",
+        "样式",
+        "款式",
+        "搜索",
+        "查找",
+        "查询",
+        "检索",
+        "看看",
+        "提供",
+        "相关",
+        "类似",
+        "有关",
+        "关于",
+        "的",
+        "与",
+        "和",
+        "及",
+        "或",
+        "中",
+        "里",
+        "上",
+        "下",
+        "有",
+        "带",
+        "用",
+        "做",
+        "配",
+        "看",
+        "找",
+        "张",
+        "个",
+        "种",
+        "类",
+        "图",
+    }
+)
+QUERY_STOP_CHARS: str = "的与和及或中里上下有带用做配看找张个种类图"
+
+# 佛教空间、石雕木作、建筑构件、器物与纹样领域核心词典（用于无空格中文复合词切分）
+DOMAIN_TERMS: tuple[str, ...] = (
+    "大雄宝殿",
+    "天王殿",
+    "观音殿",
+    "地藏殿",
+    "藏经阁",
+    "千佛殿",
+    "大佛殿",
+    "万佛墙",
+    "万佛柱",
+    "千佛墙",
+    "千佛龛",
+    "千佛",
+    "须弥座",
+    "金刚座",
+    "莲花座",
+    "仰覆莲",
+    "莲座",
+    "石座",
+    "台座",
+    "底座",
+    "基座",
+    "台基",
+    "佛龛",
+    "石龛",
+    "壁龛",
+    "拱龛",
+    "藻井",
+    "穹顶",
+    "平棊",
+    "斗拱",
+    "梁枋",
+    "雀替",
+    "柱础",
+    "柱套",
+    "抱鼓石",
+    "门楣",
+    "牌坊",
+    "山门",
+    "照壁",
+    "影壁",
+    "栏杆",
+    "护栏",
+    "栏板",
+    "望柱",
+    "御道",
+    "丹陛",
+    "石阶",
+    "台阶",
+    "踏跺",
+    "拱桥",
+    "水刀拼花",
+    "拼花",
+    "背景墙",
+    "景墙",
+    "幕墙",
+    "连廊",
+    "回廊",
+    "格栅",
+    "花窗",
+    "镂空窗",
+    "镂空屏",
+    "屏风",
+    "隔扇",
+    "隔断",
+    "吊顶",
+    "天花",
+    "地面",
+    "铺装",
+    "平面图",
+    "施工图",
+    "立面图",
+    "节点图",
+    "尺寸图",
+    "剖面",
+    "立面",
+    "清水混凝土",
+    "汉白玉",
+    "大理石",
+    "花岗岩",
+    "青白玉",
+    "青白石",
+    "青黑石",
+    "红砂岩",
+    "黄砂岩",
+    "绿砂岩",
+    "石灰石",
+    "太湖石",
+    "透光石",
+    "老榆木",
+    "金丝楠",
+    "胡桃木",
+    "铜鎏金",
+    "青石",
+    "砂岩",
+    "奢石",
+    "玉石",
+    "云石",
+    "红玉",
+    "墨玉",
+    "啡网",
+    "板岩",
+    "石材",
+    "原木",
+    "楠木",
+    "樟木",
+    "红木",
+    "乌木",
+    "松木",
+    "实木",
+    "木质",
+    "鎏金",
+    "古铜",
+    "青铜",
+    "黄铜",
+    "琉璃",
+    "金箔",
+    "贴金",
+    "描金",
+    "金漆",
+    "朱漆",
+    "彩绘",
+    "重彩",
+    "青灰",
+    "深灰",
+    "浅灰",
+    "米黄",
+    "暖金",
+    "黑金",
+    "红棕",
+    "石雕",
+    "木雕",
+    "铜雕",
+    "玉雕",
+    "砖雕",
+    "泥塑",
+    "石刻",
+    "高浮雕",
+    "深浮雕",
+    "浅浮雕",
+    "浮雕",
+    "透雕",
+    "镂空雕",
+    "镂空",
+    "圆雕",
+    "线刻",
+    "阴刻",
+    "阳刻",
+    "雕刻",
+    "雕花",
+    "石作",
+    "木作",
+    "大板",
+    "荒料",
+    "矿山",
+    "车间",
+    "释迦牟尼",
+    "阿弥陀佛",
+    "药师佛",
+    "三世佛",
+    "西方三圣",
+    "华严三圣",
+    "千手观音",
+    "观音菩萨",
+    "十八罗汉",
+    "四大天王",
+    "尊胜宝塔",
+    "观音",
+    "文殊",
+    "普贤",
+    "地藏",
+    "弥勒",
+    "罗汉",
+    "韦陀",
+    "护法",
+    "金刚",
+    "飞天",
+    "伎乐",
+    "力士",
+    "菩萨",
+    "度母",
+    "明王",
+    "佛像",
+    "大佛",
+    "立佛",
+    "坐佛",
+    "卧佛",
+    "佛首",
+    "佛头",
+    "造像",
+    "雕塑",
+    "雕像",
+    "石像",
+    "石狮",
+    "瑞兽",
+    "麒麟",
+    "盘龙",
+    "蟠龙",
+    "狻猊",
+    "佛塔",
+    "石塔",
+    "宝塔",
+    "经幢",
+    "香炉",
+    "供桌",
+    "供案",
+    "供坛",
+    "佛坛",
+    "佛台",
+    "条案",
+    "经桌",
+    "法座",
+    "茶桌",
+    "茶台",
+    "茶室",
+    "禅椅",
+    "圈椅",
+    "坐垫",
+    "拜垫",
+    "展柜",
+    "展台",
+    "宝盖",
+    "华盖",
+    "莲花灯",
+    "宫灯",
+    "吊灯",
+    "法器",
+    "供器",
+    "家具",
+    "敦煌壁画",
+    "经变壁画",
+    "壁画",
+    "缠枝莲",
+    "宝相花",
+    "莲花纹",
+    "莲瓣纹",
+    "卷草纹",
+    "拐子纹",
+    "万字纹",
+    "水波纹",
+    "八吉祥",
+    "莲瓣",
+    "莲花",
+    "荷花",
+    "牡丹",
+    "卷草",
+    "卷云",
+    "祥云",
+    "云纹",
+    "回纹",
+    "宝瓶",
+    "八宝",
+    "法轮",
+    "束腰",
+    "花板",
+    "新中式",
+    "唐宋",
+    "唐风",
+    "宋式",
+    "明清",
+    "藏传",
+    "藏式",
+    "莫卧儿",
+    "禅意",
+    "传统",
+    "现代",
+)
 
 
 # 构建石材名称或别名的正则匹配表达式（防止“敦煌壁画”误匹配为“敦煌壁”石材）
@@ -44,6 +409,20 @@ def _token_matches(token: str, text: str) -> bool:
     if token == "敦煌壁":
         return re.search(_stone_alias_regex(token), text) is not None
     return token in text
+
+
+# 为长度>=2的中文片段生成重叠二元字符n-gram（跳过停用词与“敦煌壁”）
+def _cjk_bigrams(text: str) -> list[str]:
+    if len(text) < 2 or not CJK_ONLY_RE.fullmatch(text):
+        return []
+    grams: list[str] = []
+    for idx in range(len(text) - 1):
+        bg = text[idx : idx + 2]
+        if bg in QUERY_STOP_WORDS or bg == "敦煌壁":
+            continue
+        if bg not in grams:
+            grams.append(bg)
+    return grams
 
 
 # 将长摘要压缩并截断至最多120个字符
@@ -147,46 +526,137 @@ class KnowledgeBaseIndex:
         self.kb_root = kb_root
         self.records = records
         self.materials = materials
-        self._split_terms = self._build_split_terms(materials)
+        self._split_terms = self._build_split_terms(materials, records)
 
-    # 构建用于拆分复合中文查询词的已知石材名、分类名、角色与地域词表
+    # 构建用于拆分复合中文查询词的已知石材名、分类名、领域词表与语料短词词典
     @staticmethod
-    def _build_split_terms(materials: list[StoneMaterial]) -> list[str]:
-        terms: set[str] = set(LIBRARY_TYPES) | set(STUDIO_ROLES) | set(LIBRARY_REGIONS)
+    def _build_split_terms(
+        materials: list[StoneMaterial],
+        records: dict[str, KBRecord] | None = None,
+    ) -> list[str]:
+        terms: set[str] = (
+            set(LIBRARY_TYPES)
+            | set(LIBRARY_REGIONS)
+            | set(DOMAIN_TERMS)
+            | (set(STUDIO_ROLES) - {"参考"})
+        )
         for mat in materials:
             for val in (mat.name, *mat.aliases, *mat.search_terms):
                 if val:
                     terms.add(val.casefold())
+        if records:
+            for rec in records.values():
+                for candidate in (
+                    rec.category_l1,
+                    rec.category_l2,
+                    rec.entity_type,
+                    *rec.colors,
+                ):
+                    folded = candidate.strip().casefold()
+                    if (
+                        2 <= len(folded) <= 3
+                        and CJK_ONLY_RE.fullmatch(folded)
+                        and folded not in QUERY_STOP_WORDS
+                    ):
+                        terms.add(folded)
         return sorted(terms, key=len, reverse=True)
 
-    # 将用户查询字符串拆分为确定性检索词元列表
-    def _tokenize_query(self, query: str) -> list[str]:
+    # 使用正向最大匹配（FMM）与停用词表切分单段中文文本
+    def _segment_cjk_run(self, run: str) -> tuple[list[str], list[str]]:
+        vocab = sorted(
+            set(self._split_terms) | set(QUERY_STOP_PHRASES) | set(QUERY_STOP_WORDS),
+            key=len,
+            reverse=True,
+        )
+        primary: list[str] = []
+        ngrams: list[str] = []
+        unmatched_buf: list[str] = []
+
+        def _flush_unmatched() -> None:
+            if not unmatched_buf:
+                return
+            chunk = "".join(unmatched_buf).strip(QUERY_STOP_CHARS)
+            unmatched_buf.clear()
+            if not chunk or chunk in QUERY_STOP_WORDS:
+                return
+            if chunk not in primary:
+                primary.append(chunk)
+            for bg in _cjk_bigrams(chunk):
+                if bg not in ngrams and bg not in primary:
+                    ngrams.append(bg)
+
+        idx = 0
+        n = len(run)
+        while idx < n:
+            matched_term: str | None = None
+            for term in vocab:
+                if not term or len(term) < 2:
+                    continue
+                if not run.startswith(term, idx):
+                    continue
+                if (
+                    term == "敦煌壁"
+                    and re.match(_stone_alias_regex(term), run[idx:]) is None
+                ):
+                    continue
+                matched_term = term
+                break
+
+            if matched_term is not None:
+                _flush_unmatched()
+                if matched_term not in QUERY_STOP_WORDS:
+                    if matched_term not in primary:
+                        primary.append(matched_term)
+                    if len(matched_term) >= 3 and matched_term != "敦煌壁":
+                        for bg in _cjk_bigrams(matched_term):
+                            if bg not in ngrams and bg not in primary:
+                                ngrams.append(bg)
+                idx += len(matched_term)
+            else:
+                unmatched_buf.append(run[idx])
+                idx += 1
+
+        _flush_unmatched()
+        # 若切分后存在长度>=2的实词，则剔除单字残片并将原串二元n-gram纳入备用词元
+        if any(len(t) >= 2 for t in primary):
+            if any(len(t) == 1 for t in primary):
+                for bg in _cjk_bigrams(run):
+                    if bg not in ngrams and bg not in primary:
+                        ngrams.append(bg)
+            primary = [t for t in primary if len(t) >= 2]
+        return primary, ngrams
+
+    # 将用户查询字符串拆分为主词元与备用二元n-gram元组
+    def _extract_query_plan(self, query: str) -> tuple[list[str], list[str]]:
         lowered = query.strip().casefold()
         if not lowered:
-            return []
+            return [], []
         raw_tokens = TOKEN_RE.findall(lowered)
         if not raw_tokens:
-            return []
+            return [], []
 
-        expanded: list[str] = []
+        primary_tokens: list[str] = []
+        ngram_tokens: list[str] = []
         for tok in raw_tokens:
-            remaining = tok
-            sub_tokens: list[str] = []
-            for known in self._split_terms:
-                if not known or known == remaining:
-                    continue
-                pattern = _stone_alias_regex(known)
-                if re.search(pattern, remaining):
-                    sub_tokens.append(known)
-                    remaining = re.sub(pattern, " ", remaining)
-            if sub_tokens:
-                leftovers = [p for p in remaining.split() if p]
-                for item in (*sub_tokens, *leftovers):
-                    if item not in expanded:
-                        expanded.append(item)
-            elif tok not in expanded:
-                expanded.append(tok)
-        return expanded
+            if tok in QUERY_STOP_WORDS:
+                continue
+            if CJK_ONLY_RE.fullmatch(tok):
+                seg_primary, seg_ngrams = self._segment_cjk_run(tok)
+                for item in seg_primary:
+                    if item not in primary_tokens:
+                        primary_tokens.append(item)
+                for bg in seg_ngrams:
+                    if bg not in ngram_tokens and bg not in primary_tokens:
+                        ngram_tokens.append(bg)
+            else:
+                if tok not in primary_tokens:
+                    primary_tokens.append(tok)
+        return primary_tokens, ngram_tokens
+
+    # 将用户查询字符串拆分为确定性检索词元列表（剔除停用词并按词表切分中文复合词）
+    def _tokenize_query(self, query: str) -> list[str]:
+        primary_tokens, _ = self._extract_query_plan(query)
+        return primary_tokens
 
     # 按资产ID（支持16位hex或kb_<hex>前缀）获取知识库记录
     def get(self, asset_or_kb_id: str) -> KBRecord | None:
@@ -200,7 +670,21 @@ class KnowledgeBaseIndex:
             return None
         return self.records.get(cleaned)
 
-    # 执行确定性字段与关键词匹配检索，默认排除带质量或驳回标记的记录
+    # 计算单个检索词元在记录各加权字段上的得分
+    @staticmethod
+    def _score_token_fields(token: str, rec: KBRecord, *, weight_scale: int = 2) -> int:
+        pts = 0
+        if _token_matches(token, rec.search_title):
+            pts += 5 * weight_scale
+        if _token_matches(token, rec.search_primary):
+            pts += 4 * weight_scale
+        if _token_matches(token, rec.search_secondary):
+            pts += 2 * weight_scale
+        if _token_matches(token, rec.search_summary):
+            pts += 1 * weight_scale
+        return pts
+
+    # 执行确定性字段与关键词加权检索，默认排除带质量或驳回标记的记录
     def search(
         self,
         query: str,
@@ -228,8 +712,8 @@ class KnowledgeBaseIndex:
             raise ValueError(f"Invalid region: {clean_region}")
 
         clean_query = str(query or "").strip()
-        tokens = self._tokenize_query(clean_query)
-        if clean_query and not tokens:
+        tokens, ngram_tokens = self._extract_query_plan(clean_query)
+        if clean_query and not tokens and not (clean_type or clean_role or clean_region):
             return []
 
         stone_terms = {
@@ -240,7 +724,9 @@ class KnowledgeBaseIndex:
         }
         has_stone_token = any(t in stone_terms for t in tokens)
 
-        ranked: list[tuple[int, str, KBRecord]] = []
+        full_ranked: list[tuple[int, str, KBRecord]] = []
+        partial_ranked: list[tuple[int, int, str, KBRecord]] = []
+
         for rec in self.records.values():
             if not include_flagged and rec.is_flagged:
                 continue
@@ -250,30 +736,71 @@ class KnowledgeBaseIndex:
                 continue
             if clean_region and rec.region != clean_region:
                 continue
-            if tokens and not all(_token_matches(t, rec.search_all) for t in tokens):
+
+            if not tokens:
+                base_score = 0
+                if rec.material_ids:
+                    base_score += 20
+                if rec.is_catalog_sample:
+                    base_score += 5
+                elif rec.is_catalog_slab:
+                    base_score += 2
+                full_ranked.append((base_score, rec.id, rec))
                 continue
 
+            matched_tokens = [
+                t for t in tokens if _token_matches(t, rec.search_all)
+            ]
+            matched_count = len(matched_tokens)
+
             score = 0
-            for t in tokens:
-                if _token_matches(t, rec.search_title):
-                    score += 10
-                if _token_matches(t, rec.search_primary):
-                    score += 8
-                if _token_matches(t, rec.search_secondary):
-                    score += 4
-                if _token_matches(t, rec.search_summary):
-                    score += 2
-            if rec.material_ids and (has_stone_token or not tokens):
+            for t in matched_tokens:
+                score += self._score_token_fields(t, rec, weight_scale=2)
+
+            ngram_score = 0
+            for bg in ngram_tokens:
+                if any(bg in mt for mt in matched_tokens):
+                    continue
+                if _token_matches(bg, rec.search_all):
+                    ngram_score += self._score_token_fields(bg, rec, weight_scale=1)
+
+            if matched_count == 0 and ngram_score == 0:
+                continue
+
+            matched_stone = any(t in stone_terms for t in matched_tokens)
+            if rec.material_ids and (matched_stone or (has_stone_token and matched_count == len(tokens))):
                 score += 20
             if rec.is_catalog_sample:
                 score += 5
             elif rec.is_catalog_slab:
                 score += 2
 
-            ranked.append((score, rec.id, rec))
+            if matched_count == len(tokens):
+                full_ranked.append((score + ngram_score, rec.id, rec))
+            else:
+                partial_ranked.append(
+                    (matched_count, score + ngram_score, rec.id, rec)
+                )
 
-        ranked.sort(key=lambda item: (-item[0], item[1]))
-        return [item[2] for item in ranked[:limit]]
+        full_ranked.sort(key=lambda item: (-item[0], item[1]))
+        partial_ranked.sort(key=lambda item: (-item[0], -item[1], item[2]))
+
+        if full_ranked:
+            results = [item[2] for item in full_ranked[:limit]]
+            # 当查询包含>=3个词元且完全命中不足limit条时，用高覆盖度的部分命中补足
+            if len(tokens) >= 3 and len(results) < limit and partial_ranked:
+                seen_ids = {r.id for r in results}
+                for matched_cnt, _sc, _rid, rec in partial_ranked:
+                    if matched_cnt < 2 and results:
+                        break
+                    if rec.id not in seen_ids:
+                        results.append(rec)
+                        seen_ids.add(rec.id)
+                        if len(results) >= limit:
+                            break
+            return results
+
+        return [item[3] for item in partial_ranked[:limit]]
 
     # 返回所有已知石材目录名称及别名的可读汇总字符串
     def format_known_materials(self) -> str:
