@@ -88,7 +88,7 @@ if ! jq -e '
   (.shared_token | type == "string" and length >= 64)
   and (.file_signing_key | type == "string" and test("^[0-9a-fA-F]{64}$"))
   and (.gemini_api_key | type == "string" and length >= 1)
-  and (.ark_api_key | type == "string" and length >= 1)
+  and ((.ark_api_key // "") | type == "string")
 ' "$stage/studio.json" >/dev/null; then
   echo 'Studio configuration settings are invalid.' >&2
   exit 1

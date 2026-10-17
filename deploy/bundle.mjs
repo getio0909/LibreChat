@@ -14,6 +14,21 @@ function requireSafeSingleLineSecret(name) {
   return value;
 }
 
+// 校验可选的单行密钥字段；未设置或为空字符串时返回空字符串，非空时禁止空白或非法转义字符。
+function optionalSafeSingleLineSecret(name) {
+  const value = process.env[name];
+  if (value === undefined || value === null || value === '') {
+    return '';
+  }
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`${name} must not be whitespace-only when provided.`);
+  }
+  if (/[\r\n'\\]/.test(value)) {
+    throw new Error(`${name} must be a single-line value without single quotes or backslashes.`);
+  }
+  return value;
+}
+
 // 校验镜像引用为非空单行字符串且不包含空白或特殊转义字符。
 function requireImageReference(name) {
   const value = process.env[name];
@@ -105,7 +120,7 @@ mkdirSync(target, { recursive: true });
 
 const geminiApiKey = requireSafeSingleLineSecret('GEMINI_API_KEY');
 const openrouterApiKey = requireSafeSingleLineSecret('OPENROUTER_API_KEY');
-const arkApiKey = requireSafeSingleLineSecret('ARK_API_KEY');
+const arkApiKey = optionalSafeSingleLineSecret('ARK_API_KEY');
 const librechatImage = requireImageReference('LIBRECHAT_IMAGE');
 const studioImage = requireImageReference('STUDIO_IMAGE');
 const sharedToken = resolveStudioSharedToken();
@@ -138,6 +153,9 @@ const studioSettings = {
   public_base_url: publicBaseUrl,
   gemini_api_key: geminiApiKey,
   ark_api_key: arkApiKey,
+  image_provider: 'gemini',
+  gemini_image_model: 'gemini-nano-banana-2.1',
+  enable_3d: false,
   seedream_model: 'doubao-seedream-5-0-pro-260628',
   seed3d_model: 'doubao-seed3d-2-0-260328',
   planner_model: 'gemini-4-argon',

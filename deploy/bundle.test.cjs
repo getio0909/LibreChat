@@ -74,6 +74,9 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     public_base_url: 'https://dev.xuqian.io',
     gemini_api_key: 'fixture-gemini-key',
     ark_api_key: 'fixture-ark-key',
+    image_provider: 'gemini',
+    gemini_image_model: 'gemini-nano-banana-2.1',
+    enable_3d: false,
     seedream_model: 'doubao-seedream-5-0-pro-260628',
     seed3d_model: 'doubao-seed3d-2-0-260328',
     planner_model: 'gemini-4-argon',
@@ -83,6 +86,13 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     seedream_timeout_seconds: 240,
     planner_timeout_seconds: 540,
   });
+
+  // 验证 ARK_API_KEY 为可选项，未提供或为空字符串时 studio.json 中 ark_api_key 为空字符串。
+  const withoutArk = runBundle({ ARK_API_KEY: '' });
+  assert.equal(withoutArk.result.status, 0, withoutArk.result.stderr);
+  assert.equal(withoutArk.studioJson.ark_api_key, '');
+  assert.equal(withoutArk.studioJson.image_provider, 'gemini');
+  assert.equal(withoutArk.studioJson.enable_3d, false);
 
   // 验证 DEPLOY_URL 与显式 STUDIO_FILE_SIGNING_KEY 会写入 studio.json。
   const explicitSigningKey = 'c'.repeat(64);
@@ -107,12 +117,17 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
 });
 
 test('bundle rejects multi-line, single-quoted, or backslash secrets without leaking values', () => {
-  for (const keyName of ['GEMINI_API_KEY', 'OPENROUTER_API_KEY', 'ARK_API_KEY']) {
+  for (const keyName of ['GEMINI_API_KEY', 'OPENROUTER_API_KEY']) {
     for (const invalid of ['', "bad'quote", 'bad\\slash', 'line1\nline2', 'line1\rline2']) {
       const { result } = runBundle({ [keyName]: invalid });
       assert.notEqual(result.status, 0, `${keyName} accepted invalid value: ${invalid}`);
       assert.doesNotMatch(result.stderr, /fixture-.*-key/);
     }
+  }
+  for (const invalidArk of ['   ', "bad'quote", 'bad\\slash', 'line1\nline2', 'line1\rline2']) {
+    const { result } = runBundle({ ARK_API_KEY: invalidArk });
+    assert.notEqual(result.status, 0, `ARK_API_KEY accepted invalid value: ${invalidArk}`);
+    assert.doesNotMatch(result.stderr, /fixture-.*-key/);
   }
 });
 

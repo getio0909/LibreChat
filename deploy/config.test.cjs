@@ -295,7 +295,7 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
     assert.doesNotMatch(spec.preset.modelLabel || '', VENDOR_NAME_PATTERN);
     assert.doesNotMatch(spec.preset.promptPrefix || '', VENDOR_NAME_PATTERN);
 
-    // 验证中文提示词精简且包含十个核心工具名。
+    // 验证中文提示词精简且包含八个默认启用工具名（3D 工具已暂停提供）。
     const prefix = spec.preset.promptPrefix || '';
     const chineseChars = (prefix.match(/[\u4e00-\u9fff]/g) || []).length;
     assert.ok(
@@ -312,10 +312,14 @@ test('customer-facing labels, descriptions, welcome text, and promptPrefix conta
       'list_images',
       'search_library',
       'compare_materials',
-      'create_3d_model',
-      'check_3d_model',
     ]) {
       assert.ok(prefix.includes(toolName), `promptPrefix must reference ${toolName}`);
+    }
+    for (const heldToolName of ['create_3d_model', 'check_3d_model']) {
+      assert.ok(
+        !prefix.includes(heldToolName),
+        `promptPrefix must not reference held 3D tool ${heldToolName}`,
+      );
     }
   }
 });
@@ -342,9 +346,9 @@ test('promptPrefix and MCP image context mention only tool and argument names pr
       prefix.includes('materials'),
       'promptPrefix must mention compare_materials materials',
     );
-    assert.ok(prefix.includes('image_id'), 'promptPrefix must mention create_3d_model image_id');
-    assert.ok(prefix.includes('detail'), 'promptPrefix must mention create_3d_model detail');
-    assert.ok(prefix.includes('job_id'), 'promptPrefix must mention check_3d_model job_id');
+    assert.ok(prefix.includes('image_id'), 'promptPrefix must mention image_id');
+    assert.ok(!prefix.includes('create_3d_model'), 'promptPrefix must not mention create_3d_model');
+    assert.ok(!prefix.includes('check_3d_model'), 'promptPrefix must not mention check_3d_model');
     assert.doesNotMatch(prefix, /\b(reference_uses|image_ids)\b/);
   }
 
@@ -377,7 +381,7 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   const studioServer = config.mcpServers.zyb_studio;
   assert.equal(studioServer.type, 'streamable-http');
   assert.equal(studioServer.url, 'http://studio:8000/mcp');
-  assert.equal(studioServer.title, '庄严宝刹设计工坊');
+  assert.equal(studioServer.title, '设计工具');
   assert.equal(studioServer.chatMenu, false);
   assert.equal(studioServer.requiresOAuth, false);
   // 超时时间须大于规划（540s）与生图（240s）之和 780,000ms。

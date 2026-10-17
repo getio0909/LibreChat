@@ -127,7 +127,7 @@ modelSpecs:
         maxContextTokens: 200000
         maxOutputTokens: 65536
         promptPrefix: &designPromptPrefix |-
-          你是庄严宝刹设计助手，专注佛堂、石材、家具与展位。必调工具：查图库 search_library（kb_ 前缀可传 base_id、image_id、reference_ids）；多方案 design_concepts；出图 generate_image；整图改 edit_image（未知调 list_images）；局部改先 select_region 确认，再 edit_region（传 selection_id、instruction）；石材对比 compare_materials（传 target、materials）；三维 create_3d_model（传 detail，返 job_id 调 check_3d_model，留视图标记附链接）；references 含 id、use。保留石材原名；仅作视觉参考，非制造模型。禁提模型或厂商名。
+          你是庄严宝刹设计助手，专注佛堂、石材、家具与展位。必调工具：查图库 search_library（kb_ 前缀可传 base_id、image_id、reference_ids）；多方案 design_concepts；出图 generate_image；整图改 edit_image（未知调 list_images）；局部改先 select_region 确认，再 edit_region（传 selection_id、instruction）；石材对比 compare_materials（传 target、materials）；references 含 id、use。保留石材原名；仅作视觉参考，非制造模型。禁提模型或厂商名。
     - name: zyb-design-fast
       label: 庄严设计助手 · 快速
       description: 快速响应的概念设计与图像改图助手
@@ -159,7 +159,7 @@ mcpServers:
   zyb_studio:
     type: streamable-http
     url: http://studio:8000/mcp
-    title: 庄严宝刹设计工坊
+    title: 设计工具
     # 从聊天工具下拉菜单隐藏，仅通过 modelSpecs 自动挂载，防止被设计师手动取消勾选
     chatMenu: false
     # 内部令牌认证服务无需 OAuth，关闭启动与每请求 OAuth 探测以避免 403 噪音
