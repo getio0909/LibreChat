@@ -1,5 +1,14 @@
 import { Constants } from 'librechat-data-provider';
-import { parseToolName, getToolDisplayLabel, TOOL_FRIENDLY_NAME_KEYS } from '../toolLabels';
+import {
+  parseToolName,
+  getToolDisplayLabel,
+  getMCPServerDisplayLabel,
+  getMCPToolDisplayLabel,
+  TOOL_FRIENDLY_NAME_KEYS,
+  MCP_SERVER_FRIENDLY_NAME_KEYS,
+  MCP_TOOL_FRIENDLY_NAME_KEYS,
+} from '../toolLabels';
+import zhHans from '~/locales/zh-Hans/translation.json';
 
 describe('parseToolName', () => {
   it('splits an MCP tool id into server + tool name', () => {
@@ -49,9 +58,38 @@ describe('parseToolName', () => {
 
 describe('getToolDisplayLabel', () => {
   const identityLocalize = (key: string): string => key;
+  const zhLocalize = (key: string): string =>
+    (zhHans as Record<string, string>)[key] ?? key;
 
   it('returns the MCP server name for an MCP tool', () => {
     expect(getToolDisplayLabel('search_code_mcp_github', identityLocalize)).toBe('github');
+  });
+
+  it('returns localized Chinese display names for zyb_studio MCP server and tools without vendor names', () => {
+    expect(getToolDisplayLabel('search_library_mcp_zyb_studio', zhLocalize, ['zyb_studio'])).toBe(
+      '设计工坊',
+    );
+    expect(getMCPServerDisplayLabel('zyb_studio', zhLocalize)).toBe('设计工坊');
+    expect(getMCPServerDisplayLabel('zyb_studio', identityLocalize)).toBe(
+      MCP_SERVER_FRIENDLY_NAME_KEYS.zyb_studio,
+    );
+
+    const expectedZhToolNames: Record<string, string> = {
+      search_library: '检索素材图库',
+      compare_materials: '打开素材对比面板',
+      select_region: '打开局部圈选画布',
+      edit_region: '执行局部重绘',
+      recover_region_edit: '同步精修结果',
+      finish_region_edit: '同步精修结果',
+      create_3d_model: '生成 3D 白模',
+      check_3d_model: '查询 3D 进度',
+    };
+    for (const [toolName, expected] of Object.entries(expectedZhToolNames)) {
+      const label = getMCPToolDisplayLabel(toolName, zhLocalize);
+      expect(label).toBe(expected);
+      expect(label).not.toMatch(/gemini|openai|fal|tripo|hunyuan|zyb_studio/i);
+      expect(MCP_TOOL_FRIENDLY_NAME_KEYS[toolName]).toBeDefined();
+    }
   });
 
   it('returns the friendly translation key for a known native tool', () => {

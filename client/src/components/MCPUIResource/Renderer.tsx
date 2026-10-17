@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
 import {
   isHtmlMediaType,
@@ -7,6 +8,7 @@ import {
 import type { UIResource } from 'librechat-data-provider';
 import type { ComponentProps } from 'react';
 import { useMCPAppsPolicy } from '~/Providers/MCPAppsPolicyContext';
+import { loadUIDraft } from '~/utils';
 
 type LegacyRendererProps = ComponentProps<typeof LegacyUIResourceRenderer>;
 
@@ -34,16 +36,39 @@ export default function UIResourceRenderer({
   ...props
 }: UIResourceRendererProps) {
   const { legacyHtmlEnabled } = useMCPAppsPolicy();
+  const isSupported = legacyHtmlEnabled && isSupportedUIResource(resource);
 
-  if (!legacyHtmlEnabled || !isSupportedUIResource(resource)) {
+  const safeResource = useMemo(() => {
+    if (!isSupported) {
+      return null;
+    }
+    const nextResource = { ...resource };
+    delete nextResource.contentType;
+    nextResource.mimeType = 'text/html';
+    return nextResource;
+  }, [isSupported, resource]);
+
+  const safeHtmlProps = useMemo(() => {
+    const nextHtmlProps = { ...htmlProps };
+    delete nextHtmlProps.sandboxPermissions;
+    const uri = resource?.uri ?? '';
+    if (uri.startsWith('ui://zyb_studio/selection/')) {
+      const imageId = uri.slice('ui://zyb_studio/selection/'.length).split('?')[0];
+      const draftKey = imageId ? `zyb_studio_selection_draft_${imageId}` : '';
+      const selectionDraft = draftKey ? loadUIDraft(draftKey) : undefined;
+      if (selectionDraft !== undefined) {
+        nextHtmlProps.iframeRenderData = {
+          ...(nextHtmlProps.iframeRenderData ?? {}),
+          selectionDraft,
+        };
+      }
+    }
+    return nextHtmlProps;
+  }, [htmlProps, resource?.uri]);
+
+  if (!safeResource) {
     return null;
   }
-
-  const safeResource = { ...resource };
-  const safeHtmlProps = { ...htmlProps };
-  delete safeResource.contentType;
-  safeResource.mimeType = 'text/html';
-  delete safeHtmlProps.sandboxPermissions;
 
   return (
     <LegacyUIResourceRenderer

@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
 import type { TStartupConfig, UIResource } from 'librechat-data-provider';
+import type { UIActionResult } from '@mcp-ui/client';
 import { MCPAppsPolicyProvider } from '~/Providers/MCPAppsPolicyContext';
+import { handleUIAction, saveUIDraft, loadUIDraft } from '~/utils';
 import UIResourceRenderer from '../Renderer';
 
 jest.mock('@mcp-ui/client', () => ({
@@ -28,6 +30,7 @@ const renderEnabled = (ui: React.ReactElement) =>
 describe('UIResourceRenderer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.sessionStorage.clear();
   });
 
   it.each([
@@ -153,5 +156,73 @@ describe('UIResourceRenderer', () => {
 
     expect(container).toBeEmptyDOMElement();
     expect(mockLegacyRenderer).not.toHaveBeenCalled();
+  });
+
+  it('keeps resource and htmlProps references stable across breakpoint re-renders and restores saved selection drafts', async () => {
+    const resource: UIResource = {
+      resourceId: 'selection-1',
+      uri: 'ui://zyb_studio/selection/img_demo123',
+      mimeType: 'text/html',
+      text: '<p>Selection editor</p>',
+    };
+    const htmlProps = { autoResizeIframe: { width: true, height: true } };
+    const ask = jest.fn();
+
+    const saveResp = await handleUIAction(
+      {
+        type: 'ui-draft-save',
+        payload: {
+          draftKey: 'zyb_studio_selection_draft_img_demo123',
+          draft: { tool: 'rect', instruction: '只改中间山峰轮廓' },
+        },
+      } as unknown as UIActionResult,
+      ask,
+    );
+    expect(saveResp).toEqual({
+      status: 'saved',
+      draftKey: 'zyb_studio_selection_draft_img_demo123',
+    });
+    expect(ask).not.toHaveBeenCalled();
+
+    const loadResp = await handleUIAction(
+      {
+        type: 'ui-draft-load',
+        payload: { draftKey: 'zyb_studio_selection_draft_img_demo123' },
+      } as unknown as UIActionResult,
+      ask,
+    );
+    expect(loadResp).toEqual({
+      status: 'loaded',
+      draftKey: 'zyb_studio_selection_draft_img_demo123',
+      draft: { tool: 'rect', instruction: '只改中间山峰轮廓' },
+    });
+    expect(loadUIDraft('zyb_studio_selection_draft_img_demo123')).toEqual({
+      tool: 'rect',
+      instruction: '只改中间山峰轮廓',
+    });
+
+    const { rerender } = renderEnabled(
+      <UIResourceRenderer resource={resource} htmlProps={htmlProps} />,
+    );
+    const firstProps = mockLegacyRenderer.mock.calls[0][0];
+    expect(firstProps.htmlProps?.iframeRenderData).toEqual({
+      selectionDraft: { tool: 'rect', instruction: '只改中间山峰轮廓' },
+    });
+
+    rerender(
+      <MCPAppsPolicyProvider
+        startupConfig={{ mcpApps: { enabled: true, legacyHtmlEnabled: true } } as TStartupConfig}
+        ready
+        userId="user-1"
+      >
+        <UIResourceRenderer resource={resource} htmlProps={htmlProps} />
+      </MCPAppsPolicyProvider>,
+    );
+    const secondProps = mockLegacyRenderer.mock.calls[1][0];
+    expect(secondProps.resource).toBe(firstProps.resource);
+    expect(secondProps.htmlProps).toBe(firstProps.htmlProps);
+
+    saveUIDraft('zyb_studio_selection_draft_img_demo123', null);
+    expect(loadUIDraft('zyb_studio_selection_draft_img_demo123')).toBeUndefined();
   });
 });

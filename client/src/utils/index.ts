@@ -143,8 +143,90 @@ export const extractContent = (
   return '';
 };
 
+const UI_DRAFT_STORAGE_KEY = 'zyb_studio_ui_drafts_v1';
+const uiDraftMemoryStore = new Map<string, unknown>();
+
+function readSessionDraftMap(): Record<string, unknown> {
+  if (typeof window === 'undefined' || !window.sessionStorage) {
+    return {};
+  }
+  try {
+    const raw = window.sessionStorage.getItem(UI_DRAFT_STORAGE_KEY);
+    if (!raw) {
+      return {};
+    }
+    const parsed: unknown = JSON.parse(raw);
+    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveUIDraft(draftKey: string, draft: unknown): void {
+  if (!draftKey) {
+    return;
+  }
+  if (draft == null) {
+    uiDraftMemoryStore.delete(draftKey);
+  } else {
+    uiDraftMemoryStore.set(draftKey, draft);
+  }
+  if (typeof window === 'undefined' || !window.sessionStorage) {
+    return;
+  }
+  try {
+    const map = readSessionDraftMap();
+    if (draft == null) {
+      delete map[draftKey];
+    } else {
+      map[draftKey] = draft;
+    }
+    window.sessionStorage.setItem(UI_DRAFT_STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    // Ignore storage quota or private mode errors
+  }
+}
+
+export function loadUIDraft(draftKey: string): unknown {
+  if (!draftKey) {
+    return undefined;
+  }
+  if (uiDraftMemoryStore.has(draftKey)) {
+    return uiDraftMemoryStore.get(draftKey);
+  }
+  const map = readSessionDraftMap();
+  if (Object.prototype.hasOwnProperty.call(map, draftKey)) {
+    const draft = map[draftKey];
+    uiDraftMemoryStore.set(draftKey, draft);
+    return draft;
+  }
+  return undefined;
+}
+
 /** Converts supported legacy MCP-UI actions into the existing conversation submission path. */
 export const handleUIAction = async (result: UIActionResult, ask: TAskFunction) => {
+  const rawAction = result as {
+    type?: string;
+    payload?: Record<string, unknown>;
+  };
+  if (rawAction?.type === 'ui-draft-save') {
+    const payload = rawAction.payload ?? {};
+    const draftKey = String(payload.draftKey ?? payload.imageId ?? '');
+    saveUIDraft(draftKey, payload.draft ?? null);
+    return { status: 'saved', draftKey };
+  }
+  if (rawAction?.type === 'ui-draft-load') {
+    const payload = rawAction.payload ?? {};
+    const draftKey = String(payload.draftKey ?? payload.imageId ?? '');
+    const draft = loadUIDraft(draftKey);
+    return { status: 'loaded', draftKey, draft };
+  }
+  if (rawAction?.type === 'ui-link-renew') {
+    return { status: 'ready' };
+  }
+
   const { type, payload } = result;
   let messageText = '';
 
