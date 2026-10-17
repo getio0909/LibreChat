@@ -757,6 +757,66 @@ describe('createToolEndCallback', () => {
     },
   );
 
+  // 验证同轮内 gemini_image_gen 产物的 saveBase64Image 落盘在 toolEndCallback 返回前已完成，后续专精工具立即读取不会发生竞态
+  it.each(['createToolEndCallback', 'createResponsesToolEndCallback'])(
+    '%s awaits saveBase64Image publication before resolving so same-turn specialist calls can immediately resolve the generated file_id',
+    async (factoryName) => {
+      const { saveBase64Image } = require('~/server/services/Files/process');
+      const publishedFiles = new Map();
+      const generatedFileId = '11111111-2222-4333-8444-555555555555';
+
+      saveBase64Image.mockImplementationOnce(async (_url, options) => {
+        await new Promise((resolve) => setTimeout(resolve, 25));
+        const record = {
+          file_id: options.file_id,
+          filename: `${options.file_id}-${options.filename}.png`,
+          filepath: `/images/user123/${options.file_id}-${options.filename}.png`,
+          type: 'image/png',
+          width: 1024,
+          height: 1024,
+        };
+        publishedFiles.set(options.file_id, record);
+        return record;
+      });
+
+      const tracker = { nextSequence: jest.fn().mockReturnValue(1) };
+      const toolEndCallback = require('../callbacks')[factoryName]({
+        req,
+        res,
+        tracker,
+        artifactPromises,
+      });
+
+      await toolEndCallback(
+        {
+          output: {
+            name: 'gemini_image_gen',
+            tool_call_id: 'call_img_1',
+            artifact: {
+              file_ids: [generatedFileId],
+              content: [
+                {
+                  type: 'image_url',
+                  image_url: { url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==' },
+                },
+              ],
+            },
+          },
+        },
+        {
+          run_id: 'run456',
+          thread_id: 'thread789',
+          provider: 'google',
+        },
+      );
+
+      // 模拟同轮紧随其后的 compare_materials / select_region / create_3d_model 按 ID 解析文件
+      const dependentSpecialistLookup = publishedFiles.get(generatedFileId);
+      expect(dependentSpecialistLookup).toBeDefined();
+      expect(dependentSpecialistLookup.file_id).toBe(generatedFileId);
+    },
+  );
+
   describe('ui_resources artifact handling', () => {
     it('should process ui_resources artifact and return attachment when headers not sent', async () => {
       const toolEndCallback = createToolEndCallback({ req, res, artifactPromises });
