@@ -676,7 +676,9 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             assert VENDOR_PATTERN.search(compare_html) is None
 
             assert edit_blocks[2]["type"] == "image"
-            assert edit_blocks[2]["mimeType"] in ("image/jpeg", "image/webp")
+            assert edit_blocks[2]["mimeType"] == "image/png"
+            canonical_bytes = base64.b64decode(edit_blocks[2]["data"])
+            assert hashlib.sha256(canonical_bytes).hexdigest() == edit_summary["sha256"]
 
             # 验证发往Gemini生图服务的提示词与多模态结构包含局部裁切<bbox>约束与底图裁切inlineData
             assert len(captured_gemini_requests) == 1
@@ -688,8 +690,9 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
                 "responseModalities"
             ] == ["TEXT", "IMAGE"]
 
-            # 验证落盘后的结果图在选区外与底图100%字节一致
+            # 验证落盘后的结果图在选区外与底图100%字节一致，且MCP返回的规范File字节与之完全相同
             saved_resolved = resolve_image(studio_env, USER_A, edit_summary["id"])
+            assert canonical_bytes == saved_resolved.path.read_bytes()
             saved_img = open_image(saved_resolved.path)
             mask = mask_for(confirm_selection, base_img.size)
             assert count_outside_changes(base_img, saved_img, mask) == 0
@@ -1599,12 +1602,155 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             assert rec_summary["recovered"] is True
             assert rec_summary["outside_changed_pixels"] == 0
             assert (job_dir / "original.png").is_file()
+            assert rec_result["content"][2]["type"] == "image"
+            assert rec_result["content"][2]["mimeType"] == "image/png"
+            rec_canonical = base64.b64decode(rec_result["content"][2]["data"])
+            assert hashlib.sha256(rec_canonical).hexdigest() == rec_summary["sha256"]
 
             # 校验选区外像素与原底图逐字节一致
             mask = mask_for(selection, (320, 240))
             saved_img = open_image(job_dir / "original.png")
             assert count_outside_changes(original_base_img, saved_img, mask) == 0
             assert saved_img.getpixel((160, 120)) == (215, 185, 125)
+
+    asyncio.run(_run())
+
+
+# 回归测试（Finding #2）：edit_region 返回的规范 File（MCP ImageContent）必须为无损 PNG（含 Alpha），通过 LibreChat File UUID 再次下载或复用时选区外像素与透明度 100% 保持不变
+def test_edit_region_canonical_file_id_preserves_lossless_png_and_rgba_alpha(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "88888888-9999-aaaa-bbbb-cccccccccccc"
+    base_file = user_a_lc / f"{upload_id}__rgba_altar.png"
+
+    w, h = 240, 180
+    rgba_arr = np.zeros((h, w, 4), dtype=np.uint8)
+    rgba_arr[:, :, 0] = 135
+    rgba_arr[:, :, 1] = 115
+    rgba_arr[:, :, 2] = 95
+    rgba_arr[:, :, 3] = 255
+    # 在选区外设置完全透明（alpha=0）与半透明（alpha=128）像素区
+    rgba_arr[8:36, 8:48, 3] = 0
+    rgba_arr[140:172, 180:232, 3] = 128
+    base_rgba_img = Image.fromarray(rgba_arr, mode="RGBA")
+    save_exact(base_rgba_img, base_file)
+
+    selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 300, "y": 300}, {"x": 700, "y": 700}],
+            }
+        ],
+    }
+    rec = save_confirmed_selection(studio_env, USER_A, upload_id, base_file, selection)
+    sel_id = rec["selection_id"]
+
+    async def _mock_gemini_rgba_handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        img_cfg = body["generationConfig"]["imageConfig"]
+        req_w, req_h = GEMINI_NATIVE[img_cfg["imageSize"]][img_cfg["aspectRatio"]]
+        gen_img = Image.new("RGBA", (req_w, req_h), (210, 175, 110, 255))
+        buf = io.BytesIO()
+        gen_img.save(buf, format="PNG")
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "inlineData": {
+                                        "mimeType": "image/png",
+                                        "data": base64.b64encode(buf.getvalue()).decode(
+                                            "ascii"
+                                        ),
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_mock_gemini_rgba_handler),
+    )
+
+    async def _run() -> None:
+        headers_a = {
+            "X-Studio-Token": VALID_TOKEN,
+            "X-LibreChat-User-ID": USER_A,
+        }
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            edit_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 88,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "edit_region",
+                        "arguments": {
+                            "base_id": upload_id,
+                            "selection_id": sel_id,
+                            "instruction": "将中心选区替换为暖金浮雕纹理",
+                            "size": "1K",
+                        },
+                    },
+                },
+            )
+            assert edit_res.status_code == 200
+            result = edit_res.json()["result"]
+            assert result.get("isError") is False
+            blocks = result["content"]
+            assert len(blocks) == 3
+            summary = json.loads(blocks[0]["text"])
+            assert blocks[1]["type"] == "resource"
+            assert blocks[1]["resource"]["uri"] == f"ui://zyb_studio/compare/{summary['id']}"
+            assert blocks[2]["type"] == "image"
+            assert blocks[2]["mimeType"] == "image/png"
+
+            canonical_png_bytes = base64.b64decode(blocks[2]["data"])
+            assert hashlib.sha256(canonical_png_bytes).hexdigest() == summary["sha256"]
+
+            # 模拟 LibreChat 将该规范 ImageContent 保存为用户的可下载/可复用 File UUID 记录
+            canonical_file_id = "99999999-aaaa-bbbb-cccc-dddddddddddd"
+            canonical_lc_path = (
+                user_a_lc
+                / f"{canonical_file_id}-edit_region_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-er9.png"
+            )
+            canonical_lc_path.write_bytes(canonical_png_bytes)
+
+            reused = resolve_image(studio_env, USER_A, canonical_file_id)
+            assert reused.id == canonical_file_id
+            assert reused.kind == "generated"
+            reused_img = open_image(reused.path, keep_alpha=True)
+            assert reused_img.mode == "RGBA"
+            mask = mask_for(selection, (w, h))
+            assert count_outside_changes(base_rgba_img, reused_img, mask) == 0
+
+            outside = np.asarray(mask) == 0
+            reused_arr = np.asarray(reused_img)
+            assert int(np.sum(reused_arr[:, :, 3][outside] == 0)) == int(
+                np.sum(rgba_arr[:, :, 3][outside] == 0)
+            )
+            assert int(np.sum(reused_arr[:, :, 3][outside] == 128)) == int(
+                np.sum(rgba_arr[:, :, 3][outside] == 128)
+            )
+            assert np.array_equal(rgba_arr[outside], reused_arr[outside])
 
     asyncio.run(_run())
 
