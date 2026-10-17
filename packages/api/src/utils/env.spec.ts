@@ -494,6 +494,71 @@ describe('resolveHeaders', () => {
     );
   });
 
+  it('derives a tenant-scoped Studio principal without exposing the tenant ID', () => {
+    const userId = '65f0000000000000000000a1';
+    const tenantA = createSafeUser(createTestUser({ id: userId, tenantId: 'tenant-a' }));
+    const tenantB = createSafeUser(createTestUser({ id: userId, tenantId: 'tenant-b' }));
+    const principalA = resolveHeaders({
+      headers: { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' },
+      user: tenantA,
+    })['X-Studio-Principal'];
+    const principalB = resolveHeaders({
+      headers: { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' },
+      user: tenantB,
+    })['X-Studio-Principal'];
+    expect(principalA).toMatch(/^[a-f0-9]{24}$/);
+    expect(principalA).not.toBe(principalB);
+    expect(principalA).not.toContain('tenant-a');
+    expect(tenantA).not.toHaveProperty('tenantId');
+  });
+
+  it('uses the authenticated request tenant when it is absent from the user document', () => {
+    const userId = '65f0000000000000000000a1';
+    const requestUser = createTestUser({ id: userId, tenantId: undefined });
+    const tenantA = createSafeUser(requestUser, 'tenant-a');
+    const tenantB = createSafeUser(requestUser, 'tenant-b');
+    const headers = { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' };
+
+    expect(tenantA.studioPrincipal).toMatch(/^[a-f0-9]{24}$/);
+    expect(tenantA.studioPrincipal).not.toBe(tenantB.studioPrincipal);
+    expect(tenantA).not.toHaveProperty('tenantId');
+    expect(createSafeUser(tenantA).studioPrincipal).toBe(tenantA.studioPrincipal);
+    expect(resolveHeaders({ headers, user: createSafeUser(tenantA) })['X-Studio-Principal']).toBe(
+      tenantA.studioPrincipal,
+    );
+  });
+
+  it('resolves Studio principals from raw request users and lean users', () => {
+    const userId = '65f0000000000000000000a1';
+    const tenantA = createTestUser({ id: userId, tenantId: 'tenant-a' });
+    const tenantB = createTestUser({ id: userId, tenantId: 'tenant-b' });
+    const headers = { 'X-Studio-Principal': '{{LIBRECHAT_STUDIO_PRINCIPAL}}' };
+    const principalA = resolveHeaders({ headers, user: tenantA })['X-Studio-Principal'];
+
+    expect(principalA).toBe(
+      resolveHeaders({ headers, user: createSafeUser(tenantA) })['X-Studio-Principal'],
+    );
+    expect(principalA).not.toBe(resolveHeaders({ headers, user: tenantB })['X-Studio-Principal']);
+    expect(principalA).not.toContain('tenant-a');
+    expect(
+      resolveHeaders({
+        headers,
+        user: Object.assign(tenantA, { studioPrincipal: 'stale-principal' }),
+      })['X-Studio-Principal'],
+    ).toBe(principalA);
+    expect(resolveHeaders({ headers, user: { id: userId } })['X-Studio-Principal']).toBe(userId);
+    expect(
+      resolveHeaders({ headers, user: { _id: tenantA._id, tenantId: 'tenant-a' } })[
+        'X-Studio-Principal'
+      ],
+    ).toBe(
+      resolveHeaders({
+        headers,
+        user: { id: tenantA._id.toString(), tenantId: 'tenant-a' },
+      })['X-Studio-Principal'],
+    );
+  });
+
   it('should handle multiple placeholders in one value', () => {
     const user = { id: 'abc', email: 'me@example.com' };
     const headers = {

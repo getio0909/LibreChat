@@ -181,8 +181,8 @@ describe('loadAgentTools — MCP image context', () => {
     mockLoadToolDefinitions.mockResolvedValue({
       toolDefinitions: [
         {
-          name: `generate_image${Constants.mcp_delimiter}zyb_studio`,
-          description: 'Generate concept image',
+          name: `select_region${Constants.mcp_delimiter}zyb_studio`,
+          description: 'Select region on image',
         },
       ],
       toolRegistry: new Map(),
@@ -195,7 +195,7 @@ describe('loadAgentTools — MCP image context', () => {
     async (definitionsOnly) => {
       if (!definitionsOnly) {
         mockLoadToolsUtil.mockResolvedValue({
-          loadedTools: [{ name: `generate_image${Constants.mcp_delimiter}zyb_studio`, mcp: true }],
+          loadedTools: [{ name: `select_region${Constants.mcp_delimiter}zyb_studio`, mcp: true }],
           toolContextMap: {},
           dynamicToolContextMap: {},
         });
@@ -227,13 +227,23 @@ describe('loadAgentTools — MCP image context', () => {
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
         '- img-222 (booth_ref.webp, upload, turn 2)',
       );
-      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`edit_image.base_id`');
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
+        '`gemini_image_gen.image_ids`',
+      );
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`select_region.image_id`');
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`edit_region.base_id`');
+      expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
+        '`compare_materials.base_id`',
+      );
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`references[].id`');
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain('`references[].use`');
       expect(result.dynamicToolContextMap?.mcp_image_context).toContain(
-        '`design_concepts.reference_ids`',
+        '`create_3d_model.image_id`',
       );
-      expect(result.dynamicToolContextMap?.mcp_image_context).not.toContain('image_ids');
+      expect(result.dynamicToolContextMap?.mcp_image_context).not.toContain('edit_image.base_id');
+      expect(result.dynamicToolContextMap?.mcp_image_context).not.toContain(
+        'design_concepts.reference_ids',
+      );
       expect(result.dynamicToolContextMap?.mcp_image_context).not.toContain('reference_uses');
     },
   );

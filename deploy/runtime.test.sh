@@ -30,15 +30,15 @@ cat > "$work/studio.json" <<EOF
   "file_signing_key": "$file_signing_key",
   "public_base_url": "https://dev.xuqian.io",
   "gemini_api_key": "dummy-gemini-key",
-  "ark_api_key": "dummy-ark-key",
+  "ark_api_key": "",
+  "image_provider": "gemini",
+  "gemini_image_model": "gemini-nano-banana-2.1",
+  "enable_3d": false,
   "seedream_model": "doubao-seedream-5-0-pro-260628",
   "seed3d_model": "doubao-seed3d-2-0-260328",
-  "planner_model": "gemini-4-argon",
-  "planner_thinking_level": "HIGH",
   "max_parallel_per_user": 3,
   "seed3d_max_parallel": 5,
-  "seedream_timeout_seconds": 240,
-  "planner_timeout_seconds": 540
+  "seedream_timeout_seconds": 240
 }
 EOF
 chmod 600 "$work/studio.json"
@@ -115,7 +115,6 @@ base_headers = {
     "Accept": "application/json, text/event-stream",
     "X-Studio-Token": token,
     "X-LibreChat-User-ID": valid_user_id,
-    "X-LibreChat-Conversation-ID": "smoke-conv-1",
 }
 
 def parse_mcp_payload(raw_bytes: bytes) -> dict:
@@ -179,16 +178,15 @@ with urllib.request.urlopen(list_req, timeout=10) as resp:
 tools = tools_payload.get("result", {}).get("tools", [])
 tool_names = {tool["name"] for tool in tools}
 expected_tools = {
-    "generate_image",
-    "edit_image",
-    "design_concepts",
-    "list_images",
+    "select_region",
+    "edit_region",
     "search_library",
     "compare_materials",
-    "create_3d_model",
-    "check_3d_model",
 }
-assert expected_tools.issubset(tool_names), f"Missing expected tools: {expected_tools - tool_names} (got {tool_names})"
+assert tool_names == expected_tools, f"Expected tools {expected_tools}, got {tool_names}"
+assert "create_3d_model" not in tool_names and "check_3d_model" not in tool_names
+assert "generate_image" not in tool_names and "edit_image" not in tool_names
+assert "design_concepts" not in tool_names and "list_images" not in tool_names
 assert os.path.isdir("/kb/records"), "Expected /kb/records directory inside studio container"
 assert os.path.isfile("/kb/catalog/materials.yaml"), "Expected /kb/catalog/materials.yaml inside studio container"
 print(f"Studio smoke test passed with tools: {sorted(tool_names)}")

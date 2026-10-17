@@ -3477,7 +3477,7 @@ class AgentClient extends BaseClient {
       },
       req: this.options.req,
       res: this.options.res,
-      user: createSafeUser(this.options.req.user),
+      user: createSafeUser(this.options.req.user, resolveRequestTenantId(this.options.req)),
       tenantId: resolveRequestTenantId(this.options.req),
     });
 
@@ -4701,7 +4701,7 @@ class AgentClient extends BaseClient {
                 this.options.req.body.codeWorkspaces ??
                 this.options.req.resolvedConversation?.codeWorkspaces,
             }),
-          user: createSafeUser(this.options.req.user),
+          user: createSafeUser(this.options.req.user, resolveRequestTenantId(this.options.req)),
         },
         recursionLimit: resolveRecursionLimit(agentsEConfig, this.options.agent),
         signal: abortController.signal,
@@ -5115,7 +5115,10 @@ class AgentClient extends BaseClient {
           customHandlers: reasoningLabel?.handlers(activityHandlers) ?? activityHandlers,
           requestBody: config.configurable.requestBody,
           codeApprovalMode,
-          user: createSafeUser(this.options.req?.user),
+          user: createSafeUser(
+            this.options.req?.user,
+            resolveRequestTenantId(this.options.req ?? {}),
+          ),
           traceContext: buildTraceContext(this.options),
           tenantId: resolveRequestTenantId(this.options.req ?? {}),
           summarizationConfig: appConfig?.summarization,
@@ -5524,7 +5527,7 @@ class AgentClient extends BaseClient {
                 this.options.req.body.codeWorkspaces ??
                 this.options.req.resolvedConversation?.codeWorkspaces,
             }),
-          user: createSafeUser(this.options.req.user),
+          user: createSafeUser(this.options.req.user, resolveRequestTenantId(this.options.req)),
         },
         recursionLimit: resolveRecursionLimit(agentsEConfig, this.options.agent),
         signal: abortController.signal,
@@ -5920,7 +5923,10 @@ class AgentClient extends BaseClient {
         customHandlers: reasoningLabel?.handlers(activityHandlers) ?? activityHandlers,
         requestBody: config.configurable.requestBody,
         codeApprovalMode: this.options.req.body.codeApprovalMode,
-        user: createSafeUser(this.options.req?.user),
+        user: createSafeUser(
+          this.options.req?.user,
+          resolveRequestTenantId(this.options.req ?? {}),
+        ),
         traceContext: buildTraceContext(this.options),
         tenantId: resolveRequestTenantId(this.options.req ?? {}),
         summarizationConfig: appConfig?.summarization,
@@ -6286,7 +6292,7 @@ class AgentClient extends BaseClient {
      */
     resolveConfigHeaders({
       llmConfig: clientOptions,
-      user: createSafeUser(req?.user),
+      user: createSafeUser(req?.user, resolveRequestTenantId(req ?? {})),
       tenantId: resolveRequestTenantId(req ?? {}),
       body: {
         messageId: this.responseMessageId,

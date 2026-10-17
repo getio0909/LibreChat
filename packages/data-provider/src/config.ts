@@ -3840,6 +3840,47 @@ export const toolCallPreviewsConfigSchema = z.object({
 
 export type TToolCallPreviewsConfig = z.infer<typeof toolCallPreviewsConfigSchema>;
 
+// 参考图与桥接图像引用的资源上限默认配置
+export const imageReferenceDefaults = {
+  maxItems: 14,
+  maxImageBytes: 128 * 1024 * 1024,
+  maxTotalBytes: 256 * 1024 * 1024,
+  remoteTimeoutMs: 10_000,
+} as const;
+
+export const imageReferencesConfigSchema = z
+  .object({
+    maxItems: z.number().int().min(1).max(32).default(imageReferenceDefaults.maxItems),
+    maxImageBytes: z
+      .number()
+      .int()
+      .min(1_024)
+      .max(256 * 1024 * 1024)
+      .default(imageReferenceDefaults.maxImageBytes),
+    maxTotalBytes: z
+      .number()
+      .int()
+      .min(1_024)
+      .max(256 * 1024 * 1024)
+      .default(imageReferenceDefaults.maxTotalBytes),
+    remoteTimeoutMs: z
+      .number()
+      .int()
+      .min(100)
+      .max(120_000)
+      .default(imageReferenceDefaults.remoteTimeoutMs),
+  })
+  .strict()
+  .default({});
+
+export type TImageReferencesConfig = z.infer<typeof imageReferencesConfigSchema>;
+
+export function resolveImageReferencesConfig(
+  raw?: Partial<TImageReferencesConfig> | null,
+): TImageReferencesConfig {
+  return imageReferencesConfigSchema.parse(raw ?? {});
+}
+
 export const configSchema = z.object({
   version: z.string(),
   permissions: z.object({ maxWriteAttempts: permissionWriteAttemptsSchema }).optional(),
@@ -3860,6 +3901,7 @@ export const configSchema = z.object({
   skillSync: skillSyncConfigSchema,
   secureImageLinks: z.boolean().optional(),
   imageOutputType: z.nativeEnum(EImageOutputType).default(EImageOutputType.PNG),
+  imageReferences: imageReferencesConfigSchema.default(() => imageReferencesConfigSchema.parse({})),
   conversationList: conversationListConfigSchema.default(() =>
     conversationListConfigSchema.parse({}),
   ),

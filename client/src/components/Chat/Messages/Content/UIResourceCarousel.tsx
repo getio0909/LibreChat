@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@librechat/client';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { UIResource } from 'librechat-data-provider';
+import type { UIActionResult } from '@mcp-ui/client';
 import UIResourceRenderer, { isSupportedUIResource } from '~/components/MCPUIResource/Renderer';
 import { useOptionalMessagesOperations } from '~/Providers';
 import { handleUIAction } from '~/utils';
 import { useLocalize } from '~/hooks';
+
+const AUTO_RESIZE_HTML_PROPS = {
+  autoResizeIframe: { width: true, height: true },
+};
 
 interface UIResourceCarouselProps {
   uiResources: UIResource[];
@@ -18,6 +23,20 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
   const [isContainerHovered, setIsContainerHovered] = useState(false);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const { ask } = useOptionalMessagesOperations();
+  const onUIAction = useCallback(
+    async (result: UIActionResult) => handleUIAction(result, ask),
+    [ask],
+  );
+  const handleResourceUIAction = useCallback(
+    async (result: UIActionResult, resource: UIResource) =>
+      resource.serverName
+        ? handleUIAction(result, ask, {
+            serverName: resource.serverName,
+            resource,
+          })
+        : onUIAction(result),
+    [ask, onUIAction],
+  );
   const supportedUIResources = React.useMemo(
     () => uiResources.filter(isSupportedUIResource),
     [uiResources],
@@ -60,13 +79,12 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
   }
 
   if (supportedUIResources.length === 1) {
+    const singleResource = supportedUIResources[0];
     return (
       <UIResourceRenderer
-        resource={supportedUIResources[0]}
-        onUIAction={async (result) => handleUIAction(result, ask)}
-        htmlProps={{
-          autoResizeIframe: { width: true, height: true },
-        }}
+        resource={singleResource}
+        onUIAction={(result) => handleResourceUIAction(result, singleResource)}
+        htmlProps={AUTO_RESIZE_HTML_PROPS}
       />
     );
   }
@@ -113,7 +131,7 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
 
           return (
             <div
-              key={index}
+              key={uiResource.resourceId || uiResource.uri || index}
               className="animate-in fade-in-0 slide-in-from-bottom-5 shrink-0 transform-gpu transition-all duration-300 ease-out"
               style={{
                 width: `${width}px`,
@@ -124,10 +142,8 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
               <div className="flex h-full flex-col">
                 <UIResourceRenderer
                   resource={uiResource}
-                  onUIAction={async (result) => handleUIAction(result, ask)}
-                  htmlProps={{
-                    autoResizeIframe: { width: true, height: true },
-                  }}
+                  onUIAction={(result) => handleResourceUIAction(result, uiResource)}
+                  htmlProps={AUTO_RESIZE_HTML_PROPS}
                 />
               </div>
             </div>

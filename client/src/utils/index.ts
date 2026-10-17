@@ -59,6 +59,7 @@ export * from './toolCallPhase';
 export * from './documentTitle';
 export * from './reasoningLabels';
 export * from './numbers';
+export * from './studio';
 export { default as cn } from './cn';
 export { default as logger } from './logger';
 export { default as getLoginError } from './getLoginError';
@@ -67,6 +68,17 @@ export { default as buildDefaultConvo } from './buildDefaultConvo';
 export { default as getDefaultEndpoint } from './getDefaultEndpoint';
 export { default as createChatSearchParams, processValidSettings } from './createChatSearchParams';
 export { getThemeFromEnv } from './getThemeFromEnv';
+import {
+  buildStudioDraftKey,
+  extractCurrentStudioEditorCapability,
+  extractStudioSelectionImageId,
+  isStudioUIResource,
+  loadUIDraft,
+  renewStudioResourceLinks,
+  saveUIDraft,
+  studioUIStore,
+} from './studio';
+import type { StudioUIActionContext } from './studio';
 
 export const languages = [
   'java',
@@ -143,8 +155,119 @@ export const extractContent = (
   return '';
 };
 
+function verifyStudioSelectionContext(
+  payload: Record<string, unknown>,
+  context?: StudioUIActionContext,
+  requireCapability = false,
+):
+  | {
+      ok: true;
+      draftKey: string;
+      editorCapability: string;
+      sessionNonce?: string;
+    }
+  | {
+      ok: false;
+      reason: string;
+    } {
+  if (!context?.userId?.trim() || !context.resource) {
+    return { ok: false, reason: 'unauthenticated_or_missing_resource' };
+  }
+  const resourceImageId = extractStudioSelectionImageId(context.resource.uri);
+  if (!resourceImageId || !isStudioUIResource(context.resource, context.serverName)) {
+    return { ok: false, reason: 'invalid_selection_resource' };
+  }
+  if (
+    typeof payload.resourceUri === 'string' &&
+    payload.resourceUri.trim() &&
+    payload.resourceUri.trim() !== context.resource.uri
+  ) {
+    return { ok: false, reason: 'resource_uri_mismatch' };
+  }
+  if (
+    typeof payload.imageId === 'string' &&
+    payload.imageId.trim() &&
+    payload.imageId.trim() !== resourceImageId
+  ) {
+    return { ok: false, reason: 'image_id_mismatch' };
+  }
+  const expectedCapability = extractCurrentStudioEditorCapability(context.resource);
+  const providedCapability =
+    typeof payload.editorCapability === 'string' ? payload.editorCapability.trim() : '';
+  if (!expectedCapability) {
+    return { ok: false, reason: 'invalid_current_capability' };
+  }
+  if (requireCapability && !providedCapability) {
+    return { ok: false, reason: 'missing_capability' };
+  }
+  if (providedCapability && providedCapability !== expectedCapability) {
+    return { ok: false, reason: 'capability_mismatch' };
+  }
+  const draftKey = buildStudioDraftKey(context);
+  if (!draftKey) {
+    return { ok: false, reason: 'invalid_draft_scope' };
+  }
+  if (typeof payload.draftKey === 'string' && payload.draftKey.trim()) {
+    const expectedIframeKey = `zyb_studio:selection:${resourceImageId}:${expectedCapability}`;
+    if (payload.draftKey.trim() !== draftKey && payload.draftKey.trim() !== expectedIframeKey) {
+      return { ok: false, reason: 'draft_key_mismatch' };
+    }
+  }
+  return {
+    ok: true,
+    draftKey,
+    editorCapability: expectedCapability,
+    sessionNonce: typeof payload.sessionNonce === 'string' ? payload.sessionNonce : undefined,
+  };
+}
+
 /** Converts supported legacy MCP-UI actions into the existing conversation submission path. */
-export const handleUIAction = async (result: UIActionResult, ask: TAskFunction) => {
+export const handleUIAction = async (
+  result: UIActionResult,
+  ask: TAskFunction,
+  context?: StudioUIActionContext,
+) => {
+  const rawAction = result as {
+    type?: string;
+    payload?: Record<string, unknown>;
+  };
+  if (rawAction?.type === 'ui-draft-save') {
+    const payload = rawAction.payload ?? {};
+    const verified = verifyStudioSelectionContext(payload, context, true);
+    if (!verified.ok) {
+      return { status: 'rejected', reason: verified.reason };
+    }
+    saveUIDraft(verified.draftKey, payload.draft ?? null, context?.store ?? studioUIStore);
+    return {
+      status: 'saved',
+      draftKey: verified.draftKey,
+      editorCapability: verified.editorCapability,
+      sessionNonce: verified.sessionNonce,
+    };
+  }
+  if (rawAction?.type === 'ui-draft-load') {
+    const payload = rawAction.payload ?? {};
+    const verified = verifyStudioSelectionContext(payload, context);
+    if (!verified.ok) {
+      return { status: 'rejected', reason: verified.reason };
+    }
+    const draft = loadUIDraft(verified.draftKey, context?.store ?? studioUIStore);
+    return {
+      status: 'loaded',
+      draftKey: verified.draftKey,
+      editorCapability: verified.editorCapability,
+      sessionNonce: verified.sessionNonce,
+      draft,
+    };
+  }
+  if (rawAction?.type === 'ui-link-renew') {
+    const payload = rawAction.payload ?? {};
+    if (!context) {
+      return { status: 'rejected', reason: 'missing_context' };
+    }
+    return renewStudioResourceLinks(payload, context);
+  }
+
   const { type, payload } = result;
   let messageText = '';
 
@@ -172,7 +295,14 @@ Execute the tool that is mentioned in the message using the tools available to y
     `;
   } else if (type === 'prompt') {
     const { prompt } = payload;
-    messageText = `The user clicked a button in an embedded UI Resource, and we got a message of type \`prompt\`.
+    if (isStudioUIResource(context?.resource, context?.serverName)) {
+      // 仅对已认证的智印工坊资源直接提交纯中文指令文本，避免无语言代码块围栏触发wasm语法高亮标签
+      messageText = typeof prompt === 'string' ? prompt.trim() : '';
+      if (!messageText) {
+        return;
+      }
+    } else {
+      messageText = `The user clicked a button in an embedded UI Resource, and we got a message of type \`prompt\`.
 The prompt is:
 
 \`\`\`
@@ -181,6 +311,7 @@ ${prompt}
 
 Execute the intention of the prompt that is mentioned in the message using the tools available to you.
     `;
+    }
   } else {
     return;
   }

@@ -22,6 +22,7 @@ import { resolveSubagentAgentId } from '~/components/Chat/Subagents/identity';
 import { subagentStatusLabelKey } from '~/components/Chat/Subagents/status';
 import { useOpenSubagentPanel } from '~/components/Chat/Subagents/surface';
 import { getSubagentPrompt } from '~/components/Chat/Subagents/prompt';
+import { getMCPServerDisplayLabel } from '~/utils/toolLabels';
 import { MessageContext } from '~/Providers/MessageContext';
 import { useShareContext } from '~/Providers/ShareContext';
 import MessageIcon from '~/components/Share/MessageIcon';
@@ -598,9 +599,9 @@ function ToolIdentifier({
   if (parsed.mcpServer) {
     return (
       <span className="inline-flex min-w-0 shrink items-baseline gap-1">
-        <span className="truncate">{parsed.mcpServer}</span>
+        <span className="truncate">{getMCPServerDisplayLabel(parsed.mcpServer, localize)}</span>
         <span className="text-text-tertiary shrink-0">·</span>
-        <ToolNameBadge name={parsed.toolName} />
+        <ToolNameBadge name={parsed.friendlyKey ? localize(parsed.friendlyKey) : parsed.toolName} />
       </span>
     );
   }

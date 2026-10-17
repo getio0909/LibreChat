@@ -5,7 +5,6 @@ const {
   StepTypes,
   StepEvents,
   ContentTypes,
-  FileContext,
   ErrorTypes,
   UsageEvents,
   getRunStepDurationMs,
@@ -37,11 +36,12 @@ const {
   collectToolCallIds,
   createToolTimingAdapter,
   stampCommandExecutor,
+  processToolImageArtifacts,
 } = require('@librechat/api');
 const { processFileCitations } = require('~/server/services/Files/Citations');
 const { processCodeOutput, runPreviewFinalize } = require('~/server/services/Files/Code/process');
 const { preflightCodeOutputBatch } = require('~/server/services/Files/Code/preflight');
-const { saveBase64Image } = require('~/server/services/Files/process');
+const { saveBase64Image, uploadImageBuffer } = require('~/server/services/Files/process');
 
 function isHostFileAuthoringArtifact(artifact) {
   return artifact?.[HOST_FILE_AUTHORING_ARTIFACT_KEY] === true;
@@ -977,6 +977,30 @@ function createToolEndCallback({ req, res, artifactPromises, streamId = null, jo
       return;
     }
 
+    const imagesPublished = await processToolImageArtifacts({
+      output,
+      req,
+      metadata,
+      artifactPromises,
+      saveBase64Image,
+      uploadImageBuffer,
+      logger,
+      buildMetadata: (file) =>
+        Object.assign(file, {
+          messageId: metadata.run_id,
+          toolCallId: output.tool_call_id,
+          conversationId: metadata.thread_id,
+        }),
+      onFileSaved: (fileMetadata) => {
+        if (streamId || res.headersSent) {
+          writeAttachment(res, streamId, fileMetadata, jobCreatedAt);
+        }
+      },
+    });
+    if (!imagesPublished) {
+      return;
+    }
+
     if (!output.artifact) {
       return;
     }
@@ -1077,49 +1101,6 @@ function createToolEndCallback({ req, res, artifactPromises, streamId = null, jo
     }
 
     if (output.artifact.content) {
-      /** @type {FormattedContent[]} */
-      const content = output.artifact.content;
-      for (let i = 0; i < content.length; i++) {
-        const part = content[i];
-        if (!part) {
-          continue;
-        }
-        if (part.type !== 'image_url') {
-          continue;
-        }
-        const { url } = part.image_url;
-        artifactPromises.push(
-          (async () => {
-            const filename = `${output.name}_img_${nanoid()}`;
-            const file_id = output.artifact.file_ids?.[i];
-            const file = await saveBase64Image(url, {
-              req,
-              file_id,
-              filename,
-              endpoint: metadata.provider,
-              context: FileContext.image_generation,
-            });
-            const fileMetadata = Object.assign(file, {
-              messageId: metadata.run_id,
-              toolCallId: output.tool_call_id,
-              conversationId: metadata.thread_id,
-            });
-            if (!streamId && !res.headersSent) {
-              return fileMetadata;
-            }
-
-            if (!fileMetadata) {
-              return null;
-            }
-
-            writeAttachment(res, streamId, fileMetadata, jobCreatedAt);
-            return fileMetadata;
-          })().catch((error) => {
-            logger.error('Error processing artifact content:', error);
-            return null;
-          }),
-        );
-      }
       return;
     }
 
@@ -1350,6 +1331,34 @@ function createResponsesToolEndCallback({ req, res, tracker, artifactPromises })
       return;
     }
 
+    const imagesPublished = await processToolImageArtifacts({
+      output,
+      req,
+      metadata,
+      artifactPromises,
+      saveBase64Image,
+      uploadImageBuffer,
+      logger,
+      buildMetadata: (file) => Object.assign(file, { toolCallId: output.tool_call_id }),
+      onFileSaved: (fileMetadata) => {
+        if (res.headersSent && !res.writableEnded) {
+          const attachment = {
+            file_id: fileMetadata.file_id,
+            filename: fileMetadata.filename,
+            type: fileMetadata.type,
+            url: fileMetadata.filepath,
+            width: fileMetadata.width,
+            height: fileMetadata.height,
+            tool_call_id: output.tool_call_id,
+          };
+          writeResponsesAttachment(res, tracker, attachment, metadata);
+        }
+      },
+    });
+    if (!imagesPublished) {
+      return;
+    }
+
     if (!output.artifact) {
       return;
     }
@@ -1443,57 +1452,6 @@ function createResponsesToolEndCallback({ req, res, tracker, artifactPromises })
     }
 
     if (output.artifact.content) {
-      /** @type {FormattedContent[]} */
-      const content = output.artifact.content;
-      for (let i = 0; i < content.length; i++) {
-        const part = content[i];
-        if (!part) {
-          continue;
-        }
-        if (part.type !== 'image_url') {
-          continue;
-        }
-        const { url } = part.image_url;
-        artifactPromises.push(
-          (async () => {
-            const filename = `${output.name}_img_${nanoid()}`;
-            const file_id = output.artifact.file_ids?.[i];
-            const file = await saveBase64Image(url, {
-              req,
-              file_id,
-              filename,
-              endpoint: metadata.provider,
-              context: FileContext.image_generation,
-            });
-            const fileMetadata = Object.assign(file, {
-              toolCallId: output.tool_call_id,
-            });
-
-            if (!fileMetadata) {
-              return null;
-            }
-
-            // For Responses API, emit attachment during streaming
-            if (res.headersSent && !res.writableEnded) {
-              const attachment = {
-                file_id: fileMetadata.file_id,
-                filename: fileMetadata.filename,
-                type: fileMetadata.type,
-                url: fileMetadata.filepath,
-                width: fileMetadata.width,
-                height: fileMetadata.height,
-                tool_call_id: output.tool_call_id,
-              };
-              writeResponsesAttachment(res, tracker, attachment, metadata);
-            }
-
-            return fileMetadata;
-          })().catch((error) => {
-            logger.error('Error processing artifact content:', error);
-            return null;
-          }),
-        );
-      }
       return;
     }
 

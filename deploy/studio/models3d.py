@@ -14,6 +14,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -410,14 +411,32 @@ def sign_file_token(
     model_id: str,
     *,
     expires_at: int | None = None,
+    ttl_seconds: int | None = None,
 ) -> tuple[str, int]:
     uid = validate_user_id(user_id)
     mid = validate_model_id(model_id)
-    exp = (
-        int(expires_at)
-        if expires_at is not None
-        else int(time.time()) + int(settings.file_token_ttl_seconds)
-    )
+    if expires_at is not None:
+        exp = int(expires_at)
+    else:
+        fields_set = getattr(settings, "model_fields_set", set())
+        if ttl_seconds is not None:
+            raw_ttl = int(ttl_seconds)
+        elif "preview_token_ttl_seconds" in fields_set:
+            raw_ttl = int(settings.preview_token_ttl_seconds)
+        elif "file_token_ttl_seconds" in fields_set:
+            raw_ttl = int(settings.file_token_ttl_seconds)
+        else:
+            raw_ttl = max(
+                int(settings.file_token_ttl_seconds),
+                int(
+                    getattr(
+                        settings,
+                        "preview_token_ttl_seconds",
+                        settings.file_token_ttl_seconds,
+                    )
+                ),
+            )
+        exp = int(time.time()) + max(60, raw_ttl)
     payload_raw = f"{uid}.{mid}.{exp}".encode("ascii")
     payload_b64 = base64.urlsafe_b64encode(payload_raw).decode("ascii").rstrip("=")
     key_bytes = bytes.fromhex(settings.file_signing_key)
@@ -429,7 +448,12 @@ def sign_file_token(
 
 # 校验HMAC-SHA256签名访问令牌并返回（user_id, model_id, expires_at）
 def verify_file_token(
-    settings: StudioSettings, token: str, *, now: float | None = None
+    settings: StudioSettings,
+    token: str,
+    *,
+    now: float | None = None,
+    allow_expired: bool = False,
+    max_expired_age_seconds: int | None = None,
 ) -> tuple[str, str, int]:
     cleaned_token = token if isinstance(token, str) else ""
     match = FILE_TOKEN_RE.fullmatch(cleaned_token)
@@ -460,7 +484,13 @@ def verify_file_token(
     exp = int(raw_exp)
     current_ts = time.time() if now is None else float(now)
     if current_ts >= exp:
-        raise ValueError("Token has expired")
+        if not allow_expired:
+            raise ValueError("Token has expired")
+        if (
+            max_expired_age_seconds is not None
+            and (current_ts - exp) > max_expired_age_seconds
+        ):
+            raise ValueError("Token has expired beyond renewal window")
     return uid, mid, exp
 
 
@@ -470,9 +500,46 @@ def build_signed_file_url(settings: StudioSettings, token: str) -> str:
     return f"{base}/studio-files/{token}"
 
 
+# 生成面向设计师的简短中文三维模型下载文件名（对齐设计图-<8位十六进制>命名规范，不暴露内部mdl_前缀与32位完整哈希）
+def format_model_download_filename(model_id: str) -> str:
+    mid = validate_model_id(model_id)
+    short_hex = mid.removeprefix("mdl_")[:8]
+    return f"三维模型-{short_hex}.glb"
+
+
+# 生成面向设计师的Markdown三维模型下载链接文本
+def format_model_download_markdown(model_id: str, signed_url: str) -> str:
+    display_filename = format_model_download_filename(model_id)
+    return f"[下载 GLB 模型 ({display_filename})]({signed_url})"
+
+
+# 生成遵循RFC 5987 / RFC 6266的三维模型下载Content-Disposition响应头（复用LibreChat getContentDisposition编码策略）
+def format_model_content_disposition(model_id: str) -> str:
+    mid = validate_model_id(model_id)
+    short_hex = mid.removeprefix("mdl_")[:8]
+    display_filename = f"三维模型-{short_hex}.glb"
+    encoded_filename = quote(display_filename, safe="-_.")
+    return f"attachment; filename=\"model-{short_hex}.glb\"; filename*=UTF-8''{encoded_filename}"
+
+
 # 将Unix秒级时间戳格式化为ISO8601 UTC字符串
 def format_utc_timestamp(ts: int) -> str:
     return datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+# 将ISO8601时间统一为UTC兜底文本；浏览器加载后再按设计师本地时区显示
+def format_display_timestamp(expires_at: str) -> str:
+    cleaned = (expires_at or "").strip()
+    if not cleaned:
+        return ""
+    try:
+        normalized = cleaned[:-1] + "+00:00" if cleaned.endswith("Z") else cleaned
+        dt = datetime.fromisoformat(normalized)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M")
+    except ValueError:
+        return cleaned.replace("T", " ").rstrip("Z")
 
 
 # 解析HTTP Range请求头（支持bytes=start-end、bytes=start-、bytes=-suffix）
@@ -522,8 +589,10 @@ def build_model_viewer_html(
     file_size: int,
 ) -> str:
     safe_model_id = html.escape(model_id, quote=True)
+    safe_model_id_js = json.dumps(model_id)
     safe_url_js = json.dumps(signed_url)
     safe_expires = html.escape(expires_at, quote=True)
+    human_expires = html.escape(format_display_timestamp(expires_at), quote=True)
     size_mb = f"{file_size / (1024 * 1024):.2f} MB"
     faces_label = f"约 {faces:,} 面"
 
@@ -532,7 +601,7 @@ def build_model_viewer_html(
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>三维视觉预览 - {safe_model_id}</title>
+<title>三维视觉预览（{faces_label}）</title>
 <style>
   :root {{
     color-scheme: light dark;
@@ -727,7 +796,7 @@ def build_model_viewer_html(
 </script>
 </head>
 <body>
-  <div class="viewer-shell" id="viewer-shell" role="region" aria-label="三维模型交互预览">
+  <div class="viewer-shell" id="viewer-shell" data-model-id="{safe_model_id}" role="region" aria-label="三维模型交互预览">
     <div id="canvas-container"></div>
 
     <div class="top-bar">
@@ -748,9 +817,10 @@ def build_model_viewer_html(
     </div>
 
     <div class="overlay" id="error-state" role="alert" hidden>
-      <div class="error-text" id="error-message">三维模型加载失败，请点击重试或使用对话消息中的 GLB 下载链接。</div>
+      <div class="error-text" id="error-message">三维模型加载失败，请点击重试或刷新预览链接。</div>
       <div class="controls-group">
         <button type="button" class="btn" id="retry-btn">重新加载</button>
+        <button type="button" class="btn btn-primary" id="renew-btn">刷新预览链接</button>
       </div>
     </div>
 
@@ -758,14 +828,30 @@ def build_model_viewer_html(
       <div class="badge badge-muted">
         拖拽旋转 · 滚轮/双指缩放 · 右键平移 · 仅供视觉预览（非工程制造模型）
       </div>
-      <div class="badge badge-muted" title="下载链接过期时间">
-        有效期至 {safe_expires}
+      <div class="badge badge-muted" id="model-expires-badge" data-expires="{safe_expires}" title="预览链接本地有效时间">
+        有效期至 {human_expires}
       </div>
     </div>
   </div>
 
   <script type="module">
-    const MODEL_URL = {safe_url_js};
+    const INITIAL_MODEL_URL = {safe_url_js};
+    const MODEL_URL = INITIAL_MODEL_URL;
+    let currentModelUrl = INITIAL_MODEL_URL;
+    const MODEL_ID = {safe_model_id_js};
+    const RESOURCE_URI = 'ui://zyb_studio/model/' + MODEL_ID;
+    const SESSION_NONCE = (() => {{
+      const buf = new Uint32Array(4);
+      if (window.crypto && window.crypto.getRandomValues) {{
+        window.crypto.getRandomValues(buf);
+        return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+      }}
+      return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+    }})();
+    let reqCounter = 0;
+    let pendingRenewRequestId = null;
+    let renderDataReceived = false;
+
     const shell = document.getElementById('viewer-shell');
     const container = document.getElementById('canvas-container');
     const loadingEl = document.getElementById('loading-state');
@@ -775,6 +861,51 @@ def build_model_viewer_html(
     const errorMsgEl = document.getElementById('error-message');
     const resetBtn = document.getElementById('reset-btn');
     const retryBtn = document.getElementById('retry-btn');
+    const renewBtn = document.getElementById('renew-btn');
+    const expiresBadge = document.getElementById('model-expires-badge');
+
+    function nextRequestId(prefix) {{
+      reqCounter += 1;
+      return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+    }}
+
+    function isValidRenewedModelUrl(candidateUrl) {{
+      if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+      try {{
+        const cand = new URL(candidateUrl, window.location.href);
+        if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+        const ref = new URL(INITIAL_MODEL_URL, window.location.href);
+        if (cand.origin !== ref.origin) return false;
+        return /\\/(?:studio-files|files)\\/[A-Za-z0-9_-]+\\.[0-9a-f]{{64}}$/.test(cand.pathname);
+      }} catch (_e) {{
+        return false;
+      }}
+    }}
+
+    function formatLocalExpiry(isoStr) {{
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      if (Number.isNaN(d.getTime())) return String(isoStr).replace('T', ' ').replace(/Z$/, '');
+      const pad = (n) => String(n).padStart(2, '0');
+      return (
+        d.getFullYear() +
+        '-' +
+        pad(d.getMonth() + 1) +
+        '-' +
+        pad(d.getDate()) +
+        ' ' +
+        pad(d.getHours()) +
+        ':' +
+        pad(d.getMinutes())
+      );
+    }}
+
+    if (expiresBadge && expiresBadge.dataset.expires) {{
+      const formatted = formatLocalExpiry(expiresBadge.dataset.expires);
+      if (formatted) {{
+        expiresBadge.textContent = '有效期至 ' + formatted;
+      }}
+    }}
 
     function notifyHostSize() {{
       const height = Math.ceil(shell.getBoundingClientRect().height);
@@ -788,8 +919,98 @@ def build_model_viewer_html(
     function showError(msg) {{
       loadingEl.hidden = true;
       errorEl.hidden = false;
-      errorMsgEl.textContent = msg || '三维模型加载失败，请检查网络或下载链接是否已过期。';
+      errorMsgEl.textContent = msg || '三维模型加载失败，请检查网络或点击“刷新预览链接”重新获取。';
     }}
+
+    let loadModelFn = null;
+
+    function applyRenewedModelLinks(candidate) {{
+      if (!candidate || typeof candidate !== 'object') return false;
+      if (candidate.modelId && candidate.modelId !== MODEL_ID) return false;
+      const nextUrl = candidate.modelUrl || candidate.model_url || candidate.signedUrl || candidate.signed_url;
+      if (!isValidRenewedModelUrl(nextUrl)) return false;
+      currentModelUrl = nextUrl;
+      const nextExpires = candidate.expiresAt || candidate.expires_at;
+      if (nextExpires && expiresBadge) {{
+        expiresBadge.dataset.expires = nextExpires;
+        expiresBadge.textContent = '有效期至 ' + formatLocalExpiry(nextExpires);
+      }}
+      if (typeof loadModelFn === 'function') {{
+        loadModelFn();
+      }}
+      return true;
+    }}
+
+    async function renewModelDirectly() {{
+      try {{
+        const res = await fetch(currentModelUrl, {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{
+            action: 'renew',
+            resource_uri: RESOURCE_URI,
+            model_url: currentModelUrl
+          }})
+        }});
+        const rawText = await res.text();
+        let data = {{}};
+        if (rawText) {{
+          try {{
+            const parsed = JSON.parse(rawText);
+            if (parsed && typeof parsed === 'object') data = parsed;
+          }} catch (_e) {{}}
+        }}
+        if (res.ok && applyRenewedModelLinks(data)) {{
+          return true;
+        }}
+      }} catch (_err) {{}}
+      return false;
+    }}
+
+    if (renewBtn) {{
+      renewBtn.addEventListener('click', async () => {{
+        errorMsgEl.textContent = '正在刷新三维模型预览链接，请稍候…';
+        if (window.parent && window.parent !== window) {{
+          pendingRenewRequestId = nextRequestId('renew-3d');
+          window.parent.postMessage({{
+            type: 'ui-link-renew',
+            messageId: pendingRenewRequestId,
+            payload: {{
+              resourceUri: RESOURCE_URI,
+              modelId: MODEL_ID,
+              sessionNonce: SESSION_NONCE,
+              modelUrl: currentModelUrl
+            }}
+          }}, '*');
+        }}
+        const ok = await renewModelDirectly();
+        if (!ok && (!window.parent || window.parent === window)) {{
+          errorMsgEl.textContent = '预览链接刷新失败，请稍后重试。';
+        }}
+      }});
+    }}
+
+    window.addEventListener('message', (ev) => {{
+      if (!window.parent || window.parent === window || ev.source !== window.parent) return;
+      if (!ev.data || typeof ev.data !== 'object') return;
+      const msgType = ev.data.type;
+      const payload = ev.data.payload || {{}};
+      if (msgType === 'ui-lifecycle-iframe-render-data' && !renderDataReceived) {{
+        renderDataReceived = true;
+        const renderData = payload.renderData || payload;
+        if (renderData && typeof renderData === 'object') {{
+          applyRenewedModelLinks(renderData.renewedLinks || renderData);
+        }}
+        return;
+      }}
+      if (msgType === 'ui-message-response' && ev.data.messageId && ev.data.messageId === pendingRenewRequestId) {{
+        pendingRenewRequestId = null;
+        const resp = payload.response || payload;
+        if (!resp || typeof resp !== 'object') return;
+        if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+        applyRenewedModelLinks(resp);
+      }}
+    }});
 
     try {{
       const THREE = await import('three');
@@ -901,7 +1122,7 @@ def build_model_viewer_html(
         progressLabel.textContent = '正在加载三维模型...';
 
         loader.load(
-          MODEL_URL,
+          currentModelUrl,
           (gltf) => {{
             if (currentModel) {{
               scene.remove(currentModel);
@@ -926,10 +1147,11 @@ def build_model_viewer_html(
             }}
           }},
           () => {{
-            showError('三维模型加载失败或签名下载链接已过期，请点击重试或使用对话消息中的 GLB 下载链接。');
+            showError('三维模型加载失败或签名下载链接已过期，请点击“刷新预览链接”或使用对话消息中的 GLB 下载链接。');
           }}
         );
       }}
+      loadModelFn = loadModel;
 
       resetBtn.addEventListener('click', () => {{
         camera.position.copy(defaultView.pos);

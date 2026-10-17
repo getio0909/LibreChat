@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>局部选区编辑器（400×300）</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f4ef;
+    --panel: #ffffff;
+    --border: rgba(36, 32, 26, 0.15);
+    --text: #231f1a;
+    --muted: #655e54;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --ok: #15803d;
+    --danger: #b42318;
+    --stage-bg: #1e1e22;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171614;
+      --panel: #22201c;
+      --border: rgba(245, 242, 235, 0.15);
+      --text: #f5f2eb;
+      --muted: #a69f93;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --ok: #22c55e;
+      --danger: #f87171;
+      --stage-bg: #111114;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .editor-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
+  }
+  .header-row, .toolbar-row, .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .title-badge {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .meta-badge {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .btn-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+  }
+  button {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
+  button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  button.primary-btn {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    font-weight: 600;
+    padding: 6px 14px;
+  }
+  button.primary-btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+  .brush-ctrl {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stage-viewport {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: auto;
+    background: var(--stage-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+  .stage-inner {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+  }
+  .stage-inner img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+  }
+  .stage-inner canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .status-line {
+    font-size: 12px;
+    color: var(--muted);
+    flex: 1;
+    min-width: 200px;
+  }
+  .status-line.ok {
+    color: var(--ok);
+    font-weight: 600;
+  }
+  .status-line.err {
+    color: var(--danger);
+  }
+  .instruction-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+<div class="editor-wrap" id="editorRoot" data-image-id="img_demo123">
+  <div class="header-row">
+    <span class="title-badge">只改局部 · 选区编辑器（400×300）</span>
+    <span class="meta-badge">蓝色半透明区域将被修改，选区外像素 100% 原样保留 · <span id="expiresBadge" data-expires="2030-01-01T00:00:00Z" data-editor-expires="2030-01-01T00:00:00Z" data-preview-expires="2030-01-01T00:00:00Z">有效期至 2030-01-01 00:00</span></span>
+  </div>
+  <div class="toolbar-row">
+    <div class="btn-group" role="group" aria-label="选区工具">
+      <button type="button" data-tool="point" disabled title="当前环境未挂载离线分割模型，请使用框选、套索或画笔">点选识别</button>
+      <button type="button" data-tool="rect">框选</button>
+      <button type="button" data-tool="polygon">多边形套索</button>
+      <button type="button" data-tool="stroke">画笔涂抹</button>
+    </div>
+    <div class="btn-group" role="group" aria-label="布尔模式">
+      <button type="button" data-op="add" aria-pressed="true">加选区域</button>
+      <button type="button" data-op="subtract" aria-pressed="false">减选擦除</button>
+    </div>
+    <label class="brush-ctrl" id="brushWrap">
+      <span>画笔粗细</span>
+      <input type="range" id="brushRadius" min="4" max="100" value="22" />
+      <span id="brushVal">22</span>
+    </label>
+    <div class="btn-group" role="group" aria-label="视图与历史">
+      <button type="button" id="closePolyBtn" hidden>闭合多边形</button>
+      <button type="button" id="undoBtn" disabled>撤销</button>
+      <button type="button" id="clearBtn" disabled>清空</button>
+      <button type="button" id="fitBtn">适应窗口</button>
+      <button type="button" data-zoom="1">100%</button>
+      <button type="button" data-zoom="1.5">150%</button>
+      <button type="button" data-zoom="2">200%</button>
+    </div>
+  </div>
+  <div class="stage-viewport" id="viewport">
+    <div class="stage-inner" id="stageInner">
+      <img id="baseImg" alt="待选区底图" crossorigin="anonymous" />
+      <canvas id="overlayCanvas"></canvas>
+    </div>
+  </div>
+  <div class="footer-row">
+    <div class="status-line" id="statusText">正在加载底图...</div>
+    <input type="text" class="instruction-input" id="instructionInput" placeholder="选填：输入局部修改要求（如：把选区内的台面换成白玉兰大理石）" />
+    <button type="button" id="renewBtn" hidden>重新获取链接</button>
+    <button type="button" class="primary-btn" id="confirmBtn" disabled>确认选区</button>
+  </div>
+</div>
+<script>
+(function() {
+  const SIGNED_URL = "/files/ZWR0OnVzZXJfMToxODkzNDU2MDAwOmFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE6bm9uY2VfYTppbWdfZGVtbzEyMw.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const PREVIEW_URL = "/files/aW1nOnVzZXJfMToxODkzNDU2MDAwOmltZ19kZW1vMTIz.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const IMAGE_ID = "img_demo123";
+  const RESOURCE_URI = 'ui://zyb_studio/selection/' + IMAGE_ID;
+  const EDITOR_EXPIRES_AT = "2030-01-01T00:00:00Z";
+  const PREVIEW_EXPIRES_AT = "2030-01-01T00:00:00Z";
+  const SEGMENT_READY = false;
+
+  function extractEditorCapability(signedUrl) {
+    if (typeof signedUrl !== 'string' || !signedUrl) return 'default';
+    const match = signedUrl.match(/\/(?:studio-files|files)\/([A-Za-z0-9_-]+)\.([0-9a-f]{16,64})/);
+    if (match && match[2]) return match[2].slice(0, 24);
+    const clean = signedUrl.split('?')[0].replace(/[^A-Za-z0-9_-]/g, '');
+    return clean.slice(-24) || 'default';
+  }
+
+  const EDITOR_CAPABILITY = extractEditorCapability(SIGNED_URL);
+  const DRAFT_KEY = 'zyb_studio:selection:' + IMAGE_ID + ':' + EDITOR_CAPABILITY;
+  const SESSION_NONCE = (() => {
+    const buf = new Uint32Array(4);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(buf);
+      return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+    }
+    return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+  })();
+
+  let currentEditorUrl = SIGNED_URL;
+  let currentPreviewUrl = PREVIEW_URL || SIGNED_URL;
+  let editorExpiresIso = EDITOR_EXPIRES_AT;
+  let previewExpiresIso = PREVIEW_EXPIRES_AT || EDITOR_EXPIRES_AT;
+  let reqCounter = 0;
+
+  const state = {
+    tool: "rect",
+    op: 'add',
+    brushRadius: 22,
+    zoom: 1,
+    shapes: [],
+    baseShapes: [],
+    points: [],
+    pointOp: 'add',
+    draft: null,
+    activeMaskPixels: 0,
+    confirmedId: null,
+    busy: false,
+    triedEditorFallback: false,
+    autoRenewSent: false,
+    lastDraftUpdatedAt: 0,
+    pendingDraftRequestId: null,
+    pendingRenewRequestId: null,
+    renderDataReceived: false
+  };
+
+  function nextRequestId(prefix) {
+    reqCounter += 1;
+    return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+  }
+
+  function isValidRenewedStudioUrl(candidateUrl, referenceUrl, expectedPrefix) {
+    if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+    try {
+      const cand = new URL(candidateUrl, window.location.href);
+      if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+      const ref = new URL(referenceUrl || SIGNED_URL, window.location.href);
+      if (cand.origin !== ref.origin) return false;
+      const match = cand.pathname.match(/\/(?:studio-files|files)\/([A-Za-z0-9_-]+)\.([0-9a-f]{64})$/);
+      if (!match) return false;
+      if (expectedPrefix) {
+        const b64 = match[1].replace(/-/g, '+').replace(/_/g, '/');
+        const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+        const decoded = atob(b64 + pad);
+        if (!decoded.startsWith(expectedPrefix)) return false;
+      }
+      return true;
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  const root = document.getElementById('editorRoot');
+  const viewport = document.getElementById('viewport');
+  const stageInner = document.getElementById('stageInner');
+  const baseImg = document.getElementById('baseImg');
+  const canvas = document.getElementById('overlayCanvas');
+  const statusText = document.getElementById('statusText');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const renewBtn = document.getElementById('renewBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const fitBtn = document.getElementById('fitBtn');
+  const closePolyBtn = document.getElementById('closePolyBtn');
+  const brushRadius = document.getElementById('brushRadius');
+  const brushVal = document.getElementById('brushVal');
+  const instructionInput = document.getElementById('instructionInput');
+  const expiresBadge = document.getElementById('expiresBadge');
+
+  function formatLocalExpiry(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (Number.isNaN(d.getTime())) return String(isoStr).replace('T', ' ').replace(/Z$/, '');
+    const pad = (n) => String(n).padStart(2, '0');
+    return (
+      d.getFullYear() +
+      '-' +
+      pad(d.getMonth() + 1) +
+      '-' +
+      pad(d.getDate()) +
+      ' ' +
+      pad(d.getHours()) +
+      ':' +
+      pad(d.getMinutes())
+    );
+  }
+
+  function refreshExpiryBadge() {
+    if (!expiresBadge) return;
+    const targetIso = previewExpiresIso || editorExpiresIso;
+    const formatted = formatLocalExpiry(targetIso);
+    if (formatted) {
+      expiresBadge.textContent = '有效期至 ' + formatted;
+    }
+  }
+  refreshExpiryBadge();
+
+  let lastNotifiedHeight = 0;
+  function notifyHostSize(onlyIfChanged) {
+    const h = Math.max(540, Math.ceil(root.getBoundingClientRect().height + 16));
+    if (onlyIfChanged === true && h === lastNotifiedHeight) return;
+    lastNotifiedHeight = h;
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'ui-size-change', payload: { height: h } }, '*');
+    }
+  }
+
+  function setStatus(text, kind) {
+    statusText.textContent = text;
+    statusText.className = 'status-line' + (kind ? ' ' + kind : '');
+    notifyHostSize(true);
+  }
+
+  function buildDraftSnapshot() {
+    return {
+      version: 1,
+      imageId: IMAGE_ID,
+      resourceUri: RESOURCE_URI,
+      editorCapability: EDITOR_CAPABILITY,
+      tool: state.tool,
+      op: state.op,
+      brushRadius: state.brushRadius,
+      zoom: state.zoom,
+      shapes: state.shapes.slice(),
+      baseShapes: state.baseShapes ? state.baseShapes.slice() : [],
+      points: state.points.slice(),
+      pointOp: state.pointOp,
+      instruction: instructionInput ? instructionInput.value : '',
+      confirmedId: state.confirmedId,
+      updatedAt: state.lastDraftUpdatedAt || Date.now()
+    };
+  }
+
+  function persistDraftState() {
+    state.lastDraftUpdatedAt = Date.now();
+    const snapshot = buildDraftSnapshot();
+    try {
+      window.name = JSON.stringify({
+        draftKey: DRAFT_KEY,
+        editorCapability: EDITOR_CAPABILITY,
+        draft: snapshot
+      });
+    } catch (_e) {}
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'ui-draft-save',
+        messageId: nextRequestId('draft-save'),
+        payload: {
+          draftKey: DRAFT_KEY,
+          imageId: IMAGE_ID,
+          resourceUri: RESOURCE_URI,
+          editorCapability: EDITOR_CAPABILITY,
+          sessionNonce: SESSION_NONCE,
+          draft: snapshot
+        }
+      }, '*');
+    }
+  }
+
+  function applyDraftSnapshot(draft) {
+    if (!draft || typeof draft !== 'object' || draft.imageId !== IMAGE_ID) return false;
+    // 宿主按会话与资源隔离草稿，续期后的签名可以与草稿旧签名不同。
+    if (draft.resourceUri && draft.resourceUri !== RESOURCE_URI) return false;
+    const incomingTs = Number(draft.updatedAt) || 0;
+    if (state.lastDraftUpdatedAt > 0 && incomingTs > 0 && incomingTs < state.lastDraftUpdatedAt) {
+      return false;
+    }
+    if (typeof draft.tool === 'string' && (draft.tool !== 'point' || SEGMENT_READY)) {
+      state.tool = draft.tool;
+    }
+    if (draft.op === 'add' || draft.op === 'subtract') {
+      state.op = draft.op;
+    }
+    if (Number.isFinite(Number(draft.brushRadius))) {
+      state.brushRadius = Math.max(4, Math.min(100, Number(draft.brushRadius)));
+      brushRadius.value = String(state.brushRadius);
+      brushVal.textContent = String(state.brushRadius);
+    }
+    if (Number.isFinite(Number(draft.zoom)) && Number(draft.zoom) > 0) {
+      state.zoom = Number(draft.zoom);
+    }
+    if (Array.isArray(draft.shapes)) {
+      state.shapes = draft.shapes.slice();
+    }
+    if (Array.isArray(draft.baseShapes)) {
+      state.baseShapes = draft.baseShapes.slice();
+    }
+    if (Array.isArray(draft.points)) {
+      state.points = draft.points.slice();
+    }
+    if (draft.pointOp === 'add' || draft.pointOp === 'subtract') {
+      state.pointOp = draft.pointOp;
+    }
+    if (typeof draft.instruction === 'string' && instructionInput) {
+      instructionInput.value = draft.instruction;
+    }
+    state.confirmedId = typeof draft.confirmedId === 'string' ? draft.confirmedId : null;
+    state.lastDraftUpdatedAt = incomingTs || Date.now();
+    try {
+      window.name = JSON.stringify({
+        draftKey: DRAFT_KEY,
+        editorCapability: EDITOR_CAPABILITY,
+        draft: buildDraftSnapshot()
+      });
+    } catch (_e) {}
+    syncStageLayout();
+    if (state.shapes.length > 0 && !state.confirmedId) {
+      setStatus('已恢复未确认的选区草稿，可继续调整或点击“确认选区”。', '');
+    }
+    return true;
+  }
+
+  function applyRenewedLinks(links) {
+    if (!links || typeof links !== 'object') return false;
+    const targetImgId = links.imageId || links.image_id;
+    if (targetImgId && targetImgId !== IMAGE_ID) return false;
+    let updated = false;
+    const nextEditor = links.editorUrl || links.editor_url || links.signedUrl || links.signed_url;
+    const nextPreview = links.previewUrl || links.preview_url;
+    if (typeof nextEditor === 'string' && nextEditor) {
+      if (!isValidRenewedStudioUrl(nextEditor, SIGNED_URL, 'edt:')) {
+        return false;
+      }
+      currentEditorUrl = nextEditor;
+      updated = true;
+    }
+    if (typeof nextPreview === 'string' && nextPreview) {
+      if (!isValidRenewedStudioUrl(nextPreview, PREVIEW_URL || SIGNED_URL, 'img:')) {
+        return false;
+      }
+      currentPreviewUrl = nextPreview;
+      if (!baseImg.complete || baseImg.naturalWidth === 0) {
+        baseImg.src = currentPreviewUrl;
+      }
+      updated = true;
+    } else if (updated && (!baseImg.complete || baseImg.naturalWidth === 0)) {
+      baseImg.src = currentEditorUrl;
+    }
+    const nextExpires = links.expiresAt || links.expires_at;
+    if (typeof nextExpires === 'string' && nextExpires) {
+      editorExpiresIso = nextExpires;
+    }
+    const nextPreviewExpires = links.previewExpiresAt || links.preview_expires_at;
+    if (typeof nextPreviewExpires === 'string' && nextPreviewExpires) {
+      previewExpiresIso = nextPreviewExpires;
+    }
+    if (updated) {
+      state.linksRenewed = true;
+      refreshExpiryBadge();
+      if (renewBtn) renewBtn.hidden = true;
+      setStatus('已更新选区链接，可继续框选或点击“确认选区”。', '');
+    }
+    return updated;
+  }
+
+  async function renewDirectlyFromStudio() {
+    try {
+      const res = await fetch(currentEditorUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'renew',
+          resource_uri: RESOURCE_URI,
+          image_id: IMAGE_ID,
+          editor_url: currentEditorUrl,
+          preview_url: currentPreviewUrl
+        })
+      });
+      const rawText = await res.text();
+      let data = {};
+      if (rawText) {
+        try {
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        } catch (_e) {}
+      }
+      if (res.ok && applyRenewedLinks(data)) {
+        return true;
+      }
+    } catch (_err) {}
+    return false;
+  }
+
+  async function requestLinkRenewal(mode) {
+    persistDraftState();
+    if (renewBtn) renewBtn.hidden = false;
+    if (mode === 'manual' || mode === 'tool') {
+      setStatus('正在刷新当前选区编辑链接（已保留未确认草稿）…', '');
+    }
+    if (window.parent && window.parent !== window) {
+      const reqId = nextRequestId('renew');
+      state.pendingRenewRequestId = reqId;
+      window.parent.postMessage({
+        type: 'ui-link-renew',
+        messageId: reqId,
+        payload: {
+          resourceUri: RESOURCE_URI,
+          imageId: IMAGE_ID,
+          editorCapability: EDITOR_CAPABILITY,
+          sessionNonce: SESSION_NONCE,
+          reason: mode || 'manual',
+          editorUrl: currentEditorUrl,
+          previewUrl: currentPreviewUrl
+        }
+      }, '*');
+    }
+    const ok = await renewDirectlyFromStudio();
+    if (!ok && (mode === 'manual' || mode === 'tool') && (!window.parent || window.parent === window)) {
+      setStatus('选区链接刷新失败，请稍后重试。', 'err');
+    }
+  }
+
+  function clampCoord(v) {
+    return Math.max(0, Math.min(999, Math.round(v)));
+  }
+
+  function eventPoint(ev) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: clampCoord((ev.clientX - rect.left) / Math.max(1, rect.width) * 999),
+      y: clampCoord((ev.clientY - rect.top) / Math.max(1, rect.height) * 999)
+    };
+  }
+
+  function toPx(pt, w, h) {
+    return [pt.x / 999 * w, pt.y / 999 * h];
+  }
+
+  function traceShape(ctx, shape, w, h) {
+    if (!shape || !shape.points || !shape.points.length) return;
+    if (shape.type === 'rect' && shape.points.length === 2) {
+      const [x1, y1] = toPx(shape.points[0], w, h);
+      const [x2, y2] = toPx(shape.points[1], w, h);
+      ctx.beginPath();
+      ctx.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+      ctx.fill();
+    } else if (shape.type === 'polygon' && shape.points.length >= 3) {
+      ctx.beginPath();
+      shape.points.forEach((pt, idx) => {
+        const [x, y] = toPx(pt, w, h);
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fill();
+    } else if (shape.type === 'stroke') {
+      const r = Math.max(2, (shape.radius || 22) / 999 * Math.min(w, h));
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = r * 2;
+      ctx.beginPath();
+      shape.points.forEach((pt, idx) => {
+        const [x, y] = toPx(pt, w, h);
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      if (shape.points.length === 1) {
+        const [x, y] = toPx(shape.points[0], w, h);
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function syncStageLayout() {
+    const natW = baseImg.naturalWidth || 400;
+    const natH = baseImg.naturalHeight || 300;
+    const maxW = Math.max(280, viewport.clientWidth - 16);
+    const maxH = Math.max(240, viewport.clientHeight - 16);
+    const fitScale = Math.min(maxW / natW, maxH / natH, 1);
+    const dispW = Math.max(120, Math.round(natW * fitScale * state.zoom));
+    const dispH = Math.max(90, Math.round(natH * fitScale * state.zoom));
+    stageInner.style.width = dispW + 'px';
+    stageInner.style.height = dispH + 'px';
+    if (canvas.width !== dispW || canvas.height !== dispH) {
+      canvas.width = dispW;
+      canvas.height = dispH;
+    }
+    renderOverlay();
+    notifyHostSize();
+  }
+
+  function hasAdditiveShape() {
+    return state.shapes.some(s => s.op === 'add') && state.activeMaskPixels > 0;
+  }
+
+  function updateToolbarUI() {
+    document.querySelectorAll('[data-tool]').forEach(btn => {
+      btn.setAttribute('aria-pressed', btn.dataset.tool === state.tool ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-op]').forEach(btn => {
+      btn.setAttribute('aria-pressed', btn.dataset.op === state.op ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-zoom]').forEach(btn => {
+      btn.setAttribute('aria-pressed', Number(btn.dataset.zoom) === state.zoom ? 'true' : 'false');
+    });
+    const hasHistory = state.shapes.length > 0 || state.points.length > 0 || Boolean(state.draft);
+    undoBtn.disabled = !hasHistory || state.busy;
+    clearBtn.disabled = !hasHistory || state.busy;
+    closePolyBtn.hidden = !(state.tool === 'polygon' && state.draft && state.draft.points.length >= 3);
+    confirmBtn.disabled = !hasAdditiveShape() || state.busy;
+  }
+
+  function renderOverlay() {
+    const w = canvas.width || 1;
+    const h = canvas.height || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = w;
+    maskCanvas.height = h;
+    const mctx = maskCanvas.getContext('2d');
+    const allShapes = state.draft && state.draft.type !== 'polygon'
+      ? state.shapes.concat([state.draft])
+      : state.shapes;
+
+    allShapes.forEach(shape => {
+      const isSubtract = shape.op === 'subtract';
+      mctx.globalCompositeOperation = isSubtract ? 'destination-out' : 'source-over';
+      mctx.fillStyle = isSubtract ? 'rgba(0, 0, 0, 1)' : 'rgba(37, 99, 235, 1)';
+      mctx.strokeStyle = isSubtract ? 'rgba(0, 0, 0, 1)' : 'rgba(37, 99, 235, 1)';
+      traceShape(mctx, shape, w, h);
+    });
+
+    const maskData = mctx.getImageData(0, 0, w, h).data;
+    let activePixels = 0;
+    for (let i = 3; i < maskData.length; i += 4) {
+      if (maskData[i] > 0) activePixels += 1;
+    }
+    state.activeMaskPixels = activePixels;
+
+    ctx.save();
+    ctx.globalAlpha = 0.36;
+    ctx.drawImage(maskCanvas, 0, 0);
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = '#60a5fa';
+    ctx.lineWidth = 2;
+    if (state.draft && state.draft.type === 'rect' && state.draft.points.length === 2) {
+      const [x1, y1] = toPx(state.draft.points[0], w, h);
+      const [x2, y2] = toPx(state.draft.points[1], w, h);
+      ctx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+    }
+
+    if (state.draft && state.draft.type === 'polygon') {
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      state.draft.points.forEach((pt, idx) => {
+        const [x, y] = toPx(pt, w, h);
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      if (state.draft.cursor) {
+        const [cx, cy] = toPx(state.draft.cursor, w, h);
+        ctx.lineTo(cx, cy);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      state.draft.points.forEach((pt, idx) => {
+        const [x, y] = toPx(pt, w, h);
+        ctx.fillStyle = idx === 0 ? '#2563eb' : '#ffffff';
+        ctx.beginPath();
+        ctx.arc(x, y, idx === 0 ? 5 : 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+    }
+
+    state.points.forEach(pt => {
+      const [x, y] = toPx(pt, w, h);
+      ctx.fillStyle = pt.label === 0 ? '#dc2626' : '#2563eb';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+    ctx.restore();
+    updateToolbarUI();
+  }
+
+  async function runPointSegment() {
+    if (!state.points.length) return;
+    state.busy = true;
+    setStatus('正在识别点选区域...', '');
+    updateToolbarUI();
+    try {
+      const res = await fetch(currentEditorUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'segment',
+          points: state.points,
+          operation: state.pointOp || 'add',
+          existing: state.baseShapes && state.baseShapes.length
+            ? { version: 1, shapes: state.baseShapes }
+            : null
+        })
+      });
+      const rawText = await res.text();
+      let data = {};
+      if (rawText) {
+        try {
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        } catch (_parseErr) {}
+      }
+      if (!res.ok) {
+        if (
+          res.status === 401 ||
+          res.status === 403 ||
+          res.status === 404 ||
+          res.status === 409 ||
+          res.status === 410
+        ) {
+          if (renewBtn) renewBtn.hidden = false;
+          persistDraftState();
+          throw new Error(
+            (data.error || '当前选区编辑凭证已过期或已使用') +
+              '，请点击“重新获取链接”刷新后继续（选区草稿已保留）'
+          );
+        }
+        throw new Error(data.error || '点选识别未成功，请改用框选、套索或画笔');
+      }
+      state.shapes = data.shapes || [];
+      state.confirmedId = null;
+      persistDraftState();
+      setStatus('已识别选区，可继续点选微调，或切换到画笔/框选修边，完成后点击“确认选区”。', '');
+    } catch (err) {
+      state.points.pop();
+      setStatus(err.message || '点选识别失败，请使用框选、套索或画笔', 'err');
+    } finally {
+      state.busy = false;
+      renderOverlay();
+    }
+  }
+
+  function finishPolygon() {
+    if (!state.draft || state.draft.type !== 'polygon' || state.draft.points.length < 3) return;
+    state.shapes.push({
+      type: 'polygon',
+      op: state.draft.op,
+      points: state.draft.points.slice(0, 1024)
+    });
+    state.draft = null;
+    state.points = [];
+    state.confirmedId = null;
+    persistDraftState();
+    setStatus('已添加多边形选区，可继续加选/减选或点击“确认选区”。', '');
+    renderOverlay();
+  }
+
+  canvas.addEventListener('pointerdown', ev => {
+    if (state.busy || ev.button > 0) return;
+    const pt = eventPoint(ev);
+    if (state.tool === 'point') {
+      if (!SEGMENT_READY) {
+        setStatus('当前环境使用手动选区工具，请使用框选、多边形套索或画笔涂抹。', 'err');
+        return;
+      }
+      if (state.points.length === 0) {
+        if (ev.altKey) {
+          setStatus('请先点击要修改的目标区域（加选），再按住 Alt 点击不需要的部分。', 'err');
+          return;
+        }
+        if (state.op === 'subtract' && !state.shapes.some(s => s.op === 'add')) {
+          setStatus('请先点击要修改的目标区域（加选），再点不需要的部分（减选）。', 'err');
+          return;
+        }
+        state.baseShapes = state.shapes.slice();
+        state.pointOp = state.op;
+        state.points.push({ x: pt.x, y: pt.y, label: 1 });
+      } else {
+        const label = (ev.altKey || (state.op === 'subtract' && state.pointOp === 'add')) ? 0 : 1;
+        state.points.push({ x: pt.x, y: pt.y, label });
+      }
+      renderOverlay();
+      runPointSegment();
+      return;
+    }
+    if (state.tool === 'polygon') {
+      if (!state.draft || state.draft.type !== 'polygon') {
+        state.draft = { type: 'polygon', op: state.op, points: [pt], cursor: pt };
+      } else {
+        const first = state.draft.points[0];
+        const [fx, fy] = toPx(first, canvas.width, canvas.height);
+        const [cx, cy] = toPx(pt, canvas.width, canvas.height);
+        if (state.draft.points.length >= 3 && Math.hypot(cx - fx, cy - fy) <= 12) {
+          finishPolygon();
+          return;
+        }
+        state.draft.points.push(pt);
+      }
+      renderOverlay();
+      return;
+    }
+    canvas.setPointerCapture(ev.pointerId);
+    if (state.tool === 'rect') {
+      state.draft = { type: 'rect', op: state.op, points: [pt, pt] };
+    } else if (state.tool === 'stroke') {
+      state.draft = { type: 'stroke', op: state.op, radius: state.brushRadius, points: [pt] };
+    }
+    renderOverlay();
+  });
+
+  canvas.addEventListener('pointermove', ev => {
+    if (!state.draft) return;
+    const pt = eventPoint(ev);
+    if (state.draft.type === 'polygon') {
+      state.draft.cursor = pt;
+      renderOverlay();
+      return;
+    }
+    if (state.draft.type === 'rect') {
+      state.draft.points[1] = pt;
+      renderOverlay();
+    } else if (state.draft.type === 'stroke') {
+      const last = state.draft.points[state.draft.points.length - 1];
+      if (!last || Math.hypot(pt.x - last.x, pt.y - last.y) >= 3) {
+        state.draft.points.push(pt);
+        renderOverlay();
+      }
+    }
+  });
+
+  function finishDrag(ev) {
+    if (!state.draft || state.draft.type === 'polygon') return;
+    const draft = state.draft;
+    state.draft = null;
+    if (draft.type === 'rect') {
+      const [a, b] = draft.points;
+      const x1 = Math.min(a.x, b.x), y1 = Math.min(a.y, b.y);
+      const x2 = Math.max(a.x, b.x), y2 = Math.max(a.y, b.y);
+      if (x2 - x1 >= 6 && y2 - y1 >= 6) {
+        state.shapes.push({ type: 'rect', op: draft.op, points: [{ x: x1, y: y1 }, { x: x2, y: y2 }] });
+        state.points = [];
+        state.confirmedId = null;
+        persistDraftState();
+        setStatus('已更新选区，完成后请点击“确认选区”。', '');
+      }
+    } else if (draft.type === 'stroke' && draft.points.length >= 1) {
+      state.shapes.push({
+        type: 'stroke',
+        op: draft.op,
+        radius: draft.radius,
+        points: draft.points.slice(0, 1024)
+      });
+      state.points = [];
+      state.confirmedId = null;
+      persistDraftState();
+      setStatus('已更新画笔选区，完成后请点击“确认选区”。', '');
+    }
+    renderOverlay();
+  }
+
+  canvas.addEventListener('pointerup', finishDrag);
+  canvas.addEventListener('pointercancel', finishDrag);
+  canvas.addEventListener('dblclick', () => {
+    if (state.tool === 'polygon') finishPolygon();
+  });
+
+  document.querySelectorAll('[data-tool]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      state.tool = btn.dataset.tool;
+      state.draft = null;
+      state.points = [];
+      persistDraftState();
+      renderOverlay();
+    });
+  });
+
+  document.querySelectorAll('[data-op]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.op = btn.dataset.op;
+      persistDraftState();
+      renderOverlay();
+    });
+  });
+
+  document.querySelectorAll('[data-zoom]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.zoom = Number(btn.dataset.zoom) || 1;
+      persistDraftState();
+      syncStageLayout();
+    });
+  });
+
+  fitBtn.addEventListener('click', () => {
+    state.zoom = 1;
+    persistDraftState();
+    syncStageLayout();
+  });
+
+  closePolyBtn.addEventListener('click', finishPolygon);
+
+  brushRadius.addEventListener('input', () => {
+    state.brushRadius = Number(brushRadius.value) || 22;
+    brushVal.textContent = String(state.brushRadius);
+    persistDraftState();
+  });
+
+  if (instructionInput) {
+    instructionInput.addEventListener('input', () => {
+      persistDraftState();
+    });
+  }
+
+  undoBtn.addEventListener('click', () => {
+    if (state.draft) {
+      state.draft = null;
+    } else if (state.tool === 'point' && state.points.length) {
+      state.points.pop();
+      if (state.points.some(p => p.label === 1)) {
+        runPointSegment();
+        return;
+      }
+      state.shapes = state.baseShapes ? state.baseShapes.slice() : [];
+    } else {
+      state.shapes.pop();
+    }
+    state.confirmedId = null;
+    persistDraftState();
+    renderOverlay();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    state.shapes = [];
+    state.baseShapes = [];
+    state.points = [];
+    state.draft = null;
+    state.confirmedId = null;
+    persistDraftState();
+    setStatus('已清空选区，请重新框选、套索或涂抹需要修改的局部区域。', '');
+    renderOverlay();
+  });
+
+  if (renewBtn) {
+    renewBtn.addEventListener('click', () => {
+      requestLinkRenewal('manual');
+    });
+  }
+
+  confirmBtn.addEventListener('click', async () => {
+    if (!hasAdditiveShape() || state.busy) return;
+    state.busy = true;
+    setStatus('正在保存并校验选区凭据...', '');
+    updateToolbarUI();
+    try {
+      const res = await fetch(currentEditorUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'confirm',
+          selection: { version: 1, shapes: state.shapes }
+        })
+      });
+      const rawText = await res.text();
+      let data = {};
+      if (rawText) {
+        try {
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        } catch (_parseErr) {}
+      }
+      if (!res.ok) {
+        if (
+          res.status === 401 ||
+          res.status === 403 ||
+          res.status === 404 ||
+          res.status === 409 ||
+          res.status === 410
+        ) {
+          if (renewBtn) renewBtn.hidden = false;
+          persistDraftState();
+          throw new Error(
+            (data.error || '当前选区编辑凭证已过期或已使用') +
+              '，请点击“重新获取链接”刷新后继续（选区草稿已保留）'
+          );
+        }
+        throw new Error(data.error || '选区确认失败，请检查选区范围后重试');
+      }
+      state.confirmedId = data.selection_id;
+      statusText.dataset.selectionId = data.selection_id || '';
+      persistDraftState();
+      const note = (instructionInput.value || '').trim();
+      const pxCount = (data.proof && data.proof.selected_pixels) || 0;
+      setStatus(
+        '已确认选区（选中 ' + pxCount.toLocaleString('zh-CN') + ' 像素），已向设计助手发送局部修改请求',
+        'ok'
+      );
+      const promptMsg = note
+        ? '已确认选区 ' + data.selection_id + '（底图 ' + IMAGE_ID + '），请执行局部修改：' + note
+        : '已确认选区 ' + data.selection_id + '（底图 ' + IMAGE_ID + '）。';
+      window.parent.postMessage({
+        type: 'prompt',
+        payload: { prompt: promptMsg }
+      }, '*');
+    } catch (err) {
+      setStatus(err.message || '选区确认失败，请重试', 'err');
+    } finally {
+      state.busy = false;
+      updateToolbarUI();
+      notifyHostSize();
+    }
+  });
+
+  window.addEventListener('message', (ev) => {
+    if (!window.parent || window.parent === window || ev.source !== window.parent) return;
+    if (!ev.data || typeof ev.data !== 'object') return;
+    const msgType = ev.data.type;
+    const payload = ev.data.payload || {};
+    if (msgType === 'ui-lifecycle-iframe-render-data' && !state.renderDataReceived) {
+      state.renderDataReceived = true;
+      const renderData = payload.renderData || payload;
+      if (renderData && typeof renderData === 'object') {
+        window.iframeRenderData = renderData;
+        const draftMap = renderData.drafts || {};
+        const candidateDraft = renderData.selectionDraft || draftMap[DRAFT_KEY] || renderData.draft;
+        if (candidateDraft) applyDraftSnapshot(candidateDraft);
+        if (renderData.renewedLinks) {
+          applyRenewedLinks(renderData.renewedLinks[IMAGE_ID] || renderData.renewedLinks);
+        } else if (renderData.previewUrl || renderData.editorUrl) {
+          applyRenewedLinks(renderData);
+        }
+      }
+    } else if (msgType === 'ui-message-response') {
+      const messageId = ev.data.messageId;
+      if (!messageId || typeof messageId !== 'string') return;
+      const resp = payload.response || payload;
+      if (!resp || typeof resp !== 'object') return;
+      if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+      if (messageId === state.pendingDraftRequestId) {
+        state.pendingDraftRequestId = null;
+        if (resp.editorCapability && resp.editorCapability !== EDITOR_CAPABILITY) return;
+        if (resp.draft) applyDraftSnapshot(resp.draft);
+      } else if (messageId === state.pendingRenewRequestId) {
+        state.pendingRenewRequestId = null;
+        if (resp.previewUrl || resp.preview_url || resp.editorUrl || resp.editor_url || resp.signedUrl || resp.signed_url) {
+          applyRenewedLinks(resp);
+        }
+      }
+    }
+  });
+
+  baseImg.addEventListener('load', () => {
+    const editorExpired = Date.now() >= new Date(editorExpiresIso).getTime();
+    if (renewBtn) {
+      renewBtn.hidden = !editorExpired;
+    }
+    syncStageLayout();
+    if (state.linksRenewed && !state.confirmedId) {
+      setStatus('已更新选区链接，可继续框选或点击“确认选区”。', '');
+    } else if (state.shapes.length > 0 && !state.confirmedId) {
+      setStatus('已恢复未确认的选区草稿，可继续调整或点击“确认选区”。', '');
+    } else if (!state.confirmedId) {
+      setStatus('请在图上框选、套索或画笔涂抹要修改的局部区域，蓝色区域外将保持原样，完成后点击“确认选区”。', '');
+    }
+    notifyHostSize();
+  });
+  baseImg.addEventListener('error', () => {
+    if (!state.triedEditorFallback && currentEditorUrl && baseImg.src !== currentEditorUrl) {
+      state.triedEditorFallback = true;
+      baseImg.src = currentEditorUrl;
+      return;
+    }
+    if (renewBtn) renewBtn.hidden = false;
+    setStatus('底图预览链接已过期，请点击“重新获取链接”刷新后继续操作（当前选区草稿已保留）。', 'err');
+    if (!state.autoRenewSent) {
+      state.autoRenewSent = true;
+      requestLinkRenewal('check');
+    }
+    notifyHostSize();
+  });
+
+  try {
+    if (window.iframeRenderData && typeof window.iframeRenderData === 'object') {
+      if (window.iframeRenderData.selectionDraft) {
+        applyDraftSnapshot(window.iframeRenderData.selectionDraft);
+      }
+      if (window.iframeRenderData.renewedLinks) {
+        applyRenewedLinks(window.iframeRenderData.renewedLinks);
+      }
+    }
+    if (window.name && window.name.startsWith('{')) {
+      const parsedName = JSON.parse(window.name);
+      if (
+        parsedName &&
+        parsedName.draftKey === DRAFT_KEY &&
+        (!parsedName.editorCapability || parsedName.editorCapability === EDITOR_CAPABILITY) &&
+        parsedName.draft
+      ) {
+        applyDraftSnapshot(parsedName.draft);
+      }
+    }
+  } catch (_e) {}
+
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'ui-lifecycle-iframe-ready' }, '*');
+    const loadReqId = nextRequestId('draft-load');
+    state.pendingDraftRequestId = loadReqId;
+    window.parent.postMessage({
+      type: 'ui-draft-load',
+      messageId: loadReqId,
+      payload: {
+        draftKey: DRAFT_KEY,
+        imageId: IMAGE_ID,
+        resourceUri: RESOURCE_URI,
+        editorCapability: EDITOR_CAPABILITY,
+        sessionNonce: SESSION_NONCE
+      }
+    }, '*');
+  }
+
+  window.addEventListener('resize', syncStageLayout);
+  if (typeof ResizeObserver !== 'undefined' && root) {
+    new ResizeObserver(() => {
+      notifyHostSize(true);
+    }).observe(root);
+  }
+  baseImg.src = currentPreviewUrl;
+  updateToolbarUI();
+  notifyHostSize();
+})();
+</script>
+</body>
+</html>

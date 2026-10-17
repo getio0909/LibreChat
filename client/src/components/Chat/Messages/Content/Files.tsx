@@ -48,6 +48,9 @@ const Files = ({ message }: { message?: TMessage }) => {
             height={file.height ?? 1920}
             width={file.width ?? 1080}
             altText={file.filename ?? 'Uploaded Image'}
+            fileId={file.file_id}
+            fileContext={file.context}
+            fileType={file.type}
           />
         ))}
       <FilePreviewDialog
@@ -58,6 +61,7 @@ const Files = ({ message }: { message?: TMessage }) => {
         filePath={selectedFile?.filepath}
         fileType={selectedFile?.type ?? undefined}
         fileSource={selectedFile?.source}
+        fileContext={selectedFile?.context}
         fileSize={(selectedFile as TFile)?.bytes}
         deliveryPath={selectedFile?.llmDeliveryPath}
       />

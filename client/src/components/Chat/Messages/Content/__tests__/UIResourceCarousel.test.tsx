@@ -24,6 +24,10 @@ jest.mock('~/hooks', () => ({
 
 jest.mock('~/Providers/MCPAppsPolicyContext', () => ({
   useMCPAppsPolicy: () => ({ enabled: true, legacyHtmlEnabled: true }),
+  useMCPAppsHost: () => ({
+    policy: { enabled: true, legacyHtmlEnabled: true },
+    userId: 'user-1',
+  }),
 }));
 
 // Mock the UIResourceRenderer component
@@ -342,5 +346,46 @@ describe('UIResourceCarousel', () => {
 
     // Component should not re-render with same props (React.memo)
     expect(firstRender.length).toBe(secondRender.length);
+  });
+
+  it('keys carousel items by resourceId before uri so distinct resources sharing a URI preserve their DOM instances', () => {
+    const sharedUri = 'ui://zyb_studio/selection/img_shared';
+    const initialResources: UIResource[] = [
+      {
+        resourceId: 'res-alpha',
+        uri: sharedUri,
+        mimeType: 'text/html',
+        text: 'Alpha Selection Card',
+      },
+      {
+        resourceId: 'res-beta',
+        uri: sharedUri,
+        mimeType: 'text/html',
+        text: 'Beta Selection Card',
+      },
+    ];
+
+    const { rerender } = render(<UIResourceCarousel uiResources={initialResources} />);
+    const alphaWrapperBefore =
+      screen.getByText('Alpha Selection Card').parentElement?.parentElement;
+    const betaWrapperBefore = screen.getByText('Beta Selection Card').parentElement?.parentElement;
+    expect(alphaWrapperBefore).toBeDefined();
+    expect(betaWrapperBefore).toBeDefined();
+    expect(alphaWrapperBefore).not.toBe(betaWrapperBefore);
+
+    const updatedResources: UIResource[] = [
+      initialResources[1],
+      {
+        resourceId: 'res-gamma',
+        uri: sharedUri,
+        mimeType: 'text/html',
+        text: 'Gamma Selection Card',
+      },
+    ];
+
+    rerender(<UIResourceCarousel uiResources={updatedResources} />);
+    const betaWrapperAfter = screen.getByText('Beta Selection Card').parentElement?.parentElement;
+    expect(betaWrapperAfter).toBe(betaWrapperBefore);
+    expect(betaWrapperAfter).not.toBe(alphaWrapperBefore);
   });
 });

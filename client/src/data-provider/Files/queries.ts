@@ -142,7 +142,13 @@ export const useFileDownload = (
 
         registerDownloadFilename(
           downloadURL,
-          getDownloadFilename(metadata.filename, metadata.file_id, metadata.source),
+          getDownloadFilename(
+            metadata.filename,
+            metadata.file_id,
+            metadata.source,
+            metadata.context,
+            metadata.type,
+          ),
         );
         addFileToCache(queryClient, metadata);
       } catch (e) {

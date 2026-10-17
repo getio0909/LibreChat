@@ -47,7 +47,7 @@ cleanup() {
         echo 'Restoring the previous application deployment failed.' >&2
       fi
     elif "${compose[@]}" down --remove-orphans; then
-      for file in "${config_files[@]}" .file_signing_key; do
+      for file in "${config_files[@]}" .file_signing_key .studio_agent_ids.json; do
         rm -f -- "$deploy_root/$file"
       done
       echo 'The failed initial application deployment has been stopped.' >&2
@@ -87,8 +87,25 @@ fi
 if ! jq -e '
   (.shared_token | type == "string" and length >= 64)
   and (.file_signing_key | type == "string" and test("^[0-9a-fA-F]{64}$"))
+  and (.public_base_url | type == "string" and test("^https?://[^[:space:]]+$"))
+  and (.enable_3d | type == "boolean")
   and (.gemini_api_key | type == "string" and length >= 1)
-  and (.ark_api_key | type == "string" and length >= 1)
+  and ((.ark_api_key // "") | type == "string")
+  and ((.file_token_ttl_seconds // 86400) | type == "number" and floor == . and . >= 60 and . <= 604800)
+  and ((.preview_token_ttl_seconds // 604800) | type == "number" and floor == . and . >= 300 and . <= 2592000)
+  and ((.editor_token_ttl_seconds // 900) | type == "number" and floor == . and . >= 60 and . <= 900)
+  and ((.editor_capability_max_lifetime_seconds // 86400) | type == "number" and floor == . and . >= 900 and . <= 604800)
+  and ((.max_parallel_per_user // 3) | type == "number" and floor == . and . >= 1 and . <= 10)
+  and ((.global_max_parallel // 12) | type == "number" and floor == . and . >= 1 and . <= 64)
+  and ((.comparison_preview_max_bytes // 49152) | type == "number" and floor == . and . >= 16384 and . <= 49152)
+  and ((.segment_max_pending_requests // 2) | type == "number" and floor == . and . >= 1 and . <= 32)
+  and ((.segment_request_timeout_seconds // 90) | type == "number" and . > 0 and . <= 300)
+  and ((.seed3d_max_parallel // 5) | type == "number" and floor == . and . >= 1 and . <= 32)
+  and ((.seedream_timeout_seconds // 240) | type == "number" and floor == . and . >= 5 and . <= 600)
+  and ((.seed3d_poll_timeout_seconds // 480) | type == "number" and . > 0 and . <= 600)
+  and ((.seed3d_poll_initial_seconds // 2) | type == "number" and . > 0 and . <= 60)
+  and ((.seed3d_poll_max_interval_seconds // 15) | type == "number" and . > 0 and . <= 60)
+  and ((.seed3d_background_timeout_seconds // 1800) | type == "number" and . > 0 and . <= 3600)
 ' "$stage/studio.json" >/dev/null; then
   echo 'Studio configuration settings are invalid.' >&2
   exit 1
@@ -166,6 +183,7 @@ fi
 "${closed_compose[@]}" ps
 
 # 按顺序创建首个管理员和普通用户，密码通过标准输入传递给现有账户工具。
+admin_token=''
 for account in admin user; do
   email=$(jq -r --arg account "$account" '.[$account].email' "$stage/accounts.json")
   username=$(jq -r --arg account "$account" '.[$account].username' "$stage/accounts.json")
@@ -186,13 +204,227 @@ for account in admin user; do
   expected_role=USER
   if [[ "$account" == admin ]]; then
     expected_role=ADMIN
+    admin_token=$(jq -r '.token // empty' "$stage/login.json")
   fi
   if ! jq -e --arg role "$expected_role" '.user.role == $role' "$stage/login.json" >/dev/null; then
     printf 'Default %s account role verification failed.\n' "$account" >&2
     exit 1
   fi
 done
-# 账户和角色验证通过后恢复用户配置的注册设置。
-"${compose[@]}" up -d --remove-orphans --wait --wait-timeout 240
+
+# 幂等创建或更新 Studio 持久化智能体（挂载 gemini_image_gen 与 zyb_studio MCP 工具），授权普通用户只读使用，并将生成的 agent_id 注入 librechat.yaml。
+if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; then
+  if [[ -z "$admin_token" ]]; then
+    echo 'Admin token missing for Studio agent provisioning.' >&2
+    exit 1
+  fi
+  design_instructions=$(awk '
+    /promptPrefix: &designPromptPrefix \|-/ { in_block=1; next }
+    in_block {
+      if ($0 ~ /^          /) {
+        sub(/^          /, "")
+        lines = (lines == "" ? $0 : lines "\n" $0)
+      } else if ($0 ~ /^[[:space:]]*$/) {
+        lines = lines "\n"
+      } else {
+        exit
+      }
+    }
+    END { printf "%s", lines }
+  ' "$stage/librechat.yaml")
+  if [[ -z "$design_instructions" ]]; then
+    echo 'Failed to extract Studio design instructions from librechat.yaml.' >&2
+    exit 1
+  fi
+
+  printf '%s' '{"USE":true,"CREATE":false,"SHARE":false,"SHARE_PUBLIC":false}' | \
+    curl --fail --silent --show-error -X PUT \
+      -H "Authorization: Bearer $admin_token" \
+      -H 'Content-Type: application/json' \
+      --data-binary @- \
+      -o "$stage/role-agents.json" http://127.0.0.1:3080/api/roles/USER/agents
+
+  if [[ -f "$deploy_root/.studio_agent_ids.json" ]] && jq -e 'type == "object"' "$deploy_root/.studio_agent_ids.json" >/dev/null 2>&1; then
+    cp "$deploy_root/.studio_agent_ids.json" "$stage/studio-agent-ids.json"
+  else
+    printf '{}\n' > "$stage/studio-agent-ids.json"
+  fi
+
+  # 分页拉取全部可见智能体列表，避免超过单页 100 条上限时漏检既有 Studio 智能体并产生重复创建。
+  printf '{"data":[]}\n' > "$stage/agents-list.json"
+  agents_cursor=''
+  declare -A seen_agent_cursors=()
+  for (( page_idx = 0; page_idx < 50; page_idx++ )); do
+    agents_url='http://127.0.0.1:3080/api/agents?limit=100'
+    if [[ -n "$agents_cursor" ]]; then
+      agents_url="${agents_url}&cursor=${agents_cursor}"
+    fi
+    curl --fail --silent --show-error \
+      -H "Authorization: Bearer $admin_token" \
+      -o "$stage/agents-page.json" "$agents_url"
+    jq -e '(.data | type == "array") and (.has_more | type == "boolean")' \
+      "$stage/agents-page.json" >/dev/null || {
+      echo 'Studio agent listing returned an invalid page.' >&2
+      exit 1
+    }
+    jq -s '{data: ((.[0].data // []) + (.[1].data // []))}' \
+      "$stage/agents-list.json" "$stage/agents-page.json" > "$stage/agents-list.json.tmp"
+    mv "$stage/agents-list.json.tmp" "$stage/agents-list.json"
+    has_more=$(jq -r 'if .has_more == true then "true" else "false" end' "$stage/agents-page.json")
+    next_cursor=$(jq -r '.after // empty' "$stage/agents-page.json")
+    if [[ "$has_more" != "true" ]]; then
+      break
+    fi
+    if [[ -z "$next_cursor" || -n "${seen_agent_cursors[$next_cursor]:-}" ]]; then
+      echo 'Studio agent listing returned incomplete pagination.' >&2
+      exit 1
+    fi
+    seen_agent_cursors[$next_cursor]=1
+    agents_cursor=$next_cursor
+  done
+  if [[ "$has_more" == "true" ]]; then
+    echo 'Studio agent listing exceeded the pagination limit.' >&2
+    exit 1
+  fi
+
+  is_studio_owned_agent_file() {
+    local candidate_file=$1
+    local owner_marker=$2
+    jq -e --arg marker "$owner_marker" '
+      (.id | type == "string" and test("^agent_[A-Za-z0-9_-]+$"))
+      and (.instructions | type == "string" and endswith($marker))
+    ' "$candidate_file" >/dev/null 2>&1
+  }
+
+  resolve_existing_studio_agent_id() {
+    local placeholder=$1
+    local owner_marker=$2
+    local persisted_id
+    persisted_id=$(jq -r --arg k "$placeholder" '.[$k] // empty' "$stage/studio-agent-ids.json")
+    if [[ "$persisted_id" =~ ^agent_[A-Za-z0-9_-]+$ ]]; then
+      if jq -e --arg id "$persisted_id" '(.data // []) | map(select(.id == $id)) | length > 0' "$stage/agents-list.json" >/dev/null 2>&1; then
+        curl --fail --silent --show-error \
+          -H "Authorization: Bearer $admin_token" \
+          -o "$stage/agent-expanded.json" "http://127.0.0.1:3080/api/agents/$persisted_id/expanded" || return 1
+        if is_studio_owned_agent_file "$stage/agent-expanded.json" "$owner_marker"; then
+          printf '%s' "$persisted_id"
+          return 0
+        fi
+        echo 'Persisted Studio agent ID has no matching ownership marker.' >&2
+        return 1
+      fi
+    fi
+
+    local candidate_id matched_id=''
+    while IFS= read -r candidate_id; do
+      [[ -z "$candidate_id" ]] && continue
+      curl --fail --silent --show-error \
+        -H "Authorization: Bearer $admin_token" \
+        -o "$stage/agent-expanded.json" "http://127.0.0.1:3080/api/agents/$candidate_id/expanded" || return 1
+      if is_studio_owned_agent_file "$stage/agent-expanded.json" "$owner_marker"; then
+        if [[ -n "$matched_id" ]]; then
+          echo 'Multiple Studio agents carry the same ownership marker.' >&2
+          return 1
+        fi
+        matched_id=$candidate_id
+      fi
+    done < <(jq -r '(.data // []) | .[].id // empty' "$stage/agents-list.json")
+    printf '%s' "$matched_id"
+  }
+
+  provision_studio_agent() {
+    local placeholder=$1
+    local payload_file=$2
+    local owner_marker=$3
+    local existing_id
+    existing_id=$(resolve_existing_studio_agent_id "$placeholder" "$owner_marker")
+    if [[ -n "$existing_id" ]]; then
+      curl --fail --silent --show-error -X PATCH \
+        -H "Authorization: Bearer $admin_token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @"$payload_file" \
+        -o "$stage/agent-saved.json" "http://127.0.0.1:3080/api/agents/$existing_id"
+    else
+      curl --fail --silent --show-error -X POST \
+        -H "Authorization: Bearer $admin_token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @"$payload_file" \
+        -o "$stage/agent-saved.json" http://127.0.0.1:3080/api/agents
+    fi
+    if ! jq -e --arg marker "$owner_marker" '
+      (.id | type == "string" and test("^agent_[A-Za-z0-9_-]+$"))
+      and (._id | type == "string" and length >= 1)
+      and (.tools | index("gemini_image_gen") != null)
+      and (.tools | index("sys__all__sys_mcp_zyb_studio") != null)
+      and (.instructions | endswith($marker))
+      and (.support_contact.name == "庄严宝刹")
+    ' "$stage/agent-saved.json" >/dev/null; then
+      printf 'Studio agent provisioning verification failed for %s.\n' "$agent_name" >&2
+      exit 1
+    fi
+    local resolved_id resolved_oid
+    resolved_id=$(jq -r '.id' "$stage/agent-saved.json")
+    resolved_oid=$(jq -r '._id' "$stage/agent-saved.json")
+    printf '%s' '{"public":true,"publicAccessRoleId":"agent_viewer","updated":[{"type":"role","id":"USER","accessRoleId":"agent_viewer"}],"removed":[]}' | \
+      curl --fail --silent --show-error -X PUT \
+        -H "Authorization: Bearer $admin_token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @- \
+        -o "$stage/agent-perms.json" "http://127.0.0.1:3080/api/permissions/agent/$resolved_oid"
+    sed -i "s|$placeholder|$resolved_id|g" "$stage/librechat.yaml"
+    jq --arg k "$placeholder" --arg v "$resolved_id" '.[$k] = $v' "$stage/studio-agent-ids.json" > "$stage/studio-agent-ids.json.tmp"
+    mv "$stage/studio-agent-ids.json.tmp" "$stage/studio-agent-ids.json"
+  }
+
+  main_owner_marker='<!-- librechat-studio-owner:zyb-design:v1 -->'
+  fast_owner_marker='<!-- librechat-studio-owner:zyb-design-fast:v1 -->'
+  jq -n --arg instructions "$design_instructions" --arg marker "$main_owner_marker" '{
+    name: "庄严设计助手",
+    description: "寺院装饰、石材大板、家具与展位概念设计主力助手",
+    provider: "google",
+    model: "gemini-4-argon",
+    instructions: ($instructions + "\n\n" + $marker),
+    tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
+    support_contact: {
+      name: "庄严宝刹",
+      email: ""
+    },
+    model_parameters: {
+      thinking: true,
+      thinkingLevel: "high",
+      maxContextTokens: 200000,
+      maxOutputTokens: 65536
+    }
+  }' > "$stage/agent-main.json"
+  provision_studio_agent 'agent___STUDIO_AGENT_ID_MAIN__' "$stage/agent-main.json" "$main_owner_marker"
+
+  jq -n --arg instructions "$design_instructions" --arg marker "$fast_owner_marker" '{
+    name: "庄严设计助手 · 快速",
+    description: "快速响应的概念设计与图像改图助手",
+    provider: "OpenRouter",
+    model: "anthropic/claude-haiku-5.5",
+    instructions: ($instructions + "\n\n" + $marker),
+    tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
+    support_contact: {
+      name: "庄严宝刹",
+      email: ""
+    },
+    model_parameters: {
+      maxContextTokens: 200000,
+      max_tokens: 32000
+    }
+  }' > "$stage/agent-fast.json"
+  provision_studio_agent 'agent___STUDIO_AGENT_ID_FAST__' "$stage/agent-fast.json" "$fast_owner_marker"
+
+  if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; then
+    echo 'Unresolved Studio agent placeholders remain in librechat.yaml.' >&2
+    exit 1
+  fi
+  install -m 600 "$stage/librechat.yaml" "$deploy_root/librechat.yaml"
+  install -m 600 "$stage/studio-agent-ids.json" "$deploy_root/.studio_agent_ids.json"
+fi
+
+# 账户、智能体和角色验证通过后恢复用户配置的注册设置并加载解析后的 librechat.yaml。
+"${compose[@]}" up -d --remove-orphans --force-recreate --wait --wait-timeout 240
 rm -f -- "$gate"
 echo 'Development deployment passed health checks.'

@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import type { UIActionResult } from '@mcp-ui/client';
 import { useOptionalMessagesConversation, useOptionalMessagesOperations } from '~/Providers';
 import { useConversationUIResources } from '~/hooks/Messages/useConversationUIResources';
 import UIResourceRenderer, { isSupportedUIResource } from './Renderer';
 import { handleUIAction } from '~/utils';
 import { useLocalize } from '~/hooks';
+
+const AUTO_RESIZE_HTML_PROPS = {
+  autoResizeIframe: { width: true, height: true },
+};
 
 interface MCPUIResourceProps {
   node: {
@@ -21,12 +26,22 @@ export function MCPUIResource(props: MCPUIResourceProps) {
   const { conversationId } = useOptionalMessagesConversation();
 
   const conversationResourceMap = useConversationUIResources(conversationId ?? undefined);
-
   const uiResource = conversationResourceMap.get(resourceId ?? '');
+  const onUIAction = useCallback(
+    async (result: UIActionResult) =>
+      uiResource?.serverName
+        ? handleUIAction(result, ask, {
+            conversationId,
+            serverName: uiResource.serverName,
+            resource: uiResource,
+          })
+        : handleUIAction(result, ask),
+    [ask, conversationId, uiResource],
+  );
 
   if (!uiResource) {
     return (
-      <span className="inline-flex items-center rounded bg-surface-tertiary px-2 py-1 text-xs font-medium text-text-secondary">
+      <span className="bg-surface-tertiary text-text-secondary inline-flex items-center rounded px-2 py-1 text-xs font-medium">
         {localize('com_ui_ui_resource_not_found', {
           0: resourceId ?? '',
         })}
@@ -43,17 +58,15 @@ export function MCPUIResource(props: MCPUIResourceProps) {
       <span className="mx-1 inline-block w-full align-middle">
         <UIResourceRenderer
           resource={uiResource}
-          onUIAction={async (result) => handleUIAction(result, ask)}
-          htmlProps={{
-            autoResizeIframe: { width: true, height: true },
-          }}
+          onUIAction={onUIAction}
+          htmlProps={AUTO_RESIZE_HTML_PROPS}
         />
       </span>
     );
   } catch (error) {
     console.error('Error rendering UI resource:', error);
     return (
-      <span className="inline-flex items-center rounded bg-status-error-subtle px-2 py-1 text-xs font-medium text-status-error">
+      <span className="bg-status-error-subtle text-status-error inline-flex items-center rounded px-2 py-1 text-xs font-medium">
         {localize('com_ui_ui_resource_error', { 0: uiResource.name || resourceId })}
       </span>
     );

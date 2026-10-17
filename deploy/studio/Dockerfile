@@ -1,23 +1,50 @@
 # 庄严宝刹设计工作台共享服务容器镜像定义
 FROM python:3.13-slim
 
-# 设置基础运行环境变量
+# 设置基础运行环境变量与离线推理约束
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    STUDIO_SAM2_MODEL_DIR=/opt/studio-models/sam2.1-hiera-tiny
 
 # 创建非特权运行账户与持久化目录
 RUN groupadd -g 10001 studio && \
     useradd -u 10001 -g 10001 -d /app -s /usr/sbin/nologin -M studio && \
-    mkdir -p /app/deploy/studio /data /librechat/images /kb && \
+    mkdir -p /app/deploy/studio /data /librechat/images /kb /opt/studio-models/sam2.1-hiera-tiny && \
     chown -R 10001:10001 /app /data && \
-    chmod 0555 /kb
+    chmod 0555 /kb /opt/studio-models
 
 WORKDIR /app
 
-# 仅使用预编译轮子安装固定版本依赖，不保留构建工具
+# 仅使用预编译轮子安装固定版本依赖（含PyTorch CPU与transformers），不保留构建工具
 COPY deploy/studio/requirements.txt /app/deploy/studio/requirements.txt
 RUN pip install --no-cache-dir --only-binary=:all: -r /app/deploy/studio/requirements.txt
+
+# 在镜像构建阶段拉取固定revision的facebook/sam2.1-hiera-tiny safetensors模型文件并逐一校验SHA256
+RUN python -c "import hashlib, os, pathlib, urllib.request; \
+repo = 'facebook/sam2.1-hiera-tiny'; \
+rev = 'de431c4043854a71d8101e17995dfe596bf101a5'; \
+dest = pathlib.Path('/opt/studio-models/sam2.1-hiera-tiny'); \
+dest.mkdir(parents=True, exist_ok=True); \
+files = { \
+    'model.safetensors': '48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7', \
+    'config.json': '860aff9751b139d83a4ad7df1e5535416fded533e0ead02625edbefcb9953cce', \
+    'preprocessor_config.json': '6ebf229ee259368ce4a8d4f2fe893a72b053023710853e257253939e601f583d', \
+    'processor_config.json': 'f8a68e865cfad115c1c2763f3d93eca7b1c622da06da2a9273eb437fb2389b6d', \
+}; \
+[ \
+    ( \
+        p := dest / name, \
+        urllib.request.urlretrieve(f'https://huggingface.co/{repo}/resolve/{rev}/{name}', p), \
+        actual := hashlib.sha256(p.read_bytes()).hexdigest(), \
+        (_ for _ in ()).throw( RuntimeError(f'SHA256 mismatch for {name}: {actual} != {expected}') ) if actual != expected else None, \
+        os.chmod(p, 0o444), \
+    ) \
+    for name, expected in files.items() \
+]; \
+os.chmod(dest, 0o555)"
 
 # 复制只读知识库记录、衍生图与分类目录至 /kb
 COPY --chmod=0555 knowledge/records /kb/records

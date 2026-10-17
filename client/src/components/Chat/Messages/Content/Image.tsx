@@ -1,7 +1,10 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Skeleton } from '@librechat/client';
 import { apiBaseUrl } from 'librechat-data-provider';
+import type { TFile } from 'librechat-data-provider';
+import { formatGeneratedImageFilename } from '~/utils/downloadFile';
 import { cn, toAbsoluteFilePath } from '~/utils';
+import useLocalize from '~/hooks/useLocalize';
 import DialogImage from './DialogImage';
 
 /** Max display height for chat images (Tailwind JIT class) */
@@ -32,6 +35,9 @@ const Image = ({
   args,
   width,
   height,
+  fileId,
+  fileContext,
+  fileType,
 }: {
   imagePath: string;
   altText: string;
@@ -46,9 +52,19 @@ const Image = ({
   };
   width?: number;
   height?: number;
+  fileId?: string;
+  fileContext?: TFile['context'];
+  fileType?: string;
 }) => {
+  const localize = useLocalize();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  // 依据持久化 File 上下文判断产图来源，避免用户上传文件名触发误改名
+  const displayAltText = formatGeneratedImageFilename(
+    { filename: altText, file_id: fileId, context: fileContext, type: fileType },
+    localize,
+  );
+  const downloadFilename = displayAltText || 'image.png';
 
   /** Root-relative server paths (`/images/...` static, `/api/...` downloads and
    *  share routes) are resolved against the API base so they load under a
@@ -67,7 +83,7 @@ const Image = ({
 
       const link = document.createElement('a');
       link.href = url;
-      link.download = altText || 'image.png';
+      link.download = downloadFilename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -77,7 +93,7 @@ const Image = ({
       console.error('Download failed:', error);
       const link = document.createElement('a');
       link.href = absoluteImageUrl;
-      link.download = altText || 'image.png';
+      link.download = downloadFilename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -100,7 +116,7 @@ const Image = ({
       <button
         ref={triggerRef}
         type="button"
-        aria-label={`View ${altText} in dialog`}
+        aria-label={`View ${displayAltText} in dialog`}
         aria-haspopup="dialog"
         onClick={() => setIsOpen(true)}
         className={cn(
@@ -112,7 +128,7 @@ const Image = ({
       >
         {showSkeleton && <Skeleton className="absolute inset-0" aria-hidden="true" />}
         <img
-          alt={altText}
+          alt={displayAltText}
           src={absoluteImageUrl}
           onLoad={() => paintedUrls.add(absoluteImageUrl)}
           className={cn(
@@ -130,6 +146,7 @@ const Image = ({
         downloadImage={downloadImage}
         args={args}
         triggerRef={triggerRef}
+        title={displayAltText || undefined}
       />
     </div>
   );

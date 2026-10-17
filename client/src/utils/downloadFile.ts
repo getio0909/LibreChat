@@ -1,16 +1,57 @@
-import { FileSources } from 'librechat-data-provider';
+import { FileSources, FileContext } from 'librechat-data-provider';
+import type { TFile } from 'librechat-data-provider';
 
 const blobDownloadFilenames = new Map<string, string>();
+const GENERATED_IMAGE_EXTENSIONS: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
 
 export const isHttpDownloadTarget = (target?: string | null): boolean =>
   /^https?:\/\//i.test(target ?? '');
+
+// 仅依据 File 持久化的产图上下文生成中立名称，不从用户可控文件名猜测生产者
+export function formatGeneratedImageFilename(
+  file?: Pick<TFile, 'filename'> & Partial<Pick<TFile, 'file_id' | 'context' | 'type'>>,
+  localize?: (
+    phraseKey: 'com_ui_generated_image_filename',
+    options?: Record<string, string | number>,
+  ) => string,
+): string {
+  const raw = (file?.filename ?? '').trim();
+  if (!raw) {
+    return '';
+  }
+  if (file?.context !== FileContext.image_generation) {
+    return raw;
+  }
+  const shortId = (file.file_id ?? '').replace(/[^A-Za-z0-9]/g, '').slice(0, 8) || 'image';
+  const ext = GENERATED_IMAGE_EXTENSIONS[file.type ?? ''] ?? '.png';
+  const suffix = `${shortId}${ext}`;
+  if (typeof localize === 'function') {
+    const localized = localize('com_ui_generated_image_filename', { 0: suffix });
+    if (localized && localized !== 'com_ui_generated_image_filename') {
+      return localized;
+    }
+  }
+  return `generated-image-${suffix}`;
+}
 
 export function getDownloadFilename(
   fileName: string,
   fileId?: string,
   fileSource?: string | null,
+  fileContext?: TFile['context'],
+  fileType?: string,
 ): string {
-  const filename = fileName || fileId || 'download';
+  const sanitizedFileName = formatGeneratedImageFilename({
+    filename: fileName,
+    file_id: fileId,
+    context: fileContext,
+    type: fileType,
+  });
+  const filename = sanitizedFileName || fileId || 'download';
   if (fileSource !== FileSources.text || filename.toLowerCase().endsWith('.txt')) {
     return filename;
   }

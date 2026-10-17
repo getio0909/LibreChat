@@ -24,7 +24,7 @@ export function useConversationUIResources(
 
   return useMemo(() => {
     const map = new Map<string, UIResource>();
-
+    const messages = getMessages();
     const collectResources = (attachments?: TAttachment[]) => {
       attachments
         ?.filter((attachment) => attachment?.type === Tools.ui_resources)
@@ -41,13 +41,15 @@ export function useConversationUIResources(
     };
 
     // Collect from messages (works in both main app and share view)
-    getMessages()?.forEach((message) => {
+    messages?.forEach((message) => {
       collectResources(message.attachments);
     });
 
     // Collect from in-flight messages (Recoil state during streaming - only when we have a conversationId)
     if (conversationId) {
-      Object.values(conversationAttachmentsMap).forEach(collectResources);
+      Object.values(conversationAttachmentsMap).forEach((attachments) =>
+        collectResources(attachments),
+      );
     }
 
     return map;

@@ -141,6 +141,9 @@ const SteerPart = memo(function SteerPart({
                       height={file.height ?? 1920}
                       width={file.width ?? 1080}
                       altText={file.filename ?? localize('com_ui_attached_image')}
+                      fileId={file.file_id}
+                      fileContext={file.context}
+                      fileType={file.type}
                     />
                   ))}
                 </div>
@@ -177,6 +180,7 @@ const SteerPart = memo(function SteerPart({
           filePath={selectedFile?.filepath}
           fileType={selectedFile?.type ?? undefined}
           fileSource={selectedFile?.source}
+          fileContext={selectedFile?.context}
           fileSize={(selectedFile as TFile | null)?.bytes}
           deliveryPath={selectedFile?.llmDeliveryPath}
         />

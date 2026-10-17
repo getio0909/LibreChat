@@ -4,6 +4,8 @@ import type { TFile } from 'librechat-data-provider';
 import type { AttachExistingContext } from '~/hooks/Files/useAttachExisting';
 import { useGetFiles, useGetRecentFiles, useGetStartupConfig } from '~/data-provider';
 import useAttachExisting from '~/hooks/Files/useAttachExisting';
+import { formatGeneratedImageFilename } from '~/utils';
+import { useLocalize } from '~/hooks';
 
 /**
  * The user's files for the composer palette attach section.
@@ -21,6 +23,7 @@ export default function useRecentFiles(
   files: TFile[];
   attach: (file: TFile) => void;
 } {
+  const localize = useLocalize();
   const { data: startupConfig } = useGetStartupConfig();
   const recentFileCount =
     startupConfig?.interface?.composerRecentFiles ?? DEFAULT_COMPOSER_RECENT_FILES;
@@ -34,10 +37,12 @@ export default function useRecentFiles(
 
   const files = useMemo(() => {
     if (searching) {
-      return (all ?? []).filter((file) => file.filename?.toLowerCase().includes(query));
+      return (all ?? []).filter((file) =>
+        formatGeneratedImageFilename(file, localize).toLowerCase().includes(query),
+      );
     }
     return recent ?? [];
-  }, [searching, query, all, recent]);
+  }, [searching, query, all, recent, localize]);
 
   return { files, attach };
 }

@@ -126,6 +126,9 @@ interface OutputRendererProps {
   segments?: OutputSegment[];
 }
 
+const VENDOR_IMAGE_DISPLAYED_RE =
+  /^(?:gemini|dall-e|imagen|openai)\s+displayed\s+an\s+image\b[\s\S]*$/i;
+
 export default function OutputRenderer({
   text,
   copyText,
@@ -136,7 +139,14 @@ export default function OutputRenderer({
   const localize = useLocalize();
   const terminal = variant === 'terminal';
   const extracted = useMemo(() => extractText(text, terminal), [text, terminal]);
-  const { text: displayText, rawError, isJson } = extracted;
+  const { text: rawDisplayText, rawError, isJson } = extracted;
+  const displayText = useMemo(
+    () =>
+      !terminal && !extracted.error && VENDOR_IMAGE_DISPLAYED_RE.test(rawDisplayText)
+        ? localize('com_ui_image_gen_displayed')
+        : rawDisplayText,
+    [terminal, extracted.error, rawDisplayText, localize],
+  );
   const error = extracted.error || forceError;
   const [showErrorDetails, setShowErrorDetails] = useState(false);
   const [isCopied, setIsCopied] = useState(false);

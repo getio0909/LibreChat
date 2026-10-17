@@ -10,6 +10,7 @@ import {
   processOpenIDPlaceholders,
   OpenIDReauthRequiredError,
 } from './oidc';
+import { deriveStudioStorageUserId } from './studioIdentity';
 import { getAdminApiKeyHeader } from '~/mcp/headers';
 
 /**
@@ -53,7 +54,7 @@ const ALLOWED_USER_FIELDS = [
 ] as const;
 
 type AllowedUserField = (typeof ALLOWED_USER_FIELDS)[number];
-type SafeUser = Pick<IUser, AllowedUserField>;
+type SafeUser = Pick<IUser, AllowedUserField> & { studioPrincipal?: string };
 
 /**
  * Encodes a string value to be safe for HTTP headers.
@@ -108,9 +109,11 @@ export function encodeHeaderValue(value: string): string {
  */
 export function createSafeUser(
   user:
-    | (Partial<SafeUser> & Pick<IUser, 'tenantId'> & { federatedTokens?: IUser['federatedTokens'] })
+    | (Partial<SafeUser> &
+        Partial<Pick<IUser, 'tenantId'>> & { federatedTokens?: IUser['federatedTokens'] })
     | null
     | undefined,
+  requestTenantId?: string | null,
 ): Partial<SafeUser> & { federatedTokens?: IUser['federatedTokens'] } {
   if (!user) {
     return {};
@@ -137,6 +140,14 @@ export function createSafeUser(
     safeUser.id = typeof _id === 'string' ? _id : _id?.toString?.();
   }
 
+  if (safeUser.id) {
+    // 工作台专用占位符只暴露派生身份，不将原始租户编号加入通用用户字段
+    const tenantId = user.tenantId ?? requestTenantId;
+    safeUser.studioPrincipal = tenantId
+      ? deriveStudioStorageUserId(String(safeUser.id), tenantId)
+      : user.studioPrincipal || deriveStudioStorageUserId(String(safeUser.id));
+  }
+
   if ('federatedTokens' in user) {
     safeUser.federatedTokens = user.federatedTokens;
   }
@@ -161,7 +172,7 @@ const OPENID_PLACEHOLDER_NAMES = `LIBRECHAT_OPENID_(?:${OPENID_TOKEN_FIELDS.join
  */
 const RESOLVABLE_PLACEHOLDER_PATTERN = new RegExp(
   [
-    `LIBRECHAT_USER_(?:${ALLOWED_USER_FIELDS.map((field) => field.toUpperCase()).join('|')})`,
+    `LIBRECHAT_USER_(?:${ALLOWED_USER_FIELDS.map((field) => field.toUpperCase()).join('|')})|LIBRECHAT_STUDIO_PRINCIPAL`,
     `LIBRECHAT_BODY_(?:${ALLOWED_BODY_FIELDS.map((field) => field.toUpperCase()).join('|')})`,
     OPENID_PLACEHOLDER_NAMES,
   ]
@@ -218,6 +229,18 @@ function processUserPlaceholders(
 ): string {
   if (!user || typeof value !== 'string') {
     return value;
+  }
+
+  if (value.includes('{{LIBRECHAT_STUDIO_PRINCIPAL}}')) {
+    const rawId = user.id || user._id?.toString();
+    const studioPrincipal =
+      rawId && user.tenantId
+        ? deriveStudioStorageUserId(String(rawId), user.tenantId)
+        : (user as SafeUser).studioPrincipal ||
+          (rawId ? deriveStudioStorageUserId(String(rawId)) : undefined);
+    if (studioPrincipal) {
+      value = value.replace(/\{\{LIBRECHAT_STUDIO_PRINCIPAL\}\}/g, studioPrincipal);
+    }
   }
 
   for (const field of ALLOWED_USER_FIELDS) {

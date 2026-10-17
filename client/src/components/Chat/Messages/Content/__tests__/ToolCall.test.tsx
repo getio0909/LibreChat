@@ -28,6 +28,8 @@ jest.mock('~/hooks', () => ({
       com_ui_via_server: `via ${values?.[0]}`,
       com_ui_tool_failed: 'failed',
       com_ui_tool_name_set_memory: 'Save Memory',
+      com_ui_tool_name_edit_region: '局部重绘',
+      com_ui_mcp_server_zyb_studio: '视觉生成工作台',
     };
     return translations[key] || key;
   },
@@ -1249,5 +1251,51 @@ describe('ToolCall sole tool disclosure', () => {
     );
     const panel = container.querySelector('[style*="grid-template-rows"]') as HTMLElement;
     expect(panel.style.gridTemplateRows).toBe('0fr');
+  });
+
+  it('localizes zyb_studio tools and OAuth cards while keeping raw tool names for other MCP servers', () => {
+    const { unmount } = render(
+      <RecoilRoot>
+        <ToolCall
+          args="{}"
+          name="edit_region_mcp_other_server"
+          output="ok"
+          initialProgress={1}
+          isSubmitting={false}
+        />
+      </RecoilRoot>,
+    );
+    expect(screen.getByTestId('progress-text')).toHaveTextContent('Completed edit_region');
+    expect(screen.getByTestId('subtitle')).toHaveTextContent('via other_server');
+    unmount();
+
+    const { unmount: unmountStudio } = render(
+      <RecoilRoot>
+        <ToolCall
+          args="{}"
+          name="edit_region_mcp_zyb_studio"
+          output="ok"
+          initialProgress={1}
+          isSubmitting={false}
+        />
+      </RecoilRoot>,
+    );
+    expect(screen.getByTestId('progress-text')).toHaveTextContent('Completed 局部重绘');
+    expect(screen.getByTestId('subtitle')).toHaveTextContent('via 视觉生成工作台');
+    unmountStudio();
+
+    render(
+      <RecoilRoot>
+        <ToolCall
+          args="{}"
+          name="zyb_studio_mcp_zyb_studio"
+          output="ok"
+          initialProgress={1}
+          isSubmitting={false}
+        />
+      </RecoilRoot>,
+    );
+    expect(screen.getByTestId('progress-text')).toHaveTextContent('Completed 视觉生成工作台');
+    expect(screen.getByTestId('subtitle')).toHaveTextContent('via 视觉生成工作台');
   });
 });

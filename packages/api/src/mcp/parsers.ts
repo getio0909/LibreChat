@@ -427,7 +427,7 @@ export function formatToolContent(
           baseHash,
           result,
           metadata?.toolArgs,
-          undefined,
+          metadata?.serverName,
           undefined,
         );
         const uiResource: UIResource = {
@@ -436,6 +436,8 @@ export function formatToolContent(
             ? { mimeType: resolveMCPUIResourceMimeType(item.resource.mimeType) }
             : {}),
           resourceId,
+          serverName: metadata?.serverName,
+          verifiedServerName: metadata?.serverName,
         };
         uiResources.push(uiResource);
         placementMarkerCount += 1;

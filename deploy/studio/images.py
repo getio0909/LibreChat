@@ -22,6 +22,8 @@ from .store import ensure_safe_subpath, read_bytes_no_follow
 # 默认生图接口地址、模型编号与档位像素基准
 BASE_URL = "https://ark.cn-beijing.volces.com/api/v3"
 MODEL = "doubao-seedream-5-0-pro-260628"
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
+GEMINI_MODEL = "gemini-nano-banana-2.1"
 SIZES = {"1K": 1024, "2K": 2048}
 NATIVE: dict[str, dict[str, tuple[int, int]]] = {
     "1K": {
@@ -39,11 +41,63 @@ NATIVE: dict[str, dict[str, tuple[int, int]]] = {
         "9:16": (1440, 2560),
     },
 }
+# Google Gemini Nano Banana 2.1 官方支持的宽高比与各档位原生像素尺寸（https://ai.google.dev/gemini-api/docs/image-generation#nano-banana-21）
+GEMINI_ASPECT_RATIOS: dict[str, tuple[int, int]] = {
+    "1:1": (1, 1),
+    "1:4": (1, 4),
+    "4:1": (4, 1),
+    "1:8": (1, 8),
+    "8:1": (8, 1),
+    "2:3": (2, 3),
+    "3:2": (3, 2),
+    "3:4": (3, 4),
+    "4:3": (4, 3),
+    "4:5": (4, 5),
+    "5:4": (5, 4),
+    "9:16": (9, 16),
+    "16:9": (16, 9),
+    "21:9": (21, 9),
+}
+GEMINI_NATIVE: dict[str, dict[str, tuple[int, int]]] = {
+    "1K": {
+        "1:1": (1024, 1024),
+        "1:4": (512, 2048),
+        "1:8": (384, 3072),
+        "2:3": (848, 1264),
+        "3:2": (1264, 848),
+        "3:4": (896, 1200),
+        "4:1": (2048, 512),
+        "4:3": (1200, 896),
+        "4:5": (928, 1152),
+        "5:4": (1152, 928),
+        "8:1": (3072, 384),
+        "9:16": (768, 1376),
+        "16:9": (1376, 768),
+        "21:9": (1584, 672),
+    },
+    "2K": {
+        "1:1": (2048, 2048),
+        "1:4": (1024, 4096),
+        "1:8": (768, 6144),
+        "2:3": (1696, 2528),
+        "3:2": (2528, 1696),
+        "3:4": (1792, 2400),
+        "4:1": (4096, 1024),
+        "4:3": (2400, 1792),
+        "4:5": (1856, 2304),
+        "5:4": (2304, 1856),
+        "8:1": (6144, 768),
+        "9:16": (1536, 2752),
+        "16:9": (2752, 1536),
+        "21:9": (3168, 1344),
+    },
+}
 MAX_REFERENCES = 10
 MAX_EDIT_REFERENCES = 9
 MAX_INPUT_PIXELS = 40_000_000
 MAX_OUTPUT_PIXELS = 24_000_000
-MAX_RESPONSE_BYTES = 64 * 1024 * 1024
+# 24MP RGBA PNG 的无压缩字节约 96MiB，base64 响应需要额外三分之一空间
+MAX_RESPONSE_BYTES = 160 * 1024 * 1024
 MAX_DISPLAY_BYTES = 3 * 1024 * 1024
 REFERENCE_USES = ("参考", "物件", "造型", "材质", "纹样", "风格")
 
@@ -83,7 +137,7 @@ def _mark_uncertain(directory: Path, values: dict[str, Any], **extra: Any) -> No
         pass
 
 
-# 按原图宽高比计算1K或2K档位下符合16倍数与面积范围的目标尺寸
+# 按原图宽高比计算1K或2K档位下符合16倍数、面积范围与2.5%宽高比误差上限的目标尺寸
 def source_dimensions(
     size: str, source_size: tuple[int, int] | list[int]
 ) -> tuple[int, int]:
@@ -99,14 +153,47 @@ def source_dimensions(
         or not 1 / 16 <= w / h <= 16
     ):
         raise ValueError("Source image aspect ratio is out of supported range")
-    scale = math.sqrt(SIZES[size] ** 2 / (w * h))
-    width = max(16, round(w * scale / 16) * 16)
-    height = max(16, round(h * scale / 16) * 16)
-    if not 921600 <= width * height <= 4624220 or not 1 / 16 <= width / height <= 16:
+    ratio = w / h
+    target_area = SIZES[size] ** 2
+    scale = math.sqrt(target_area / (w * h))
+    base_w = max(16, round(w * scale / 16) * 16)
+    base_h = max(16, round(h * scale / 16) * 16)
+    if (
+        921600 <= base_w * base_h <= 4624220
+        and 1 / 16 <= base_w / base_h <= 16
+        and abs((base_w / base_h) / ratio - 1.0) <= 0.025
+    ):
+        return base_w, base_h
+
+    best_pair: tuple[int, int] | None = None
+    best_key: tuple[float, float] | None = None
+    for dw in range(-20, 21):
+        cw = base_w + dw * 16
+        if cw < 16:
+            continue
+        for dh in range(-20, 21):
+            ch = base_h + dh * 16
+            if ch < 16:
+                continue
+            area = cw * ch
+            if not (921600 <= area <= 4624220):
+                continue
+            cand_ratio = cw / ch
+            if not (1 / 16 <= cand_ratio <= 16):
+                continue
+            discrepancy = abs(cand_ratio / ratio - 1.0)
+            if discrepancy > 0.025:
+                continue
+            key = (discrepancy, float(abs(area - target_area)))
+            if best_key is None or key < best_key:
+                best_key = key
+                best_pair = (cw, ch)
+
+    if best_pair is None:
         raise ValueError(
             "Cannot generate at source aspect ratio; please choose a standard aspect ratio"
         )
-    return width, height
+    return best_pair
 
 
 # 规范化参考图片并返回Data URI与EXIF方向校正后的像素尺寸
@@ -449,54 +536,6 @@ def build_stone_replacements(
     return replacements
 
 
-# 组装概念生图提示词、参考规则与参考图路径列表
-def build_generate_prompt(
-    prompt: str,
-    references: list[dict[str, Any]],
-    rules: StudioRules,
-) -> tuple[str, list[Path]]:
-    if len(references) > MAX_REFERENCES:
-        raise ValueError(f"At most {MAX_REFERENCES} reference images are allowed")
-    unique_paths: list[Path] = []
-    for ref in references:
-        use = ref.get("use", "参考")
-        if use not in REFERENCE_USES:
-            raise ValueError(f"Invalid reference use: {use}")
-        p = Path(ref["path"])
-        if p not in unique_paths:
-            unique_paths.append(p)
-
-    replacements = build_stone_replacements(
-        rules, unique_paths, references, has_base=False
-    )
-    clean_prompt = neutralize_stone_names(prompt.strip(), replacements)
-    if not unique_paths:
-        return rules.render_prefix + clean_prompt, []
-
-    lines: list[str] = []
-    for ref in references:
-        p = Path(ref["path"])
-        sample = f"图{unique_paths.index(p) + 1}"
-        use = ref.get("use", "参考")
-        raw_note = (ref.get("note") or "").strip()
-        part = (
-            neutralize_stone_names(raw_note, replacements) if raw_note else use
-        ).rstrip("。；，.!?;:,！？")
-        lines.append(f"从{sample}取用{part}，用于新方案的相应部分。")
-        if use == "材质":
-            lines.append(
-                f"{sample}只提供颜色与纹理，用于新设计的指定部位，不取用样图背景、地面、支架、标签与其他物件。"
-            )
-
-    compose_tail = (
-        "按说明组合成新的完整设计，各参考图地位相同，不默认第一张是底图。"
-        "只取指定内容，统一比例、透视、光线与构图，不拼成对照图或分栏图。"
-    )
-    body = "\n".join([clean_prompt, *lines, compose_tail])
-    full_prompt = f"{rules.render_prefix}{rules.reference_rules}\n{body}"
-    return full_prompt, unique_paths
-
-
 # 组装整图修改提示词、底图保护规则与参考图路径列表
 def build_edit_prompt(
     instruction: str,
@@ -547,6 +586,27 @@ def build_edit_prompt(
     return full_prompt, unique_paths
 
 
+# 组装局部选区修改提示词（附加局部裁切框内的归一化<bbox>约束及可选原样贴入说明）
+def build_local_edit_prompt(
+    instruction: str,
+    references: list[dict[str, Any]],
+    rules: StudioRules,
+    *,
+    region_bbox: tuple[int, int, int, int],
+    placement_instruction: str | None = None,
+) -> tuple[str, list[Path]]:
+    base_prompt, unique_paths = build_edit_prompt(instruction, references, rules)
+    rx1, ry1, rx2, ry2 = region_bbox
+    region_line = (
+        f"图1是原场景的局部裁图。仅修改 <bbox>{rx1} {ry1} {rx2} {ry2}</bbox> 内的指定内容，"
+        "保持构图位置、边缘结构与周围光线一致，不添加选区标记。"
+    )
+    extra_parts = [
+        part for part in (placement_instruction, region_line) if part and part.strip()
+    ]
+    return "\n".join([base_prompt, *extra_parts]), unique_paths
+
+
 # 生成用于MCP结果展示的压缩图片（JPEG或WebP，严格不超过3MB），不修改原图字节
 def encode_display_image(
     raw_bytes: bytes, max_bytes: int = MAX_DISPLAY_BYTES
@@ -577,7 +637,7 @@ def encode_display_image(
             return data, "image/jpeg"
 
 
-# 调用云端图像生成接口并原子保存原始字节与receipt.json
+# 调用云端图像生成接口并原子保存原始字节与receipt.json（支持局部选区回贴与选区外像素零改动校验）
 async def generate_seedream(
     settings: StudioSettings,
     prompt: str,
@@ -587,6 +647,7 @@ async def generate_seedream(
     destination: Path,
     *,
     source_size: tuple[int, int] | None = None,
+    local_composite: dict[str, Any] | None = None,
     transport: httpx.AsyncBaseTransport | None = None,
 ) -> dict[str, Any]:
     if size not in NATIVE or (aspect != "source" and aspect not in NATIVE[size]):
@@ -645,6 +706,7 @@ async def generate_seedream(
         "Content-Type": "application/json",
     }
 
+    job_id = destination.name
     try:
         # 设定10秒连接超时以加速双栈回退；任何未发送请求字节的ConnectError/ConnectTimeout均标记为failed且未计费
         async with httpx.AsyncClient(
@@ -679,16 +741,18 @@ async def generate_seedream(
         raise connect_err from None
     except (httpx.TimeoutException, TimeoutError, httpx.HTTPError, OSError):
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg) from None
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
 
     if response.status_code >= 500:
         _mark_uncertain(destination, record, http_status=response.status_code)
-        raise GenerationUncertain(uncertain_msg)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id)
 
     if response.status_code >= 400:
         record.update(
             state="rejected", http_status=response.status_code, finished=time.time()
         )
+        if response.status_code == 429:
+            record.update(billed=False, error_code="rate_limited")
         try:
             write_receipt(destination, record)
         except OSError:
@@ -707,7 +771,7 @@ async def generate_seedream(
 
     if len(raw_content) > MAX_RESPONSE_BYTES:
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id)
 
     try:
         parsed = json.loads(raw_content)
@@ -735,7 +799,118 @@ async def generate_seedream(
         Image.DecompressionBombError,
     ):
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg) from None
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+    if local_composite is not None:
+        from .regions import composite_local, write_local_recovery
+
+        crop_path = destination / f"crop{suffix}"
+        crop_sha256 = hashlib.sha256(image_bytes).hexdigest()
+        try:
+            temp_crop = destination / "crop.part"
+            desc = os.open(temp_crop, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(desc, "wb") as stream:
+                stream.write(image_bytes)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temp_crop, crop_path)
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+        recovery_record: dict[str, Any] = {
+            "job_id": job_id,
+            "state": "recoverable",
+            "recoverable": True,
+            "created": time.time(),
+            "base_id": str(local_composite.get("base_id") or ""),
+            "base_path": str(local_composite["base_path"]),
+            "selection_id": str(local_composite.get("selection_id") or ""),
+            "selection": local_composite["selection"],
+            "proof": local_composite.get("proof"),
+            "crop": [int(v) for v in local_composite["crop"]],
+            "crop_file": crop_path.name,
+            "crop_sha256": crop_sha256,
+            "requested_size": body["size"],
+        }
+        record.update(
+            state="recoverable",
+            recoverable=True,
+            job_id=job_id,
+            base_id=recovery_record["base_id"],
+            selection_id=recovery_record["selection_id"],
+            crop_file=crop_path.name,
+            crop_sha256=crop_sha256,
+            crop_width=actual_width,
+            crop_height=actual_height,
+        )
+        try:
+            write_local_recovery(destination, recovery_record)
+            write_receipt(destination, record)
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+        original_path = destination / "original.png"
+        try:
+            comp = composite_local(
+                local_composite["base_path"],
+                crop_path,
+                local_composite["selection"],
+                local_composite["crop"],
+                original_path,
+                expected_proof=local_composite.get("proof"),
+            )
+            final_bytes = original_path.read_bytes()
+            record.update(
+                state="saved",
+                recoverable=False,
+                finished=time.time(),
+                width=comp["width"],
+                height=comp["height"],
+                file=original_path.name,
+                sha256=comp["sha256"],
+                selected_pixels=comp["selected_pixels"],
+                outside_changed_pixels=0,
+            )
+            write_receipt(destination, record)
+            try:
+                (destination / "local_recovery.json").unlink(missing_ok=True)
+            except OSError:
+                pass
+        except (ValueError, RuntimeError, OSError) as exc:
+            recovery_record["error"] = str(exc)
+            record.update(
+                state="recoverable",
+                recoverable=True,
+                finished=time.time(),
+                error=str(exc),
+            )
+            try:
+                write_local_recovery(destination, recovery_record)
+                write_receipt(destination, record)
+            except OSError:
+                pass
+            raise GenerationUncertain(
+                f"Paid local crop was saved for job {job_id}, but local composite failed ({exc}); "
+                f"the request may have been billed and no automatic retry was performed. "
+                f"Call edit_region with job_id='{job_id}' to composite the saved crop without a new paid call.",
+                job_id=job_id,
+                state="recoverable",
+            ) from exc
+
+        return {
+            "path": original_path,
+            "raw_bytes": final_bytes,
+            "width": comp["width"],
+            "height": comp["height"],
+            "sha256": comp["sha256"],
+            "selected_pixels": comp["selected_pixels"],
+            "outside_changed_pixels": 0,
+            "requested_size": body["size"],
+            "reference_count": len(references),
+            "watermark": False,
+        }
 
     original_path = destination / f"original{suffix}"
     try:
@@ -757,7 +932,7 @@ async def generate_seedream(
         write_receipt(destination, record)
     except OSError:
         _mark_uncertain(destination, record)
-        raise GenerationUncertain(uncertain_msg) from None
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
 
     return {
         "path": original_path,
@@ -768,3 +943,468 @@ async def generate_seedream(
         "reference_count": len(references),
         "watermark": False,
     }
+
+
+# 将请求的档位与比例（含"source"原图比例）映射为Gemini Nano Banana 2.1支持的aspectRatio与原生像素尺寸
+def gemini_aspect_and_size(
+    size: str,
+    aspect: str,
+    source_size: tuple[int, int] | list[int] | None = None,
+) -> tuple[str, tuple[int, int]]:
+    if size not in GEMINI_NATIVE:
+        raise ValueError("Invalid image size or aspect ratio")
+    if aspect == "source":
+        if source_size is None:
+            raise ValueError("Invalid source image dimensions")
+        # 复用source_dimensions校验原图宽高整数合法性及[1/16, 16]范围
+        source_dimensions(size, source_size)
+        w, h = int(source_size[0]), int(source_size[1])
+        target_ratio = w / h
+        resolved_aspect = min(
+            GEMINI_ASPECT_RATIOS,
+            key=lambda name: abs(
+                math.log(
+                    (GEMINI_ASPECT_RATIOS[name][0] / GEMINI_ASPECT_RATIOS[name][1])
+                    / target_ratio
+                )
+            ),
+        )
+        return resolved_aspect, GEMINI_NATIVE[size][resolved_aspect]
+    if aspect not in GEMINI_NATIVE[size]:
+        raise ValueError("Invalid image size or aspect ratio")
+    return aspect, GEMINI_NATIVE[size][aspect]
+
+
+# 将Data URI解析为Gemini generateContent所需的inlineData图像块
+def _parse_data_uri_inline_part(uri: str) -> dict[str, Any]:
+    if not isinstance(uri, str) or not uri.startswith("data:") or "," not in uri:
+        raise ValueError("Invalid reference image data URI")
+    header, b64_data = uri.split(",", 1)
+    mime_type = header.removeprefix("data:").split(";", 1)[0].strip() or "image/jpeg"
+    cleaned_b64 = b64_data.strip()
+    if not cleaned_b64:
+        raise ValueError("Empty reference image data URI")
+    return {"inlineData": {"mimeType": mime_type, "data": cleaned_b64}}
+
+
+# 从Gemini generateContent响应中提取非思考阶段的最后一张inlineData图像原始字节
+def _extract_gemini_inline_image(payload: Any) -> bytes:
+    if not isinstance(payload, dict):
+        raise TypeError("Gemini response must be a JSON object")
+    candidates = payload.get("candidates")
+    if not isinstance(candidates, list) or not candidates:
+        raise ValueError("No image returned in Gemini candidates")
+    first = candidates[0]
+    if not isinstance(first, dict):
+        raise TypeError("Invalid candidate entry in Gemini response")
+    content = first.get("content")
+    if not isinstance(content, dict):
+        raise TypeError("No image returned in Gemini candidate content")
+    parts = content.get("parts")
+    if not isinstance(parts, list) or not parts:
+        raise ValueError("No image returned in Gemini candidate parts")
+
+    inline_blobs: list[str] = []
+    for part in parts:
+        if not isinstance(part, dict) or part.get("thought") is True:
+            continue
+        inline_obj = part.get("inlineData") or part.get("inline_data")
+        if isinstance(inline_obj, dict):
+            data = inline_obj.get("data")
+            if isinstance(data, str) and data.strip():
+                inline_blobs.append(data.strip())
+
+    if not inline_blobs:
+        raise ValueError("No image returned in Gemini response parts")
+    return base64.b64decode(inline_blobs[-1], validate=True)
+
+
+# 调用Google Gemini Nano Banana 2.1生图/改图接口并原子保存原始字节与receipt.json（支持局部选区回贴与选区外像素零改动校验）
+async def generate_gemini(
+    settings: StudioSettings,
+    prompt: str,
+    references: list[str],
+    size: str,
+    aspect: str,
+    destination: Path,
+    *,
+    source_size: tuple[int, int] | None = None,
+    local_composite: dict[str, Any] | None = None,
+    transport: httpx.AsyncBaseTransport | None = None,
+) -> dict[str, Any]:
+    resolved_aspect, (expected_w, expected_h) = gemini_aspect_and_size(
+        size, aspect, source_size
+    )
+    if len(references) > MAX_REFERENCES:
+        raise ValueError(f"Reference image count exceeds limit of {MAX_REFERENCES}")
+    inline_parts = [_parse_data_uri_inline_part(ref) for ref in references]
+
+    destination = Path(destination)
+    destination.mkdir(parents=True, mode=0o700, exist_ok=True)
+    if destination.is_symlink() or (destination / "receipt.json").exists():
+        raise ValueError("Job directory already contains a generation receipt")
+    if shutil.disk_usage(destination).free < 2 * MAX_RESPONSE_BYTES:
+        raise ValueError("Insufficient disk space to submit image generation")
+
+    key = settings.gemini_api_key.strip()
+    if not key or any(ch.isspace() for ch in key):
+        raise ValueError("Invalid image API key format")
+
+    requested_size = f"{expected_w}x{expected_h}"
+    parts: list[dict[str, Any]] = [{"text": prompt}, *inline_parts]
+    body: dict[str, Any] = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": parts,
+            }
+        ],
+        "generationConfig": {
+            "responseModalities": ["TEXT", "IMAGE"],
+            "imageConfig": {
+                "aspectRatio": resolved_aspect,
+                "imageSize": size,
+            },
+        },
+    }
+
+    record: dict[str, Any] = {
+        "state": "pending",
+        "started": time.time(),
+        "provider": "gemini",
+        "model": settings.gemini_image_model,
+        "requested_size": requested_size,
+        "aspect_ratio": resolved_aspect,
+        "image_size": size,
+        "reference_count": len(references),
+        "reference_sha256": [
+            hashlib.sha256(ref.encode("utf-8")).hexdigest() for ref in references
+        ],
+    }
+    write_receipt(destination, record)
+
+    uncertain_msg = (
+        "Image generation status is uncertain after request dispatch "
+        "(the request may have been billed); no automatic retry was performed. "
+        "Please check existing images before retrying."
+    )
+
+    url = (
+        f"{settings.gemini_base_url.rstrip('/')}"
+        f"/models/{settings.gemini_image_model}:generateContent"
+    )
+    headers = {
+        "x-goog-api-key": key,
+        "Content-Type": "application/json",
+    }
+
+    job_id = destination.name
+    try:
+        # 设定10秒连接超时以加速双栈回退；任何未发送请求字节的ConnectError/ConnectTimeout均标记为failed且未计费
+        async with httpx.AsyncClient(
+            transport=transport,
+            timeout=httpx.Timeout(
+                float(settings.seedream_timeout_seconds), connect=10.0
+            ),
+            follow_redirects=False,
+        ) as client:
+            response = await client.post(url, json=body, headers=headers)
+            raw_content = response.content
+    except asyncio.CancelledError:
+        _mark_uncertain(destination, record)
+        raise
+    except (httpx.ConnectError, httpx.ConnectTimeout):
+        record.update(
+            state="failed",
+            billed=False,
+            error_code="connect_error",
+            finished=time.time(),
+        )
+        try:
+            write_receipt(destination, record)
+        except OSError:
+            pass
+        connect_err = RuntimeError(
+            "Image generation service connection failed before request dispatch "
+            "(the request was not billed); no automatic retry was performed"
+        )
+        connect_err.state = "failed"  # type: ignore[attr-defined]
+        connect_err.billed = False  # type: ignore[attr-defined]
+        raise connect_err from None
+    except (httpx.TimeoutException, TimeoutError, httpx.HTTPError, OSError):
+        _mark_uncertain(destination, record)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+    if response.status_code >= 500:
+        _mark_uncertain(destination, record, http_status=response.status_code)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id)
+
+    if response.status_code >= 400:
+        record.update(
+            state="rejected", http_status=response.status_code, finished=time.time()
+        )
+        if response.status_code == 429:
+            record.update(billed=False, error_code="rate_limited")
+        try:
+            write_receipt(destination, record)
+        except OSError:
+            pass
+        status_messages = {
+            400: "Image generation parameters or content were rejected",
+            401: "Image service authentication failed",
+            402: "Image service account balance is insufficient",
+            403: "Image service access was denied",
+            429: "Image service rate limit exceeded",
+        }
+        msg = status_messages.get(
+            response.status_code, "Image service rejected the request"
+        )
+        raise RuntimeError(f"{msg}; no automatic retry was performed")
+
+    if len(raw_content) > MAX_RESPONSE_BYTES:
+        _mark_uncertain(destination, record)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id)
+
+    no_image_returned = False
+    try:
+        parsed = json.loads(raw_content)
+        try:
+            image_bytes = _extract_gemini_inline_image(parsed)
+        except (TypeError, ValueError) as exc:
+            if "No image returned" in str(exc):
+                no_image_returned = True
+            raise
+        with Image.open(io.BytesIO(image_bytes)) as im:
+            suffix = {"JPEG": ".jpg", "PNG": ".png", "WEBP": ".webp"}[im.format]
+            actual_width, actual_height = im.size
+            if actual_width * actual_height > MAX_OUTPUT_PIXELS:
+                raise ValueError("Output image exceeds maximum pixel count")
+            if any(
+                k.casefold() in ("prompt", "workflow", "parameters", "description")
+                for k in im.info
+            ):
+                raise ValueError("Output image contains disallowed metadata")
+            im.verify()
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        OSError,
+        binascii.Error,
+        Image.DecompressionBombError,
+    ):
+        if no_image_returned:
+            _mark_uncertain(destination, record, error_code="no_image")
+            raise GenerationUncertain(
+                "Image generation response contained no image data "
+                "(the request may have been billed); no automatic retry was performed. "
+                "Please check existing images before retrying.",
+                job_id=job_id,
+            ) from None
+        _mark_uncertain(destination, record)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+    if local_composite is not None:
+        from .regions import composite_local, write_local_recovery
+
+        # 当局部裁切框处于两个Gemini离散比例之间且返回图符合请求的离散比例时，先对齐至裁切框目标尺寸再落盘crop
+        crop_box = local_composite["crop"]
+        crop_w = int(crop_box[2]) - int(crop_box[0])
+        crop_h = int(crop_box[3]) - int(crop_box[1])
+        if crop_w > 0 and crop_h > 0:
+            crop_ratio = crop_w / crop_h
+            actual_ratio = actual_width / actual_height
+            expected_gemini_ratio = expected_w / expected_h
+            if (
+                abs(actual_ratio / crop_ratio - 1.0) > 0.025
+                and abs(actual_ratio / expected_gemini_ratio - 1.0) <= 0.05
+            ):
+                target_w, target_h = source_dimensions(size, (crop_w, crop_h))
+                with Image.open(io.BytesIO(image_bytes)) as crop_im:
+                    resized_crop = ImageOps.exif_transpose(crop_im).resize(
+                        (target_w, target_h), Image.Resampling.LANCZOS
+                    )
+                    crop_buf = io.BytesIO()
+                    resized_crop.save(crop_buf, format="PNG")
+                    image_bytes = crop_buf.getvalue()
+                    suffix = ".png"
+                    actual_width, actual_height = target_w, target_h
+
+        crop_path = destination / f"crop{suffix}"
+        crop_sha256 = hashlib.sha256(image_bytes).hexdigest()
+        try:
+            temp_crop = destination / "crop.part"
+            desc = os.open(temp_crop, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(desc, "wb") as stream:
+                stream.write(image_bytes)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temp_crop, crop_path)
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+        recovery_record: dict[str, Any] = {
+            "job_id": job_id,
+            "state": "recoverable",
+            "recoverable": True,
+            "created": time.time(),
+            "base_id": str(local_composite.get("base_id") or ""),
+            "base_path": str(local_composite["base_path"]),
+            "selection_id": str(local_composite.get("selection_id") or ""),
+            "selection": local_composite["selection"],
+            "proof": local_composite.get("proof"),
+            "crop": [int(v) for v in local_composite["crop"]],
+            "crop_file": crop_path.name,
+            "crop_sha256": crop_sha256,
+            "requested_size": requested_size,
+        }
+        record.update(
+            state="recoverable",
+            recoverable=True,
+            job_id=job_id,
+            base_id=recovery_record["base_id"],
+            selection_id=recovery_record["selection_id"],
+            crop_file=crop_path.name,
+            crop_sha256=crop_sha256,
+            crop_width=actual_width,
+            crop_height=actual_height,
+        )
+        try:
+            write_local_recovery(destination, recovery_record)
+            write_receipt(destination, record)
+        except OSError:
+            _mark_uncertain(destination, record)
+            raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+        original_path = destination / "original.png"
+        try:
+            comp = composite_local(
+                local_composite["base_path"],
+                crop_path,
+                local_composite["selection"],
+                local_composite["crop"],
+                original_path,
+                expected_proof=local_composite.get("proof"),
+            )
+            final_bytes = original_path.read_bytes()
+            record.update(
+                state="saved",
+                recoverable=False,
+                finished=time.time(),
+                width=comp["width"],
+                height=comp["height"],
+                file=original_path.name,
+                sha256=comp["sha256"],
+                selected_pixels=comp["selected_pixels"],
+                outside_changed_pixels=0,
+            )
+            write_receipt(destination, record)
+            try:
+                (destination / "local_recovery.json").unlink(missing_ok=True)
+            except OSError:
+                pass
+        except (ValueError, RuntimeError, OSError) as exc:
+            recovery_record["error"] = str(exc)
+            record.update(
+                state="recoverable",
+                recoverable=True,
+                finished=time.time(),
+                error=str(exc),
+            )
+            try:
+                write_local_recovery(destination, recovery_record)
+                write_receipt(destination, record)
+            except OSError:
+                pass
+            raise GenerationUncertain(
+                f"Paid local crop was saved for job {job_id}, but local composite failed ({exc}); "
+                f"the request may have been billed and no automatic retry was performed. "
+                f"Call edit_region with job_id='{job_id}' to composite the saved crop without a new paid call.",
+                job_id=job_id,
+                state="recoverable",
+            ) from exc
+
+        return {
+            "path": original_path,
+            "raw_bytes": final_bytes,
+            "width": comp["width"],
+            "height": comp["height"],
+            "sha256": comp["sha256"],
+            "selected_pixels": comp["selected_pixels"],
+            "outside_changed_pixels": 0,
+            "requested_size": requested_size,
+            "aspect_ratio": resolved_aspect,
+            "reference_count": len(references),
+        }
+
+    original_path = destination / f"original{suffix}"
+    try:
+        temporary = destination / "original.part"
+        descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(image_bytes)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, original_path)
+        record.update(
+            state="saved",
+            finished=time.time(),
+            width=actual_width,
+            height=actual_height,
+            file=original_path.name,
+            sha256=hashlib.sha256(image_bytes).hexdigest(),
+        )
+        write_receipt(destination, record)
+    except OSError:
+        _mark_uncertain(destination, record)
+        raise GenerationUncertain(uncertain_msg, job_id=job_id) from None
+
+    return {
+        "path": original_path,
+        "raw_bytes": image_bytes,
+        "width": actual_width,
+        "height": actual_height,
+        "requested_size": requested_size,
+        "aspect_ratio": resolved_aspect,
+        "reference_count": len(references),
+    }
+
+
+# 按工作台配置的image_provider路由至Gemini Nano Banana 2.1（默认）或火山方舟Seedream（备用）
+async def generate_image_with_provider(
+    settings: StudioSettings,
+    prompt: str,
+    references: list[str],
+    size: str,
+    aspect: str,
+    destination: Path,
+    *,
+    source_size: tuple[int, int] | None = None,
+    local_composite: dict[str, Any] | None = None,
+    ark_transport: httpx.AsyncBaseTransport | None = None,
+    gemini_transport: httpx.AsyncBaseTransport | None = None,
+) -> dict[str, Any]:
+    if settings.image_provider == "seedream":
+        return await generate_seedream(
+            settings,
+            prompt,
+            references,
+            size=size,
+            aspect=aspect,
+            destination=destination,
+            source_size=source_size,
+            local_composite=local_composite,
+            transport=ark_transport,
+        )
+    return await generate_gemini(
+        settings,
+        prompt,
+        references,
+        size=size,
+        aspect=aspect,
+        destination=destination,
+        source_size=source_size,
+        local_composite=local_composite,
+        transport=gemini_transport,
+    )

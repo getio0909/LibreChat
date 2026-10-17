@@ -2,6 +2,7 @@ import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { getDefaultStore } from 'jotai';
 import userEvent from '@testing-library/user-event';
+import { FileContext } from 'librechat-data-provider';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import type { TConversation } from 'librechat-data-provider';
 import type { PaletteEntry } from '~/hooks/Input/usePaletteEntries';
@@ -928,6 +929,28 @@ describe('Palette', () => {
       await user.click(favorite);
       expect(mockToggleFavorite).toHaveBeenCalledWith('tool', 'only');
       expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    it('formats generated tool image filenames neutrally in recent files while preserving ordinary user filenames', () => {
+      mockRecentFiles = [
+        {
+          file_id: 'gen-1',
+          filename:
+            '11111111-2222-4333-8444-555555555555-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.png',
+          type: 'image/png',
+          context: FileContext.image_generation,
+        },
+        {
+          file_id: 'usr-1',
+          filename: 'vacation_img_01.png',
+          type: 'image/png',
+        },
+      ];
+      renderPalette({ entries: [] });
+      const renderedRows = rows();
+      expect(renderedRows.some((text) => text.includes('gen1.png'))).toBe(true);
+      expect(renderedRows.some((text) => text.toLowerCase().includes('gemini'))).toBe(false);
+      expect(renderedRows.some((text) => text.includes('vacation_img_01.png'))).toBe(true);
     });
   });
 });

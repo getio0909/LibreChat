@@ -1,11 +1,12 @@
-import { FileSources } from 'librechat-data-provider';
+import { FileSources, FileContext } from 'librechat-data-provider';
 import {
-  getCodeBlockFilename,
+  triggerDownload,
   getDownloadFilename,
+  getCodeBlockFilename,
   isHttpDownloadTarget,
   registerDownloadFilename,
-  triggerDownload,
   unregisterDownloadFilename,
+  formatGeneratedImageFilename,
 } from '../downloadFile';
 
 describe('downloadFile utilities', () => {
@@ -119,6 +120,68 @@ describe('getDownloadFilename', () => {
 
   it('preserves filenames for other storage sources', () => {
     expect(getDownloadFilename('report.pdf', 'file-3', FileSources.local)).toBe('report.pdf');
+  });
+
+  // 验证生图工具产生的文件名在下载时剥离厂商与工具名
+  it('replaces generated tool image filenames with a neutral name free of vendor/tool identifiers', () => {
+    const raw =
+      '11111111-2222-4333-8444-555555555555-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.png';
+    const downloadName = getDownloadFilename(
+      raw,
+      '11111111-2222-4333-8444-555555555555',
+      FileSources.local,
+      FileContext.image_generation,
+      'image/png',
+    );
+    expect(downloadName).toBe('generated-image-11111111.png');
+    expect(downloadName).not.toContain('gemini');
+    expect(downloadName).not.toContain('gemini_image_gen');
+  });
+});
+
+// 验证 formatGeneratedImageFilename 支持中英文本地化展示并保留普通上传文件名不变
+describe('formatGeneratedImageFilename', () => {
+  it('formats generated filenames using localized template without vendor or tool names', () => {
+    const rawGemini =
+      '11111111-2222-4333-8444-555555555555-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.png';
+    const rawStudio =
+      '22222222-3333-4444-8555-666666666666-edit_region_mcp_zyb_studio_img_AbCdEf12_xyz.webp';
+
+    const zhLocalize = (_key: string, options?: Record<string, string | number>) =>
+      `设计图-${options?.['0'] ?? ''}`;
+    const enLocalize = (_key: string, options?: Record<string, string | number>) =>
+      `generated-image-${options?.['0'] ?? ''}`;
+
+    const geminiFile = {
+      filename: rawGemini,
+      file_id: '11111111-2222-4333-8444-555555555555',
+      context: FileContext.image_generation,
+      type: 'image/png',
+    };
+    expect(formatGeneratedImageFilename(geminiFile, zhLocalize)).toBe('设计图-11111111.png');
+    expect(formatGeneratedImageFilename(geminiFile, enLocalize)).toBe(
+      'generated-image-11111111.png',
+    );
+    expect(
+      formatGeneratedImageFilename(
+        {
+          filename: rawStudio,
+          file_id: '22222222-3333-4444-8555-666666666666',
+          context: FileContext.image_generation,
+          type: 'image/webp',
+        },
+        zhLocalize,
+      ),
+    ).toBe('设计图-22222222.webp');
+    expect(formatGeneratedImageFilename({ filename: 'user_upload_sketch.png' }, zhLocalize)).toBe(
+      'user_upload_sketch.png',
+    );
+    expect(formatGeneratedImageFilename({ filename: 'vacation_img_01.png' }, zhLocalize)).toBe(
+      'vacation_img_01.png',
+    );
+    expect(formatGeneratedImageFilename({ filename: rawGemini }, zhLocalize)).toBe(rawGemini);
+    expect(getDownloadFilename(rawGemini, 'upload-1', FileSources.local)).toBe(rawGemini);
+    expect(getDownloadFilename('vacation_img_01.png', 'file-vac')).toBe('vacation_img_01.png');
   });
 });
 

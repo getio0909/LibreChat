@@ -7,6 +7,7 @@ import type { TMessageContentProps, TDisplayProps } from '~/common';
 import useSmoothStreaming from '~/hooks/Messages/useSmoothStreaming';
 import Error from '~/components/Messages/Content/Error';
 import ToolCallLimitNotice from './ToolCallLimitNotice';
+import { cn, unwrapLegacyUIPromptText } from '~/utils';
 import CollapsibleText from './Parts/CollapsibleText';
 import { useMessageContext } from '~/Providers';
 import EmptyText from './Parts/EmptyText';
@@ -16,7 +17,6 @@ import Thinking from './Parts/Thinking';
 import { useLocalize } from '~/hooks';
 import Container from './Container';
 import Markdown from './Markdown';
-import { cn } from '~/utils';
 import store from '~/store';
 
 const ERROR_CONNECTION_TEXT = 'Error connecting to server, try refreshing the page.';
@@ -95,6 +95,7 @@ export const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: T
   const enableUserMsgMarkdown = useRecoilValue(store.enableUserMsgMarkdown);
   const collapseLongUserMessages = useRecoilValue(store.collapseLongUserMessages);
   const smoothStreaming = useSmoothStreaming();
+  const displayText = isCreatedByUser ? unwrapLegacyUIPromptText(text, { message }) : text;
 
   // The word fade itself indicates streaming, so the trailing block cursor
   // only shows when the fade is unavailable (setting off or reduced motion).
@@ -105,13 +106,13 @@ export const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: T
 
   const content = useMemo(() => {
     if (!isCreatedByUser) {
-      return <Markdown content={text} isLatestMessage={isLatestMessage} />;
+      return <Markdown content={displayText} isLatestMessage={isLatestMessage} />;
     }
     if (enableUserMsgMarkdown) {
-      return <MarkdownLite content={text} />;
+      return <MarkdownLite content={displayText} />;
     }
-    return <>{text}</>;
-  }, [isCreatedByUser, enableUserMsgMarkdown, text, isLatestMessage]);
+    return <>{displayText}</>;
+  }, [isCreatedByUser, enableUserMsgMarkdown, displayText, isLatestMessage]);
 
   return (
     <Container message={message}>
@@ -120,7 +121,7 @@ export const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: T
           className={cn(
             'markdown prose message-content dark:prose-invert light w-full break-words',
             isSubmitting && 'submitting',
-            showCursorState && text.length > 0 && 'result-streaming',
+            showCursorState && displayText.length > 0 && 'result-streaming',
             isCreatedByUser && !enableUserMsgMarkdown && 'whitespace-pre-wrap',
             'text-text-primary',
           )}

@@ -258,6 +258,37 @@ describe('formatToolContent', () => {
   });
 
   describe('resource handling', () => {
+    it('persists the authenticated tool server instead of a resource claimed server', () => {
+      const claimedResource = {
+        uri: 'ui://zyb_studio/selection/img_demo123',
+        mimeType: 'text/html',
+        text: '<p>selection</p>',
+        serverName: 'zyb_studio',
+        verifiedServerName: 'zyb_studio',
+      };
+      const result: t.MCPToolCallResponse = {
+        content: [
+          {
+            type: 'resource',
+            resource: claimedResource,
+          },
+        ],
+      };
+      const [, untrusted] = formatToolContent(result, 'openai', {
+        serverName: 'untrusted_mcp_zyb_studio',
+        mcpApps: ENABLED_MCP_APPS_POLICY,
+      });
+      const [, missing] = formatToolContent(result, 'openai', {
+        mcpApps: ENABLED_MCP_APPS_POLICY,
+      });
+      expect(untrusted?.ui_resources?.data?.[0]).toMatchObject({
+        serverName: 'untrusted_mcp_zyb_studio',
+        verifiedServerName: 'untrusted_mcp_zyb_studio',
+      });
+      expect(missing?.ui_resources?.data?.[0]?.serverName).toBeUndefined();
+      expect(missing?.ui_resources?.data?.[0]?.verifiedServerName).toBeUndefined();
+    });
+
     it('should handle UI resources in artifacts', () => {
       const result: t.MCPToolCallResponse = {
         content: [
@@ -423,7 +454,8 @@ describe('formatToolContent', () => {
       const uiResourceArtifact = artifacts?.ui_resources?.data?.[0];
       expect(content).toContain('UI Resource Marker:');
       expect(uiResourceArtifact).toMatchObject({ uri: 'ui://static' });
-      expect(uiResourceArtifact?.serverName).toBeUndefined();
+      expect(uiResourceArtifact?.serverName).toBe('srv');
+      expect(uiResourceArtifact?.verifiedServerName).toBe('srv');
       expect(uiResourceArtifact?.toolName).toBeUndefined();
       expect(uiResourceArtifact?.structuredContent).toBeUndefined();
       expect(uiResourceArtifact?.resultMeta).toBeUndefined();
@@ -1474,7 +1506,8 @@ describe('formatToolContent', () => {
 
       const resource = artifacts?.ui_resources?.data?.[0];
       expect(resource).toMatchObject({ uri: 'ui://s/doc', mimeType: 'text/html' });
-      expect(resource?.serverName).toBeUndefined();
+      expect(resource?.serverName).toBe('s');
+      expect(resource?.verifiedServerName).toBe('s');
       expect(resource?.toolName).toBeUndefined();
       expect(resource?.content).toBeUndefined();
     });
@@ -1621,7 +1654,8 @@ describe('formatToolContent', () => {
       expect(data).toHaveLength(2);
       const chart = data.find((resource) => resource.uri === 'ui://chart');
       expect(chart).toMatchObject({ mimeType: 'text/html' });
-      expect(chart?.serverName).toBeUndefined();
+      expect(chart?.serverName).toBe('srv');
+      expect(chart?.verifiedServerName).toBe('srv');
       expect(chart?.toolName).toBeUndefined();
       expect(data.some((resource) => resource.uri === 'ui://app')).toBe(true);
     });

@@ -17,18 +17,26 @@ interface:
     create: false
     share: false
     placeholder: '请选择设计工具'
+  agents:
+    use: true
   customWelcome: '庄严宝刹 AI 设计助手'
   # 替换为中性中文页脚，隐藏默认 LibreChat 版本与标语
   customFooter: '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考'
 
-# 聊天附件上传配置，允许两个模型端点上传参考图片
+# 聊天附件上传与内置生图分辨率配置：
+# imageGeneration.percentage 设为 100 以保留 2K/4K 完整像素尺寸（如 2400×1792），防止默认 high 档位缩放到 768 短边；
+# 普通内置生图（gemini_image_gen）仅需完整像素分辨率与无损 PNG 重编码，无需额外保存字节级一致的原始响应流；
+# 局部重绘（edit_region）的像素级一致与透明通道保证由 Studio 原生 PNG 合成文件与原图归档承担。
 fileConfig:
+  serverFileSizeLimit: 128
+  imageGeneration:
+    percentage: 100
   endpoints:
     google: &image-files
       disabled: false
       fileLimit: 10
-      fileSizeLimit: 25
-      totalSizeLimit: 100
+      fileSizeLimit: 128
+      totalSizeLimit: 256
       supportedMimeTypes:
         - '^image/(jpeg|jpg|png|webp|gif)$'
     OpenRouter: *image-files
@@ -102,7 +110,7 @@ endpoints:
       - tools
       - context
 
-# 模型预设规范：对外隐藏底层模型与厂商名称，仅挂载概念设计 MCP 服务
+# 模型预设规范：对外隐藏底层模型与厂商名称，通过持久化智能体（preset.agent_id）挂载内置生图工具与概念设计专精 MCP 服务
 modelSpecs:
   enforce: true
   prioritize: true
@@ -114,10 +122,9 @@ modelSpecs:
       default: true
       # 隐藏输入框下方的可移除工具标签栏，防止设计师误删概念设计工具
       hideBadgeRow: true
-      mcpServers:
-        - zyb_studio
       preset:
-        endpoint: google
+        endpoint: agents
+        agent_id: agent___STUDIO_AGENT_ID_MAIN__
         model: gemini-4-argon
         iconURL: /assets/zybc-seal.svg
         thinking: true
@@ -127,7 +134,7 @@ modelSpecs:
         maxContextTokens: 200000
         maxOutputTokens: 65536
         promptPrefix: &designPromptPrefix |-
-          你是庄严宝刹设计助手，专注佛堂、石材、家具与展位设计。出图或三维预览调工具：查图库用 search_library（kb_ 前缀 id 可传 base_id、image_id、references、reference_ids）；多方案用 design_concepts（传 reference_ids）；出图用 generate_image；改图用 edit_image（取 base_id，未知调 list_images）；对比石材用 compare_materials（传 base_id、target、materials）；三维用 create_3d_model（传 image_id、detail，返 job_id 调 check_3d_model，留视图标记并附下载链接）；references 含 id 与 use。保留石材原名；产物仅作视觉参考，非制造模型。禁提模型或厂商名。
+          庄严宝刹设计助手，专注佛堂石材家具展位。概念用中文提1-3方向（含定位构思材质工艺，缺尺寸造价写待确认；各方案须保留物体数量与空间位置关系，禁擅添宗教符号、编造文化身份、资料依据或可制造工艺，非施工图），调 gemini_image_gen（prompt、image_ids、aspectRatio、imageSize）出图改图：单品棚拍四分之三视角，空间按完整场景，禁文字水印；改图保持未改主体五官姿态光线不变；材质图仅取色泽纹理不取展架，prompt 石材写视觉特征或附图石材，中文留原名。专精：search_library（kb_ 传 base_id、image_id）；compare_materials（base_id、target、materials）；局部改先 select_region（image_id）再 edit_region（base_id、selection_id、instruction、references 含 id、use 或 job_id）；create_3d_model（image_id、detail）与 check_3d_model（job_id）。禁提模型厂商名。
     - name: zyb-design-fast
       label: 庄严设计助手 · 快速
       description: 快速响应的概念设计与图像改图助手
@@ -135,10 +142,9 @@ modelSpecs:
       default: false
       # 隐藏输入框下方的可移除工具标签栏，防止设计师误删概念设计工具
       hideBadgeRow: true
-      mcpServers:
-        - zyb_studio
       preset:
-        endpoint: OpenRouter
+        endpoint: agents
+        agent_id: agent___STUDIO_AGENT_ID_FAST__
         model: anthropic/claude-haiku-5.5
         iconURL: /assets/zybc-seal.svg
         # OpenRouter 公开模型接口：anthropic/claude-haiku-5.5 总窗口 1,000,000，最大补全输出 128,000；
@@ -159,14 +165,14 @@ mcpServers:
   zyb_studio:
     type: streamable-http
     url: http://studio:8000/mcp
-    title: 庄严宝刹设计工坊
+    title: 设计工具
     # 从聊天工具下拉菜单隐藏，仅通过 modelSpecs 自动挂载，防止被设计师手动取消勾选
     chatMenu: false
     # 内部令牌认证服务无需 OAuth，关闭启动与每请求 OAuth 探测以避免 403 噪音
     requiresOAuth: false
-    # 单次 design_concepts 规划最长 540s + 出图最长 240s = 780s，预留 120s 缓冲设为 900s（900,000ms）
+    # 覆盖三维模型轮询（最长 480s）与多石材并发对比生图（最长 240s），设为 900s（900,000ms）
     timeout: 900000
     headers:
-      X-LibreChat-User-ID: '{{LIBRECHAT_USER_ID}}'
-      X-LibreChat-Conversation-ID: '{{LIBRECHAT_BODY_CONVERSATIONID}}'
+      X-LibreChat-User-ID: '{{LIBRECHAT_STUDIO_PRINCIPAL}}'
+      X-LibreChat-Raw-User-ID: '{{LIBRECHAT_USER_ID}}'
       X-Studio-Token: '${STUDIO_SHARED_TOKEN}'

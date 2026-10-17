@@ -5,8 +5,16 @@ import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 # 默认密钥配置文件路径、规则数据目录与共享令牌64位十六进制正则
 DEFAULT_SETTINGS_PATH = Path("/run/secrets/studio.json")
@@ -32,13 +40,8 @@ class StoneMaterial(BaseModel):
 class StudioRules(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    reference_rules: str
     edit_rules: str
-    planner_rules: str
-    planner_system: str
-    render_prefix: str
     edit_prefix: str
-    no_reference_rules: str
     materials: list[StoneMaterial]
 
 
@@ -50,17 +53,23 @@ class StudioSettings(BaseModel):
     file_signing_key: str
     public_base_url: str = "https://dev.xuqian.io"
     file_token_ttl_seconds: int = Field(default=86400, ge=60, le=604800)
+    preview_token_ttl_seconds: int = Field(default=604800, ge=300, le=2592000)
+    editor_token_ttl_seconds: int = Field(default=900, ge=60, le=900)
+    editor_capability_max_lifetime_seconds: int = Field(default=86400, ge=900, le=604800)
+    image_provider: Literal["gemini", "seedream"] = "gemini"
+    gemini_image_model: str = "gemini-nano-banana-2.1"
+    enable_3d: bool = False
     gemini_api_key: str
-    ark_api_key: str
+    ark_api_key: str = ""
     seedream_model: str = "doubao-seedream-5-0-pro-260628"
     seed3d_model: str = "doubao-seed3d-2-0-260328"
-    planner_model: str = "gemini-4-argon"
-    planner_thinking_level: str = "HIGH"
     max_parallel_per_user: int = Field(default=3, ge=1, le=10)
     global_max_parallel: int = Field(default=12, ge=1, le=64)
+    comparison_preview_max_bytes: int = Field(default=48 * 1024, ge=16 * 1024, le=48 * 1024)
+    segment_max_pending_requests: int = Field(default=2, ge=1, le=32)
+    segment_request_timeout_seconds: float = Field(default=90.0, gt=0.0, le=300.0)
     seed3d_max_parallel: int = Field(default=5, ge=1, le=32)
     seedream_timeout_seconds: int = Field(default=240, ge=5, le=600)
-    planner_timeout_seconds: int = Field(default=540, ge=5, le=600)
     seed3d_poll_timeout_seconds: float = Field(default=480.0, gt=0.0, le=600.0)
     seed3d_poll_initial_seconds: float = Field(default=2.0, gt=0.0, le=60.0)
     seed3d_poll_max_interval_seconds: float = Field(default=15.0, gt=0.0, le=60.0)
@@ -95,8 +104,8 @@ class StudioSettings(BaseModel):
             raise ValueError("public_base_url must be a valid http(s) base URL")
         return cleaned
 
-    # 校验API密钥不包含空白字符且非空
-    @field_validator("gemini_api_key", "ark_api_key")
+    # 校验必填API密钥不包含空白字符且非空
+    @field_validator("gemini_api_key")
     @classmethod
     def _validate_secret(cls, value: str) -> str:
         cleaned = value.strip()
@@ -105,6 +114,30 @@ class StudioSettings(BaseModel):
                 "Secret configuration value must be a non-empty string without whitespace"
             )
         return cleaned
+
+    # 校验可选ARK密钥：为空时允许缺省，非空时禁止包含空白字符
+    @field_validator("ark_api_key")
+    @classmethod
+    def _validate_optional_ark_secret(cls, value: str) -> str:
+        if value == "":
+            return ""
+        cleaned = value.strip()
+        if not cleaned or any(ch.isspace() for ch in cleaned):
+            raise ValueError(
+                "Secret configuration value must be a non-empty string without whitespace"
+            )
+        return cleaned
+
+    # 当启用seedream生图或enable_3d时要求提供有效的ark_api_key
+    @model_validator(mode="after")
+    def _validate_provider_requirements(self) -> "StudioSettings":
+        if (
+            self.image_provider == "seedream" or self.enable_3d
+        ) and not self.ark_api_key:
+            raise ValueError(
+                "ark_api_key is required when image_provider is 'seedream' or enable_3d is true"
+            )
+        return self
 
 
 # 从受保护的JSON文件加载工作台运行配置
@@ -137,20 +170,12 @@ def load_rules(rules_dir: str | Path = RULES_DIR) -> StudioRules:
         raise ValueError("Rules directory is invalid")
     image_cfg = json.loads((base / "studio-image.json").read_text(encoding="utf-8"))
     runtime_cfg = json.loads((base / "studio-runtime.json").read_text(encoding="utf-8"))
-    policy_cfg = json.loads(
-        (base / "studio-creation-policy.json").read_text(encoding="utf-8")
-    )
     materials_cfg = json.loads(
         (base / "studio-materials.json").read_text(encoding="utf-8")
     )
     return StudioRules(
-        reference_rules=image_cfg["reference_rules"],
         edit_rules=image_cfg["edit_rules"],
-        planner_rules=runtime_cfg["planner_rules"],
-        planner_system=runtime_cfg["planner_system"],
-        render_prefix=runtime_cfg["render_prefix"],
         edit_prefix=runtime_cfg["edit_prefix"],
-        no_reference_rules=policy_cfg["no_reference_rules"],
         materials=[StoneMaterial.model_validate(item) for item in materials_cfg],
     )
 

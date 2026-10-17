@@ -31,6 +31,57 @@ export const TOOL_FRIENDLY_NAME_KEYS: Record<string, TranslationKeys> = {
   read_file: 'com_ui_tool_name_read_file',
 };
 
+/** Built-in MCP server id → translation key for a user-readable server name. */
+export const MCP_SERVER_FRIENDLY_NAME_KEYS: Record<string, TranslationKeys> = {
+  zyb_studio: 'com_ui_mcp_server_zyb_studio',
+};
+
+/** Studio MCP tool id → translation key for a user-readable action name. */
+export const MCP_TOOL_FRIENDLY_NAME_KEYS: Record<string, TranslationKeys> = {
+  search_library: 'com_ui_tool_name_search_library',
+  compare_materials: 'com_ui_tool_name_compare_materials',
+  select_region: 'com_ui_tool_name_select_region',
+  edit_region: 'com_ui_tool_name_edit_region',
+  recover_region_edit: 'com_ui_tool_name_recover_region_edit',
+  finish_region_edit: 'com_ui_tool_name_recover_region_edit',
+  create_3d_model: 'com_ui_tool_name_create_3d_model',
+  check_3d_model: 'com_ui_tool_name_check_3d_model',
+};
+
+/** MCP server id → tool id → translation key so server-specific tool labels never bleed across servers. */
+export const MCP_SERVER_TOOL_FRIENDLY_NAME_KEYS: Record<string, Record<string, TranslationKeys>> = {
+  zyb_studio: MCP_TOOL_FRIENDLY_NAME_KEYS,
+};
+
+export function getMCPServerDisplayLabel(
+  serverName: string | undefined,
+  localize: (key: TranslationKeys) => string,
+): string {
+  if (!serverName) {
+    return '';
+  }
+  const key = MCP_SERVER_FRIENDLY_NAME_KEYS[serverName];
+  return key ? localize(key) : serverName;
+}
+
+export function getMCPToolDisplayLabel(
+  toolName: string | undefined,
+  localize: (key: TranslationKeys) => string,
+  serverName?: string,
+): string {
+  if (!toolName) {
+    return '';
+  }
+  if (serverName && (toolName === serverName || toolName === 'oauth')) {
+    return getMCPServerDisplayLabel(serverName, localize);
+  }
+  if (!serverName && MCP_SERVER_FRIENDLY_NAME_KEYS[toolName]) {
+    return getMCPServerDisplayLabel(toolName, localize);
+  }
+  const key = serverName ? MCP_SERVER_TOOL_FRIENDLY_NAME_KEYS[serverName]?.[toolName] : undefined;
+  return key ? localize(key) : toolName;
+}
+
 export interface ParsedToolName {
   /** Original tool id (unchanged). */
   raw: string;
@@ -41,8 +92,7 @@ export interface ParsedToolName {
    *  code-style badge next to the server name. */
   toolName: string;
   /** Translation key for a user-friendly display name, when the raw
-   *  name matches a built-in native tool (web_search, execute_code, …).
-   *  Absent for MCP tools and unknown names. */
+   *  name matches a built-in native tool or a localized MCP server tool. */
   friendlyKey?: TranslationKeys;
 }
 
@@ -59,7 +109,18 @@ export function parseToolName(
 ): ParsedToolName {
   if (rawName.includes(Constants.mcp_delimiter)) {
     const [toolName, mcpServer = ''] = splitToolCallName(rawName, knownServerNames);
-    return { raw: rawName, mcpServer, toolName };
+    let friendlyKey: TranslationKeys | undefined;
+    if (mcpServer && (toolName === 'oauth' || toolName === mcpServer)) {
+      friendlyKey = MCP_SERVER_FRIENDLY_NAME_KEYS[mcpServer];
+    } else if (mcpServer) {
+      friendlyKey = MCP_SERVER_TOOL_FRIENDLY_NAME_KEYS[mcpServer]?.[toolName];
+    }
+    return {
+      raw: rawName,
+      mcpServer,
+      toolName,
+      ...(friendlyKey ? { friendlyKey } : {}),
+    };
   }
   const friendlyKey = TOOL_FRIENDLY_NAME_KEYS[rawName];
   return {
@@ -75,7 +136,7 @@ export function parseToolName(
  * use `parseToolName` directly when you need structured parts (e.g. to
  * render a code-style badge for the tool name next to the server).
  *
- *   - MCP tool  → server name (keeps the header summary short)
+ *   - MCP tool  → localized friendly server name (or raw server name)
  *   - Native   → localized friendly name from {@link TOOL_FRIENDLY_NAME_KEYS}
  *   - Unknown  → raw name
  */
@@ -85,7 +146,7 @@ export function getToolDisplayLabel(
   knownServerNames?: readonly string[],
 ): string {
   const parsed = parseToolName(rawName, knownServerNames);
-  if (parsed.mcpServer) return parsed.mcpServer;
+  if (parsed.mcpServer) return getMCPServerDisplayLabel(parsed.mcpServer, localize);
   if (parsed.friendlyKey) return localize(parsed.friendlyKey);
   return parsed.toolName;
 }

@@ -23,16 +23,21 @@ UUID_RE = re.compile(
 LIBRECHAT_FILE_RE = re.compile(
     r"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(__|-)(.+)$"
 )
-# LibreChat持久化MCP工具输出图片的文件名格式：<file_id>-<toolName>_img_<nanoid>.<ext>
-# 其中MCP工具的toolName为 <upstreamToolName>_mcp_<normalizedServerName>
+# LibreChat持久化内置生图与MCP工具输出图片的文件名格式：<file_id>-<toolName>_img_<nanoid>.<ext>
+# 其中MCP工具的toolName为 <upstreamToolName>_mcp_<normalizedServerName>，内置工具为 gemini_image_gen
 MCP_DELIMITER = "_mcp_"
 STUDIO_MCP_SERVER_NAME = "zyb_studio"
 IMAGE_PRODUCING_TOOLS: frozenset[str] = frozenset(
     {
+        "gemini_image_gen",
+        "edit_region",
+        "finish_region_edit",
+        "compare_materials",
+        "studio_ref",
+        # 保留已下线旧产图工具名称，确保历史已保存的 LibreChat File UUID 仍能正常解析读取
         "generate_image",
         "edit_image",
         "design_concepts",
-        "compare_materials",
     }
 )
 LIBRECHAT_TOOL_OUTPUT_RE = re.compile(r"^([A-Za-z0-9_.-]+?)_img_([A-Za-z0-9_-]+)$")
@@ -71,21 +76,6 @@ class ResolvedImage:
                 "verify quality and rights before use."
             )
         return None
-
-    # 转换为对外的无敏感信息字典结构
-    def to_public_dict(self) -> dict[str, Any]:
-        payload: dict[str, Any] = {
-            "id": self.id,
-            "kind": self.kind,
-            "created": self.created,
-            "width": self.width,
-            "height": self.height,
-            "size": f"{self.width}x{self.height}",
-        }
-        if self.state != "saved" or self.warning:
-            payload["state"] = self.state
-            payload["warning"] = True
-        return payload
 
 
 # 校验并返回合法的24位十六进制LibreChat用户编号
@@ -149,7 +139,7 @@ def ensure_safe_subpath(path: Path, root: Path) -> Path:
 
 # 使用O_NOFOLLOW安全读取文件字节
 def read_bytes_no_follow(
-    path: Path, root: Path, max_bytes: int = 64 * 1024 * 1024
+    path: Path, root: Path, max_bytes: int = 128 * 1024 * 1024
 ) -> bytes:
     ensure_safe_subpath(path, root)
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
@@ -180,6 +170,12 @@ def _format_mtime_ns(mtime_ns: int) -> str:
 # 获取用户在LibreChat图片卷中的专属目录
 def user_librechat_images_dir(settings: StudioSettings, user_id: str) -> Path:
     uid = validate_user_id(user_id)
+    owner_file = user_studio_dir(settings, uid, create=False) / "owner.json"
+    if owner_file.exists() or owner_file.is_symlink():
+        if owner_file.is_symlink() or not owner_file.is_file():
+            raise ValueError("Invalid Studio owner record")
+        owner = json.loads(owner_file.read_text(encoding="utf-8"))
+        uid = validate_user_id(owner.get("raw_user_id"))
     base = Path(settings.librechat_images_dir)
     if base.is_symlink():
         raise ValueError("LibreChat images root must not be a symlink")
@@ -206,6 +202,43 @@ def user_studio_dir(
     if create:
         user_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
     return user_dir
+
+
+# 将租户隔离后的工作台身份绑定到原始用户编号，以便签名预览仍能读取该用户的 LibreChat 上传文件
+def bind_studio_principal(
+    settings: StudioSettings, principal_id: str, raw_user_id: str
+) -> None:
+    principal = validate_user_id(principal_id)
+    raw_user = validate_user_id(raw_user_id)
+    if principal == raw_user:
+        return
+    user_dir = user_studio_dir(settings, principal, create=True)
+    owner_file = user_dir / "owner.json"
+    if owner_file.is_symlink():
+        raise ValueError("Invalid Studio owner record")
+    if not owner_file.exists():
+        if any(not entry.name.startswith(".owner-") for entry in user_dir.iterdir()):
+            raise ValueError("Unowned Studio directory cannot be adopted")
+        temporary_file = user_dir / f".owner-{uuid.uuid4().hex}"
+        try:
+            fd = os.open(
+                temporary_file,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
+                0o600,
+            )
+            with os.fdopen(fd, "w", encoding="utf-8") as stream:
+                json.dump({"raw_user_id": raw_user}, stream)
+            try:
+                os.link(temporary_file, owner_file, follow_symlinks=False)
+            except FileExistsError:
+                pass
+        finally:
+            temporary_file.unlink(missing_ok=True)
+    if owner_file.is_symlink() or not owner_file.is_file():
+        raise ValueError("Invalid Studio owner record")
+    owner = json.loads(owner_file.read_text(encoding="utf-8"))
+    if owner.get("raw_user_id") != raw_user:
+        raise ValueError("Studio principal belongs to another user")
 
 
 # 为单次生图分配唯一编号与专属目录
@@ -527,19 +560,18 @@ def reconcile_pending_receipts(settings: StudioSettings) -> int:
     return reconciled_count
 
 
-# 扫描用户目录中的全部可用图像记录（仅计入上传图与四类产图工具输出，可选包含uncertain状态任务）
+# 扫描用户目录中的全部可用图像记录（仅计入上传图与产图工具输出）
 def _collect_user_images(
     settings: StudioSettings,
     user_id: str,
     *,
-    include_uncertain: bool = False,
     kb_index: KnowledgeBaseIndex | None = None,
 ) -> list[ResolvedImage]:
     del kb_index
     uid = validate_user_id(user_id)
     results: list[ResolvedImage] = []
 
-    # 扫描LibreChat挂载目录中的上传图与四类产图工具输出（排除search_library、3D工具及其他工具输出）
+    # 扫描LibreChat挂载目录中的上传图与产图工具输出（排除search_library、3D工具及其他工具输出）
     lc_dir = user_librechat_images_dir(settings, uid)
     if lc_dir.is_dir() and not lc_dir.is_symlink():
         for entry in lc_dir.iterdir():
@@ -571,7 +603,7 @@ def _collect_user_images(
                 )
             )
 
-    # 扫描工作台数据目录中的已保存原图与可选uncertain任务
+    # 扫描工作台数据目录中的已保存原图
     studio_dir = user_studio_dir(settings, uid, create=False)
     jobs_dir = studio_dir / "jobs"
     if jobs_dir.is_dir() and not jobs_dir.is_symlink():
@@ -614,28 +646,6 @@ def _collect_user_images(
                             mtime_ns=stat_info.st_mtime_ns,
                             width=width,
                             height=height,
-                        )
-                    )
-                elif include_uncertain and state == "uncertain":
-                    stat_info = receipt_file.stat(follow_symlinks=False)
-                    width = int(receipt_data.get("width") or 0)
-                    height = int(receipt_data.get("height") or 0)
-                    req_size = receipt_data.get("requested_size")
-                    if (width <= 0 or height <= 0) and isinstance(req_size, str):
-                        parts = req_size.split("x")
-                        if len(parts) == 2 and all(p.isdigit() for p in parts):
-                            width, height = int(parts[0]), int(parts[1])
-                    results.append(
-                        ResolvedImage(
-                            id=job_dir.name,
-                            kind="studio",
-                            path=receipt_file.resolve(strict=True),
-                            created=_format_mtime_ns(stat_info.st_mtime_ns),
-                            mtime_ns=stat_info.st_mtime_ns,
-                            width=width,
-                            height=height,
-                            state="uncertain",
-                            warning=True,
                         )
                     )
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
@@ -770,6 +780,17 @@ def resolve_image(
                         else:
                             saw_unmapped_preview = True
                         continue
+                    explicit_studio_img = re.search(
+                        r"img_([0-9a-f]{32})", rest, re.IGNORECASE
+                    )
+                    if explicit_studio_img is not None:
+                        canonical_img_id = f"img_{explicit_studio_img.group(1).lower()}"
+                        try:
+                            return resolve_image(
+                                settings, uid, canonical_img_id, kb_index=kb_index
+                            )
+                        except ValueError:
+                            pass
                     if tool_name not in IMAGE_PRODUCING_TOOLS:
                         continue
                 width, height = _read_image_dimensions(entry, lc_dir)
@@ -798,19 +819,3 @@ def resolve_image(
                 return matches[0]
 
     raise ValueError(f"Image not found for current user: {cleaned_id}")
-
-
-# 按时间倒序返回当前用户的最近图片列表（含uncertain状态警告项）
-def list_user_images(
-    settings: StudioSettings,
-    user_id: str,
-    limit: int = 20,
-    *,
-    kb_index: KnowledgeBaseIndex | None = None,
-) -> list[dict[str, Any]]:
-    if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 50:
-        raise ValueError("limit must be an integer between 1 and 50")
-    images = _collect_user_images(
-        settings, user_id, include_uncertain=True, kb_index=kb_index
-    )
-    return [item.to_public_dict() for item in images[:limit]]

@@ -1,8 +1,10 @@
 import asyncio
 import base64
 import contextlib
+import hashlib
 import hmac
 import json
+import logging
 from collections.abc import AsyncIterator
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -27,6 +29,13 @@ from .config import (
     load_rules,
     load_settings,
 )
+from .comparisons import (
+    comparison_guard,
+    comparison_job_dir,
+    comparison_job_id,
+    comparison_key,
+    saved_comparison_result,
+)
 from .images import (
     MAX_EDIT_REFERENCES,
     MAX_REFERENCES,
@@ -34,11 +43,10 @@ from .images import (
     REFERENCE_USES,
     GenerationUncertain,
     build_edit_prompt,
-    build_generate_prompt,
-    build_stone_replacements,
+    build_local_edit_prompt,
     comparison_target,
     encode_display_image,
-    generate_seedream,
+    generate_image_with_provider,
     neutralize_stone_names,
     normalize_reference,
     normalize_reference_with_size,
@@ -51,17 +59,38 @@ from .models3d import (
     ModelJobManager,
     build_model_viewer_html,
     build_signed_file_url,
+    format_model_content_disposition,
+    format_model_download_markdown,
     format_utc_timestamp,
     load_saved_model_bytes,
     parse_byte_range,
     sign_file_token,
     verify_file_token,
 )
-from .planner import plan_concepts
+from .regions import (
+    EditorTokenReplayError,
+    OnnxSamSegmenter,
+    build_compare_viewer_html,
+    build_selection_editor_html,
+    finish_region_edit,
+    is_editor_nonce_consumed,
+    is_editor_token,
+    is_image_token,
+    load_confirmed_selection,
+    local_context,
+    object_placement,
+    save_confirmed_selection,
+    sign_editor_token,
+    sign_image_token,
+    verify_editor_token,
+    verify_image_token,
+)
+from .segment_worker import SegmentationUnavailable, SupervisedSegmenter
 from .store import (
     ResolvedImage,
     allocate_studio_job,
-    list_user_images,
+    bind_studio_principal,
+    ensure_safe_subpath,
     normalize_conversation_id,
     read_bytes_no_follow,
     reconcile_pending_receipts,
@@ -71,6 +100,8 @@ from .store import (
     user_studio_dir,
     validate_user_id,
 )
+
+_LOG = logging.getLogger(__name__)
 
 
 # 单次MCP请求的认证上下文
@@ -86,7 +117,7 @@ _request_ctx_var: ContextVar[RequestContext | None] = ContextVar(
 )
 
 
-# 六个固定MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
+# 专精业务MCP工具的扁平JSON Schema定义（不含$ref、oneOf、anyOf、prefixItems）
 REFERENCE_ITEM_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -109,86 +140,22 @@ REFERENCE_ITEM_SCHEMA: dict[str, Any] = {
 
 STUDIO_TOOLS: list[types.Tool] = [
     types.Tool(
-        name="design_concepts",
-        description="根据设计需求规划多个差异化中文概念方案，并可并发生成各方案的概念效果图。",
+        name="select_region",
+        description="打开内联局部选区编辑器，支持框选、多边形套索、画笔涂抹加减选（及离线点选分割就绪时的点选识别），确认选区后生成绑定的选区编号（selection_id）。",
         inputSchema={
             "type": "object",
             "properties": {
-                "brief": {
+                "image_id": {
                     "type": "string",
-                    "description": "设计需求与背景描述",
-                },
-                "count": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 3,
-                    "default": 3,
-                    "description": "概念方案数量（1-3）",
-                },
-                "with_images": {
-                    "type": "boolean",
-                    "default": True,
-                    "description": "是否同时为每个方案生成概念效果图",
-                },
-                "aspect": {
-                    "type": "string",
-                    "enum": ["1:1", "4:3", "3:4", "16:9", "9:16"],
-                    "default": "4:3",
-                    "description": "画面比例",
-                },
-                "size": {
-                    "type": "string",
-                    "enum": ["1K", "2K"],
-                    "default": "2K",
-                    "description": "输出尺寸档位",
-                },
-                "reference_ids": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "maxItems": 10,
-                    "default": [],
-                    "description": "参考图片编号列表（支持 file_id、img_<hex>、kb_<id> 或 @latest，最多10张）",
+                    "description": "待框选局部区域的底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
                 },
             },
-            "required": ["brief"],
+            "required": ["image_id"],
         },
     ),
     types.Tool(
-        name="generate_image",
-        description="根据设计描述与可选参考图片生成单张概念效果图。",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "prompt": {
-                    "type": "string",
-                    "description": "画面设计描述",
-                },
-                "aspect": {
-                    "type": "string",
-                    "enum": ["1:1", "4:3", "3:4", "16:9", "9:16"],
-                    "default": "4:3",
-                    "description": "画面比例",
-                },
-                "size": {
-                    "type": "string",
-                    "enum": ["1K", "2K"],
-                    "default": "2K",
-                    "description": "输出尺寸档位",
-                },
-                "references": {
-                    "type": "array",
-                    "items": REFERENCE_ITEM_SCHEMA,
-                    "maxItems": 10,
-                    "default": [],
-                    "description": "参考图片列表（最多10张）",
-                },
-            },
-            "required": ["prompt"],
-        },
-    ),
-    types.Tool(
-        name="edit_image",
-        description="以选定图片为底图并保持底图比例进行整图修改，可附带最多9张补充参考图片。",
+        name="edit_region",
+        description="基于已确认的选区（selection_id）执行局部重绘并严格保证选区外每一像素字节与原图完全一致，返回前后对比预览与结果图；若传入可恢复任务的 job_id 则直接复用已保存的局部裁切图完成回贴而不重复计费。",
         inputSchema={
             "type": "object",
             "properties": {
@@ -196,9 +163,17 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "type": "string",
                     "description": "底图编号（file_id、img_<hex>、kb_<id> 或 @latest）",
                 },
+                "selection_id": {
+                    "type": "string",
+                    "description": "已确认的选区编号（sel_<hex> 或 @latest）",
+                },
                 "instruction": {
                     "type": "string",
-                    "description": "修改说明",
+                    "description": "局部修改说明（如需将参考图物件原样放入选区可注明“原样贴入”）",
+                },
+                "job_id": {
+                    "type": "string",
+                    "description": "可选：已保存局部裁切图的可恢复任务编号（img_<hex>），传入后直接完成本地回贴而不再次发起计费调用",
                 },
                 "references": {
                     "type": "array",
@@ -211,24 +186,7 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "type": "string",
                     "enum": ["1K", "2K"],
                     "default": "2K",
-                    "description": "输出尺寸档位",
-                },
-            },
-            "required": ["base_id", "instruction"],
-        },
-    ),
-    types.Tool(
-        name="list_images",
-        description="按时间倒序列出当前用户最近上传和生成的图片。",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 50,
-                    "default": 20,
-                    "description": "返回的最大图片数量（1-50）",
+                    "description": "局部裁切重绘尺寸档位",
                 },
             },
             "required": [],
@@ -296,6 +254,10 @@ STUDIO_TOOLS: list[types.Tool] = [
                     "maxItems": 3,
                     "description": "要对比的石材名称或别名列表（1-3款）",
                 },
+                "idempotency_key": {
+                    "type": "string",
+                    "description": "仅在明确要求对相同底图、部位和石材重新生成一组结果时填写新的请求编号；普通调用和重试请省略",
+                },
             },
             "required": ["base_id", "target", "materials"],
         },
@@ -341,6 +303,9 @@ STUDIO_TOOLS: list[types.Tool] = [
 ]
 
 
+# 默认暂停对外提供的三维模型生成工具名称集合（仅当enable_3d开启时启用）
+THREE_D_TOOL_NAMES: frozenset[str] = frozenset({"create_3d_model", "check_3d_model"})
+
 # 汇总显式传入的带标记知识库资产警告信息（按编号去重）
 def _collect_flag_warnings(items: list[ResolvedImage]) -> list[str]:
     warnings: list[str] = []
@@ -370,7 +335,7 @@ def _get_active_context(mcp_server: Server) -> RequestContext:
     return ctx
 
 
-# 构建并绑定MCP底层Server与八个设计工具处理器
+# 构建并绑定MCP底层Server与设计工具处理器
 def build_mcp_server(
     settings: StudioSettings,
     rules: StudioRules,
@@ -378,6 +343,7 @@ def build_mcp_server(
     *,
     kb_index: KnowledgeBaseIndex | None = None,
     model_manager: ModelJobManager | None = None,
+    segmenter: OnnxSamSegmenter | SupervisedSegmenter | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Server:
@@ -397,11 +363,14 @@ def build_mcp_server(
         limiter,
         ark_transport=ark_transport,
     )
+    active_segmenter = segmenter if segmenter is not None else SupervisedSegmenter()
 
-    # 注册tools/list处理器，返回固定扁平Schema的工具列表
+    # 注册tools/list处理器，返回固定扁平Schema的工具列表（默认隐藏3D工具，仅当enable_3d开启时提供）
     @mcp_server.list_tools()
     async def handle_list_tools() -> list[types.Tool]:
-        return STUDIO_TOOLS
+        if settings.enable_3d:
+            return STUDIO_TOOLS
+        return [tool for tool in STUDIO_TOOLS if tool.name not in THREE_D_TOOL_NAMES]
 
     # 组装三维模型生成完成或进行中的MCP返回结构（含JSON摘要、Three.js UI资源与源图像）
     def _format_3d_model_tool_result(
@@ -447,7 +416,7 @@ def build_mcp_server(
         token, exp_ts = sign_file_token(settings, user_id, model_id)
         signed_url = build_signed_file_url(settings, token)
         expires_at = format_utc_timestamp(exp_ts)
-        download_markdown = f"[下载 GLB 模型 ({model_id}.glb)]({signed_url})"
+        download_markdown = format_model_download_markdown(model_id, signed_url)
 
         summary_payload: dict[str, Any] = {
             "model_id": model_id,
@@ -527,28 +496,9 @@ def build_mcp_server(
                 kb_root,
             )
 
-            if name == "list_images":
-                limit = int(args.get("limit", 20))
-                images = list_user_images(
-                    settings, user_id, limit=limit, kb_index=active_kb
-                )
-                warnings = [
-                    f"Image job {item['id']} is in uncertain state (the request may have been billed)."
-                    for item in images
-                    if item.get("warning")
-                ]
-                payload = {
-                    "images": images,
-                    "count": len(images),
-                    "warnings": warnings,
-                }
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text", text=json.dumps(payload, ensure_ascii=False)
-                        )
-                    ],
-                    isError=False,
+            if name in THREE_D_TOOL_NAMES and not settings.enable_3d:
+                raise ValueError(
+                    f"Tool '{name}' is disabled because 3D model generation is on hold"
                 )
 
             if name == "search_library":
@@ -629,177 +579,6 @@ def build_mcp_server(
                     isError=False,
                 )
 
-            if name == "generate_image":
-                prompt = str(args.get("prompt") or "").strip()
-                if not prompt:
-                    raise ValueError("prompt must be a non-empty string")
-                aspect = str(args.get("aspect", "4:3"))
-                size = str(args.get("size", "2K"))
-                if size not in NATIVE or aspect not in NATIVE[size]:
-                    raise ValueError("Invalid size or aspect parameter")
-                raw_refs = args.get("references") or []
-                if not isinstance(raw_refs, list) or len(raw_refs) > MAX_REFERENCES:
-                    raise ValueError(f"At most {MAX_REFERENCES} references are allowed")
-
-                resolved_objs: list[ResolvedImage] = []
-                resolved_refs: list[dict[str, Any]] = []
-                for item in raw_refs:
-                    if not isinstance(item, dict):
-                        raise TypeError("Each reference must be an object")
-                    resolved = resolve_image(
-                        settings,
-                        user_id,
-                        str(item.get("id") or ""),
-                        kb_index=active_kb,
-                    )
-                    resolved_objs.append(resolved)
-                    resolved_refs.append(
-                        {
-                            "id": resolved.id,
-                            "path": resolved.path,
-                            "use": str(item.get("use") or "参考"),
-                            "note": str(item.get("note") or ""),
-                            "material_ids": resolved.material_ids,
-                        }
-                    )
-
-                full_prompt, unique_paths = build_generate_prompt(
-                    prompt, resolved_refs, active_rules
-                )
-                ref_uris = [normalize_reference(p, allowed_roots) for p in unique_paths]
-
-                async with limiter.acquire(user_id):
-                    img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_seedream(
-                        settings,
-                        full_prompt,
-                        ref_uris,
-                        size=size,
-                        aspect=aspect,
-                        destination=job_dir,
-                        transport=ark_transport,
-                    )
-
-                display_bytes, display_mime = encode_display_image(
-                    gen_result["raw_bytes"]
-                )
-                b64_display = base64.b64encode(display_bytes).decode("ascii")
-                summary = {
-                    "id": img_id,
-                    "kind": "studio",
-                    "width": gen_result["width"],
-                    "height": gen_result["height"],
-                    "size": f"{gen_result['width']}x{gen_result['height']}",
-                    "warnings": _collect_flag_warnings(resolved_objs),
-                }
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text", text=json.dumps(summary, ensure_ascii=False)
-                        ),
-                        types.ImageContent(
-                            type="image", data=b64_display, mimeType=display_mime
-                        ),
-                    ],
-                    isError=False,
-                )
-
-            if name == "edit_image":
-                base_id = str(args.get("base_id") or "").strip()
-                instruction = str(args.get("instruction") or "").strip()
-                if not base_id or not instruction:
-                    raise ValueError("base_id and instruction are required")
-                size = str(args.get("size", "2K"))
-                if size not in NATIVE:
-                    raise ValueError("Invalid size parameter")
-                raw_refs = args.get("references") or []
-                if (
-                    not isinstance(raw_refs, list)
-                    or len(raw_refs) > MAX_EDIT_REFERENCES
-                ):
-                    raise ValueError(
-                        f"At most {MAX_EDIT_REFERENCES} additional references are allowed"
-                    )
-
-                base_resolved = resolve_image(
-                    settings, user_id, base_id, kb_index=active_kb
-                )
-                base_uri, base_size = normalize_reference_with_size(
-                    base_resolved.path, allowed_roots
-                )
-
-                resolved_objs = [base_resolved]
-                resolved_refs = []
-                for item in raw_refs:
-                    if not isinstance(item, dict):
-                        raise TypeError("Each reference must be an object")
-                    resolved = resolve_image(
-                        settings,
-                        user_id,
-                        str(item.get("id") or ""),
-                        kb_index=active_kb,
-                    )
-                    resolved_objs.append(resolved)
-                    resolved_refs.append(
-                        {
-                            "id": resolved.id,
-                            "path": resolved.path,
-                            "use": str(item.get("use") or "参考"),
-                            "note": str(item.get("note") or ""),
-                            "material_ids": resolved.material_ids,
-                        }
-                    )
-
-                full_prompt, unique_paths = build_edit_prompt(
-                    instruction, resolved_refs, active_rules
-                )
-                extra_uris = [
-                    normalize_reference(p, allowed_roots) for p in unique_paths
-                ]
-                all_uris = [base_uri, *extra_uris]
-                if len(all_uris) > MAX_REFERENCES:
-                    raise ValueError(
-                        f"Total images including base exceed limit of {MAX_REFERENCES}"
-                    )
-
-                async with limiter.acquire(user_id):
-                    img_id, job_dir = allocate_studio_job(settings, user_id)
-                    gen_result = await generate_seedream(
-                        settings,
-                        full_prompt,
-                        all_uris,
-                        size=size,
-                        aspect="source",
-                        source_size=base_size,
-                        destination=job_dir,
-                        transport=ark_transport,
-                    )
-
-                display_bytes, display_mime = encode_display_image(
-                    gen_result["raw_bytes"]
-                )
-                b64_display = base64.b64encode(display_bytes).decode("ascii")
-                summary = {
-                    "id": img_id,
-                    "base_id": base_resolved.id,
-                    "kind": "studio",
-                    "width": gen_result["width"],
-                    "height": gen_result["height"],
-                    "size": f"{gen_result['width']}x{gen_result['height']}",
-                    "warnings": _collect_flag_warnings(resolved_objs),
-                }
-                return types.CallToolResult(
-                    content=[
-                        types.TextContent(
-                            type="text", text=json.dumps(summary, ensure_ascii=False)
-                        ),
-                        types.ImageContent(
-                            type="image", data=b64_display, mimeType=display_mime
-                        ),
-                    ],
-                    isError=False,
-                )
-
             if name == "compare_materials":
                 base_id = str(args.get("base_id") or "").strip()
                 if not base_id:
@@ -816,6 +595,10 @@ def build_mcp_server(
                 size = str(args.get("size", "2K"))
                 if size not in NATIVE:
                     raise ValueError("Invalid size parameter")
+
+                request_key = args.get("idempotency_key", "")
+                if not isinstance(request_key, str) or len(request_key) > 128:
+                    raise ValueError("idempotency_key must be a string of at most 128 characters")
 
                 # 先解析所有请求的石材名称/别名与无标记样图，拒绝自动选用带标记样图；若某石材无可用样图则报错
                 resolved_materials = []
@@ -847,6 +630,10 @@ def build_mcp_server(
                     resolved_materials.append(
                         (raw_mat_name.strip(), mat_obj, sample_images)
                     )
+                if len({mat_obj.id for _, mat_obj, _ in resolved_materials}) != len(
+                    resolved_materials
+                ):
+                    raise ValueError("materials must refer to distinct catalog materials")
 
                 base_resolved = resolve_image(
                     settings, user_id, base_id, kb_index=active_kb
@@ -855,6 +642,22 @@ def build_mcp_server(
                 base_uri, base_size = normalize_reference_with_size(
                     base_resolved.path, allowed_roots
                 )
+                base_sha256 = hashlib.sha256(base_resolved.path.read_bytes()).hexdigest()
+                variant_keys = [
+                    comparison_key(
+                        base_id=base_resolved.id,
+                        base_sha256=base_sha256,
+                        target=target,
+                        material_id=mat_obj.id,
+                        sample_fingerprints=[
+                            f"{sample.id}:{hashlib.sha256(sample.path.read_bytes()).hexdigest()}"
+                            for sample in sample_images
+                        ],
+                        size=size,
+                        request_key=request_key,
+                    )
+                    for _, mat_obj, sample_images in resolved_materials
+                ]
 
                 # 对target中可能出现的任何石材商业名称做中性化处理，再生成Mac标准替换说明
                 generic_stone_map = {
@@ -869,10 +672,13 @@ def build_mcp_server(
                 )
 
                 async def _render_material_variant(
-                    req_name: str,
+                    img_id: str,
                     mat_obj: Any,
                     sample_images: list[ResolvedImage],
                 ) -> tuple[dict[str, Any] | None, str | None, bool]:
+                    previous = saved_comparison_result(settings, user_id, img_id)
+                    if previous is not None:
+                        return previous
                     variant_refs = [
                         {
                             "id": sample_img.id,
@@ -893,8 +699,8 @@ def build_mcp_server(
                     all_uris = [base_uri, *sample_uris]
                     try:
                         async with limiter.acquire(user_id):
-                            img_id, job_dir = allocate_studio_job(settings, user_id)
-                            result = await generate_seedream(
+                            job_dir = comparison_job_dir(settings, user_id, img_id)
+                            result = await generate_image_with_provider(
                                 settings,
                                 full_prompt,
                                 all_uris,
@@ -902,7 +708,8 @@ def build_mcp_server(
                                 aspect="source",
                                 source_size=base_size,
                                 destination=job_dir,
-                                transport=ark_transport,
+                                ark_transport=ark_transport,
+                                gemini_transport=gemini_transport,
                             )
                         return {"id": img_id, **result}, None, False
                     except GenerationUncertain as exc:
@@ -910,12 +717,32 @@ def build_mcp_server(
                     except (ValueError, TypeError, RuntimeError, OSError) as exc:
                         return None, str(exc), False
 
-                rendered_variants = await asyncio.gather(
-                    *(
-                        _render_material_variant(req_name, mat_obj, sample_images)
-                        for req_name, mat_obj, sample_images in resolved_materials
-                    )
-                )
+                # 交叠批次按相同顺序加锁，重复材质共用一次生成结果。
+                async with contextlib.AsyncExitStack() as locks:
+                    for variant_key in sorted(set(variant_keys)):
+                        await locks.enter_async_context(
+                            comparison_guard(settings, user_id, variant_key)
+                        )
+                    unique_variants = {
+                        variant_key: (mat_obj, sample_images)
+                        for variant_key, (_, mat_obj, sample_images) in zip(
+                            variant_keys, resolved_materials
+                        )
+                    }
+                    async with asyncio.TaskGroup() as tasks:
+                        result_tasks = {
+                            variant_key: tasks.create_task(
+                                _render_material_variant(
+                                    comparison_job_id(variant_key), mat_obj, sample_images
+                                )
+                            )
+                            for variant_key, (mat_obj, sample_images) in unique_variants.items()
+                        }
+                    result_by_key = {
+                        variant_key: task.result()
+                        for variant_key, task in result_tasks.items()
+                    }
+                    rendered_variants = [result_by_key[key] for key in variant_keys]
 
                 variants_out: list[dict[str, Any]] = []
                 image_blocks: list[types.ImageContent] = []
@@ -943,7 +770,7 @@ def build_mcp_server(
                             f"{img_res['width']}x{img_res['height']}"
                         )
                         disp_bytes, disp_mime = encode_display_image(
-                            img_res["raw_bytes"]
+                            img_res["raw_bytes"], max_bytes=settings.comparison_preview_max_bytes
                         )
                         image_blocks.append(
                             types.ImageContent(
@@ -952,6 +779,7 @@ def build_mcp_server(
                                 mimeType=disp_mime,
                             )
                         )
+                        variant_entry["preview_image_index"] = len(image_blocks)
                     elif err_text:
                         variant_entry["error"] = err_text
                         if is_uncertain:
@@ -966,6 +794,8 @@ def build_mcp_server(
                     "variants": variants_out,
                     "comparisons": variants_out,
                     "count": len(image_blocks),
+                    "idempotency_key": request_key,
+                    "image_context": "Preview images follow the successful variants in order. Inspect each image before describing its colors or edited parts; the named material is not visual evidence.",
                     "warnings": warnings,
                 }
                 if any_uncertain:
@@ -982,161 +812,313 @@ def build_mcp_server(
                     isError=is_err,
                 )
 
-            if name == "design_concepts":
-                brief = str(args.get("brief") or "").strip()
-                if not brief:
-                    raise ValueError("brief must be a non-empty string")
-                count = int(args.get("count", 3))
-                with_images = bool(args.get("with_images", True))
-                aspect = str(args.get("aspect", "4:3"))
-                size = str(args.get("size", "2K"))
-                if size not in NATIVE or aspect not in NATIVE[size]:
-                    raise ValueError("Invalid size or aspect parameter")
-                raw_ref_ids = args.get("reference_ids") or []
-                if (
-                    not isinstance(raw_ref_ids, list)
-                    or len(raw_ref_ids) > MAX_REFERENCES
-                ):
-                    raise ValueError(
-                        f"At most {MAX_REFERENCES} reference_ids are allowed"
-                    )
-
-                resolved_ref_items = [
-                    resolve_image(settings, user_id, str(rid), kb_index=active_kb)
-                    for rid in raw_ref_ids
-                ]
-                unique_ref_paths: list[Any] = []
-                canonical_ref_ids: list[str] = []
-                for item in resolved_ref_items:
-                    canonical_ref_ids.append(item.id)
-                    if item.path not in unique_ref_paths:
-                        unique_ref_paths.append(item.path)
-                ref_uris = [
-                    normalize_reference(p, allowed_roots) for p in unique_ref_paths
-                ]
-
-                async with limiter.acquire(user_id):
-                    planned = await plan_concepts(
-                        settings,
-                        active_rules,
-                        brief=brief,
-                        count=count,
-                        reference_ids=canonical_ref_ids,
-                        reference_data_uris=ref_uris,
-                        transport=gemini_transport,
-                    )
-
-                concept_refs = [
-                    {
-                        "id": item.id,
-                        "path": item.path,
-                        "use": "参考",
-                        "note": item.path.stem,
-                        "material_ids": item.material_ids,
-                    }
-                    for item in resolved_ref_items
-                ]
-                stone_map = build_stone_replacements(
-                    active_rules, unique_ref_paths, concept_refs, has_base=False
+            if name == "select_region":
+                image_id = str(args.get("image_id") or "").strip()
+                if not image_id:
+                    raise ValueError("image_id is required")
+                resolved = resolve_image(
+                    settings, user_id, image_id, kb_index=active_kb
                 )
-
-                public_concepts: list[dict[str, Any]] = []
-                image_blocks = []
-                warnings = _collect_flag_warnings(resolved_ref_items)
-                render_errors: list[str] = []
-
-                if with_images:
-                    # 按每用户并发上限并发生成各概念方案的效果图，并附带原始brief作为硬性design_constraints
-                    clean_brief = neutralize_stone_names(brief, stone_map)
-                    constraints_line = json.dumps(
-                        {"design_constraints": clean_brief}, ensure_ascii=False
-                    )
-
-                    async def _render_concept(
-                        concept_item: dict[str, str],
-                    ) -> tuple[dict[str, Any] | None, str | None]:
-                        raw_img_prompt = neutralize_stone_names(
-                            concept_item["image_prompt"], stone_map
-                        )
-                        full_prompt = active_rules.render_prefix + raw_img_prompt
-                        if ref_uris:
-                            full_prompt = (
-                                f"{full_prompt}\n{active_rules.reference_rules}"
-                            )
-                        full_prompt = f"{full_prompt}\n{constraints_line}"
-                        try:
-                            async with limiter.acquire(user_id):
-                                img_id, job_dir = allocate_studio_job(settings, user_id)
-                                result = await generate_seedream(
-                                    settings,
-                                    full_prompt,
-                                    ref_uris,
-                                    size=size,
-                                    aspect=aspect,
-                                    destination=job_dir,
-                                    transport=ark_transport,
-                                )
-                            return {"id": img_id, **result}, None
-                        except (ValueError, TypeError, RuntimeError, OSError) as exc:
-                            return None, str(exc)
-
-                    rendered = await asyncio.gather(
-                        *(_render_concept(c) for c in planned)
-                    )
-                    for concept_item, (img_res, err_text) in zip(planned, rendered):
-                        entry: dict[str, Any] = {
-                            "title": concept_item["title"],
-                            "positioning": concept_item["positioning"],
-                            "description": concept_item["description"],
-                            "materials": concept_item["materials"],
-                            "key_details": concept_item["key_details"],
-                        }
-                        if img_res is not None:
-                            entry["image_id"] = img_res["id"]
-                            entry["width"] = img_res["width"]
-                            entry["height"] = img_res["height"]
-                            entry["size"] = f"{img_res['width']}x{img_res['height']}"
-                            disp_bytes, disp_mime = encode_display_image(
-                                img_res["raw_bytes"]
-                            )
-                            image_blocks.append(
-                                types.ImageContent(
-                                    type="image",
-                                    data=base64.b64encode(disp_bytes).decode("ascii"),
-                                    mimeType=disp_mime,
-                                )
-                            )
-                        elif err_text:
-                            render_errors.append(err_text)
-                            warnings.append(err_text)
-                        public_concepts.append(entry)
-                else:
-                    for concept_item in planned:
-                        public_concepts.append(
-                            {
-                                "title": concept_item["title"],
-                                "positioning": concept_item["positioning"],
-                                "description": concept_item["description"],
-                                "materials": concept_item["materials"],
-                                "key_details": concept_item["key_details"],
-                            }
-                        )
-
-                summary_payload = {
-                    "concepts": public_concepts,
-                    "count": len(public_concepts),
-                    "warnings": warnings,
+                base_sha256 = hashlib.sha256(resolved.path.read_bytes()).hexdigest()
+                preview_token, preview_exp_ts = sign_image_token(
+                    settings, user_id, resolved.id
+                )
+                preview_url = build_signed_file_url(settings, preview_token)
+                preview_expires_at = format_utc_timestamp(preview_exp_ts)
+                editor_token, exp_ts = sign_editor_token(
+                    settings, user_id, resolved.id, base_sha256
+                )
+                editor_url = build_signed_file_url(settings, editor_token)
+                expires_at = format_utc_timestamp(exp_ts)
+                seg_ready = active_segmenter.ready()
+                editor_html = build_selection_editor_html(
+                    image_id=resolved.id,
+                    signed_url=editor_url,
+                    expires_at=expires_at,
+                    preview_url=preview_url,
+                    preview_expires_at=preview_expires_at,
+                    width=resolved.width,
+                    height=resolved.height,
+                    segment_ready=seg_ready,
+                )
+                summary = {
+                    "image_id": resolved.id,
+                    "width": resolved.width,
+                    "height": resolved.height,
+                    "size": f"{resolved.width}x{resolved.height}",
+                    "segment_ready": seg_ready,
+                    "segmentation_mode": (
+                        "sam2_hiera_tiny" if seg_ready else "manual_tools_only"
+                    ),
+                    "preview_url": preview_url,
+                    "preview_expires_at": preview_expires_at,
+                    "expires_at": expires_at,
+                    "message": (
+                        "Inline selection editor is ready. Draw or refine the selection in the UI "
+                        "and click '确认选区' to generate a selection_id before calling edit_region."
+                    ),
+                    "warnings": _collect_flag_warnings([resolved]),
                 }
-                is_err = bool(with_images and not image_blocks and render_errors)
                 return types.CallToolResult(
                     content=[
                         types.TextContent(
                             type="text",
-                            text=json.dumps(summary_payload, ensure_ascii=False),
+                            text=json.dumps(summary, ensure_ascii=False),
                         ),
-                        *image_blocks,
+                        types.EmbeddedResource(
+                            type="resource",
+                            resource=types.TextResourceContents(
+                                uri=f"ui://zyb_studio/selection/{resolved.id}",
+                                mimeType="text/html",
+                                text=editor_html,
+                            ),
+                        ),
                     ],
-                    isError=is_err,
+                    isError=False,
+                )
+
+            if name in ("edit_region", "finish_region_edit"):
+                recovery_job_id = str(args.get("job_id") or "").strip()
+                if name == "finish_region_edit" or recovery_job_id:
+                    if not recovery_job_id:
+                        raise ValueError("job_id is required")
+                    rec_result = finish_region_edit(settings, user_id, recovery_job_id)
+                    img_id = str(rec_result["id"])
+                    rec_base_id = str(rec_result["base_id"])
+                    rec_sel_id = str(rec_result["selection_id"])
+                    # MCP内联图像块使用受控展示编码以避免大图超出10MiB传输上限；规范无损PNG通过Studio文件目录与认证接口落盘为LibreChat File
+                    disp_bytes, disp_mime = encode_display_image(
+                        rec_result["raw_bytes"]
+                    )
+                    b64_display = base64.b64encode(disp_bytes).decode("ascii")
+                    before_token, before_exp = sign_image_token(
+                        settings, user_id, rec_base_id
+                    )
+                    after_token, after_exp = sign_image_token(settings, user_id, img_id)
+                    before_url = build_signed_file_url(settings, before_token)
+                    after_url = build_signed_file_url(settings, after_token)
+                    expires_at = format_utc_timestamp(min(before_exp, after_exp))
+                    compare_html = build_compare_viewer_html(
+                        image_id=img_id,
+                        base_id=rec_base_id,
+                        selection_id=rec_sel_id,
+                        before_url=before_url,
+                        after_url=after_url,
+                        expires_at=expires_at,
+                        width=int(rec_result["width"]),
+                        height=int(rec_result["height"]),
+                        selected_pixels=int(rec_result["selected_pixels"]),
+                    )
+                    summary = {
+                        "id": img_id,
+                        "image_id": img_id,
+                        "job_id": img_id,
+                        "base_id": rec_base_id,
+                        "selection_id": rec_sel_id,
+                        "kind": "studio",
+                        "state": "saved",
+                        "recovered": True,
+                        "width": rec_result["width"],
+                        "height": rec_result["height"],
+                        "size": f"{rec_result['width']}x{rec_result['height']}",
+                        "sha256": rec_result["sha256"],
+                        "selected_pixels": rec_result["selected_pixels"],
+                        "outside_changed_pixels": 0,
+                        "before_url": before_url,
+                        "after_url": after_url,
+                        "expires_at": expires_at,
+                        "warnings": [],
+                    }
+                    return types.CallToolResult(
+                        content=[
+                            types.TextContent(
+                                type="text",
+                                text=json.dumps(summary, ensure_ascii=False),
+                            ),
+                            types.EmbeddedResource(
+                                type="resource",
+                                resource=types.TextResourceContents(
+                                    uri=f"ui://zyb_studio/compare/{img_id}",
+                                    mimeType="text/html",
+                                    text=compare_html,
+                                ),
+                            ),
+                            types.ImageContent(
+                                type="image", data=b64_display, mimeType=disp_mime
+                            ),
+                        ],
+                        isError=False,
+                    )
+
+                base_id = str(args.get("base_id") or "").strip()
+                selection_id = str(args.get("selection_id") or "").strip()
+                instruction = str(args.get("instruction") or "").strip()
+                if not base_id or not selection_id or not instruction:
+                    raise ValueError(
+                        "base_id, selection_id, and instruction are required"
+                    )
+                size = str(args.get("size", "2K"))
+                if size not in NATIVE:
+                    raise ValueError("Invalid size parameter")
+                raw_refs = args.get("references") or []
+                if (
+                    not isinstance(raw_refs, list)
+                    or len(raw_refs) > MAX_EDIT_REFERENCES
+                ):
+                    raise ValueError(
+                        f"At most {MAX_EDIT_REFERENCES} additional references are allowed"
+                    )
+
+                base_resolved = resolve_image(
+                    settings, user_id, base_id, kb_index=active_kb
+                )
+                # 强制核对当前用户的已确认选区及其底图/掩码SHA256凭据
+                sel_record = load_confirmed_selection(
+                    settings,
+                    user_id,
+                    selection_id,
+                    base_image_id=base_resolved.id,
+                    base_path=base_resolved.path,
+                )
+                confirmed_sel_id = str(sel_record["selection_id"])
+                confirmed_selection = sel_record["selection"]
+                confirmed_proof = sel_record["proof"]
+
+                resolved_objs = [base_resolved]
+                resolved_refs: list[dict[str, Any]] = []
+                for item in raw_refs:
+                    if not isinstance(item, dict):
+                        raise TypeError("Each reference must be an object")
+                    resolved = resolve_image(
+                        settings,
+                        user_id,
+                        str(item.get("id") or ""),
+                        kb_index=active_kb,
+                    )
+                    resolved_objs.append(resolved)
+                    resolved_refs.append(
+                        {
+                            "id": resolved.id,
+                            "path": resolved.path,
+                            "use": str(item.get("use") or "参考"),
+                            "note": str(item.get("note") or ""),
+                            "material_ids": resolved.material_ids,
+                        }
+                    )
+
+                if resolved_refs and (
+                    "原样贴入" in instruction
+                    or any(
+                        "原样贴入" in str(r.get("note") or "") for r in resolved_refs
+                    )
+                ):
+                    ctx_info = object_placement(
+                        base_resolved.path,
+                        confirmed_selection,
+                        resolved_refs[0]["path"],
+                    )
+                    placement_note: str | None = str(ctx_info.get("instruction") or "")
+                else:
+                    ctx_info = local_context(base_resolved.path, confirmed_selection)
+                    placement_note = None
+
+                full_prompt, unique_paths = build_local_edit_prompt(
+                    instruction,
+                    resolved_refs,
+                    active_rules,
+                    region_bbox=ctx_info["region"],
+                    placement_instruction=placement_note,
+                )
+                extra_uris = [
+                    normalize_reference(p, allowed_roots) for p in unique_paths
+                ]
+                all_uris = [ctx_info["data_uri"], *extra_uris]
+                if len(all_uris) > MAX_REFERENCES:
+                    raise ValueError(
+                        f"Total images including base crop exceed limit of {MAX_REFERENCES}"
+                    )
+
+                async with limiter.acquire(user_id):
+                    img_id, job_dir = allocate_studio_job(settings, user_id)
+                    gen_result = await generate_image_with_provider(
+                        settings,
+                        full_prompt,
+                        all_uris,
+                        size=size,
+                        aspect="source",
+                        source_size=ctx_info["size"],
+                        local_composite={
+                            "base_id": base_resolved.id,
+                            "selection_id": confirmed_sel_id,
+                            "base_path": base_resolved.path,
+                            "selection": confirmed_selection,
+                            "crop": ctx_info["crop"],
+                            "proof": confirmed_proof,
+                        },
+                        destination=job_dir,
+                        ark_transport=ark_transport,
+                        gemini_transport=gemini_transport,
+                    )
+
+                # MCP内联图像块使用受控展示编码以避免大图超出10MiB传输上限；规范无损PNG通过Studio文件目录与认证接口落盘为LibreChat File
+                disp_bytes, disp_mime = encode_display_image(gen_result["raw_bytes"])
+                b64_display = base64.b64encode(disp_bytes).decode("ascii")
+
+                before_token, before_exp = sign_image_token(
+                    settings, user_id, base_resolved.id
+                )
+                after_token, after_exp = sign_image_token(settings, user_id, img_id)
+                before_url = build_signed_file_url(settings, before_token)
+                after_url = build_signed_file_url(settings, after_token)
+                expires_at = format_utc_timestamp(min(before_exp, after_exp))
+
+                compare_html = build_compare_viewer_html(
+                    image_id=img_id,
+                    base_id=base_resolved.id,
+                    selection_id=confirmed_sel_id,
+                    before_url=before_url,
+                    after_url=after_url,
+                    expires_at=expires_at,
+                    width=gen_result["width"],
+                    height=gen_result["height"],
+                    selected_pixels=int(gen_result["selected_pixels"]),
+                )
+                summary = {
+                    "id": img_id,
+                    "image_id": img_id,
+                    "base_id": base_resolved.id,
+                    "selection_id": confirmed_sel_id,
+                    "kind": "studio",
+                    "width": gen_result["width"],
+                    "height": gen_result["height"],
+                    "size": f"{gen_result['width']}x{gen_result['height']}",
+                    "sha256": gen_result["sha256"],
+                    "selected_pixels": gen_result["selected_pixels"],
+                    "outside_changed_pixels": 0,
+                    "before_url": before_url,
+                    "after_url": after_url,
+                    "expires_at": expires_at,
+                    "warnings": _collect_flag_warnings(resolved_objs),
+                }
+                return types.CallToolResult(
+                    content=[
+                        types.TextContent(
+                            type="text",
+                            text=json.dumps(summary, ensure_ascii=False),
+                        ),
+                        types.EmbeddedResource(
+                            type="resource",
+                            resource=types.TextResourceContents(
+                                uri=f"ui://zyb_studio/compare/{img_id}",
+                                mimeType="text/html",
+                                text=compare_html,
+                            ),
+                        ),
+                        types.ImageContent(
+                            type="image", data=b64_display, mimeType=disp_mime
+                        ),
+                    ],
+                    isError=False,
                 )
 
             if name == "create_3d_model":
@@ -1190,6 +1172,8 @@ def build_mcp_server(
             err_payload: dict[str, Any] = {
                 "error": str(exc),
                 "state": exc.state,
+                "recoverable": exc.state == "recoverable",
+                "billing_warning": "The request may have been billed.",
             }
             if exc.job_id:
                 err_payload["job_id"] = exc.job_id
@@ -1231,6 +1215,7 @@ def create_app(
     settings: StudioSettings | None = None,
     rules: StudioRules | None = None,
     *,
+    segmenter: OnnxSamSegmenter | SupervisedSegmenter | None = None,
     ark_transport: httpx.AsyncBaseTransport | None = None,
     gemini_transport: httpx.AsyncBaseTransport | None = None,
 ) -> Starlette:
@@ -1249,12 +1234,22 @@ def create_app(
         limiter,
         ark_transport=ark_transport,
     )
+    active_segmenter = segmenter if segmenter is not None else SupervisedSegmenter()
+    pending_segment_requests = 0
+
+    def _release_segment_slot(task: asyncio.Task[Any]) -> None:
+        nonlocal pending_segment_requests
+        pending_segment_requests -= 1
+        if not task.cancelled():
+            task.exception()
+
     mcp_server = build_mcp_server(
         active_settings,
         active_rules,
         limiter,
         kb_index=kb_index,
         model_manager=model_manager,
+        segmenter=active_segmenter,
         ark_transport=ark_transport,
         gemini_transport=gemini_transport,
     )
@@ -1278,9 +1273,13 @@ def create_app(
         app_instance.state.session_manager = manager
         async with manager.run():
             try:
+                if segmenter is None:
+                    await asyncio.to_thread(active_segmenter.start)
                 yield
             finally:
                 await model_manager.shutdown()
+                if segmenter is None:
+                    await asyncio.to_thread(active_segmenter.close)
                 app_instance.state.session_manager = None
 
     # 健康检查端点处理函数
@@ -1293,8 +1292,8 @@ def create_app(
     ) -> dict[str, str]:
         headers = {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-            "Access-Control-Allow-Headers": "Range, If-None-Match, If-Modified-Since",
+            "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Range, If-None-Match, If-Modified-Since",
             "Access-Control-Expose-Headers": "Accept-Ranges, Content-Disposition, Content-Length, Content-Range, Content-Type",
             "X-Content-Type-Options": "nosniff",
         }
@@ -1308,8 +1307,72 @@ def create_app(
             "Not Found", status_code=404, headers=_signed_file_cors_headers()
         )
 
-    # 校验HMAC签名令牌并提供支持Range分段传输与CORS的GLB二进制下载服务
+    # 局部选区POST请求体最大允许字节数（512KiB）与超限异常类型
+    max_region_post_body_bytes = 512 * 1024
+
+    class _PayloadTooLargeError(Exception):
+        pass
+
+    # 先检查Content-Length再按流分块读取POST请求体，一旦超出512KiB立即中止读取并拒绝
+    async def _read_bounded_body(
+        request: Request, max_bytes: int = max_region_post_body_bytes
+    ) -> bytes:
+        raw_cl = request.headers.get("content-length")
+        if raw_cl is not None:
+            try:
+                parsed_cl = int(raw_cl.strip())
+            except ValueError as exc:
+                raise ValueError("Invalid Content-Length header") from exc
+            if parsed_cl < 0:
+                raise ValueError("Invalid Content-Length header")
+            if parsed_cl > max_bytes:
+                raise _PayloadTooLargeError()
+        chunks: list[bytes] = []
+        total = 0
+        async for chunk in request.stream():
+            total += len(chunk)
+            if total > max_bytes:
+                raise _PayloadTooLargeError()
+            chunks.append(chunk)
+        return b"".join(chunks)
+
+    # 读取经过白名单根目录校验的用户或知识库图片字节与MIME类型
+    def _load_safe_image_bytes(
+        user_id: str, resolved: ResolvedImage
+    ) -> tuple[bytes, str] | None:
+        allowed_roots = (
+            user_librechat_images_dir(active_settings, user_id),
+            user_studio_dir(active_settings, user_id, create=False),
+            Path(active_settings.kb_root),
+        )
+        matched_root: Path | None = None
+        for root in allowed_roots:
+            if not root.exists() or root.is_symlink():
+                continue
+            try:
+                ensure_safe_subpath(resolved.path, root)
+                matched_root = root
+                break
+            except (OSError, ValueError):
+                continue
+        if matched_root is None:
+            return None
+        try:
+            img_bytes = read_bytes_no_follow(resolved.path, matched_root)
+        except (OSError, ValueError):
+            return None
+        suffix = resolved.path.suffix.lower()
+        media_type = {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".webp": "image/webp",
+        }.get(suffix, "application/octet-stream")
+        return img_bytes, media_type
+
+    # 校验HMAC签名令牌并提供3D模型GLB下载、只读图片预览（img:）及选区编辑器交互（edt:）服务
     async def signed_file_endpoint(request: Request) -> Response:
+        nonlocal pending_segment_requests
         token = str(request.path_params.get("token") or "")
         if not token or "/" in token or "\\" in token or ".." in token:
             return PlainTextResponse(
@@ -1317,6 +1380,574 @@ def create_app(
             )
         if request.method == "OPTIONS":
             return Response(b"", status_code=204, headers=_signed_file_cors_headers())
+
+        # 允许携带内部X-Studio-Token与X-LibreChat-User-ID的后端服务按用户权限读取kb_或img_原图以桥接LibreChat File记录
+        if (
+            not is_image_token(token)
+            and not is_editor_token(token)
+            and token.startswith(("kb_", "img_"))
+            and request.method in ("GET", "HEAD")
+        ):
+            provided_token = request.headers.get("x-studio-token")
+            expected_token = active_settings.shared_token
+            if isinstance(provided_token, str) and hmac.compare_digest(
+                provided_token.encode("utf-8"),
+                expected_token.encode("utf-8"),
+            ):
+                try:
+                    auth_user_id = validate_user_id(
+                        request.headers.get("x-librechat-user-id")
+                    )
+                    raw_user_id = validate_user_id(
+                        request.headers.get("x-librechat-raw-user-id")
+                        or auth_user_id
+                    )
+                    bind_studio_principal(
+                        active_settings, auth_user_id, raw_user_id
+                    )
+                    resolved_internal = resolve_image(
+                        active_settings, auth_user_id, token, kb_index=kb_index
+                    )
+                    loaded_internal = _load_safe_image_bytes(
+                        auth_user_id, resolved_internal
+                    )
+                except (ValueError, RuntimeError, OSError):
+                    loaded_internal = None
+                if loaded_internal is not None:
+                    img_bytes, media_type = loaded_internal
+                    return Response(
+                        b"" if request.method == "HEAD" else img_bytes,
+                        status_code=200,
+                        media_type=media_type,
+                        headers={
+                            "Cache-Control": "private, no-store",
+                            "Content-Length": str(len(img_bytes)),
+                            "X-Content-Type-Options": "nosniff",
+                        },
+                    )
+                return PlainTextResponse(
+                    "Not Found", status_code=404, headers=_signed_file_cors_headers()
+                )
+
+        max_renewal_age = max(
+            int(getattr(active_settings, "preview_token_ttl_seconds", 604800)) * 4,
+            30 * 86400,
+        )
+
+        def _can_renew_owner(token_user_id: str) -> bool:
+            provided_secret = request.headers.get("x-studio-token", "")
+            if not hmac.compare_digest(provided_secret, active_settings.shared_token):
+                return False
+            try:
+                authenticated_user = validate_user_id(
+                    request.headers.get("x-librechat-user-id")
+                )
+            except ValueError:
+                return False
+            return hmac.compare_digest(authenticated_user, token_user_id)
+
+        def _extract_token_from_url_or_raw(raw_val: object) -> str:
+            cleaned = str(raw_val or "").strip()
+            if not cleaned:
+                return ""
+            for marker in ("/studio-files/", "/files/"):
+                if marker in cleaned:
+                    tail = cleaned.rsplit(marker, 1)[-1]
+                    return tail.split("?", 1)[0].split("#", 1)[0].strip()
+            return cleaned
+
+        def _format_renewed_url(
+            new_token: str, reference_url: object = None
+        ) -> str:
+            ref_str = str(reference_url or "").strip()
+            if ref_str.startswith(("http://", "https://")):
+                for marker in ("/studio-files/", "/files/"):
+                    if marker in ref_str:
+                        prefix = ref_str.rsplit(marker, 1)[0]
+                        public_base = active_settings.public_base_url.rstrip("/")
+                        req_origin = f"{request.url.scheme}://{request.url.netloc}"
+                        if prefix in (public_base, req_origin):
+                            return f"{prefix}{marker}{new_token}"
+            if request.url.hostname in (
+                "127.0.0.1",
+                "localhost",
+                "testserver",
+            ) and request.url.path.startswith("/files/"):
+                return f"{request.url.scheme}://{request.url.netloc}/files/{new_token}"
+            return build_signed_file_url(active_settings, new_token)
+
+        if is_image_token(token):
+            if request.method == "POST":
+                try:
+                    raw_body = await _read_bounded_body(
+                        request, max_region_post_body_bytes
+                    )
+                    payload = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+                except (_PayloadTooLargeError, ValueError, UnicodeDecodeError):
+                    payload = {}
+                if isinstance(payload, dict) and payload.get("action") == "renew":
+                    try:
+                        user_id, image_id, _ = verify_image_token(
+                            active_settings,
+                            token,
+                            allow_expired=True,
+                            max_expired_age_seconds=max_renewal_age,
+                        )
+                        if not _can_renew_owner(user_id):
+                            return JSONResponse(
+                                {"error": "Authenticated owner required for renewal"},
+                                status_code=403,
+                                headers=_signed_file_cors_headers(),
+                            )
+                        resolved = resolve_image(
+                            active_settings, user_id, image_id, kb_index=kb_index
+                        )
+                    except (ValueError, RuntimeError, OSError):
+                        return PlainTextResponse(
+                            "Not Found",
+                            status_code=404,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    if _load_safe_image_bytes(user_id, resolved) is None:
+                        return PlainTextResponse(
+                            "Not Found",
+                            status_code=404,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    before_ref = payload.get("before_url") or payload.get("beforeUrl")
+                    after_ref = payload.get("after_url") or payload.get("afterUrl")
+                    if before_ref and after_ref:
+                        try:
+                            before_tok = _extract_token_from_url_or_raw(before_ref)
+                            after_tok = _extract_token_from_url_or_raw(after_ref)
+                            b_uid, b_img_id, _ = verify_image_token(
+                                active_settings,
+                                before_tok,
+                                allow_expired=True,
+                                max_expired_age_seconds=max_renewal_age,
+                            )
+                            a_uid, a_img_id, _ = verify_image_token(
+                                active_settings,
+                                after_tok,
+                                allow_expired=True,
+                                max_expired_age_seconds=max_renewal_age,
+                            )
+                            if b_uid != user_id or a_uid != user_id:
+                                raise ValueError("Comparison token user mismatch")
+                            b_resolved = resolve_image(
+                                active_settings, user_id, b_img_id, kb_index=kb_index
+                            )
+                            a_resolved = resolve_image(
+                                active_settings, user_id, a_img_id, kb_index=kb_index
+                            )
+                            if (
+                                _load_safe_image_bytes(user_id, b_resolved) is None
+                                or _load_safe_image_bytes(user_id, a_resolved) is None
+                            ):
+                                raise ValueError("Comparison image missing")
+                        except (ValueError, RuntimeError, OSError):
+                            return PlainTextResponse(
+                                "Not Found",
+                                status_code=404,
+                                headers=_signed_file_cors_headers(),
+                            )
+                        new_before_tok, _ = sign_image_token(
+                            active_settings, user_id, b_resolved.id
+                        )
+                        new_after_tok, after_exp = sign_image_token(
+                            active_settings, user_id, a_resolved.id
+                        )
+                        return JSONResponse(
+                            {
+                                "status": "renewed",
+                                "resource_uri": f"ui://zyb_studio/compare/{a_resolved.id}",
+                                "image_id": a_resolved.id,
+                                "before_url": _format_renewed_url(
+                                    new_before_tok, before_ref
+                                ),
+                                "after_url": _format_renewed_url(
+                                    new_after_tok, after_ref
+                                ),
+                                "expires_at": format_utc_timestamp(after_exp),
+                            },
+                            status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    new_preview_tok, preview_exp = sign_image_token(
+                        active_settings, user_id, resolved.id
+                    )
+                    preview_ref = payload.get("preview_url") or payload.get("previewUrl")
+                    return JSONResponse(
+                        {
+                            "status": "renewed",
+                            "image_id": resolved.id,
+                            "preview_url": _format_renewed_url(
+                                new_preview_tok, preview_ref
+                            ),
+                            "preview_expires_at": format_utc_timestamp(preview_exp),
+                            "expires_at": format_utc_timestamp(preview_exp),
+                        },
+                        status_code=200,
+                        headers=_signed_file_cors_headers(),
+                    )
+                try:
+                    user_id, image_id, _ = verify_image_token(active_settings, token)
+                    resolve_image(
+                        active_settings, user_id, image_id, kb_index=kb_index
+                    )
+                except (ValueError, RuntimeError, OSError):
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                return JSONResponse(
+                    {
+                        "error": "Image preview token is read-only and does not permit POST operations"
+                    },
+                    status_code=403,
+                    headers=_signed_file_cors_headers(),
+                )
+
+            try:
+                user_id, image_id, _ = verify_image_token(active_settings, token)
+                resolved = resolve_image(
+                    active_settings, user_id, image_id, kb_index=kb_index
+                )
+            except (ValueError, RuntimeError, OSError):
+                return PlainTextResponse(
+                    "Not Found", status_code=404, headers=_signed_file_cors_headers()
+                )
+
+            if request.method in ("GET", "HEAD"):
+                loaded = _load_safe_image_bytes(user_id, resolved)
+                if loaded is None:
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                img_bytes, media_type = loaded
+                img_headers = _signed_file_cors_headers(
+                    {
+                        "Cache-Control": "private, max-age=3600",
+                        "Content-Length": str(len(img_bytes)),
+                    }
+                )
+                return Response(
+                    b"" if request.method == "HEAD" else img_bytes,
+                    status_code=200,
+                    media_type=media_type,
+                    headers=img_headers,
+                )
+
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
+
+        if is_editor_token(token):
+            post_payload: dict[str, Any] | None = None
+            is_renew_post = False
+            if request.method == "POST":
+                try:
+                    raw_body = await _read_bounded_body(
+                        request, max_region_post_body_bytes
+                    )
+                except _PayloadTooLargeError:
+                    return JSONResponse(
+                        {"error": "Request body exceeds maximum allowed size"},
+                        status_code=413,
+                        headers=_signed_file_cors_headers(),
+                    )
+                except ValueError as exc:
+                    return JSONResponse(
+                        {"error": str(exc)},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                try:
+                    parsed_body = json.loads(raw_body.decode("utf-8"))
+                except (ValueError, UnicodeDecodeError):
+                    return JSONResponse(
+                        {"error": "Invalid JSON request body"},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                if not isinstance(parsed_body, dict):
+                    return JSONResponse(
+                        {"error": "Request body must be a JSON object"},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                post_payload = parsed_body
+                is_renew_post = post_payload.get("action") == "renew"
+
+            try:
+                claims = verify_editor_token(
+                    active_settings,
+                    token,
+                    allow_expired=is_renew_post,
+                    max_expired_age_seconds=max_renewal_age if is_renew_post else None,
+                )
+                user_id = str(claims["user_id"])
+                if is_renew_post and not _can_renew_owner(user_id):
+                    return JSONResponse(
+                        {"error": "Authenticated owner required for renewal"},
+                        status_code=403,
+                        headers=_signed_file_cors_headers(),
+                    )
+                image_id = str(claims["image_id"])
+                expected_sha = str(claims["image_sha256"])
+                editor_nonce = str(claims["nonce"])
+                resolved = resolve_image(
+                    active_settings, user_id, image_id, kb_index=kb_index
+                )
+            except (ValueError, RuntimeError, OSError):
+                return PlainTextResponse(
+                    "Not Found", status_code=404, headers=_signed_file_cors_headers()
+                )
+
+            loaded = _load_safe_image_bytes(user_id, resolved)
+            if loaded is None:
+                return PlainTextResponse(
+                    "Not Found",
+                    status_code=404,
+                    headers=_signed_file_cors_headers(),
+                )
+            img_bytes, media_type = loaded
+            if hashlib.sha256(img_bytes).hexdigest() != expected_sha:
+                return JSONResponse(
+                    {
+                        "error": "Base image content changed since selection editor token was issued"
+                    },
+                    status_code=409,
+                    headers=_signed_file_cors_headers(),
+                )
+
+            if request.method in ("GET", "HEAD"):
+                img_headers = _signed_file_cors_headers(
+                    {
+                        "Cache-Control": "private, no-store",
+                        "Content-Length": str(len(img_bytes)),
+                    }
+                )
+                return Response(
+                    b"" if request.method == "HEAD" else img_bytes,
+                    status_code=200,
+                    media_type=media_type,
+                    headers=img_headers,
+                )
+
+            if request.method == "POST" and post_payload is not None:
+                payload = post_payload
+                action = payload.get("action")
+                if action == "renew":
+                    if is_editor_nonce_consumed(
+                        active_settings, user_id, editor_nonce
+                    ):
+                        return JSONResponse(
+                            {
+                                "error": "Selection editor token has already been used to confirm a selection"
+                            },
+                            status_code=409,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    new_preview_tok, preview_exp = sign_image_token(
+                        active_settings, user_id, resolved.id
+                    )
+                    try:
+                        new_editor_tok, editor_exp = sign_editor_token(
+                            active_settings,
+                            user_id,
+                            resolved.id,
+                            expected_sha,
+                            nonce=editor_nonce,
+                            issued_at=int(claims["issued_at"]),
+                        )
+                    except ValueError:
+                        return PlainTextResponse(
+                            "Not Found",
+                            status_code=404,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    editor_ref = payload.get("editor_url") or payload.get("editorUrl")
+                    preview_ref = (
+                        payload.get("preview_url")
+                        or payload.get("previewUrl")
+                        or editor_ref
+                    )
+                    fresh_preview_url = _format_renewed_url(
+                        new_preview_tok, preview_ref
+                    )
+                    fresh_editor_url = _format_renewed_url(
+                        new_editor_tok, editor_ref
+                    )
+                    return JSONResponse(
+                        {
+                            "status": "renewed",
+                            "resource_uri": f"ui://zyb_studio/selection/{resolved.id}",
+                            "image_id": resolved.id,
+                            "preview_url": fresh_preview_url,
+                            "preview_expires_at": format_utc_timestamp(preview_exp),
+                            "editor_url": fresh_editor_url,
+                            "signed_url": fresh_editor_url,
+                            "expires_at": format_utc_timestamp(editor_exp),
+                        },
+                        status_code=200,
+                        headers=_signed_file_cors_headers(),
+                    )
+                if action == "segment":
+                    if pending_segment_requests >= active_settings.segment_max_pending_requests:
+                        _LOG.warning("Segmentation admission limit reached")
+                        return JSONResponse(
+                            {"error": "选区分割繁忙，请稍后重试。"},
+                            status_code=503,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    pending_segment_requests += 1
+                    segment_task = asyncio.create_task(
+                        asyncio.to_thread(
+                            active_segmenter.segment,
+                            resolved.path,
+                            payload.get("points"),
+                            payload.get("existing"),
+                            str(payload.get("operation") or "add"),
+                        )
+                    )
+                    segment_task.add_done_callback(_release_segment_slot)
+                    try:
+                        seg_out = await asyncio.wait_for(
+                            asyncio.shield(segment_task),
+                            timeout=active_settings.segment_request_timeout_seconds,
+                        )
+                        return JSONResponse(
+                            seg_out,
+                            status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except asyncio.TimeoutError:
+                        _LOG.warning("Segmentation request timed out including queue wait")
+                        return JSONResponse(
+                            {"error": "选区分割等待超时，请稍后重试。"},
+                            status_code=503,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except SegmentationUnavailable:
+                        return JSONResponse(
+                            {"error": "Segmentation is unavailable"},
+                            status_code=503,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except (ValueError, RuntimeError, OSError) as exc:
+                        return JSONResponse(
+                            {"error": str(exc)},
+                            status_code=400,
+                            headers=_signed_file_cors_headers(),
+                        )
+                if action == "confirm":
+                    try:
+                        rec = save_confirmed_selection(
+                            active_settings,
+                            user_id,
+                            resolved.id,
+                            resolved.path,
+                            payload.get("selection"),
+                            expected_image_sha256=expected_sha,
+                            editor_nonce=editor_nonce,
+                        )
+                        return JSONResponse(
+                            {
+                                "selection_id": rec["selection_id"],
+                                "image_id": rec["image_id"],
+                                "proof": rec["proof"],
+                            },
+                            status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except EditorTokenReplayError as exc:
+                        return JSONResponse(
+                            {"error": str(exc)},
+                            status_code=409,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    except (ValueError, RuntimeError, OSError) as exc:
+                        return JSONResponse(
+                            {"error": str(exc)},
+                            status_code=400,
+                            headers=_signed_file_cors_headers(),
+                        )
+                return JSONResponse(
+                    {"error": "Unsupported region action"},
+                    status_code=400,
+                    headers=_signed_file_cors_headers(),
+                )
+
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
+
+        if request.method == "POST":
+            try:
+                raw_body = await _read_bounded_body(
+                    request, max_region_post_body_bytes
+                )
+                payload = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+            except (_PayloadTooLargeError, ValueError, UnicodeDecodeError):
+                payload = {}
+            if isinstance(payload, dict) and payload.get("action") == "renew":
+                try:
+                    user_id, model_id, _ = verify_file_token(
+                        active_settings,
+                        token,
+                        allow_expired=True,
+                        max_expired_age_seconds=max_renewal_age,
+                    )
+                    if not _can_renew_owner(user_id):
+                        return JSONResponse(
+                            {"error": "Authenticated owner required for renewal"},
+                            status_code=403,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    load_saved_model_bytes(active_settings, user_id, model_id)
+                except (ValueError, RuntimeError, OSError):
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                new_model_tok, model_exp = sign_file_token(
+                    active_settings, user_id, model_id
+                )
+                model_ref = payload.get("model_url") or payload.get("modelUrl")
+                fresh_model_url = _format_renewed_url(new_model_tok, model_ref)
+                return JSONResponse(
+                    {
+                        "status": "renewed",
+                        "resource_uri": f"ui://zyb_studio/model/{model_id}",
+                        "model_id": model_id,
+                        "model_url": fresh_model_url,
+                        "signed_url": fresh_model_url,
+                        "expires_at": format_utc_timestamp(model_exp),
+                    },
+                    status_code=200,
+                    headers=_signed_file_cors_headers(),
+                )
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
+
+        if request.method not in ("GET", "HEAD"):
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
 
         try:
             user_id, model_id, _ = verify_file_token(active_settings, token)
@@ -1331,7 +1962,7 @@ def create_app(
             {
                 "Accept-Ranges": "bytes",
                 "Cache-Control": "private, max-age=3600",
-                "Content-Disposition": f'attachment; filename="{model_id}.glb"',
+                "Content-Disposition": format_model_content_disposition(model_id),
             }
         )
         range_header = request.headers.get("range")
@@ -1389,6 +2020,12 @@ def create_app(
             raw_user_id = request.headers.get("x-librechat-user-id")
             try:
                 user_id = validate_user_id(raw_user_id)
+                original_user_id = validate_user_id(
+                    request.headers.get("x-librechat-raw-user-id") or user_id
+                )
+                bind_studio_principal(
+                    active_settings, user_id, original_user_id
+                )
             except ValueError:
                 response = JSONResponse({"error": "Forbidden"}, status_code=403)
                 await response(scope, receive, send)
@@ -1444,7 +2081,7 @@ def create_app(
             Route(
                 "/files/{token:path}",
                 endpoint=signed_file_endpoint,
-                methods=["GET", "HEAD", "OPTIONS"],
+                methods=["GET", "HEAD", "POST", "OPTIONS"],
             ),
             Route(
                 "/mcp", endpoint=_MCPASGIHandler(), methods=["POST", "GET", "DELETE"]
@@ -1457,5 +2094,6 @@ def create_app(
     app.state.kb_index = kb_index
     app.state.limiter = limiter
     app.state.model_manager = model_manager
+    app.state.segmenter = active_segmenter
     app.state.session_manager = None
     return app

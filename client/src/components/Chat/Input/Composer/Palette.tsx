@@ -23,10 +23,10 @@ import type { AttachEntry } from '~/hooks/Input/useAttachItems';
 import type { ExtendedFile, FileSetter } from '~/common';
 import type { CatalogSection } from './Catalog';
 import type { TranslationKeys } from '~/hooks';
+import { formatGeneratedImageFilename, isUnifiedUploadMode, getFileType, cn } from '~/utils';
 import FilePreview from '~/components/Chat/Input/Files/FilePreview';
 import { SharePointPickerDialog } from '~/components/SharePoint';
 import useReducedMotion from '~/hooks/Generic/useReducedMotion';
-import { getFileType, isUnifiedUploadMode, cn } from '~/utils';
 import useToolFavorites from '~/hooks/Input/useToolFavorites';
 import useElementSize from '~/hooks/Generic/useElementSize';
 import useRecentFiles from '~/hooks/Input/useRecentFiles';
@@ -1001,7 +1001,7 @@ function Palette({
                   />
                 )}
                 <span className="flex min-w-0 flex-1 flex-col justify-center">
-                  <span className="truncate">{file.filename}</span>
+                  <span className="truncate">{formatGeneratedImageFilename(file, localize)}</span>
                   <span className="text-text-secondary truncate text-xs">
                     {formatFileDate(file)}
                   </span>

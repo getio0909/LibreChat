@@ -635,7 +635,7 @@ const loadTools = async ({
   }
 
   const loadedTools = (await Promise.all(toolPromises)).flatMap((plugin) => plugin || []);
-  const safeUser = createSafeUser(options.req?.user);
+  const safeUser = createSafeUser(options.req?.user, options.req?.tenantId ?? getTenantId());
   const admittedAppConfig = options.req?.config;
   const admittedMCPAppsPolicy = resolveMCPAppsPolicy(
     admittedAppConfig?.mcpSettings?.apps,

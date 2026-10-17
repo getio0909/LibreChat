@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import hashlib
 import io
 import json
 import os
@@ -15,11 +16,15 @@ from PIL import Image, ImageCms
 from deploy.studio.app import create_app
 from deploy.studio.config import StudioSettings, load_rules, load_settings
 from deploy.studio.images import (
+    GEMINI_MODEL,
+    MAX_RESPONSE_BYTES,
     NATIVE,
     GenerationUncertain,
     build_edit_prompt,
-    build_generate_prompt,
     comparison_target,
+    gemini_aspect_and_size,
+    generate_gemini,
+    generate_image_with_provider,
     generate_seedream,
     normalize_reference,
     source_dimensions,
@@ -32,8 +37,12 @@ from deploy.studio.models3d import (
     parse_seed3d_query_response,
     sign_file_token,
 )
-from deploy.studio.planner import build_planner_system_prompt, plan_concepts
-from deploy.studio.store import list_user_images, resolve_image
+from deploy.studio.store import (
+    bind_studio_principal,
+    resolve_image,
+    user_librechat_images_dir,
+    user_studio_dir,
+)
 
 # 测试固定常量定义
 VALID_TOKEN = "a" * 64
@@ -41,6 +50,100 @@ VALID_SIGNING_KEY = "f" * 64
 USER_A = "65f00000000000000000000a"
 USER_B = "65f00000000000000000000b"
 FIXTURE_KB_TEMPLATE = Path(__file__).resolve().parent / "fixtures" / "kb"
+
+
+def test_response_budget_covers_supported_4k_rgba_png() -> None:
+    assert MAX_RESPONSE_BYTES > ((4096 * 4096 * 4 + 2) // 3) * 4
+
+
+def test_scoped_studio_principal_blocks_cross_tenant_image_reads(
+    studio_env: StudioSettings,
+) -> None:
+    image_id = "img_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    image_bytes = _make_image_bytes(fmt="PNG")
+    principal_a = hashlib.sha256(
+        json.dumps(
+            ["studio-user-v1", "tenant-a", USER_A], separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()[:24]
+    principal_b = hashlib.sha256(
+        json.dumps(
+            ["studio-user-v1", "tenant-b", USER_A], separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()[:24]
+    bind_studio_principal(studio_env, principal_a, USER_A)
+    assert user_librechat_images_dir(studio_env, principal_a) == Path(
+        studio_env.librechat_images_dir
+    ) / USER_A
+    job_dir = user_studio_dir(studio_env, principal_a, create=True) / "jobs" / image_id
+    job_dir.mkdir(parents=True)
+    (job_dir / "receipt.json").write_text(
+        json.dumps({"state": "saved", "file": "original.png"}), encoding="utf-8"
+    )
+    (job_dir / "original.png").write_bytes(image_bytes)
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            for principal, expected_status in ((principal_a, 200), (principal_b, 404)):
+                response = await client.get(
+                    f"/files/{image_id}",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": principal,
+                        "X-LibreChat-Raw-User-ID": USER_A,
+                    },
+                )
+                assert response.status_code == expected_status
+                if expected_status == 200:
+                    assert response.content == image_bytes
+            mismatch = await client.get(
+                f"/files/{image_id}",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": principal_a,
+                    "X-LibreChat-Raw-User-ID": USER_B,
+                },
+            )
+            assert mismatch.status_code == 404
+
+    asyncio.run(_run())
+
+
+# 构造Gemini Nano Banana 2.1生图响应JSON辅助函数
+def _gemini_image_response(
+    image_bytes: bytes, mime_type: str = "image/jpeg"
+) -> dict[str, Any]:
+    return {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "inlineData": {
+                                "mimeType": mime_type,
+                                "data": base64.b64encode(image_bytes).decode("ascii"),
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+
+# 从Gemini generateContent请求体提取inlineData URI列表与提示词文本
+def _extract_gemini_parts(body: dict[str, Any]) -> tuple[list[str], str]:
+    parts = body["contents"][0]["parts"]
+    uris = [
+        f"data:{p['inlineData']['mimeType']};base64,{p['inlineData']['data']}"
+        for p in parts
+        if "inlineData" in p
+    ]
+    texts = [p["text"] for p in parts if "text" in p]
+    return uris, (texts[-1] if texts else "")
 
 
 # 生成指定尺寸与格式的测试图像字节
@@ -125,7 +228,6 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
                 "shared_token": VALID_TOKEN,
                 "file_signing_key": VALID_SIGNING_KEY,
                 "gemini_api_key": "gkey",
-                "ark_api_key": "akey",
             }
         ),
         encoding="utf-8",
@@ -136,17 +238,43 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
 
     secret_file.chmod(0o600)
     loaded = load_settings(secret_file)
+    assert loaded.image_provider == "gemini"
+    assert loaded.gemini_image_model == "gemini-nano-banana-2.1"
+    assert loaded.enable_3d is False
+    assert loaded.ark_api_key == ""
     assert loaded.seedream_model == "doubao-seedream-5-0-pro-260628"
     assert loaded.seed3d_model == "doubao-seed3d-2-0-260328"
-    assert loaded.planner_model == "gemini-4-argon"
-    assert loaded.planner_thinking_level == "HIGH"
     assert loaded.max_parallel_per_user == 3
+    assert loaded.comparison_preview_max_bytes == 48 * 1024
     assert loaded.seed3d_max_parallel == 5
     assert loaded.public_base_url == "https://dev.xuqian.io"
     assert loaded.file_token_ttl_seconds == 86400
     assert loaded.seedream_timeout_seconds == 240
-    assert loaded.planner_timeout_seconds == 540
     assert loaded.kb_root == Path("/kb")
+
+    with pytest.raises(ValueError, match="comparison_preview_max_bytes"):
+        StudioSettings(
+            shared_token=VALID_TOKEN,
+            file_signing_key=VALID_SIGNING_KEY,
+            gemini_api_key="gkey",
+            comparison_preview_max_bytes=48 * 1024 + 1,
+        )
+
+    # 当启用seedream或enable_3d时必须提供ark_api_key
+    with pytest.raises(ValueError, match="ark_api_key"):
+        StudioSettings(
+            shared_token=VALID_TOKEN,
+            file_signing_key=VALID_SIGNING_KEY,
+            gemini_api_key="gkey",
+            image_provider="seedream",
+        )
+    with pytest.raises(ValueError, match="ark_api_key"):
+        StudioSettings(
+            shared_token=VALID_TOKEN,
+            file_signing_key=VALID_SIGNING_KEY,
+            gemini_api_key="gkey",
+            enable_3d=True,
+        )
 
 
 # 校验/health端点与/mcp端点的认证和用户ID隔离检查
@@ -204,10 +332,18 @@ def test_auth_and_health_endpoints(studio_env: StudioSettings) -> None:
                 )
                 assert res_bad_uid.status_code == 403
 
+            # 目录查询无需对话编号，重复查询同一连接仍能列出设计工具。
+            headers = {"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A}
+            for _ in range(2):
+                listed = await client.post("/mcp", headers=headers, json=rpc_body)
+                assert listed.status_code == 200
+                names = {tool["name"] for tool in listed.json()["result"]["tools"]}
+                assert {"edit_region", "compare_materials"}.issubset(names)
+
     asyncio.run(_run())
 
 
-# 校验图片ID解析（上传__、生成-、@latest、studio img_）以及跨用户隔离
+# 校验图片ID解析（上传__、内置gemini_image_gen产图-、@latest、studio img_）以及跨用户隔离
 def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -> None:
     user_a_lc = studio_env.librechat_images_dir / USER_A
     user_b_lc = studio_env.librechat_images_dir / USER_B
@@ -224,7 +360,7 @@ def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -
 
     img_gen_a = (
         user_a_lc
-        / f"{gen_id_a}-generate_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-myT.webp"
+        / f"{gen_id_a}-gemini_image_gen_img_V1StGXR8_Z5jdHi6B-myT.webp"
     )
     img_gen_a.write_bytes(_make_image_bytes(160, 120, fmt="WEBP"))
     os.utime(img_gen_a, ns=(1_700_000_005_000_000_000, 1_700_000_005_000_000_000))
@@ -272,11 +408,6 @@ def test_image_resolution_and_cross_user_isolation(studio_env: StudioSettings) -
 
     res_latest = resolve_image(studio_env, USER_A, "@latest")
     assert res_latest.id == studio_id_a
-
-    # 验证list_user_images按时间倒序排列且只包含用户A自己的图片
-    listed_a = list_user_images(studio_env, USER_A, limit=10)
-    assert [item["id"] for item in listed_a] == [studio_id_a, gen_id_a, upload_id_a]
-    assert [item["kind"] for item in listed_a] == ["studio", "generated", "upload"]
 
     # 验证用户A无法解析用户B的file_id，用户B也无法解析用户A的studio_id或file_id
     with pytest.raises(ValueError, match="not found"):
@@ -347,39 +478,33 @@ def test_prompt_rules_and_stone_neutralization(tmp_path: Path) -> None:
     rules = load_rules()
     ref1 = tmp_path / "ref1.jpg"
     ref2 = tmp_path / "ref2.jpg"
+    ref3 = tmp_path / "ref3.jpg"
     ref1.write_bytes(_make_image_bytes(32, 32))
     ref2.write_bytes(_make_image_bytes(32, 32))
+    ref3.write_bytes(_make_image_bytes(32, 32))
 
-    # 整图修改下底图是图1，参考图从图2开始计数
+    # 改图下底图是图1，参考图从图2开始计数
     edit_prompt, edit_paths = build_edit_prompt(
-        "把佛龛台面换成敦煌金，背板用梵高皇，墙上保留敦煌壁画，底座换成敦煌壁",
+        "把佛龛台面换成敦煌金，背板用梵高皇，墙上保留敦煌壁画，底座换成敦煌壁，局部点缀金镶玉与梦幻庄园",
         [
             {"id": "r1", "path": ref1, "use": "材质", "note": "天川金台面样板"},
             {"id": "r2", "path": ref2, "use": "材质", "note": "梵高皇背板样板"},
+            {"id": "r3", "path": ref3, "use": "材质", "note": "金镶玉纹理"},
         ],
         rules,
     )
-    assert edit_paths == [ref1, ref2]
+    assert edit_paths == [ref1, ref2, ref3]
     assert "敦煌金" not in edit_prompt
     assert "天川金" not in edit_prompt
     assert "梵高皇" not in edit_prompt
+    assert "金镶玉" not in edit_prompt
+    assert "梦幻庄园" not in edit_prompt
     assert "图2所示石材" in edit_prompt
     assert "图3所示石材" in edit_prompt
+    assert "图4所示石材" in edit_prompt
     assert "敦煌壁画" in edit_prompt
     assert rules.edit_rules in edit_prompt
     assert "图1是唯一的修改底图" in edit_prompt
-
-    # 生图模式下参考图从图1开始计数
-    gen_prompt, gen_paths = build_generate_prompt(
-        "设计一款金镶玉与梦幻庄园结合的供桌",
-        [{"id": "r1", "path": ref1, "use": "材质", "note": "金镶玉纹理"}],
-        rules,
-    )
-    assert gen_paths == [ref1]
-    assert "金镶玉" not in gen_prompt
-    assert "梦幻庄园" not in gen_prompt
-    assert "图1所示石材" in gen_prompt
-    assert rules.reference_rules in gen_prompt
 
 
 # 校验Seedream请求载荷、各比例尺寸、receipt状态流转与超时uncertain无重试
@@ -509,89 +634,6 @@ def test_seedream_payloads_sizes_and_uncertain_timeout(
     asyncio.run(_run())
 
 
-# 校验Gemini 4 Argon概念规划器REST载荷（thinkingLevel HIGH、JSON Schema、无重试）
-def test_planner_gemini_rest_payload_and_no_retry(studio_env: StudioSettings) -> None:
-    rules = load_rules()
-    captured: list[dict[str, Any]] = []
-
-    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
-        assert request.url == httpx.URL(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-4-argon:generateContent"
-        )
-        assert request.headers["x-goog-api-key"] == studio_env.gemini_api_key
-        payload = json.loads(request.content.decode("utf-8"))
-        captured.append(payload)
-        concepts = [
-            {
-                "title": f"方案{i}",
-                "positioning": f"定位说明{i}",
-                "description": f"整体视觉与结构描述{i}",
-                "materials": f"主材建议（待确认）{i}",
-                "key_details": f"关键工艺细节{i}",
-                "image_prompt": f"A coherent studio concept view {i} with warm stone texture.",
-            }
-            for i in range(1, 4)
-        ]
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {"thought": True, "text": "internal reasoning"},
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": concepts}, ensure_ascii=False
-                                    )
-                                },
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
-
-    async def _run() -> None:
-        concepts = await plan_concepts(
-            studio_env,
-            rules,
-            brief="设计一座寺庙大殿供桌",
-            count=3,
-            transport=httpx.MockTransport(_gemini_handler),
-        )
-        assert len(concepts) == 3
-        assert len(captured) == 1
-        gen_cfg = captured[0]["generationConfig"]
-        assert gen_cfg["thinkingConfig"]["thinkingLevel"] == "HIGH"
-        assert gen_cfg["responseMimeType"] == "application/json"
-        assert "responseSchema" in gen_cfg
-        sys_text = captured[0]["systemInstruction"]["parts"][0]["text"]
-        assert rules.planner_system.replace("{count}", "3") in sys_text
-        assert rules.planner_rules.replace("{count}", "3") in sys_text
-        assert rules.no_reference_rules.replace("{count}", "3") in sys_text
-
-        # 验证超时不自动重试
-        fail_calls = 0
-
-        async def _fail_handler(request: httpx.Request) -> httpx.Response:
-            nonlocal fail_calls
-            fail_calls += 1
-            raise httpx.ReadTimeout("timeout")
-
-        with pytest.raises(RuntimeError, match="no automatic retry"):
-            await plan_concepts(
-                studio_env,
-                rules,
-                brief="测试超时",
-                count=2,
-                transport=httpx.MockTransport(_fail_handler),
-            )
-        assert fail_calls == 1
-
-    asyncio.run(_run())
-
-
 # 递归检查JSON Schema中不包含禁用关键字
 def _assert_flat_schema(node: Any) -> None:
     forbidden = {"prefixItems", "oneOf", "anyOf", "$ref", "$defs"}
@@ -605,7 +647,7 @@ def _assert_flat_schema(node: Any) -> None:
             _assert_flat_schema(item)
 
 
-# 校验MCP tools/list扁平Schema与tools/call端到端调用（generate_image、edit_image、design_concepts、list_images）
+# 校验MCP tools/list扁平Schema（仅保留真实业务缺口工具且默认不含3D工具）与compare_materials端到端调用
 def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None:
     # 为用户A准备一张上传参考图
     user_a_lc = studio_env.librechat_images_dir / USER_A
@@ -624,61 +666,31 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
     raw_big_png = big_png_buf.getvalue()
     assert len(raw_big_png) > 3 * 1024 * 1024
 
-    ark_requests: list[dict[str, Any]] = []
-
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={
-                "data": [{"b64_json": base64.b64encode(raw_big_png).decode("ascii")}]
-            },
-        )
+    gemini_image_requests: list[dict[str, Any]] = []
 
     async def _gemini_handler(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content.decode("utf-8"))
-        assert body["generationConfig"]["thinkingConfig"]["thinkingLevel"] == "HIGH"
-        concepts = [
-            {
-                "title": f"禅意石案 {i}",
-                "positioning": "大殿主供案",
-                "description": "简洁庄严的石木结合供案",
-                "materials": "黄色纹理石材（待确认）",
-                "key_details": "倒角收边与内收束腰",
-                "image_prompt": f"Minimalist temple stone altar concept {i} using 敦煌金.",
-            }
-            for i in range(1, 3)
+        assert "gemini-nano-banana-2.1" in request.url.path
+        assert request.headers.get("x-goog-api-key") == studio_env.gemini_api_key
+        assert body["generationConfig"]["responseModalities"] == [
+            "TEXT",
+            "IMAGE",
         ]
+        gemini_image_requests.append(body)
         return httpx.Response(
             200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": concepts}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
+            json=_gemini_image_response(raw_big_png, mime_type="image/png"),
         )
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
         gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     headers = {
         "X-Studio-Token": VALID_TOKEN,
         "X-LibreChat-User-ID": USER_A,
-        "X-LibreChat-Conversation-ID": "NO_PARENT",
     }
 
     async def _run() -> None:
@@ -691,7 +703,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
         ):
             assert app.state.session_manager is not None
             assert getattr(app.state.session_manager, "_task_group", None) is not None
-            # 1. 验证tools/list返回恰好8个工具且Schema完全扁平
+            # 1. 验证默认enable_3d=False时tools/list仅返回4个专有工具且移除重复工具与3D工具
             list_res = await client.post(
                 "/mcp",
                 headers=headers,
@@ -700,14 +712,10 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
             assert list_res.status_code == 200
             tools = list_res.json()["result"]["tools"]
             assert [t["name"] for t in tools] == [
-                "design_concepts",
-                "generate_image",
-                "edit_image",
-                "list_images",
+                "select_region",
+                "edit_region",
                 "search_library",
                 "compare_materials",
-                "create_3d_model",
-                "check_3d_model",
             ]
             for tool in tools:
                 _assert_flat_schema(tool["inputSchema"])
@@ -724,8 +732,28 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 ):
                     assert forbidden_vendor not in serialized
 
-            # 2. 端到端调用generate_image，返回文本JSON块+小于3MB的展示图像块，且落盘保留原始PNG字节
-            call_gen_res = await client.post(
+            # 默认状态下调用create_3d_model或check_3d_model必须返回明确暂停提示
+            for disabled_3d_tool in ("create_3d_model", "check_3d_model"):
+                hold_res = await client.post(
+                    "/mcp",
+                    headers=headers,
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 99,
+                        "method": "tools/call",
+                        "params": {
+                            "name": disabled_3d_tool,
+                            "arguments": {"image_id": upload_id, "job_id": "mdl_test"},
+                        },
+                    },
+                )
+                assert hold_res.status_code == 200
+                hold_result = hold_res.json()["result"]
+                assert hold_result["isError"] is True
+                assert "on hold" in hold_result["content"][0]["text"]
+
+            # 2. 端到端调用compare_materials，返回文本JSON块+内联对比UI资源+小于3MB的展示图像块，且落盘保留原始PNG字节
+            call_cmp_res = await client.post(
                 "/mcp",
                 headers=headers,
                 json={
@@ -733,30 +761,27 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                     "id": 2,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "prompt": "用敦煌金制作一尊佛龛底座",
-                            "aspect": "4:3",
+                            "base_id": upload_id,
+                            "target": "供桌台面",
+                            "materials": ["天川金"],
                             "size": "2K",
-                            "references": [
-                                {"id": upload_id, "use": "材质", "note": "敦煌金样板"}
-                            ],
                         },
                     },
                 },
             )
-            assert call_gen_res.status_code == 200
-            result_gen = call_gen_res.json()["result"]
-            assert result_gen.get("isError") is False
-            content_blocks = result_gen["content"]
+            assert call_cmp_res.status_code == 200
+            result_cmp = call_cmp_res.json()["result"]
+            assert result_cmp.get("isError") is False
+            content_blocks = result_cmp["content"]
             assert len(content_blocks) == 2
             assert content_blocks[0]["type"] == "text"
             assert content_blocks[1]["type"] == "image"
 
             text_meta = json.loads(content_blocks[0]["text"])
-            generated_studio_id = text_meta["id"]
+            generated_studio_id = text_meta["variants"][0]["image_id"]
             assert generated_studio_id.startswith("img_")
-            assert text_meta["size"] == "1100x1100"
             for forbidden_key in (
                 "prompt",
                 "model",
@@ -764,6 +789,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 "seedream",
                 "doubao",
                 "ark",
+                "gemini",
             ):
                 assert forbidden_key not in content_blocks[0]["text"].casefold()
 
@@ -780,86 +806,427 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 / "original.png"
             )
             assert saved_orig.read_bytes() == raw_big_png
-            assert "敦煌金" not in ark_requests[-1]["prompt"]
-            assert "图1所示石材" in ark_requests[-1]["prompt"]
+            cmp_uris, cmp_prompt = _extract_gemini_parts(gemini_image_requests[-1])
+            assert len(cmp_uris) >= 2
+            assert gemini_image_requests[-1]["generationConfig"]["imageConfig"] == {
+                "aspectRatio": "4:3",
+                "imageSize": "2K",
+            }
+            assert "供桌台面" in cmp_prompt
 
-            # 3. 端到端调用edit_image（使用@latest作为底图，保持底图1:1比例）
-            call_edit_res = await client.post(
-                "/mcp",
-                headers=headers,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 3,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "edit_image",
-                        "arguments": {
-                            "base_id": "@latest",
-                            "instruction": "将顶部线脚改为天川金材质",
-                            "references": [
-                                {"id": upload_id, "use": "材质", "note": "天川金样板"}
-                            ],
-                            "size": "1K",
+    asyncio.run(_run())
+
+
+# 三款大图对比必须低于MCP响应上限，预览供模型辨认，且同一请求跨并发与重启只计费一次。
+def test_compare_materials_bounded_previews_and_durable_idempotency(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e1111111-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    raw_png = io.BytesIO()
+    Image.frombytes("RGB", (1100, 1100), os.urandom(1100 * 1100 * 3)).save(
+        raw_png, format="PNG", compress_level=0
+    )
+    canonical = raw_png.getvalue()
+    assert len(canonical) > 3 * 1024 * 1024
+    paid_calls = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal paid_calls
+        paid_calls += 1
+        return httpx.Response(
+            200, json=_gemini_image_response(canonical, mime_type="image/png")
+        )
+
+    def _app():
+        return create_app(
+            settings=studio_env,
+            rules=load_rules(),
+            gemini_transport=httpx.MockTransport(_gemini_handler),
+        )
+
+    headers = {
+        "X-Studio-Token": VALID_TOKEN,
+        "X-LibreChat-User-ID": USER_A,
+        "X-LibreChat-Conversation-ID": "11111111-2222-3333-4444-555555555555",
+    }
+    arguments = {
+        "base_id": base_id,
+        "target": "供桌台面",
+        "materials": ["敦煌金", "金镶玉", "蓝金灰"],
+    }
+
+    async def _call(client: httpx.AsyncClient, args: dict[str, Any]) -> httpx.Response:
+        return await client.post(
+            "/mcp",
+            headers=headers,
+            json={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "tools/call",
+                "params": {"name": "compare_materials", "arguments": args},
+            },
+        )
+
+    async def _run() -> None:
+        app = _app()
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            first, simultaneous_retry = await asyncio.gather(
+                _call(client, arguments), _call(client, arguments)
+            )
+            assert paid_calls == 3
+            for response in (first, simultaneous_retry):
+                assert response.status_code == 200
+                assert len(response.content) < 4 * 1024 * 1024
+                result = response.json()["result"]
+                assert result["isError"] is False
+                assert len(result["content"]) == 4
+                payload = json.loads(result["content"][0]["text"])
+                assert payload["count"] == 3
+                assert "Inspect each image" in payload["image_context"]
+                assert [v["preview_image_index"] for v in payload["variants"]] == [
+                    1,
+                    2,
+                    3,
+                ]
+                assert len({v["image_id"] for v in payload["variants"]}) == 3
+                for variant, block in zip(payload["variants"], result["content"][1:]):
+                    assert block["type"] == "image"
+                    assert (
+                        len(base64.b64decode(block["data"]))
+                        <= studio_env.comparison_preview_max_bytes
+                    )
+                    saved = (
+                        studio_env.data_dir
+                        / "users"
+                        / USER_A
+                        / "jobs"
+                        / variant["image_id"]
+                        / "original.png"
+                    )
+                    assert saved.read_bytes() == canonical
+            assert first.json()["result"]["content"][0]["text"] == simultaneous_retry.json()["result"]["content"][0]["text"]
+
+        restarted = _app()
+        async with (
+            restarted.router.lifespan_context(restarted),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=restarted),
+                base_url="http://studio:8000",
+            ) as client,
+        ):
+            retry = await _call(client, arguments)
+            assert retry.json()["result"]["isError"] is False
+            assert paid_calls == 3
+            original_variants = json.loads(first.json()["result"]["content"][0]["text"])[
+                "variants"
+            ]
+            headers["X-LibreChat-Conversation-ID"] = "22222222-3333-4444-5555-666666666666"
+            split = await _call(client, {**arguments, "materials": ["蓝金灰"]})
+            split_variants = json.loads(split.json()["result"]["content"][0]["text"])[
+                "variants"
+            ]
+            assert split_variants[0]["image_id"] == original_variants[2]["image_id"]
+            reordered = await _call(
+                client, {**arguments, "materials": ["蓝金灰", "敦煌金", "金镶玉"]}
+            )
+            reordered_variants = json.loads(
+                reordered.json()["result"]["content"][0]["text"]
+            )["variants"]
+            assert [item["image_id"] for item in reordered_variants] == [
+                original_variants[2]["image_id"],
+                original_variants[0]["image_id"],
+                original_variants[1]["image_id"],
+            ]
+            assert paid_calls == 3
+            fresh = await _call(client, {**arguments, "idempotency_key": "new-render"})
+            assert fresh.json()["result"]["isError"] is False
+            assert paid_calls == 6
+            old_payload = json.loads(first.json()["result"]["content"][0]["text"])
+            new_payload = json.loads(fresh.json()["result"]["content"][0]["text"])
+            assert old_payload["idempotency_key"] != new_payload["idempotency_key"]
+
+    asyncio.run(_run())
+
+
+# 已保存变体与计费状态不确定的变体都不能因同参数重试而再次发起付费请求。
+def test_compare_materials_partial_result_retry_does_not_rebill(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e2222222-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    paid_calls = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal paid_calls
+        paid_calls += 1
+        if paid_calls == 2:
+            raise httpx.ReadTimeout("simulated timeout after dispatch")
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+    request_body = {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "method": "tools/call",
+        "params": {
+            "name": "compare_materials",
+            "arguments": {
+                "base_id": base_id,
+                "target": "供桌台面",
+                "materials": ["敦煌金", "金镶玉"],
+            },
+        },
+    }
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            responses = []
+            for _ in range(2):
+                responses.append(
+                    await client.post(
+                        "/mcp",
+                        headers={
+                            "X-Studio-Token": VALID_TOKEN,
+                            "X-LibreChat-User-ID": USER_A,
+                        },
+                        json=request_body,
+                    )
+                )
+            assert paid_calls == 2
+            first = responses[0].json()["result"]
+            retry = responses[1].json()["result"]
+            for result in (first, retry):
+                assert result["isError"] is False
+                assert len(result["content"]) == 2
+                payload = json.loads(result["content"][0]["text"])
+                assert payload["count"] == 1
+                assert payload["variants"][0]["image_id"].startswith("img_")
+                assert payload["variants"][1]["state"] == "uncertain"
+                assert "may have been billed" in payload["variants"][1]["error"]
+            first_payload = json.loads(first["content"][0]["text"])
+            retry_payload = json.loads(retry["content"][0]["text"])
+            assert first_payload["variants"][0]["image_id"] == retry_payload["variants"][0]["image_id"]
+
+    asyncio.run(_run())
+
+
+# 未派发的请求可沿用同一变体编号重试，已保存的结果不会因再次调用而计费。
+def test_compare_materials_retries_only_unbilled_variant(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e3333333-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    attempts = 0
+    billed = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal attempts, billed
+        attempts += 1
+        if attempts == 1:
+            raise httpx.ConnectError("simulated pre-dispatch failure")
+        billed += 1
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+    body = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": "compare_materials",
+            "arguments": {
+                "base_id": base_id,
+                "target": "供桌台面",
+                "materials": ["敦煌金"],
+            },
+        },
+    }
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            headers = {"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A}
+            first = await client.post("/mcp", headers=headers, json=body)
+            assert first.json()["result"]["isError"] is True
+            jobs = list((studio_env.data_dir / "users" / USER_A / "jobs").iterdir())
+            assert len(jobs) == 1
+            assert json.loads((jobs[0] / "receipt.json").read_text())["billed"] is False
+
+            second = await client.post("/mcp", headers=headers, json=body)
+            assert second.json()["result"]["isError"] is False
+            third = await client.post("/mcp", headers=headers, json=body)
+            assert third.json()["result"]["isError"] is False
+            assert attempts == 2
+            assert billed == 1
+            assert json.loads((jobs[0] / "receipt.json").read_text())["state"] == "saved"
+
+    asyncio.run(_run())
+
+
+def test_compare_materials_retries_rate_limited_variant_without_regenerating_sibling(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e4444444-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    attempts = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 2:
+            return httpx.Response(429, json={"error": "rate limited"})
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+    body = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": "compare_materials",
+            "arguments": {
+                "base_id": base_id,
+                "target": "供桌台面",
+                "materials": ["敦煌金", "金镶玉"],
+                "idempotency_key": "rate-limit-retry",
+            },
+        },
+    }
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            headers = {"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A}
+            first = await client.post("/mcp", headers=headers, json=body)
+            first_payload = json.loads(first.json()["result"]["content"][0]["text"])
+            assert first_payload["count"] == 1
+            successful = next(v for v in first_payload["variants"] if "image_id" in v)
+            second = await client.post("/mcp", headers=headers, json=body)
+            second_payload = json.loads(second.json()["result"]["content"][0]["text"])
+            assert second_payload["count"] == 2
+            assert successful["image_id"] in {
+                variant["image_id"] for variant in second_payload["variants"]
+            }
+            third = await client.post("/mcp", headers=headers, json=body)
+            assert json.loads(third.json()["result"]["content"][0]["text"])["count"] == 2
+            assert attempts == 3
+
+    asyncio.run(_run())
+
+
+# 两个顺序相反且包含相同石材的并发请求必须共用任务，并且不会互相等待成死锁。
+def test_compare_materials_overlapping_reordered_batches(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e4444444-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    billed = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal billed
+        billed += 1
+        await asyncio.sleep(0.02)
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            async def _call(materials: list[str]) -> dict[str, Any]:
+                response = await client.post(
+                    "/mcp",
+                    headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "compare_materials",
+                            "arguments": {
+                                "base_id": base_id,
+                                "target": "供桌台面",
+                                "materials": materials,
+                            },
                         },
                     },
-                },
-            )
-            assert call_edit_res.status_code == 200
-            edit_result = call_edit_res.json()["result"]
-            assert edit_result.get("isError") is False
-            assert ark_requests[-1]["size"] == "1024x1024"
-            assert isinstance(ark_requests[-1]["image"], list)
-            assert len(ark_requests[-1]["image"]) == 2
-            assert "天川金" not in ark_requests[-1]["prompt"]
-            assert "图2所示石材" in ark_requests[-1]["prompt"]
+                )
+                result = response.json()["result"]
+                assert result["isError"] is False
+                return json.loads(result["content"][0]["text"])
 
-            # 4. 端到端调用design_concepts，验证规划+并发出图且不泄露image_prompt与模型名
-            call_concepts_res = await client.post(
-                "/mcp",
-                headers=headers,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 4,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "design_concepts",
-                        "arguments": {
-                            "brief": "设计两款寺庙石材供桌",
-                            "count": 2,
-                            "with_images": True,
-                            "aspect": "16:9",
-                            "size": "2K",
-                            "reference_ids": [upload_id],
-                        },
-                    },
-                },
+            first, reversed_order = await asyncio.wait_for(
+                asyncio.gather(
+                    _call(["敦煌金", "金镶玉"]),
+                    _call(["金镶玉", "敦煌金"]),
+                ),
+                timeout=10,
             )
-            assert call_concepts_res.status_code == 200
-            concepts_result = call_concepts_res.json()["result"]
-            assert concepts_result.get("isError") is False
-            assert len(concepts_result["content"]) == 3
-            concepts_summary = json.loads(concepts_result["content"][0]["text"])
-            assert concepts_summary["count"] == 2
-            for c_item in concepts_summary["concepts"]:
-                assert "image_prompt" not in c_item
-                assert c_item["image_id"].startswith("img_")
-
-            # 5. 端到端调用list_images
-            call_list_res = await client.post(
-                "/mcp",
-                headers=headers,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 5,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {"limit": 10}},
-                },
-            )
-            assert call_list_res.status_code == 200
-            listed_payload = json.loads(
-                call_list_res.json()["result"]["content"][0]["text"]
-            )
-            assert listed_payload["count"] == 5
+            assert billed == 2
+            assert [item["image_id"] for item in first["variants"]] == [
+                item["image_id"] for item in reversed(reversed_order["variants"])
+            ]
 
     asyncio.run(_run())
 
@@ -868,7 +1235,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
 def test_concurrency_cap_and_mcp_error_states(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
-    # 校验HTTP 401被标记为rejected且不泄露上游响应体
+    # 校验HTTP 401被标记为rejected且不泄露上游响应体（覆盖Gemini与Seedream）
     calls_401 = 0
 
     async def _handler_401(request: httpx.Request) -> httpx.Response:
@@ -877,6 +1244,24 @@ def test_concurrency_cap_and_mcp_error_states(
         return httpx.Response(401, content=b"sensitive-upstream-secret-detail")
 
     async def _run_401() -> None:
+        job_401_gemini = tmp_path / "job_401_gemini"
+        with pytest.raises(RuntimeError, match="authentication failed") as exc_gemini:
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=job_401_gemini,
+                transport=httpx.MockTransport(_handler_401),
+            )
+        assert "sensitive-upstream-secret-detail" not in str(exc_gemini.value)
+        rec_g = json.loads(
+            (job_401_gemini / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_g["state"] == "rejected"
+        assert rec_g["http_status"] == 401
+
         job_401 = tmp_path / "job_401"
         with pytest.raises(RuntimeError, match="authentication failed") as exc_info:
             await generate_seedream(
@@ -889,66 +1274,38 @@ def test_concurrency_cap_and_mcp_error_states(
                 transport=httpx.MockTransport(_handler_401),
             )
         assert "sensitive-upstream-secret-detail" not in str(exc_info.value)
-        assert calls_401 == 1
+        assert calls_401 == 2
         rec = json.loads((job_401 / "receipt.json").read_text(encoding="utf-8"))
         assert rec["state"] == "rejected"
         assert rec["http_status"] == 401
 
     asyncio.run(_run_401())
 
-    # 校验单用户并发上限max_parallel_per_user=2
+    # 校验单用户并发上限max_parallel_per_user=2（通过compare_materials三材质并发渲染验证）
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_id = "e0000000-1111-2222-3333-444444444444"
+    (user_lc / f"{base_id}__base.jpg").write_bytes(
+        _make_image_bytes(120, 90, fmt="JPEG")
+    )
+
     capped_settings = studio_env.model_copy(update={"max_parallel_per_user": 2})
     active_in_flight = 0
     max_observed_in_flight = 0
     small_jpg = _make_image_bytes(32, 32, fmt="JPEG")
 
-    async def _slow_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _gemini_3_variants(request: httpx.Request) -> httpx.Response:
         nonlocal active_in_flight, max_observed_in_flight
         active_in_flight += 1
         max_observed_in_flight = max(max_observed_in_flight, active_in_flight)
         await asyncio.sleep(0.05)
         active_in_flight -= 1
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
-        )
-
-    async def _gemini_3_concepts(request: httpx.Request) -> httpx.Response:
-        concepts = [
-            {
-                "title": f"方向{i}",
-                "positioning": "定位",
-                "description": "描述",
-                "materials": "材质",
-                "key_details": "细节",
-                "image_prompt": f"Concept {i}",
-            }
-            for i in range(1, 4)
-        ]
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": concepts}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
+        return httpx.Response(200, json=_gemini_image_response(small_jpg))
 
     app = create_app(
         settings=capped_settings,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_slow_ark_handler),
-        gemini_transport=httpx.MockTransport(_gemini_3_concepts),
+        gemini_transport=httpx.MockTransport(_gemini_3_variants),
     )
 
     async def _run_concurrency() -> None:
@@ -964,22 +1321,23 @@ def test_concurrency_cap_and_mcp_error_states(
                     "id": 10,
                     "method": "tools/call",
                     "params": {
-                        "name": "design_concepts",
+                        "name": "compare_materials",
                         "arguments": {
-                            "brief": "三方案并发限制测试",
-                            "count": 3,
-                            "with_images": True,
+                            "base_id": base_id,
+                            "target": "供桌台面",
+                            "materials": ["天川金", "梵高皇", "蓝金灰"],
                         },
                     },
                 },
             )
             assert res.status_code == 200
+            assert res.json()["result"]["isError"] is False
             assert max_observed_in_flight == 2
 
     asyncio.run(_run_concurrency())
 
 
-# 校验POST派发后取消请求会落盘uncertain，且启动时自动将遗留pending对账为uncertain并在list_images警告展示
+# 校验POST派发后取消请求会落盘uncertain，且启动时自动将遗留pending对账为uncertain
 def test_cancellation_marks_uncertain_and_startup_reconciles_pending(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
@@ -1032,36 +1390,12 @@ def test_cancellation_marks_uncertain_and_startup_reconciles_pending(
             encoding="utf-8",
         )
 
-        app = create_app(settings=studio_env, rules=load_rules())
+        create_app(settings=studio_env, rules=load_rules())
         reconciled_receipt = json.loads(
             (abandoned_job_dir / "receipt.json").read_text(encoding="utf-8")
         )
         assert reconciled_receipt["state"] == "uncertain"
-
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
-            res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 20,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {"limit": 10}},
-                },
-            )
-            assert res.status_code == 200
-            payload = json.loads(res.json()["result"]["content"][0]["text"])
-            by_id = {item["id"]: item for item in payload["images"]}
-            assert "img_cancelled01" in by_id
-            assert by_id["img_cancelled01"]["state"] == "uncertain"
-            assert by_id["img_cancelled01"]["warning"] is True
-            assert "img_abandoned02" in by_id
-            assert by_id["img_abandoned02"]["state"] == "uncertain"
-            assert by_id["img_abandoned02"]["warning"] is True
-            assert len(payload["warnings"]) >= 2
+        assert "finished" in reconciled_receipt
 
     asyncio.run(_run())
 
@@ -1090,12 +1424,29 @@ def test_receipt_write_failure_preserves_uncertain_warning(
         return httpx.Response(502, content=b"bad gateway")
 
     async def _invalid_body_handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={"data": []})
+        return httpx.Response(200, json={"data": [], "candidates": []})
+
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    base_id = "d0000000-1111-2222-3333-444444444444"
+    (user_lc / f"{base_id}__base.jpg").write_bytes(
+        _make_image_bytes(120, 90, fmt="JPEG")
+    )
 
     async def _run() -> None:
         for idx, handler in enumerate(
             (_timeout_handler, _502_handler, _invalid_body_handler)
         ):
+            with pytest.raises(GenerationUncertain, match="may have been billed"):
+                await generate_gemini(
+                    studio_env,
+                    "prompt",
+                    [],
+                    size="1K",
+                    aspect="1:1",
+                    destination=tmp_path / f"flaky_gemini_{idx}",
+                    transport=httpx.MockTransport(handler),
+                )
             with pytest.raises(GenerationUncertain, match="may have been billed"):
                 await generate_seedream(
                     studio_env,
@@ -1107,11 +1458,12 @@ def test_receipt_write_failure_preserves_uncertain_warning(
                     transport=httpx.MockTransport(handler),
                 )
 
-        # 通过MCP调用generate_image时同样返回uncertain状态与可能已计费提示
+        # 通过MCP调用compare_materials时同样在变体结果中返回uncertain状态与可能已计费提示
         app = create_app(
             settings=studio_env,
             rules=load_rules(),
             ark_transport=httpx.MockTransport(_timeout_handler),
+            gemini_transport=httpx.MockTransport(_timeout_handler),
         )
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(
@@ -1125,8 +1477,12 @@ def test_receipt_write_failure_preserves_uncertain_warning(
                     "id": 21,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
-                        "arguments": {"prompt": "供桌设计"},
+                        "name": "compare_materials",
+                        "arguments": {
+                            "base_id": base_id,
+                            "target": "供桌台面",
+                            "materials": ["天川金"],
+                        },
                     },
                 },
             )
@@ -1134,111 +1490,13 @@ def test_receipt_write_failure_preserves_uncertain_warning(
             result = res.json()["result"]
             assert result["isError"] is True
             err_body = json.loads(result["content"][0]["text"])
-            assert err_body["state"] == "uncertain"
-            assert "may have been billed" in err_body["error"]
+            assert err_body["variants"][0]["state"] == "uncertain"
+            assert "may have been billed" in err_body["variants"][0]["error"]
 
     asyncio.run(_run())
 
 
-# 校验design_concepts规划阶段受每用户并发上限与全局并发上限约束，且在出图前释放规划信号量
-def test_planner_concurrency_caps_single_and_multi_user(
-    studio_env: StudioSettings,
-) -> None:
-    user_c = "65f00000000000000000000c"
-    capped = studio_env.model_copy(
-        update={"max_parallel_per_user": 2, "global_max_parallel": 3}
-    )
-
-    active_planner = 0
-    max_planner_observed = 0
-
-    async def _slow_gemini_handler(request: httpx.Request) -> httpx.Response:
-        nonlocal active_planner, max_planner_observed
-        active_planner += 1
-        max_planner_observed = max(max_planner_observed, active_planner)
-        await asyncio.sleep(0.05)
-        active_planner -= 1
-        concept = {
-            "title": "禅案",
-            "positioning": "定位",
-            "description": "描述",
-            "materials": "材质（待确认）",
-            "key_details": "细节",
-            "image_prompt": "A stone altar concept.",
-        }
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": [concept]}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
-
-    app = create_app(
-        settings=capped,
-        rules=load_rules(),
-        gemini_transport=httpx.MockTransport(_slow_gemini_handler),
-    )
-
-    async def _call_plan(client: httpx.AsyncClient, uid: str, req_id: int) -> None:
-        res = await client.post(
-            "/mcp",
-            headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": uid},
-            json={
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "method": "tools/call",
-                "params": {
-                    "name": "design_concepts",
-                    "arguments": {
-                        "brief": "并发规划限制测试",
-                        "count": 1,
-                        "with_images": False,
-                    },
-                },
-            },
-        )
-        assert res.status_code == 200
-        assert res.json()["result"]["isError"] is False
-
-    async def _run() -> None:
-        nonlocal max_planner_observed
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
-            # 1. 单用户发起4个并发with_images=False规划请求，受max_parallel_per_user=2限制
-            max_planner_observed = 0
-            await asyncio.gather(*(_call_plan(client, USER_A, i) for i in range(1, 5)))
-            assert max_planner_observed == 2
-
-            # 2. 三个用户同时各发起2个并发with_images=False规划请求（共6个），受global_max_parallel=3限制
-            max_planner_observed = 0
-            await asyncio.gather(
-                _call_plan(client, USER_A, 11),
-                _call_plan(client, USER_A, 12),
-                _call_plan(client, USER_B, 13),
-                _call_plan(client, USER_B, 14),
-                _call_plan(client, user_c, 15),
-                _call_plan(client, user_c, 16),
-            )
-            assert max_planner_observed == 3
-
-    asyncio.run(_run())
-
-
-# 校验LibreChat用户目录中的头像文件（avatar-*、agent-*-avatar-*）与非UUID前缀文件不会被列出或成为@latest
+# 校验LibreChat用户目录中的头像文件（avatar-*、agent-*-avatar-*）与非UUID前缀文件不会被解析或成为@latest
 def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
     user_lc = studio_env.librechat_images_dir / USER_A
     user_lc.mkdir(parents=True, mode=0o700)
@@ -1246,9 +1504,9 @@ def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
     valid_upload_id = "12345678-1234-1234-1234-123456789abc"
     valid_file = user_lc / f"{valid_upload_id}__design.png"
     valid_file.write_bytes(_make_image_bytes(100, 100, fmt="PNG"))
-    os.utime(valid_file, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000))
+    os.utime(valid_file, ns=(1_700_000_000_000_000_000, 1_700_000_000_000_000_000))
 
-    # 写入更新时间戳的头像与非UUID文件，验证不会抢占@latest或进入列表
+    # 写入更新时间戳的头像与非UUID文件，验证不会抢占@latest
     for bogus_name in (
         "avatar-1700000999.png",
         "agent-xyz123-avatar-1700000999.png",
@@ -1258,9 +1516,6 @@ def test_avatar_and_non_uuid_files_excluded(studio_env: StudioSettings) -> None:
         bogus_file = user_lc / bogus_name
         bogus_file.write_bytes(_make_image_bytes(64, 64, fmt="PNG"))
         os.utime(bogus_file, ns=(1_700_000_999_000_000_000, 1_700_000_999_000_000_000))
-
-    listed = list_user_images(studio_env, USER_A, limit=20)
-    assert [item["id"] for item in listed] == [valid_upload_id]
 
     latest = resolve_image(studio_env, USER_A, "@latest")
     assert latest.id == valid_upload_id
@@ -1280,20 +1535,14 @@ def test_stone_neutralization_only_for_matching_references(
     matched_ref = tmp_path / "vangogh_sample.jpg"
     matched_ref.write_bytes(_make_image_bytes(32, 32))
 
-    # 1. 无参考图生图：保留客户原文“敦煌金”，不得凭空生成“图1所示石材”
-    no_ref_prompt, no_ref_paths = build_generate_prompt("用敦煌金设计供桌", [], rules)
-    assert no_ref_paths == []
-    assert "敦煌金" in no_ref_prompt
-    assert "所示石材" not in no_ref_prompt
-
-    # 2. 无额外参考图改图：保留客户原文“敦煌金”，不得指向底图“图1所示石材”
+    # 1. 无额外参考图改图：保留客户原文“敦煌金”，不得指向底图“图1所示石材”
     no_ref_edit, no_ref_edit_paths = build_edit_prompt("把台面换成敦煌金", [], rules)
     assert no_ref_edit_paths == []
     assert "敦煌金" in no_ref_edit
     assert "所示石材" not in no_ref_edit
 
-    # 3. 含无关参考图与另一款匹配石材参考图：只替换匹配的梵高皇/敦煌壁，保留未匹配的敦煌金
-    mixed_prompt, _ = build_generate_prompt(
+    # 2. 含无关参考图与另一款匹配石材参考图：只替换匹配的梵高皇（图3），保留未匹配的敦煌金
+    mixed_prompt, _ = build_edit_prompt(
         "台面用敦煌金，背板用梵高皇",
         [
             {"id": "u1", "path": unrelated_ref, "use": "造型", "note": "明式束腰造型"},
@@ -1302,12 +1551,12 @@ def test_stone_neutralization_only_for_matching_references(
         rules,
     )
     assert "敦煌金" in mixed_prompt
-    assert "图1所示石材" not in mixed_prompt
+    assert "图2所示石材" not in mixed_prompt
     assert "梵高皇" not in mixed_prompt
-    assert "图2所示石材" in mixed_prompt
+    assert "图3所示石材" in mixed_prompt
 
 
-# 校验EXIF Orientation 6与8的4000x3000底图在edit_image中旋转像素尺寸与请求输出比例一致（竖幅）
+# 校验EXIF Orientation 6与8的4000x3000底图在compare_materials中旋转像素尺寸与请求输出比例一致（竖幅）
 def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> None:
     user_lc = studio_env.librechat_images_dir / USER_A
     user_lc.mkdir(parents=True, mode=0o700)
@@ -1322,25 +1571,22 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
         _make_image_bytes(4000, 3000, fmt="JPEG", exif_orientation=8)
     )
 
-    # 验证store解析与列表尺寸均为EXIF转置后的竖幅3000x4000
+    # 验证store解析尺寸均为EXIF转置后的竖幅3000x4000
     for fid in (id_orient_6, id_orient_8):
         resolved = resolve_image(studio_env, USER_A, fid)
         assert (resolved.width, resolved.height) == (3000, 4000)
 
     captured_requests: list[dict[str, Any]] = []
-    out_jpg = _make_image_bytes(1776, 2368, fmt="JPEG")
+    out_jpg = _make_image_bytes(1792, 2400, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
         captured_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run() -> None:
@@ -1360,10 +1606,11 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
                         "id": idx,
                         "method": "tools/call",
                         "params": {
-                            "name": "edit_image",
+                            "name": "compare_materials",
                             "arguments": {
                                 "base_id": fid,
-                                "instruction": "微调边角倒角",
+                                "target": "供桌台面",
+                                "materials": ["天川金"],
                                 "size": "2K",
                             },
                         },
@@ -1372,211 +1619,14 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
                 assert res.status_code == 200
                 assert res.json()["result"]["isError"] is False
                 req_body = captured_requests[-1]
-                assert req_body["size"] == "1776x2368"
-                sent_b64 = req_body["image"].split(",", 1)[1]
+                assert req_body["generationConfig"]["imageConfig"] == {
+                    "aspectRatio": "3:4",
+                    "imageSize": "2K",
+                }
+                sent_b64 = req_body["contents"][0]["parts"][1]["inlineData"]["data"]
                 with Image.open(io.BytesIO(base64.b64decode(sent_b64))) as sent_im:
                     assert sent_im.width < sent_im.height
                     assert sent_im.size == (1536, 2048)
-
-    asyncio.run(_run())
-
-
-# 校验概念方案渲染时即使规划器的image_prompt遗漏了必选副件与空间布局，仍会附带原始brief作为design_constraints发送给生图接口
-def test_concept_rendering_includes_binding_design_constraints(
-    studio_env: StudioSettings,
-) -> None:
-    ark_prompts: list[str] = []
-    small_jpg = _make_image_bytes(64, 48, fmt="JPEG")
-
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        body = json.loads(request.content.decode("utf-8"))
-        ark_prompts.append(body["prompt"])
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
-        )
-
-    # 模拟规划器在image_prompt中遗漏了“配套三足香炉”和“禅堂全景布局”，只写了孤立供桌
-    async def _omitting_gemini_handler(request: httpx.Request) -> httpx.Response:
-        concept = {
-            "title": "极简石案",
-            "positioning": "主供桌定位",
-            "description": "石质供桌配三足香炉",
-            "materials": "青石（待确认）",
-            "key_details": "直腿内收",
-            "image_prompt": "An isolated stone altar table in a neutral studio.",
-        }
-        return httpx.Response(
-            200,
-            json={
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [
-                                {
-                                    "text": json.dumps(
-                                        {"concepts": [concept]}, ensure_ascii=False
-                                    )
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-        )
-
-    app = create_app(
-        settings=studio_env,
-        rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
-        gemini_transport=httpx.MockTransport(_omitting_gemini_handler),
-    )
-
-    brief_text = (
-        "设计禅堂中轴线上的石材供桌，桌面正中必须放置配套三足香炉，保留完整禅堂空间布局"
-    )
-
-    async def _run() -> None:
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://studio:8000"
-        ) as client:
-            res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 30,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "design_concepts",
-                        "arguments": {
-                            "brief": brief_text,
-                            "count": 1,
-                            "with_images": True,
-                        },
-                    },
-                },
-            )
-            assert res.status_code == 200
-            assert res.json()["result"]["isError"] is False
-            assert len(ark_prompts) == 1
-            sent_prompt = ark_prompts[0]
-            assert "design_constraints" in sent_prompt
-            assert (
-                json.dumps({"design_constraints": brief_text}, ensure_ascii=False)
-                in sent_prompt
-            )
-            assert "配套三足香炉" in sent_prompt
-            assert "完整禅堂空间布局" in sent_prompt
-
-    asyncio.run(_run())
-
-
-# 校验count=1/2/3时组装的systemInstruction与user提示词中无冲突数量指令，且仅引用responseSchema定义的6个字段
-def test_planner_instructions_consistent_for_counts_1_to_3(
-    studio_env: StudioSettings,
-) -> None:
-    rules = load_rules()
-    forbidden_count_tokens = ("exactly 4", "3–4", "3-4", "4 个", "4个", "{count}")
-    forbidden_legacy_fields = (
-        '"summary"',
-        "material_notes",
-        '"silhouette"',
-        "key_features",
-        '"craftsmanship"',
-        '"styling"',
-        "render_prompt",
-    )
-    expected_schema_fields = (
-        "title",
-        "positioning",
-        "description",
-        "materials",
-        "key_details",
-        "image_prompt",
-    )
-
-    async def _run() -> None:
-        for count in (1, 2, 3):
-            sys_no_ref = build_planner_system_prompt(
-                rules, has_references=False, count=count
-            )
-            sys_with_ref = build_planner_system_prompt(
-                rules, has_references=True, count=count
-            )
-            for sys_text in (sys_no_ref, sys_with_ref):
-                assert f"围绕当前品类和目标提出 {count} 个不同" in sys_text
-                assert f"concepts长度严格为 {count}" in sys_text
-                assert f"在全部 {count} 个方向中均须保留" in sys_text
-                for bad_tok in forbidden_count_tokens:
-                    assert bad_tok not in sys_text
-                for legacy_field in forbidden_legacy_fields:
-                    assert legacy_field not in sys_text
-                for valid_field in expected_schema_fields:
-                    assert valid_field in sys_text
-            assert f"完成既定 JSON 格式的 {count} 个完整设计方向" in sys_no_ref
-
-            captured: list[dict[str, Any]] = []
-
-            async def _gemini_handler(
-                request: httpx.Request,
-                target_count: int = count,
-                bucket: list[dict[str, Any]] = captured,
-            ) -> httpx.Response:
-                body = json.loads(request.content.decode("utf-8"))
-                bucket.append(body)
-                concepts = [
-                    {
-                        "title": f"方案{i}",
-                        "positioning": "禅意定位",
-                        "description": "造型说明",
-                        "materials": "石材（待确认）",
-                        "key_details": "工艺收口",
-                        "image_prompt": f"Concept {i} render prompt.",
-                    }
-                    for i in range(1, target_count + 1)
-                ]
-                return httpx.Response(
-                    200,
-                    json={
-                        "candidates": [
-                            {
-                                "content": {
-                                    "parts": [
-                                        {
-                                            "text": json.dumps(
-                                                {"concepts": concepts},
-                                                ensure_ascii=False,
-                                            )
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                )
-
-            result = await plan_concepts(
-                studio_env,
-                rules,
-                brief="设计寺庙供桌",
-                count=count,
-                transport=httpx.MockTransport(_gemini_handler),
-            )
-            assert len(result) == count
-            sent_body = captured[0]
-            sent_sys = sent_body["systemInstruction"]["parts"][0]["text"]
-            sent_user = sent_body["contents"][0]["parts"][0]["text"]
-            schema_props = sent_body["generationConfig"]["responseSchema"][
-                "properties"
-            ]["concepts"]["items"]["properties"]
-            assert set(schema_props.keys()) == set(expected_schema_fields)
-            for text_part in (sent_sys, sent_user):
-                for bad_tok in forbidden_count_tokens:
-                    assert bad_tok not in text_part
-                for legacy_field in forbidden_legacy_fields:
-                    assert legacy_field not in text_part
 
     asyncio.run(_run())
 
@@ -1639,21 +1689,18 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
     in_flight_count = 0
     small_jpg = _make_image_bytes(64, 64, fmt="JPEG")
 
-    async def _barrier_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _barrier_gemini_handler(request: httpx.Request) -> httpx.Response:
         nonlocal in_flight_count
         in_flight_count += 1
         if in_flight_count >= 2:
             both_in_flight.set()
         await asyncio.wait_for(both_in_flight.wait(), timeout=5.0)
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
-        )
+        return httpx.Response(200, json=_gemini_image_response(small_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_barrier_ark_handler),
+        gemini_transport=httpx.MockTransport(_barrier_gemini_handler),
     )
 
     async def _run() -> None:
@@ -1668,23 +1715,23 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
             assert shared_mgr is not None
             assert getattr(shared_mgr, "_task_group", None) is not None
 
-            # 并发执行User A与User B的generate_image，且各自只允许解析自身名下的参考图
+            # 并发执行User A与User B的compare_materials，且各自只允许解析自身名下的底图
             req_a = client.post(
                 "/mcp",
                 headers={
                     "X-Studio-Token": VALID_TOKEN,
                     "X-LibreChat-User-ID": USER_A,
-                    "X-LibreChat-Conversation-ID": "conv-user-a-001",
                 },
                 json={
                     "jsonrpc": "2.0",
                     "id": 101,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "prompt": "用户A专属供案",
-                            "references": [{"id": upload_a, "use": "造型"}],
+                            "base_id": upload_a,
+                            "target": "供桌台面",
+                            "materials": ["天川金"],
                         },
                     },
                 },
@@ -1694,17 +1741,17 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
                 headers={
                     "X-Studio-Token": VALID_TOKEN,
                     "X-LibreChat-User-ID": USER_B,
-                    "X-LibreChat-Conversation-ID": "conv-user-b-002",
                 },
                 json={
                     "jsonrpc": "2.0",
                     "id": 102,
                     "method": "tools/call",
                     "params": {
-                        "name": "generate_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "prompt": "用户B专属香炉",
-                            "references": [{"id": upload_b, "use": "造型"}],
+                            "base_id": upload_b,
+                            "target": "香炉底座",
+                            "materials": ["梵高皇"],
                         },
                     },
                 },
@@ -1718,8 +1765,8 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
             assert body_a["isError"] is False
             assert body_b["isError"] is False
 
-            img_id_a = json.loads(body_a["content"][0]["text"])["id"]
-            img_id_b = json.loads(body_b["content"][0]["text"])["id"]
+            img_id_a = json.loads(body_a["content"][0]["text"])["variants"][0]["image_id"]
+            img_id_b = json.loads(body_b["content"][0]["text"])["variants"][0]["image_id"]
             assert img_id_a != img_id_b
 
             # 验证生成结果分别落盘在各自用户的目录且互不可见
@@ -1731,50 +1778,8 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
             assert not (
                 studio_env.data_dir / "users" / USER_B / "jobs" / img_id_a
             ).exists()
-
-            # 并发调用list_images验证各自只返回自己的上传图与生成图
-            list_a, list_b = await asyncio.gather(
-                client.post(
-                    "/mcp",
-                    headers={
-                        "X-Studio-Token": VALID_TOKEN,
-                        "X-LibreChat-User-ID": USER_A,
-                    },
-                    json={
-                        "jsonrpc": "2.0",
-                        "id": 103,
-                        "method": "tools/call",
-                        "params": {"name": "list_images", "arguments": {"limit": 10}},
-                    },
-                ),
-                client.post(
-                    "/mcp",
-                    headers={
-                        "X-Studio-Token": VALID_TOKEN,
-                        "X-LibreChat-User-ID": USER_B,
-                    },
-                    json={
-                        "jsonrpc": "2.0",
-                        "id": 104,
-                        "method": "tools/call",
-                        "params": {"name": "list_images", "arguments": {"limit": 10}},
-                    },
-                ),
-            )
-            ids_a = {
-                item["id"]
-                for item in json.loads(list_a.json()["result"]["content"][0]["text"])[
-                    "images"
-                ]
-            }
-            ids_b = {
-                item["id"]
-                for item in json.loads(list_b.json()["result"]["content"][0]["text"])[
-                    "images"
-                ]
-            }
-            assert ids_a == {upload_a, img_id_a}
-            assert ids_b == {upload_b, img_id_b}
+            assert resolve_image(studio_env, USER_A, "@latest").id == img_id_a
+            assert resolve_image(studio_env, USER_B, "@latest").id == img_id_b
 
     asyncio.run(_run())
 
@@ -1961,21 +1966,42 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
     assert flagged_rej.warning is True
     assert "rejected" in flagged_rej.warning_reasons
 
-    # 4. 在generate_image与edit_image中使用kb_<id>作为材质参考或底图，验证石材名通过catalog资产ID中性化且返回flagged警告
-    ark_requests: list[dict[str, Any]] = []
+    # 4. 在build_edit_prompt与compare_materials中使用kb_<id>作为材质参考或底图，验证石材名通过catalog资产ID中性化且返回flagged警告
+    rules = load_rules()
+    edit_prompt, _ = build_edit_prompt(
+        "采用敦煌金台面配莲花纹浮雕制作供桌",
+        [
+            {
+                "id": resolved.id,
+                "path": resolved.path,
+                "use": "材质",
+                "note": "",
+                "material_ids": resolved.material_ids,
+            },
+            {
+                "id": flagged_ai.id,
+                "path": flagged_ai.path,
+                "use": "纹样",
+                "note": "",
+                "material_ids": flagged_ai.material_ids,
+            },
+        ],
+        rules,
+    )
+    assert "敦煌金" not in edit_prompt
+    assert "图2所示石材" in edit_prompt
+
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
-        rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
+        rules=rules,
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run() -> None:
@@ -1983,38 +2009,8 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
         async with httpx.AsyncClient(
             transport=transport, base_url="http://studio:8000"
         ) as client:
-            # 传入kb_1111111111111111（不写note）与带标记的kb_6666666666666661
-            gen_res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 202,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "generate_image",
-                        "arguments": {
-                            "prompt": "采用敦煌金台面配莲花纹浮雕制作供桌",
-                            "references": [
-                                {"id": "kb_1111111111111111", "use": "材质"},
-                                {"id": "kb_6666666666666661", "use": "纹样"},
-                            ],
-                        },
-                    },
-                },
-            )
-            assert gen_res.status_code == 200
-            gen_result = gen_res.json()["result"]
-            assert gen_result.get("isError") is False
-            meta = json.loads(gen_result["content"][0]["text"])
-            assert "warnings" in meta
-            assert any("kb_6666666666666661" in w for w in meta["warnings"])
-            # 即使未提供note，通过kb_1111111111111111匹配catalog中的敦煌金后仍将“敦煌金”中性化为“图1所示石材”
-            assert "敦煌金" not in ark_requests[-1]["prompt"]
-            assert "图1所示石材" in ark_requests[-1]["prompt"]
-
-            # 使用kb_5555555555555551作为edit_image的base_id
-            edit_res = await client.post(
+            # 使用带标记的kb_6666666666666661作为compare_materials的base_id，验证返回flagged警告且正常渲染
+            cmp_res = await client.post(
                 "/mcp",
                 headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
                 json={
@@ -2022,21 +2018,24 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
                     "id": 203,
                     "method": "tools/call",
                     "params": {
-                        "name": "edit_image",
+                        "name": "compare_materials",
                         "arguments": {
-                            "base_id": "kb_5555555555555551",
-                            "instruction": "将供桌台面替换为梵高皇",
-                            "references": [
-                                {"id": "kb_2222222222222221", "use": "材质"}
-                            ],
+                            "base_id": "kb_6666666666666661",
+                            "target": "供桌台面",
+                            "materials": ["梵高皇"],
                         },
                     },
                 },
             )
-            assert edit_res.status_code == 200
-            assert edit_res.json()["result"].get("isError") is False
-            assert "梵高皇" not in ark_requests[-1]["prompt"]
-            assert "图2所示石材" in ark_requests[-1]["prompt"]
+            assert cmp_res.status_code == 200
+            cmp_result = cmp_res.json()["result"]
+            assert cmp_result.get("isError") is False
+            meta = json.loads(cmp_result["content"][0]["text"])
+            assert "warnings" in meta
+            assert any("kb_6666666666666661" in w for w in meta["warnings"])
+            _, cmp_prompt = _extract_gemini_parts(gemini_requests[-1])
+            assert "梵高皇" not in cmp_prompt
+            assert "图2所示石材" in cmp_prompt
 
     asyncio.run(_run())
 
@@ -2078,20 +2077,17 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
         )
     ]
 
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_ok_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_ok_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_ok_handler),
+        gemini_transport=httpx.MockTransport(_gemini_ok_handler),
     )
 
     async def _run_ok_and_unknown() -> None:
@@ -2124,7 +2120,28 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
             assert "未知火星石" in err_text
             for known_name in ("敦煌金", "敦煌壁", "金镶玉", "蓝金灰"):
                 assert known_name in err_text
-            assert len(ark_requests) == 0
+            assert len(gemini_requests) == 0
+
+            duplicate_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 304,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "compare_materials",
+                        "arguments": {
+                            "base_id": base_upload_id,
+                            "target": "供桌台面",
+                            "materials": ["敦煌金", "天川金"],
+                        },
+                    },
+                },
+            )
+            assert duplicate_res.json()["result"]["isError"] is True
+            assert "distinct catalog materials" in duplicate_res.json()["result"]["content"][0]["text"]
+            assert len(gemini_requests) == 0
 
             # 2. 对比“天川金”（别名->敦煌金，2张样图）与“梵高皇”（别名->敦煌壁，1张样图），验证同一底图独立渲染且绝不链式串改
             cmp_res = await client.post(
@@ -2167,42 +2184,41 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
             ]
             assert payload["comparisons"][1]["reference_ids"] == ["kb_2222222222222221"]
 
-            assert len(ark_requests) == 2
+            assert len(gemini_requests) == 2
             # 两个变体的首张图（图1底图）完全一致，均来自原始base_id而非前一次生成结果
-            assert ark_requests[0]["image"][0] == expected_base_uri
-            assert ark_requests[1]["image"][0] == expected_base_uri
-            assert ark_requests[0]["image"][1:] == expected_dunhuang_uris
-            assert ark_requests[1]["image"][1:] == expected_vangogh_uris
-            for req in ark_requests:
+            uris_0, prompt_0 = _extract_gemini_parts(gemini_requests[0])
+            uris_1, prompt_1 = _extract_gemini_parts(gemini_requests[1])
+            assert uris_0[0] == expected_base_uri
+            assert uris_1[0] == expected_base_uri
+            assert uris_0[1:] == expected_dunhuang_uris
+            assert uris_1[1:] == expected_vangogh_uris
+            for prompt in (prompt_0, prompt_1):
                 assert (
                     "将图1的供桌台面替换为本次材质样图所示石材，其他部分不变。"
-                    in req["prompt"]
+                    in prompt
                 )
-                assert rules.edit_rules in req["prompt"]
-                assert "敦煌金" not in req["prompt"]
-                assert "天川金" not in req["prompt"]
-                assert "梵高皇" not in req["prompt"]
-                assert "敦煌壁" not in req["prompt"]
+                assert rules.edit_rules in prompt
+                assert "敦煌金" not in prompt
+                assert "天川金" not in prompt
+                assert "梵高皇" not in prompt
+                assert "敦煌壁" not in prompt
 
     asyncio.run(_run_ok_and_unknown())
 
     # 3. 验证部分失败时保留成功生成的变体图像并返回告警
     call_counter = 0
 
-    async def _partial_fail_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _partial_fail_gemini_handler(request: httpx.Request) -> httpx.Response:
         nonlocal call_counter
         call_counter += 1
         if call_counter == 2:
             return httpx.Response(400, content=b"bad request on second variant")
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app_partial = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_partial_fail_ark_handler),
+        gemini_transport=httpx.MockTransport(_partial_fail_gemini_handler),
     )
 
     async def _run_partial() -> None:
@@ -2223,6 +2239,7 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
                             "base_id": base_upload_id,
                             "target": "供桌台面",
                             "materials": ["敦煌金", "梵高皇", "金镶玉"],
+                            "idempotency_key": "partial-failure-case",
                         },
                     },
                 },
@@ -2463,7 +2480,7 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
         return httpx.Response(404)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_seed3d_handler),
     )
@@ -2473,6 +2490,23 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
         async with httpx.AsyncClient(
             transport=transport, base_url="http://studio:8000"
         ) as client:
+            # 0. 当enable_3d=True时tools/list包含create_3d_model与check_3d_model（共6个工具）
+            list_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 400,
+                    "method": "tools/list",
+                    "params": {},
+                },
+            )
+            assert list_res.status_code == 200
+            tool_names = [t["name"] for t in list_res.json()["result"]["tools"]]
+            assert "create_3d_model" in tool_names
+            assert "check_3d_model" in tool_names
+            assert len(tool_names) == 6
+
             # 1. 标准精度（100k faces / low）+ ZIP内嵌GLB解包
             res_std = await client.post(
                 "/mcp",
@@ -2657,6 +2691,16 @@ def test_signed_file_endpoint_auth_expiry_tamper_cross_user_range_and_cors(
                 assert res_ok.headers["accept-ranges"] == "bytes"
                 assert res_ok.headers["access-control-allow-origin"] == "*"
                 assert int(res_ok.headers["content-length"]) == len(glb_bytes)
+                assert model_id not in res_ok.headers["content-disposition"]
+                assert (
+                    f'filename="model-{model_id.removeprefix("mdl_")[:8]}.glb"'
+                    in res_ok.headers["content-disposition"]
+                )
+                assert (
+                    "filename*=UTF-8''%E4%B8%89%E7%BB%B4%E6%A8%A1%E5%9E%8B-"
+                    f"{model_id.removeprefix('mdl_')[:8]}.glb"
+                    in res_ok.headers["content-disposition"]
+                )
 
                 # 2. HEAD与OPTIONS请求支持
                 res_head = await client.head(f"/files/{valid_tok}")
@@ -2755,6 +2799,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
         _make_image_bytes(360, 360, fmt="JPEG")
     )
     raw_glb = _make_glb_bytes(b"PAGODA_GLB_MODEL")
+    env_3d = studio_env.model_copy(update={"enable_3d": True})
 
     # 1. 上游任务返回status="failed"时记录failed且不自动重试
     failed_create_calls = 0
@@ -2774,7 +2819,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
         )
 
     app_fail = create_app(
-        settings=studio_env,
+        settings=env_3d,
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_failed_task_handler),
     )
@@ -2788,7 +2833,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
         raise httpx.ReadTimeout("timeout after POST create-task")
 
     app_uncertain = create_app(
-        settings=studio_env,
+        settings=env_3d,
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_timeout_create_handler),
     )
@@ -2819,7 +2864,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
             return httpx.Response(200, content=raw_glb)
         return httpx.Response(404)
 
-    short_poll_settings = studio_env.model_copy(
+    short_poll_settings = env_3d.model_copy(
         update={
             "seed3d_poll_timeout_seconds": 0.03,
             "seed3d_poll_initial_seconds": 0.01,
@@ -2980,7 +3025,7 @@ def test_seed3d_per_user_and_global_concurrency_limits(
         )
 
     capped = studio_env.model_copy(
-        update={"max_parallel_per_user": 2, "seed3d_max_parallel": 3}
+        update={"enable_3d": True, "max_parallel_per_user": 2, "seed3d_max_parallel": 3}
     )
     raw_glb = _make_glb_bytes()
     active_seed3d = 0
@@ -3085,20 +3130,17 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
         allowed_roots,
     )
 
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run_fixture_kb() -> None:
@@ -3131,12 +3173,14 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
                 "kb_3333333333333331"[:3] + "4444444444444441"
             ]
             assert payload["warnings"] == []
-            assert len(ark_requests) == 2
-            assert ark_requests[0]["image"] == [
+            assert len(gemini_requests) == 2
+            uris_0, _ = _extract_gemini_parts(gemini_requests[0])
+            uris_1, _ = _extract_gemini_parts(gemini_requests[1])
+            assert uris_0 == [
                 expected_base_uri,
                 expected_gold_jade_unflagged_uri,
             ]
-            assert ark_requests[1]["image"] == [
+            assert uris_1 == [
                 expected_base_uri,
                 expected_blue_grey_unflagged_uri,
             ]
@@ -3160,11 +3204,11 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
             real_kb_root / "assets" / "ref2048" / "68d94ad9e998ccc2.jpg",
             real_allowed,
         )
-        ark_requests.clear()
+        gemini_requests.clear()
         real_app = create_app(
             settings=real_env,
             rules=rules,
-            ark_transport=httpx.MockTransport(_ark_handler),
+            gemini_transport=httpx.MockTransport(_gemini_handler),
         )
 
         async def _run_real_kb() -> None:
@@ -3203,12 +3247,14 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
                     "kb_68d94ad9e998ccc2"
                 ]
                 assert payload["warnings"] == []
-                assert len(ark_requests) == 2
-                assert ark_requests[0]["image"] == [
+                assert len(gemini_requests) == 2
+                uris_0, _ = _extract_gemini_parts(gemini_requests[0])
+                uris_1, _ = _extract_gemini_parts(gemini_requests[1])
+                assert uris_0 == [
                     expected_base_uri,
                     expected_real_gold,
                 ]
-                assert ark_requests[1]["image"] == [
+                assert uris_1 == [
                     expected_base_uri,
                     expected_real_blue,
                 ]
@@ -3224,11 +3270,11 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
     )
     mat_yaml_path.write_text(mat_yaml_text, encoding="utf-8")
     flagged_env = studio_env.model_copy(update={"kb_root": all_flagged_kb})
-    ark_requests.clear()
+    gemini_requests.clear()
     flagged_app = create_app(
         settings=flagged_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run_all_flagged() -> None:
@@ -3257,7 +3303,7 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
             result = res.json()["result"]
             assert result.get("isError") is True
             assert "no usable unflagged sample assets" in result["content"][0]["text"]
-            assert len(ark_requests) == 0
+            assert len(gemini_requests) == 0
 
     asyncio.run(_run_all_flagged())
 
@@ -3288,20 +3334,17 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
         allowed_roots,
     )
 
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run() -> None:
@@ -3370,26 +3413,10 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
                 ns=(1_700_000_060_000_000_000, 1_700_000_060_000_000_000),
             )
 
-            # 3. 验证list_images不会将search_library预览缩略图列为generated
-            list_res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 411,
-                    "method": "tools/call",
-                    "params": {"name": "list_images", "arguments": {"limit": 20}},
-                },
-            )
-            assert list_res.status_code == 200
-            listed_payload = json.loads(list_res.json()["result"]["content"][0]["text"])
-            listed_ids = [item["id"] for item in listed_payload["images"]]
-            assert listed_ids == [upload_id]
-            assert preview_uuid_1 not in listed_ids
-            assert preview_uuid_2 not in listed_ids
+            # 3. 验证@latest跳过search_library预览缩略图，准确选中早先的上传底图upload_id
+            assert resolve_image(studio_env, USER_A, "@latest").id == upload_id
 
-            # 4. 验证@latest跳过search_library预览缩略图，准确选中早先的上传底图upload_id
-            edit_latest_res = await client.post(
+            cmp_latest_res = await client.post(
                 "/mcp",
                 headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
                 json={
@@ -3397,55 +3424,47 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
                     "id": 412,
                     "method": "tools/call",
                     "params": {
-                        "name": "edit_image",
+                        "name": "compare_materials",
                         "arguments": {
                             "base_id": "@latest",
-                            "instruction": "将背景墙调亮",
+                            "target": "背景墙",
+                            "materials": ["天川金"],
                         },
                     },
                 },
             )
-            assert edit_latest_res.status_code == 200
-            edit_latest_meta = json.loads(
-                edit_latest_res.json()["result"]["content"][0]["text"]
+            assert cmp_latest_res.status_code == 200
+            cmp_latest_meta = json.loads(
+                cmp_latest_res.json()["result"]["content"][0]["text"]
             )
-            assert edit_latest_meta["base_id"] == upload_id
-            assert ark_requests[-1]["image"] == expected_upload_uri
+            assert cmp_latest_meta["base_id"] == upload_id
+            latest_uris, _ = _extract_gemini_parts(gemini_requests[-1])
+            assert latest_uris[0] == expected_upload_uri
 
-            # 5. 验证显式传入带标记预览图的UUID时，自动映射回kb_3333333333333332的ref2048高清图、保留石材名中性化并返回low_res警告
-            edit_with_preview_res = await client.post(
-                "/mcp",
-                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 413,
-                    "method": "tools/call",
-                    "params": {
-                        "name": "edit_image",
-                        "arguments": {
-                            "base_id": upload_id,
-                            "instruction": "将供桌台面替换为金镶玉",
-                            "references": [
-                                {"id": preview_uuid_2, "use": "材质"},
-                            ],
-                        },
-                    },
-                },
+            # 4. 验证显式传入带标记预览图的UUID时，自动映射回kb_3333333333333332的ref2048高清图、保留石材名中性化并返回low_res警告
+            resolved_preview_2 = resolve_image(studio_env, USER_A, preview_uuid_2)
+            assert resolved_preview_2.id == "kb_3333333333333332"
+            assert resolved_preview_2.warning is True
+            assert "low_res" in resolved_preview_2.warning_reasons
+            assert (
+                normalize_reference(resolved_preview_2.path, allowed_roots)
+                == expected_flagged_gold_ref2048_uri
             )
-            assert edit_with_preview_res.status_code == 200
-            edit_preview_result = edit_with_preview_res.json()["result"]
-            assert edit_preview_result.get("isError") is False
-            edit_preview_meta = json.loads(edit_preview_result["content"][0]["text"])
-            assert any(
-                "kb_3333333333333332" in w and "low_res" in w
-                for w in edit_preview_meta["warnings"]
+            preview_prompt, _ = build_edit_prompt(
+                "将供桌台面替换为金镶玉",
+                [
+                    {
+                        "id": resolved_preview_2.id,
+                        "path": resolved_preview_2.path,
+                        "use": "材质",
+                        "note": "",
+                        "material_ids": resolved_preview_2.material_ids,
+                    }
+                ],
+                rules,
             )
-            assert ark_requests[-1]["image"] == [
-                expected_upload_uri,
-                expected_flagged_gold_ref2048_uri,
-            ]
-            assert "金镶玉" not in ark_requests[-1]["prompt"]
-            assert "图2所示石材" in ark_requests[-1]["prompt"]
+            assert "金镶玉" not in preview_prompt
+            assert "图2所示石材" in preview_prompt
 
     asyncio.run(_run())
 
@@ -3497,7 +3516,7 @@ def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
         assert "7243258cbd656d7c" in real_mural_hits
         assert "d2149859ecaf18f1" in real_mural_hits
 
-    # 3. 校验使用kb_3333333333333331或kb_9999999999999991生图时，绝不会把提示词中的“敦煌壁”或“梵高皇”误中性化
+    # 3. 校验使用kb_3333333333333331或kb_9999999999999991改图时，绝不会把提示词中的“敦煌壁”或“梵高皇”误中性化
     rules = load_rules()
     resolved_gold = resolve_image(
         studio_env, USER_A, "kb_3333333333333331", kb_index=kb_index
@@ -3505,7 +3524,7 @@ def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
     resolved_mural = resolve_image(
         studio_env, USER_A, "kb_9999999999999991", kb_index=kb_index
     )
-    prompt_with_gold, _ = build_generate_prompt(
+    prompt_with_gold, _ = build_edit_prompt(
         "用金镶玉做供桌，墙面保留敦煌壁与梵高皇装饰及敦煌壁画",
         [
             {
@@ -3519,12 +3538,12 @@ def test_dunhuang_mural_does_not_match_dunhuang_wall_stone(
         rules,
     )
     assert "金镶玉" not in prompt_with_gold
-    assert "图1所示石材" in prompt_with_gold
+    assert "图2所示石材" in prompt_with_gold
     assert "敦煌壁" in prompt_with_gold
     assert "梵高皇" in prompt_with_gold
     assert "敦煌壁画" in prompt_with_gold
 
-    prompt_with_mural, _ = build_generate_prompt(
+    prompt_with_mural, _ = build_edit_prompt(
         "参考敦煌壁画方柱设计展厅，采用敦煌壁与梵高皇背景墙",
         [
             {
@@ -3665,6 +3684,7 @@ def test_p2b_finding1_get_only_recovery_after_uncertain_or_restart(
 
     cfg = studio_env.model_copy(
         update={
+            "enable_3d": True,
             "seed3d_poll_timeout_seconds": 0.01,
             "seed3d_background_timeout_seconds": 0.03,
             "seed3d_poll_initial_seconds": 0.01,
@@ -3803,7 +3823,7 @@ def test_p2b_finding2_storage_failure_returns_uncertain_with_job_id_and_recovers
     monkeypatch.setattr(models3d_mod, "write_model_receipt", _flaky_write_receipt)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_handler),
     )
@@ -3941,6 +3961,7 @@ def test_p2b_finding3_terminal_saved_never_overwritten_by_race_or_timeout(
 
     cfg = studio_env.model_copy(
         update={
+            "enable_3d": True,
             "seed3d_poll_timeout_seconds": 0.005,
             "seed3d_background_timeout_seconds": 0.04,
             "seed3d_poll_initial_seconds": 0.02,
@@ -4060,7 +4081,7 @@ def test_p2b_finding4_query_4xx_marks_uncertain_not_failed_and_recovers(
         return httpx.Response(200, content=raw_glb)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_handler),
     )
@@ -4181,6 +4202,7 @@ def test_p2b_finding5_admission_held_across_background_handoff_until_terminal(
     # 设置max_parallel_per_user=1与seed3d_max_parallel=1，验证后台续跑期间配额不泄露
     cfg = studio_env.model_copy(
         update={
+            "enable_3d": True,
             "max_parallel_per_user": 1,
             "seed3d_max_parallel": 1,
             "seed3d_poll_timeout_seconds": 0.015,
@@ -4386,7 +4408,7 @@ def test_p2b_finding8_seed3d_image_prep_aspect_padding_and_min_size_rejection(
         return httpx.Response(200, content=raw_glb)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_handler),
     )
@@ -4462,7 +4484,10 @@ def test_p2b_finding6_sandboxed_viewer_and_host_download_link(
         port = s.getsockname()[1]
 
     local_cfg = studio_env.model_copy(
-        update={"public_base_url": f"http://127.0.0.1:{port}"}
+        update={
+            "enable_3d": True,
+            "public_base_url": f"http://127.0.0.1:{port}",
+        }
     )
 
     async def _seed3d_handler(request: httpx.Request) -> httpx.Response:
@@ -4511,12 +4536,17 @@ def test_p2b_finding6_sandboxed_viewer_and_host_download_link(
 
     meta, viewer_html = asyncio.run(_call_create())
     model_id = meta["model_id"]
+    short_model_hex = model_id.removeprefix("mdl_")[:8]
+    expected_display_filename = f"三维模型-{short_model_hex}.glb"
     download_url = meta["download_url"]
     download_md = meta["download_markdown"]
 
-    # 1. 验证文本结果包含签名下载链接与Markdown链接，且viewer_html不含<a、download=或target="_blank"
+    # 1. 验证文本结果包含签名下载链接与简短中文名Markdown链接，不暴露完整mdl_<32位hex>，且viewer_html不含<a、download=或target="_blank"
     assert download_url.startswith(f"http://127.0.0.1:{port}/studio-files/")
-    assert download_md == f"[下载 GLB 模型 ({model_id}.glb)]({download_url})"
+    assert (
+        download_md == f"[下载 GLB 模型 ({expected_display_filename})]({download_url})"
+    )
+    assert f"{model_id}.glb" not in download_md
     assert download_md in meta["message"]
     assert "<a " not in viewer_html
     assert "download=" not in viewer_html
@@ -4654,7 +4684,7 @@ export class GLTFLoader {
   </script>
   <iframe id="mcp-sandbox-frame" sandbox="allow-scripts" srcdoc="{escaped_srcdoc}" style="width:640px;height:440px;border:0;"></iframe>
   <div id="chat-message">
-    <a id="host-chat-download-link" href="{escaped_dl}">下载 GLB 模型 ({model_id}.glb)</a>
+    <a id="host-chat-download-link" href="{escaped_dl}">下载 GLB 模型 ({expected_display_filename})</a>
   </div>
 </body>
 </html>"""
@@ -4785,7 +4815,7 @@ const {{ chromium }} = require('playwright');
             "parsedExtras": "FINDING6_REAL_GLTF2_BINARY",
         }
         assert pw_out["hostHeight"] >= 360
-        assert pw_out["suggestedFilename"] == f"{model_id}.glb"
+        assert pw_out["suggestedFilename"] == expected_display_filename
         assert dl_target.read_bytes() == raw_glb
     finally:
         uvi_server.should_exit = True
@@ -5000,7 +5030,7 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
     user_lc = studio_env.librechat_images_dir / USER_A
     user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
 
-    # 1. 创建上传图与四类产图工具输出（模拟LibreChat resizeImageBuffer重编码后的真实文件名与WebP字节）
+    # 1. 创建上传图与产图工具输出（含内置gemini_image_gen、edit_region与compare_materials，模拟LibreChat resizeImageBuffer重编码后的真实文件名与WebP字节）
     upload_id = "10000000-1111-2222-3333-444444444444"
     (user_lc / f"{upload_id}__client_photo.jpg").write_bytes(
         _make_image_bytes(140, 100, color=(90, 80, 70), fmt="JPEG")
@@ -5012,32 +5042,38 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
 
     producing_specs = [
         (
+            "20000011-1111-2222-3333-444444444444",
+            "generate_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-lg1",
+            2,
+        ),
+        (
+            "20000012-1111-2222-3333-444444444444",
+            "edit_image_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-lg2",
+            4,
+        ),
+        (
+            "20000013-1111-2222-3333-444444444444",
+            "design_concepts_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-lg3",
+            6,
+        ),
+        (
             "20000001-1111-2222-3333-444444444444",
-            "generate_image",
-            "V1StGXR8_Z5jdHi6B-gn1",
+            "gemini_image_gen_img_V1StGXR8_Z5jdHi6B-gn1",
             10,
         ),
         (
             "20000002-1111-2222-3333-444444444444",
-            "edit_image",
-            "V1StGXR8_Z5jdHi6B-ed2",
+            "edit_region_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-er2",
             20,
         ),
         (
-            "20000003-1111-2222-3333-444444444444",
-            "design_concepts",
-            "V1StGXR8_Z5jdHi6B-dc3",
-            30,
-        ),
-        (
             "20000004-1111-2222-3333-444444444444",
-            "compare_materials",
-            "V1StGXR8_Z5jdHi6B-cm4",
+            "compare_materials_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-cm4",
             40,
         ),
     ]
-    for fid, tool_name, nanoid, sec in producing_specs:
-        fpath = user_lc / f"{fid}-{tool_name}_mcp_zyb_studio_img_{nanoid}.webp"
+    for fid, suffix_stem, sec in producing_specs:
+        fpath = user_lc / f"{fid}-{suffix_stem}.webp"
         with Image.open(
             io.BytesIO(_make_image_bytes(200, 150, color=(sec, 100, 150), fmt="PNG"))
         ) as im:
@@ -5061,12 +5097,12 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
         ),
         (
             "30000003-1111-2222-3333-444444444444",
-            "list_images_mcp_zyb_studio_img_V1StGXR8_ls3",
+            "select_region_mcp_zyb_studio_img_V1StGXR8_sr3",
             70,
         ),
         (
             "30000004-1111-2222-3333-444444444444",
-            "generate_image_mcp_other_server_img_V1StGXR8_ot4",
+            "compare_materials_mcp_other_server_img_V1StGXR8_ot4",
             80,
         ),
     ]
@@ -5076,17 +5112,8 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
         ts_ns = (1_700_000_000 + sec) * 1_000_000_000
         os.utime(fpath, ns=(ts_ns, ts_ns))
 
-    # 验证list_images与@latest仅包含上传图与四类产图工具输出，且@latest指向最新的compare_materials输出
-    listed = list_user_images(studio_env, USER_A, limit=20)
-    listed_ids = [item["id"] for item in listed]
-    assert listed_ids == [
-        "20000004-1111-2222-3333-444444444444",
-        "20000003-1111-2222-3333-444444444444",
-        "20000002-1111-2222-3333-444444444444",
-        "20000001-1111-2222-3333-444444444444",
-        upload_id,
-    ]
-    for fid, _, _, _ in producing_specs:
+    # 验证resolve_image与@latest仅识别上传图与允许的产图工具输出，且@latest指向最新的compare_materials输出
+    for fid, _, _ in producing_specs:
         resolved_prod = resolve_image(studio_env, USER_A, fid)
         assert resolved_prod.id == fid
         assert resolved_prod.kind == "generated"
@@ -5191,12 +5218,7 @@ def test_librechat_tool_output_classification_and_reencoded_search_previews(
             t2_ns = time.time_ns() + 5_000_000
             os.utime(s2_file_0, ns=(t2_ns, t2_ns))
 
-            # 验证search_library输出不进入list_images或@latest，但resolve_image按批次与顺序精确映射回各自的kb_<id>
-            after_list = list_user_images(studio_env, USER_A, limit=20)
-            after_ids = [item["id"] for item in after_list]
-            assert s1_uuid_0 not in after_ids
-            assert s1_uuid_1 not in after_ids
-            assert s2_uuid_0 not in after_ids
+            # 验证search_library输出不抢占@latest，但resolve_image按批次与顺序精确映射回各自的kb_<id>
             assert resolve_image(studio_env, USER_A, "@latest").id == (
                 "20000004-1111-2222-3333-444444444444"
             )
@@ -5302,7 +5324,7 @@ def test_kb_index_and_search_library_with_607_records_and_region_filter(
     asyncio.run(_run())
 
 
-# 校验Seedream、Seed3D与Gemini规划器均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
+# 校验Gemini生图、Seedream与Seed3D均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
 def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_uncertain(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
@@ -5319,16 +5341,40 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
 
     observed_timeouts: dict[str, dict[str, Any]] = {}
 
+    async def _inspect_gemini_handler(request: httpx.Request) -> httpx.Response:
+        observed_timeouts["gemini"] = dict(request.extensions.get("timeout") or {})
+        raise httpx.ConnectError("IPv4 unreachable before dispatch")
+
     async def _inspect_seedream_handler(request: httpx.Request) -> httpx.Response:
         observed_timeouts["seedream"] = dict(request.extensions.get("timeout") or {})
         raise httpx.ConnectError("IPv4 unreachable before dispatch")
 
-    async def _inspect_planner_handler(request: httpx.Request) -> httpx.Response:
-        observed_timeouts["planner"] = dict(request.extensions.get("timeout") or {})
-        raise httpx.ConnectTimeout("connect timed out before dispatch")
-
     async def _run() -> None:
-        # 1. 验证Seedream、Planner与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
+        # 1. 验证Gemini生图、Seedream与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
+        with pytest.raises(RuntimeError, match="not billed") as exc_gem_conn:
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gemini_conn_err",
+                transport=httpx.MockTransport(_inspect_gemini_handler),
+            )
+        assert not isinstance(exc_gem_conn.value, GenerationUncertain)
+        assert getattr(exc_gem_conn.value, "state", None) == "failed"
+        assert getattr(exc_gem_conn.value, "billed", None) is False
+        assert observed_timeouts["gemini"]["connect"] == 10.0
+        assert observed_timeouts["gemini"]["read"] == float(
+            studio_env.seedream_timeout_seconds
+        )
+        rec_gem_conn = json.loads(
+            (tmp_path / "gemini_conn_err" / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_gem_conn["state"] == "failed"
+        assert rec_gem_conn["billed"] is False
+        assert rec_gem_conn["error_code"] == "connect_error"
+
         with pytest.raises(RuntimeError, match="not billed") as exc_img_conn:
             await generate_seedream(
                 studio_env,
@@ -5358,9 +5404,28 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         assert rec_conn_err["billed"] is False
         assert rec_conn_err["error_code"] == "connect_error"
 
-        # 验证Seedream ConnectTimeout同样标记为failed+未计费
+        # 验证Gemini与Seedream ConnectTimeout同样标记为failed+未计费
         async def _seedream_connect_timeout(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectTimeout("connect timeout before request bytes sent")
+
+        with pytest.raises(RuntimeError, match="not billed") as exc_gem_ct:
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gemini_conn_timeout",
+                transport=httpx.MockTransport(_seedream_connect_timeout),
+            )
+        assert not isinstance(exc_gem_ct.value, GenerationUncertain)
+        rec_gem_ct = json.loads(
+            (tmp_path / "gemini_conn_timeout" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_gem_ct["state"] == "failed"
+        assert rec_gem_ct["billed"] is False
 
         with pytest.raises(RuntimeError, match="not billed") as exc_img_ct:
             await generate_seedream(
@@ -5381,9 +5446,26 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         assert rec_ct["state"] == "failed"
         assert rec_ct["billed"] is False
 
-        # 验证Seedream派发后ReadTimeout依然保持state="uncertain"并抛出GenerationUncertain
+        # 验证Gemini与Seedream派发后ReadTimeout依然保持state="uncertain"并抛出GenerationUncertain
         async def _seedream_read_timeout(request: httpx.Request) -> httpx.Response:
             raise httpx.ReadTimeout("read timeout after request dispatch")
+
+        with pytest.raises(GenerationUncertain, match="may have been billed"):
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gemini_read_timeout",
+                transport=httpx.MockTransport(_seedream_read_timeout),
+            )
+        rec_gem_rt = json.loads(
+            (tmp_path / "gemini_read_timeout" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_gem_rt["state"] == "uncertain"
 
         with pytest.raises(GenerationUncertain, match="may have been billed"):
             await generate_seedream(
@@ -5401,20 +5483,6 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
             )
         )
         assert rec_rt["state"] == "uncertain"
-
-        # 验证Gemini规划器connect=10.0超时配置与派发前连接异常提示
-        with pytest.raises(RuntimeError, match="not billed"):
-            await plan_concepts(
-                studio_env,
-                rules,
-                brief="供桌方案",
-                count=1,
-                transport=httpx.MockTransport(_inspect_planner_handler),
-            )
-        assert observed_timeouts["planner"]["connect"] == 10.0
-        assert observed_timeouts["planner"]["read"] == float(
-            studio_env.planner_timeout_seconds
-        )
 
         # 2. 验证Seed3D _build_client配置connect=10.0，且ConnectError/ConnectTimeout与派发后ReadTimeout分流
         mgr_probe = ModelJobManager(
@@ -5446,16 +5514,17 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
                 raise err
 
             app_conn = create_app(
-                settings=studio_env,
+                settings=studio_env.model_copy(update={"enable_3d": True}),
                 rules=rules,
                 ark_transport=httpx.MockTransport(_seed3d_conn_fail),
+                gemini_transport=httpx.MockTransport(_seed3d_conn_fail),
             )
             async with httpx.AsyncClient(
                 transport=httpx.ASGITransport(app=app_conn),
                 base_url="http://studio:8000",
             ) as client:
-                # MCP generate_image：返回state=failed, billed=False，且list_images不出现uncertain警告
-                res_img = await client.post(
+                # MCP compare_materials：返回变体state=failed且提示not billed，无uncertain计费警告
+                res_cmp = await client.post(
                     "/mcp",
                     headers={
                         "X-Studio-Token": VALID_TOKEN,
@@ -5466,40 +5535,23 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
                         "id": 800 + idx,
                         "method": "tools/call",
                         "params": {
-                            "name": "generate_image",
-                            "arguments": {"prompt": "须弥座设计"},
+                            "name": "compare_materials",
+                            "arguments": {
+                                "base_id": src_upload_id,
+                                "target": "须弥座",
+                                "materials": ["天川金"],
+                            },
                         },
                     },
                 )
-                img_res = res_img.json()["result"]
-                assert img_res["isError"] is True
-                img_err = json.loads(img_res["content"][0]["text"])
-                assert img_err["state"] == "failed"
-                assert img_err["billed"] is False
-                assert "not billed" in img_err["error"]
-                assert "may have been billed" not in img_err["error"]
-                assert "uncertain" not in img_err["error"].casefold()
-
-                res_list = await client.post(
-                    "/mcp",
-                    headers={
-                        "X-Studio-Token": VALID_TOKEN,
-                        "X-LibreChat-User-ID": USER_A,
-                    },
-                    json={
-                        "jsonrpc": "2.0",
-                        "id": 810 + idx,
-                        "method": "tools/call",
-                        "params": {"name": "list_images", "arguments": {"limit": 10}},
-                    },
-                )
-                list_payload = json.loads(
-                    res_list.json()["result"]["content"][0]["text"]
-                )
-                assert list_payload["warnings"] == []
-                assert all(
-                    item.get("state") != "uncertain" for item in list_payload["images"]
-                )
+                cmp_res = res_cmp.json()["result"]
+                assert cmp_res["isError"] is True
+                cmp_err = json.loads(cmp_res["content"][0]["text"])
+                variant_err = cmp_err["variants"][0]
+                assert variant_err.get("state") != "uncertain"
+                assert "not billed" in variant_err["error"]
+                assert "may have been billed" not in variant_err["error"]
+                assert "uncertain" not in variant_err["error"].casefold()
 
                 # MCP create_3d_model + check_3d_model：返回state=failed, billed=False，无uncertain计费警告
                 res_3d = await client.post(
@@ -5570,9 +5622,10 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
             raise httpx.ReadTimeout("read timeout after POST dispatch")
 
         app_rt = create_app(
-            settings=studio_env,
+            settings=studio_env.model_copy(update={"enable_3d": True}),
             rules=rules,
             ark_transport=httpx.MockTransport(_seed3d_read_timeout),
+            gemini_transport=httpx.MockTransport(_seed3d_read_timeout),
         )
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app_rt), base_url="http://studio:8000"
@@ -5679,3 +5732,312 @@ def test_search_library_chinese_multi_term_tokenization_ranking_and_thumbnail_la
                 assert item["thumbnail_label"] in tool_text
 
     asyncio.run(_run())
+
+
+# 校验Gemini Nano Banana 2.1尺寸/比例映射、thought分块跳过、无图错误与image_provider双后端切换
+def test_gemini_nano_banana_21_unit_and_provider_switch(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    # 1. 验证gemini_aspect_and_size支持的标准比例与source自适应最近比例映射
+    assert gemini_aspect_and_size("1K", "1:1") == ("1:1", (1024, 1024))
+    assert gemini_aspect_and_size("2K", "3:4") == ("3:4", (1792, 2400))
+    assert gemini_aspect_and_size("2K", "source", (1600, 1200)) == (
+        "4:3",
+        (2400, 1792),
+    )
+    assert gemini_aspect_and_size("1K", "source", (1080, 1920)) == (
+        "9:16",
+        (768, 1376),
+    )
+    with pytest.raises(ValueError, match="Invalid image size or aspect ratio"):
+        gemini_aspect_and_size("8K", "1:1")
+    with pytest.raises(ValueError, match="Invalid image size or aspect ratio"):
+        gemini_aspect_and_size("1K", "7:5")
+    with pytest.raises(ValueError, match="Invalid source image dimensions"):
+        gemini_aspect_and_size("1K", "source", None)
+
+    # 2. 验证generate_gemini跳过thought=True分块、解析inline_data/inlineData、并在无图时抛出GenerationUncertain
+    raw_png = _make_image_bytes(160, 120, color=(40, 90, 140), fmt="PNG")
+    ref_uri = "data:image/jpeg;base64," + base64.b64encode(
+        _make_image_bytes(120, 90, color=(200, 100, 50), fmt="JPEG")
+    ).decode("ascii")
+
+    captured_reqs: list[dict[str, Any]] = []
+
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers.get("x-goog-api-key") == "test-gemini-key-no-spaces"
+        assert request.url.path.endswith(f"/models/{GEMINI_MODEL}:generateContent")
+        body = json.loads(request.content.decode("utf-8"))
+        captured_reqs.append(body)
+        if len(captured_reqs) == 1:
+            return httpx.Response(
+                200,
+                json={
+                    "candidates": [
+                        {
+                            "content": {
+                                "parts": [
+                                    {
+                                        "thought": True,
+                                        "inlineData": {
+                                            "mimeType": "image/png",
+                                            "data": base64.b64encode(
+                                                _make_image_bytes(
+                                                    32, 32, color=(0, 0, 0), fmt="PNG"
+                                                )
+                                            ).decode("ascii"),
+                                        },
+                                    },
+                                    {"text": "Rendering finished."},
+                                    {
+                                        "inline_data": {
+                                            "mime_type": "image/png",
+                                            "data": base64.b64encode(raw_png).decode(
+                                                "ascii"
+                                            ),
+                                        }
+                                    },
+                                ]
+                            }
+                        }
+                    ]
+                },
+            )
+        # 第二次请求返回纯文本无图像 -> 应判定为post-dispatch uncertain
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {"content": {"parts": [{"text": "I cannot generate that image."}]}}
+                ]
+            },
+        )
+
+    seedream_called = 0
+
+    async def _seedream_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal seedream_called
+        seedream_called += 1
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {"b64_json": base64.b64encode(raw_png).decode("ascii")},
+                ]
+            },
+        )
+
+    async def _gemini_ok_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=_gemini_image_response(raw_png))
+
+    async def _run() -> None:
+        res_ok = await generate_gemini(
+            studio_env,
+            "石雕须弥座测试",
+            [ref_uri],
+            size="2K",
+            aspect="source",
+            source_size=(1600, 1200),
+            destination=tmp_path / "gem_ok",
+            transport=httpx.MockTransport(_gemini_handler),
+        )
+        assert res_ok["raw_bytes"] == raw_png
+        assert res_ok["width"] == 160
+        assert res_ok["height"] == 120
+        req0 = captured_reqs[0]
+        assert req0["generationConfig"] == {
+            "responseModalities": ["TEXT", "IMAGE"],
+            "imageConfig": {"aspectRatio": "4:3", "imageSize": "2K"},
+        }
+        parts0 = req0["contents"][0]["parts"]
+        assert parts0[0] == {"text": "石雕须弥座测试"}
+        assert parts0[1]["inlineData"]["mimeType"] == "image/jpeg"
+
+        rec_ok = json.loads(
+            (tmp_path / "gem_ok" / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_ok["state"] == "saved"
+        assert rec_ok["provider"] == "gemini"
+        assert rec_ok["model"] == GEMINI_MODEL
+        assert rec_ok["aspect_ratio"] == "4:3"
+        assert rec_ok["image_size"] == "2K"
+
+        # 无图响应必须标记为uncertain且不自动重试
+        with pytest.raises(GenerationUncertain, match="no image data"):
+            await generate_gemini(
+                studio_env,
+                "石雕须弥座无图测试",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gem_no_img",
+                transport=httpx.MockTransport(_gemini_handler),
+            )
+        rec_no_img = json.loads(
+            (tmp_path / "gem_no_img" / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_no_img["state"] == "uncertain"
+        assert rec_no_img["error_code"] == "no_image"
+
+        # 3. 验证generate_image_with_provider根据settings.image_provider在gemini与seedream之间切换
+        res_switch_gem = await generate_image_with_provider(
+            studio_env,
+            "默认走Gemini",
+            [],
+            size="1K",
+            aspect="1:1",
+            destination=tmp_path / "switch_gem",
+            ark_transport=httpx.MockTransport(_seedream_handler),
+            gemini_transport=httpx.MockTransport(_gemini_ok_handler),
+        )
+        assert res_switch_gem["raw_bytes"] == raw_png
+        assert seedream_called == 0
+
+        seedream_cfg = studio_env.model_copy(update={"image_provider": "seedream"})
+        res_switch_sd = await generate_image_with_provider(
+            seedream_cfg,
+            "切换回Seedream",
+            [],
+            size="1K",
+            aspect="1:1",
+            destination=tmp_path / "switch_sd",
+            ark_transport=httpx.MockTransport(_seedream_handler),
+            gemini_transport=httpx.MockTransport(_gemini_handler),
+        )
+        assert res_switch_sd["raw_bytes"] == raw_png
+        assert seedream_called == 1
+
+    asyncio.run(_run())
+
+
+# 校验内部 /files/{kb_...|img_...} 桥接端点：凭共享令牌与用户ID返回知识库资产或当前用户专精产物，拒绝跨用户访问
+def test_internal_files_bridge_for_kb_and_user_img_with_isolation(
+    studio_env: StudioSettings,
+) -> None:
+    img_id = "img_1234567890abcdef1234567890abcdef"
+    job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / img_id
+    job_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
+    png_bytes = _make_image_bytes(64, 64, fmt="PNG")
+    (job_dir / "original.png").write_bytes(png_bytes)
+    (job_dir / "receipt.json").write_text(
+        json.dumps({"state": "saved", "file": "original.png"}), encoding="utf-8"
+    )
+
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            # 1. 合法令牌+用户ID获取kb_<16-hex>
+            kb_res = await client.get(
+                "/files/kb_1111111111111111",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_A,
+                },
+            )
+            assert kb_res.status_code == 200
+            assert kb_res.headers["content-type"].startswith("image/jpeg")
+            assert len(kb_res.content) > 0
+
+            # 2. 合法令牌+所属用户获取img_<32-hex>
+            own_res = await client.get(
+                f"/files/{img_id}",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_A,
+                },
+            )
+            assert own_res.status_code == 200
+            assert own_res.headers["content-type"].startswith("image/png")
+            assert own_res.content == png_bytes
+
+            # 3. 跨用户获取USER_A的img_<32-hex>被拒绝（404）
+            other_res = await client.get(
+                f"/files/{img_id}",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_B,
+                },
+            )
+            assert other_res.status_code == 404
+
+            # 4. 缺少或错误令牌被拒绝（404，不泄露内部ID存在性）
+            unauth_res = await client.get(
+                f"/files/{img_id}",
+                headers={
+                    "X-Studio-Token": "0" * 64,
+                    "X-LibreChat-User-ID": USER_A,
+                },
+            )
+            assert unauth_res.status_code == 404
+
+    asyncio.run(_run())
+
+
+# 验证桥接生成的 studio_ref_img_<32位hex> LibreChat File UUID 可被 Studio 专精工具解析并复用
+def test_resolve_bridged_studio_ref_img_uuid(studio_env: StudioSettings) -> None:
+    png_bytes = _make_image_bytes(320, 240, fmt="PNG")
+    img_id = "img_fedcba0987654321fedcba0987654321"
+    job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / img_id
+    job_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
+    (job_dir / "original.png").write_bytes(png_bytes)
+    (job_dir / "receipt.json").write_text(
+        json.dumps({"state": "saved", "file": "original.png"}), encoding="utf-8"
+    )
+
+    lc_dir = Path(studio_env.librechat_images_dir) / USER_A
+    lc_dir.mkdir(parents=True, exist_ok=True)
+    bridged_uuid = "55555555-6666-5777-8888-999999999999"
+    bridged_name = f"{bridged_uuid}-studio_ref_{img_id}_img_{bridged_uuid[:8]}.png"
+    (lc_dir / bridged_name).write_bytes(png_bytes)
+
+    resolved = resolve_image(studio_env, USER_A, bridged_uuid)
+    assert resolved.id == img_id
+    assert resolved.kind == "studio"
+    assert resolved.width == 320
+    assert resolved.height == 240
+    assert resolved.path.read_bytes() == png_bytes
+
+    # 若工作台原图目录已清理，仍能回退使用桥接在 lc_dir 中的文件并保留真实尺寸
+    (job_dir / "receipt.json").unlink()
+    fallback_resolved = resolve_image(studio_env, USER_A, bridged_uuid)
+    assert fallback_resolved.id == bridged_uuid
+    assert fallback_resolved.width == 320
+    assert fallback_resolved.height == 240
+    assert fallback_resolved.path.read_bytes() == png_bytes
+
+
+# 验证三维模型下载文件名、Markdown下载链接与Content-Disposition使用简短中文命名（三维模型-<8位hex>.glb）且不暴露原始mdl_<32位hex>
+def test_model_download_filename_and_content_disposition_use_short_chinese_name() -> (
+    None
+):
+    from deploy.studio.models3d import (
+        format_model_content_disposition,
+        format_model_download_filename,
+        format_model_download_markdown,
+    )
+
+    model_id = "mdl_464d284fabcd1234567890abcdef1234"
+    signed_url = "https://zybc.example.com/studio-files/tok.sig"
+
+    filename = format_model_download_filename(model_id)
+    assert filename == "三维模型-464d284f.glb"
+    assert "mdl_" not in filename
+    assert "464d284fabcd" not in filename
+
+    markdown = format_model_download_markdown(model_id, signed_url)
+    assert markdown == f"[下载 GLB 模型 (三维模型-464d284f.glb)]({signed_url})"
+    assert model_id not in markdown
+
+    disposition = format_model_content_disposition(model_id)
+    # HTTP响应头必须可按Latin-1编码（Starlette/ASGI要求），同时通过RFC 5987提供UTF-8中文文件名
+    disposition.encode("latin-1")
+    assert model_id not in disposition
+    assert 'filename="model-464d284f.glb"' in disposition
+    assert (
+        "filename*=UTF-8''%E4%B8%89%E7%BB%B4%E6%A8%A1%E5%9E%8B-464d284f.glb"
+        in disposition
+    )
