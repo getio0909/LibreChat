@@ -18,6 +18,10 @@ jest.mock('~/Providers', () => ({
 }));
 jest.mock('~/Providers/MCPAppsPolicyContext', () => ({
   useMCPAppsPolicy: () => ({ enabled: true, legacyHtmlEnabled: true }),
+  useMCPAppsHost: () => ({
+    policy: { enabled: true, legacyHtmlEnabled: true },
+    userId: 'user-1',
+  }),
 }));
 jest.mock('~/hooks', () => ({ useLocalize: jest.fn() }));
 jest.mock('~/utils', () => ({ handleUIAction: jest.fn() }));

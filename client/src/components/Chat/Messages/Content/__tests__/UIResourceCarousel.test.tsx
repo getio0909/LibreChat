@@ -24,6 +24,10 @@ jest.mock('~/hooks', () => ({
 
 jest.mock('~/Providers/MCPAppsPolicyContext', () => ({
   useMCPAppsPolicy: () => ({ enabled: true, legacyHtmlEnabled: true }),
+  useMCPAppsHost: () => ({
+    policy: { enabled: true, legacyHtmlEnabled: true },
+    userId: 'user-1',
+  }),
 }));
 
 // Mock the UIResourceRenderer component

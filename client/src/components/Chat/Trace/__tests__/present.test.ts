@@ -319,6 +319,45 @@ describe('presentRecord', () => {
     });
   });
 
+  it('localizes Studio MCP tool titles and server captions without mislabeling other MCP servers', () => {
+    const studioRound = buildTraceModel([
+      generation('llm-1', 'model', 'llm', 100),
+      {
+        ...round('round-studio', 1500),
+        tools: ['edit_region_mcp_zyb_studio', 'edit_region_mcp_other_server'],
+      },
+    ]);
+    const studioNode = studioRound.nodes.get('round-studio');
+    const presented =
+      studioNode &&
+      presentRecord(studioNode, {
+        localize: (key) => {
+          const map: Record<string, string> = {
+            com_ui_mcp_server_zyb_studio: '设计工坊',
+            com_ui_tool_name_edit_region: '执行局部重绘',
+            com_ui_trace_role_tools_count: '2 个工具',
+          };
+          return map[key] ?? key;
+        },
+        activity: buildActivityIndex(studioRound, buildPreviews([])),
+        previewOf: () => undefined,
+        agentOf: () => undefined,
+        mcpServerNames: ['zyb_studio', 'other_server'],
+      });
+    expect(presented?.calls).toEqual([
+      expect.objectContaining({
+        name: 'edit_region_mcp_zyb_studio',
+        title: '执行局部重绘',
+        caption: '设计工坊',
+      }),
+      expect.objectContaining({
+        name: 'edit_region_mcp_other_server',
+        title: 'edit_region',
+        caption: 'other_server',
+      }),
+    ]);
+  });
+
   it('keeps the agent row when the agent can no longer be loaded', () => {
     expect(present([response], {}).of('scout')).toMatchObject({
       title: 'com_ui_agent',

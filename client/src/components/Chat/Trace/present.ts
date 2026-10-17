@@ -2,7 +2,7 @@ import type { Agent, TTraceRecord, TTraceRecordRole } from 'librechat-data-provi
 import type { ActivityIndex, ToolCallPreview } from './preview';
 import type { TranslationKeys } from '~/hooks';
 import type { TraceNode } from './model';
-import { parseToolName } from '~/utils/toolLabels';
+import { getMCPServerDisplayLabel, parseToolName } from '~/utils/toolLabels';
 
 type Localize = (key: TranslationKeys, values?: Record<string, string | number>) => string;
 
@@ -52,10 +52,13 @@ export function presentTool(
   { localize, mcpServerNames }: Pick<PresentationSources, 'localize' | 'mcpServerNames'>,
 ): Pick<RecordPresentation, 'title' | 'caption'> {
   const parsed = parseToolName(name, mcpServerNames);
+  const caption = parsed.mcpServer
+    ? getMCPServerDisplayLabel(parsed.mcpServer, localize)
+    : undefined;
   if (parsed.friendlyKey != null) {
-    return { title: localize(parsed.friendlyKey) };
+    return { title: localize(parsed.friendlyKey), ...(caption ? { caption } : {}) };
   }
-  return { title: parsed.toolName, caption: parsed.mcpServer || undefined };
+  return { title: parsed.toolName, caption };
 }
 
 function presentToolRound(record: TTraceRecord, sources: PresentationSources): RecordPresentation {

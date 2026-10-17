@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useAtomValue } from 'jotai';
 import { UIResourceRenderer as LegacyUIResourceRenderer } from '@mcp-ui/client';
 import {
   isHtmlMediaType,
@@ -6,9 +7,20 @@ import {
   resolveMCPUIResourceMimeType,
 } from 'librechat-data-provider';
 import type { UIResource } from 'librechat-data-provider';
+import type { UIActionResult } from '@mcp-ui/client';
 import type { ComponentProps } from 'react';
-import { useMCPAppsPolicy } from '~/Providers/MCPAppsPolicyContext';
-import { loadUIDraft } from '~/utils';
+import type { TAskFunction } from '~/common';
+import {
+  buildStudioDraftKey,
+  buildStudioResourceKey,
+  loadUIDraft,
+  studioRenewedLinksAtom,
+  studioUIStore,
+  upgradePersistedStudioHtml,
+} from '~/utils/studio';
+import { useOptionalMessagesConversation } from '~/Providers/MessagesViewContext';
+import { useMCPAppsHost } from '~/Providers/MCPAppsPolicyContext';
+import { handleUIAction } from '~/utils';
 
 type LegacyRendererProps = ComponentProps<typeof LegacyUIResourceRenderer>;
 
@@ -18,6 +30,8 @@ type UIResourceRendererProps = Omit<
 > & {
   resource: UIResource;
 };
+
+const NOOP_ASK: TAskFunction = () => undefined;
 
 export function isSupportedUIResource(
   resource: UIResource | null | undefined,
@@ -33,10 +47,19 @@ export function isSupportedUIResource(
 export default function UIResourceRenderer({
   resource,
   htmlProps,
+  onUIAction,
   ...props
 }: UIResourceRendererProps) {
-  const { legacyHtmlEnabled } = useMCPAppsPolicy();
-  const isSupported = legacyHtmlEnabled && isSupportedUIResource(resource);
+  const { policy, userId } = useMCPAppsHost();
+  const { conversationId } = useOptionalMessagesConversation();
+  const isSupported = Boolean(policy?.legacyHtmlEnabled) && isSupportedUIResource(resource);
+
+  const resourceKey = useMemo(
+    () => buildStudioResourceKey({ userId, conversationId, resource }),
+    [userId, conversationId, resource],
+  );
+  const renewedLinksMap = useAtomValue(studioRenewedLinksAtom, { store: studioUIStore });
+  const renewedLinks = resourceKey ? renewedLinksMap[resourceKey] : undefined;
 
   const safeResource = useMemo(() => {
     if (!isSupported) {
@@ -45,26 +68,50 @@ export default function UIResourceRenderer({
     const nextResource = { ...resource };
     delete nextResource.contentType;
     nextResource.mimeType = 'text/html';
+    if (typeof nextResource.text === 'string' && nextResource.text) {
+      nextResource.text = upgradePersistedStudioHtml(
+        nextResource.text,
+        nextResource.uri,
+        renewedLinks,
+      );
+    }
     return nextResource;
-  }, [isSupported, resource]);
+  }, [isSupported, resource, renewedLinks]);
 
   const safeHtmlProps = useMemo(() => {
     const nextHtmlProps = { ...htmlProps };
     delete nextHtmlProps.sandboxPermissions;
-    const uri = resource?.uri ?? '';
-    if (uri.startsWith('ui://zyb_studio/selection/')) {
-      const imageId = uri.slice('ui://zyb_studio/selection/'.length).split('?')[0];
-      const draftKey = imageId ? `zyb_studio_selection_draft_${imageId}` : '';
-      const selectionDraft = draftKey ? loadUIDraft(draftKey) : undefined;
-      if (selectionDraft !== undefined) {
-        nextHtmlProps.iframeRenderData = {
-          ...(nextHtmlProps.iframeRenderData ?? {}),
-          selectionDraft,
-        };
-      }
+    const draftKey = buildStudioDraftKey({ userId, conversationId, resource });
+    const selectionDraft = draftKey ? loadUIDraft(draftKey, studioUIStore) : undefined;
+    if (selectionDraft !== undefined || renewedLinks !== undefined) {
+      nextHtmlProps.iframeRenderData = {
+        ...(nextHtmlProps.iframeRenderData ?? {}),
+        ...(selectionDraft !== undefined ? { selectionDraft } : {}),
+        ...(renewedLinks !== undefined ? { renewedLinks } : {}),
+      };
     }
     return nextHtmlProps;
-  }, [htmlProps, resource?.uri]);
+  }, [htmlProps, userId, conversationId, resource, renewedLinks]);
+
+  const scopedOnUIAction = useCallback(
+    async (result: UIActionResult) => {
+      const rawType = (result as { type?: string } | null)?.type;
+      if (
+        rawType === 'ui-draft-save' ||
+        rawType === 'ui-draft-load' ||
+        rawType === 'ui-link-renew'
+      ) {
+        return handleUIAction(result, NOOP_ASK, {
+          userId,
+          conversationId,
+          resource,
+          store: studioUIStore,
+        });
+      }
+      return onUIAction?.(result);
+    },
+    [onUIAction, userId, conversationId, resource],
+  );
 
   if (!safeResource) {
     return null;
@@ -74,6 +121,7 @@ export default function UIResourceRenderer({
     <LegacyUIResourceRenderer
       {...props}
       resource={safeResource}
+      onUIAction={scopedOnUIAction}
       htmlProps={safeHtmlProps}
       supportedContentTypes={['rawHtml']}
     />

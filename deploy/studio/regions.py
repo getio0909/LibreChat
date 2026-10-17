@@ -1474,6 +1474,8 @@ def verify_image_token(
     token: str,
     *,
     now: float | None = None,
+    allow_expired: bool = False,
+    max_expired_age_seconds: int | None = None,
 ) -> tuple[str, str, int]:
     cleaned_token = token if isinstance(token, str) else ""
     match = REGION_TOKEN_RE.fullmatch(cleaned_token)
@@ -1503,7 +1505,13 @@ def verify_image_token(
     exp = int(raw_exp)
     current_ts = time.time() if now is None else float(now)
     if current_ts >= exp:
-        raise ValueError("Image token has expired")
+        if not allow_expired:
+            raise ValueError("Image token has expired")
+        if (
+            max_expired_age_seconds is not None
+            and (current_ts - exp) > max_expired_age_seconds
+        ):
+            raise ValueError("Image token has expired beyond renewal window")
     cleaned_img = _validate_token_image_id(raw_image_id)
     return uid, cleaned_img, exp
 
@@ -1577,12 +1585,27 @@ def is_editor_token(token: str) -> bool:
     return decoded.startswith("edt:")
 
 
+# 检查指定用户的选区编辑器单次随机数是否已被确认操作消耗
+def is_editor_nonce_consumed(
+    settings: StudioSettings, user_id: str, editor_nonce: str
+) -> bool:
+    uid = validate_user_id(user_id)
+    cleaned_nonce = editor_nonce.strip() if isinstance(editor_nonce, str) else ""
+    if not EDITOR_NONCE_RE.fullmatch(cleaned_nonce):
+        raise ValueError("Invalid editor token nonce")
+    studio_dir = user_studio_dir(settings, uid, create=False)
+    nonce_lock_path = studio_dir / "selections" / "_used_nonces" / f"{cleaned_nonce}.lock"
+    return nonce_lock_path.exists() or nonce_lock_path.is_symlink()
+
+
 # 校验HMAC-SHA256选区编辑器令牌并返回绑定声明字典（user_id, image_id, image_sha256, nonce, expires_at）
 def verify_editor_token(
     settings: StudioSettings,
     token: str,
     *,
     now: float | None = None,
+    allow_expired: bool = False,
+    max_expired_age_seconds: int | None = None,
 ) -> dict[str, Any]:
     cleaned_token = token if isinstance(token, str) else ""
     match = REGION_TOKEN_RE.fullmatch(cleaned_token)
@@ -1612,7 +1635,13 @@ def verify_editor_token(
     exp = int(raw_exp)
     current_ts = time.time() if now is None else float(now)
     if current_ts >= exp:
-        raise ValueError("Editor token has expired")
+        if not allow_expired:
+            raise ValueError("Editor token has expired")
+        if (
+            max_expired_age_seconds is not None
+            and (current_ts - exp) > max_expired_age_seconds
+        ):
+            raise ValueError("Editor token has expired beyond renewal window")
     if not SHA256_HEX_RE.fullmatch(raw_sha):
         raise ValueError("Invalid image SHA-256 in editor token")
     if not EDITOR_NONCE_RE.fullmatch(raw_nonce):
@@ -1883,14 +1912,35 @@ def build_selection_editor_html(
   const SIGNED_URL = {safe_url_js};
   const PREVIEW_URL = {safe_preview_url_js};
   const IMAGE_ID = {safe_image_id_js};
+  const RESOURCE_URI = 'ui://zyb_studio/selection/' + IMAGE_ID;
   const EDITOR_EXPIRES_AT = {safe_expires_js};
   const PREVIEW_EXPIRES_AT = {safe_preview_expires_js};
   const SEGMENT_READY = {segment_ready_js};
-  const DRAFT_KEY = 'zyb_studio:selection:' + IMAGE_ID;
+
+  function extractEditorCapability(signedUrl) {{
+    if (typeof signedUrl !== 'string' || !signedUrl) return 'default';
+    const match = signedUrl.match(/\\/(?:studio-files|files)\\/([A-Za-z0-9_-]+)\\.([0-9a-f]{{16,64}})/);
+    if (match && match[2]) return match[2].slice(0, 24);
+    const clean = signedUrl.split('?')[0].replace(/[^A-Za-z0-9_-]/g, '');
+    return clean.slice(-24) || 'default';
+  }}
+
+  const EDITOR_CAPABILITY = extractEditorCapability(SIGNED_URL);
+  const DRAFT_KEY = 'zyb_studio:selection:' + IMAGE_ID + ':' + EDITOR_CAPABILITY;
+  const SESSION_NONCE = (() => {{
+    const buf = new Uint32Array(4);
+    if (window.crypto && window.crypto.getRandomValues) {{
+      window.crypto.getRandomValues(buf);
+      return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+    }}
+    return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+  }})();
+
   let currentEditorUrl = SIGNED_URL;
   let currentPreviewUrl = PREVIEW_URL || SIGNED_URL;
   let editorExpiresIso = EDITOR_EXPIRES_AT;
   let previewExpiresIso = PREVIEW_EXPIRES_AT || EDITOR_EXPIRES_AT;
+  let reqCounter = 0;
 
   const state = {{
     tool: {default_tool_js},
@@ -1907,8 +1957,37 @@ def build_selection_editor_html(
     busy: false,
     triedEditorFallback: false,
     autoRenewSent: false,
-    lastDraftUpdatedAt: 0
+    lastDraftUpdatedAt: 0,
+    pendingDraftRequestId: null,
+    pendingRenewRequestId: null,
+    renderDataReceived: false
   }};
+
+  function nextRequestId(prefix) {{
+    reqCounter += 1;
+    return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+  }}
+
+  function isValidRenewedStudioUrl(candidateUrl, referenceUrl, expectedPrefix) {{
+    if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+    try {{
+      const cand = new URL(candidateUrl, window.location.href);
+      if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+      const ref = new URL(referenceUrl || SIGNED_URL, window.location.href);
+      if (cand.origin !== ref.origin) return false;
+      const match = cand.pathname.match(/\\/(?:studio-files|files)\\/([A-Za-z0-9_-]+)\\.([0-9a-f]{{64}})$/);
+      if (!match) return false;
+      if (expectedPrefix) {{
+        const b64 = match[1].replace(/-/g, '+').replace(/_/g, '/');
+        const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+        const decoded = atob(b64 + pad);
+        if (!decoded.startsWith(expectedPrefix)) return false;
+      }}
+      return true;
+    }} catch (_e) {{
+      return false;
+    }}
+  }}
 
   const root = document.getElementById('editorRoot');
   const viewport = document.getElementById('viewport');
@@ -1971,6 +2050,8 @@ def build_selection_editor_html(
     return {{
       version: 1,
       imageId: IMAGE_ID,
+      resourceUri: RESOURCE_URI,
+      editorCapability: EDITOR_CAPABILITY,
       tool: state.tool,
       op: state.op,
       brushRadius: state.brushRadius,
@@ -1989,14 +2070,22 @@ def build_selection_editor_html(
     state.lastDraftUpdatedAt = Date.now();
     const snapshot = buildDraftSnapshot();
     try {{
-      window.name = JSON.stringify({{ draftKey: DRAFT_KEY, draft: snapshot }});
+      window.name = JSON.stringify({{
+        draftKey: DRAFT_KEY,
+        editorCapability: EDITOR_CAPABILITY,
+        draft: snapshot
+      }});
     }} catch (_e) {{}}
     if (window.parent && window.parent !== window) {{
       window.parent.postMessage({{
         type: 'ui-draft-save',
+        messageId: nextRequestId('draft-save'),
         payload: {{
           draftKey: DRAFT_KEY,
           imageId: IMAGE_ID,
+          resourceUri: RESOURCE_URI,
+          editorCapability: EDITOR_CAPABILITY,
+          sessionNonce: SESSION_NONCE,
           draft: snapshot
         }}
       }}, '*');
@@ -2005,6 +2094,7 @@ def build_selection_editor_html(
 
   function applyDraftSnapshot(draft) {{
     if (!draft || typeof draft !== 'object' || draft.imageId !== IMAGE_ID) return false;
+    if (draft.editorCapability && draft.editorCapability !== EDITOR_CAPABILITY) return false;
     const incomingTs = Number(draft.updatedAt) || 0;
     if (state.lastDraftUpdatedAt > 0 && incomingTs > 0 && incomingTs < state.lastDraftUpdatedAt) {{
       return false;
@@ -2041,7 +2131,11 @@ def build_selection_editor_html(
     state.confirmedId = typeof draft.confirmedId === 'string' ? draft.confirmedId : null;
     state.lastDraftUpdatedAt = incomingTs || Date.now();
     try {{
-      window.name = JSON.stringify({{ draftKey: DRAFT_KEY, draft: buildDraftSnapshot() }});
+      window.name = JSON.stringify({{
+        draftKey: DRAFT_KEY,
+        editorCapability: EDITOR_CAPABILITY,
+        draft: buildDraftSnapshot()
+      }});
     }} catch (_e) {{}}
     syncStageLayout();
     if (state.shapes.length > 0 && !state.confirmedId) {{
@@ -2052,28 +2146,40 @@ def build_selection_editor_html(
 
   function applyRenewedLinks(links) {{
     if (!links || typeof links !== 'object') return false;
-    if (links.imageId && links.imageId !== IMAGE_ID) return false;
+    const targetImgId = links.imageId || links.image_id;
+    if (targetImgId && targetImgId !== IMAGE_ID) return false;
     let updated = false;
-    const nextEditor = links.editorUrl || links.signedUrl;
-    const nextPreview = links.previewUrl || nextEditor;
+    const nextEditor = links.editorUrl || links.editor_url || links.signedUrl || links.signed_url;
+    const nextPreview = links.previewUrl || links.preview_url;
     if (typeof nextEditor === 'string' && nextEditor) {{
+      if (!isValidRenewedStudioUrl(nextEditor, SIGNED_URL, 'edt:')) {{
+        return false;
+      }}
       currentEditorUrl = nextEditor;
       updated = true;
     }}
     if (typeof nextPreview === 'string' && nextPreview) {{
+      if (!isValidRenewedStudioUrl(nextPreview, PREVIEW_URL || SIGNED_URL, 'img:')) {{
+        return false;
+      }}
       currentPreviewUrl = nextPreview;
-      if (!baseImg.complete || baseImg.naturalWidth === 0 || baseImg.src !== currentPreviewUrl) {{
+      if (!baseImg.complete || baseImg.naturalWidth === 0) {{
         baseImg.src = currentPreviewUrl;
       }}
       updated = true;
+    }} else if (updated && (!baseImg.complete || baseImg.naturalWidth === 0)) {{
+      baseImg.src = currentEditorUrl;
     }}
-    if (typeof links.expiresAt === 'string' && links.expiresAt) {{
-      editorExpiresIso = links.expiresAt;
+    const nextExpires = links.expiresAt || links.expires_at;
+    if (typeof nextExpires === 'string' && nextExpires) {{
+      editorExpiresIso = nextExpires;
     }}
-    if (typeof links.previewExpiresAt === 'string' && links.previewExpiresAt) {{
-      previewExpiresIso = links.previewExpiresAt;
+    const nextPreviewExpires = links.previewExpiresAt || links.preview_expires_at;
+    if (typeof nextPreviewExpires === 'string' && nextPreviewExpires) {{
+      previewExpiresIso = nextPreviewExpires;
     }}
     if (updated) {{
+      state.linksRenewed = true;
       refreshExpiryBadge();
       if (renewBtn) renewBtn.hidden = true;
       setStatus('已更新选区链接，可继续框选或点击“确认选区”。', '');
@@ -2081,30 +2187,60 @@ def build_selection_editor_html(
     return updated;
   }}
 
-  function requestLinkRenewal(mode) {{
+  async function renewDirectlyFromStudio() {{
+    try {{
+      const res = await fetch(currentEditorUrl, {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{
+          action: 'renew',
+          resource_uri: RESOURCE_URI,
+          image_id: IMAGE_ID,
+          editor_url: currentEditorUrl,
+          preview_url: currentPreviewUrl
+        }})
+      }});
+      const rawText = await res.text();
+      let data = {{}};
+      if (rawText) {{
+        try {{
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        }} catch (_e) {{}}
+      }}
+      if (res.ok && applyRenewedLinks(data)) {{
+        return true;
+      }}
+    }} catch (_err) {{}}
+    return false;
+  }}
+
+  async function requestLinkRenewal(mode) {{
     persistDraftState();
     if (renewBtn) renewBtn.hidden = false;
-    if (!window.parent || window.parent === window) return;
-    if (mode === 'tool') {{
-      window.parent.postMessage({{
-        type: 'tool',
-        messageId: 'renew-tool-' + Date.now(),
-        payload: {{
-          toolName: 'select_region',
-          params: {{ image_id: IMAGE_ID }}
-        }}
-      }}, '*');
-      setStatus('已向设计助手请求刷新选区链接，新卡片就绪后将自动恢复当前选区草稿…', '');
-    }} else {{
+    if (mode === 'manual' || mode === 'tool') {{
+      setStatus('正在刷新当前选区编辑链接（已保留未确认草稿）…', '');
+    }}
+    if (window.parent && window.parent !== window) {{
+      const reqId = nextRequestId('renew');
+      state.pendingRenewRequestId = reqId;
       window.parent.postMessage({{
         type: 'ui-link-renew',
-        messageId: 'renew-check-' + Date.now(),
+        messageId: reqId,
         payload: {{
-          toolName: 'select_region',
-          params: {{ image_id: IMAGE_ID }},
-          imageId: IMAGE_ID
+          resourceUri: RESOURCE_URI,
+          imageId: IMAGE_ID,
+          editorCapability: EDITOR_CAPABILITY,
+          sessionNonce: SESSION_NONCE,
+          reason: mode || 'manual',
+          editorUrl: currentEditorUrl,
+          previewUrl: currentPreviewUrl
         }}
       }}, '*');
+    }}
+    const ok = await renewDirectlyFromStudio();
+    if (!ok && (mode === 'manual' || mode === 'tool') && (!window.parent || window.parent === window)) {{
+      setStatus('选区链接刷新失败，请稍后重试。', 'err');
     }}
   }}
 
@@ -2301,10 +2437,28 @@ def build_selection_editor_html(
             : null
         }})
       }});
-      const data = await res.json();
+      const rawText = await res.text();
+      let data = {{}};
+      if (rawText) {{
+        try {{
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        }} catch (_parseErr) {{}}
+      }}
       if (!res.ok) {{
-        if (res.status === 401 || res.status === 403 || res.status === 409 || res.status === 410) {{
+        if (
+          res.status === 401 ||
+          res.status === 403 ||
+          res.status === 404 ||
+          res.status === 409 ||
+          res.status === 410
+        ) {{
           if (renewBtn) renewBtn.hidden = false;
+          persistDraftState();
+          throw new Error(
+            (data.error || '当前选区编辑凭证已过期或已使用') +
+              '，请点击“重新获取链接”刷新后继续（选区草稿已保留）'
+          );
         }}
         throw new Error(data.error || '点选识别未成功，请改用框选、套索或画笔');
       }}
@@ -2523,7 +2677,7 @@ def build_selection_editor_html(
 
   if (renewBtn) {{
     renewBtn.addEventListener('click', () => {{
-      requestLinkRenewal('tool');
+      requestLinkRenewal('manual');
     }});
   }}
 
@@ -2541,13 +2695,27 @@ def build_selection_editor_html(
           selection: {{ version: 1, shapes: state.shapes }}
         }})
       }});
-      const data = await res.json();
+      const rawText = await res.text();
+      let data = {{}};
+      if (rawText) {{
+        try {{
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        }} catch (_parseErr) {{}}
+      }}
       if (!res.ok) {{
-        if (res.status === 401 || res.status === 403 || res.status === 409 || res.status === 410) {{
+        if (
+          res.status === 401 ||
+          res.status === 403 ||
+          res.status === 404 ||
+          res.status === 409 ||
+          res.status === 410
+        ) {{
           if (renewBtn) renewBtn.hidden = false;
           persistDraftState();
           throw new Error(
-            (data.error || '当前选区编辑凭证已过期或已使用') + '，请点击“重新获取链接”刷新后继续（选区草稿已保留）'
+            (data.error || '当前选区编辑凭证已过期或已使用') +
+              '，请点击“重新获取链接”刷新后继续（选区草稿已保留）'
           );
         }}
         throw new Error(data.error || '选区确认失败，请检查选区范围后重试');
@@ -2578,12 +2746,15 @@ def build_selection_editor_html(
   }});
 
   window.addEventListener('message', (ev) => {{
+    if (!window.parent || window.parent === window || ev.source !== window.parent) return;
     if (!ev.data || typeof ev.data !== 'object') return;
     const msgType = ev.data.type;
     const payload = ev.data.payload || {{}};
-    if (msgType === 'ui-lifecycle-iframe-render-data') {{
+    if (msgType === 'ui-lifecycle-iframe-render-data' && !state.renderDataReceived) {{
+      state.renderDataReceived = true;
       const renderData = payload.renderData || payload;
       if (renderData && typeof renderData === 'object') {{
+        window.iframeRenderData = renderData;
         const draftMap = renderData.drafts || {{}};
         const candidateDraft = renderData.selectionDraft || draftMap[DRAFT_KEY] || renderData.draft;
         if (candidateDraft) applyDraftSnapshot(candidateDraft);
@@ -2593,21 +2764,34 @@ def build_selection_editor_html(
           applyRenewedLinks(renderData);
         }}
       }}
-    }} else if (msgType === 'ui-message-response' || msgType === 'ui-draft-restore' || msgType === 'ui-link-renewed') {{
+    }} else if (msgType === 'ui-message-response') {{
+      const messageId = ev.data.messageId;
+      if (!messageId || typeof messageId !== 'string') return;
       const resp = payload.response || payload;
-      if (resp && typeof resp === 'object') {{
+      if (!resp || typeof resp !== 'object') return;
+      if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+      if (messageId === state.pendingDraftRequestId) {{
+        state.pendingDraftRequestId = null;
+        if (resp.editorCapability && resp.editorCapability !== EDITOR_CAPABILITY) return;
         if (resp.draft) applyDraftSnapshot(resp.draft);
-        if (resp.previewUrl || resp.editorUrl || resp.signedUrl) applyRenewedLinks(resp);
+      }} else if (messageId === state.pendingRenewRequestId) {{
+        state.pendingRenewRequestId = null;
+        if (resp.previewUrl || resp.preview_url || resp.editorUrl || resp.editor_url || resp.signedUrl || resp.signed_url) {{
+          applyRenewedLinks(resp);
+        }}
       }}
     }}
   }});
 
   baseImg.addEventListener('load', () => {{
-    if (renewBtn && Date.now() < new Date(editorExpiresIso).getTime()) {{
-      renewBtn.hidden = true;
+    const editorExpired = Date.now() >= new Date(editorExpiresIso).getTime();
+    if (renewBtn) {{
+      renewBtn.hidden = !editorExpired;
     }}
     syncStageLayout();
-    if (state.shapes.length > 0 && !state.confirmedId) {{
+    if (state.linksRenewed && !state.confirmedId) {{
+      setStatus('已更新选区链接，可继续框选或点击“确认选区”。', '');
+    }} else if (state.shapes.length > 0 && !state.confirmedId) {{
       setStatus('已恢复未确认的选区草稿，可继续调整或点击“确认选区”。', '');
     }} else if (!state.confirmedId) {{
       setStatus('请在图上框选、套索或画笔涂抹要修改的局部区域，蓝色区域外将保持原样，完成后点击“确认选区”。', '');
@@ -2630,9 +2814,22 @@ def build_selection_editor_html(
   }});
 
   try {{
+    if (window.iframeRenderData && typeof window.iframeRenderData === 'object') {{
+      if (window.iframeRenderData.selectionDraft) {{
+        applyDraftSnapshot(window.iframeRenderData.selectionDraft);
+      }}
+      if (window.iframeRenderData.renewedLinks) {{
+        applyRenewedLinks(window.iframeRenderData.renewedLinks);
+      }}
+    }}
     if (window.name && window.name.startsWith('{{')) {{
       const parsedName = JSON.parse(window.name);
-      if (parsedName && parsedName.draftKey === DRAFT_KEY && parsedName.draft) {{
+      if (
+        parsedName &&
+        parsedName.draftKey === DRAFT_KEY &&
+        (!parsedName.editorCapability || parsedName.editorCapability === EDITOR_CAPABILITY) &&
+        parsedName.draft
+      ) {{
         applyDraftSnapshot(parsedName.draft);
       }}
     }}
@@ -2640,12 +2837,17 @@ def build_selection_editor_html(
 
   if (window.parent && window.parent !== window) {{
     window.parent.postMessage({{ type: 'ui-lifecycle-iframe-ready' }}, '*');
+    const loadReqId = nextRequestId('draft-load');
+    state.pendingDraftRequestId = loadReqId;
     window.parent.postMessage({{
       type: 'ui-draft-load',
-      messageId: 'draft-load-' + IMAGE_ID,
+      messageId: loadReqId,
       payload: {{
         draftKey: DRAFT_KEY,
-        imageId: IMAGE_ID
+        imageId: IMAGE_ID,
+        resourceUri: RESOURCE_URI,
+        editorCapability: EDITOR_CAPABILITY,
+        sessionNonce: SESSION_NONCE
       }}
     }}, '*');
   }}
@@ -2680,6 +2882,7 @@ def build_compare_viewer_html(
     human_expires = html.escape(format_display_timestamp(expires_at), quote=True)
     before_url_js = json.dumps(before_url)
     after_url_js = json.dumps(after_url)
+    image_id_js = json.dumps(image_id)
     base_id_js = json.dumps(base_id)
 
     return f"""<!DOCTYPE html>
@@ -2832,9 +3035,25 @@ def build_compare_viewer_html(
 </div>
 <script>
 (function() {{
-  let currentBeforeUrl = {before_url_js};
-  let currentAfterUrl = {after_url_js};
+  const INITIAL_BEFORE_URL = {before_url_js};
+  const INITIAL_AFTER_URL = {after_url_js};
+  let currentBeforeUrl = INITIAL_BEFORE_URL;
+  let currentAfterUrl = INITIAL_AFTER_URL;
+  const IMAGE_ID = {image_id_js};
   const BASE_ID = {base_id_js};
+  const RESOURCE_URI = 'ui://zyb_studio/compare/' + IMAGE_ID;
+  const SESSION_NONCE = (() => {{
+    const buf = new Uint32Array(4);
+    if (window.crypto && window.crypto.getRandomValues) {{
+      window.crypto.getRandomValues(buf);
+      return Array.from(buf, (n) => n.toString(16).padStart(8, '0')).join('');
+    }}
+    return String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+  }})();
+  let reqCounter = 0;
+  let pendingRenewRequestId = null;
+  let renderDataReceived = false;
+
   const root = document.getElementById('compareRoot');
   const canvas = document.getElementById('compareCanvas');
   const toggleBeforeBtn = document.getElementById('toggleBeforeBtn');
@@ -2843,6 +3062,29 @@ def build_compare_viewer_html(
   const sliderWrap = document.getElementById('sliderWrap');
   const compareRenewBtn = document.getElementById('compareRenewBtn');
   const compareExpiresBadge = document.getElementById('compareExpiresBadge');
+
+  function nextRequestId(prefix) {{
+    reqCounter += 1;
+    return prefix + '-' + SESSION_NONCE + '-' + reqCounter;
+  }}
+
+  function isValidRenewedCompareUrl(candidateUrl, referenceUrl) {{
+    if (typeof candidateUrl !== 'string' || !candidateUrl) return false;
+    try {{
+      const cand = new URL(candidateUrl, window.location.href);
+      if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+      const ref = new URL(referenceUrl || INITIAL_AFTER_URL, window.location.href);
+      if (cand.origin !== ref.origin) return false;
+      const match = cand.pathname.match(/\\/(?:studio-files|files)\\/([A-Za-z0-9_-]+)\\.([0-9a-f]{{64}})$/);
+      if (!match) return false;
+      const b64 = match[1].replace(/-/g, '+').replace(/_/g, '/');
+      const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+      const decoded = atob(b64 + pad);
+      return decoded.startsWith('img:');
+    }} catch (_e) {{
+      return false;
+    }}
+  }}
 
   function formatLocalExpiry(isoStr) {{
     if (!isoStr) return '';
@@ -2997,20 +3239,98 @@ def build_compare_viewer_html(
   beforeImg.addEventListener('error', onImageError);
   afterImg.addEventListener('error', onImageError);
 
+  function applyRenewedCompareLinks(links) {{
+    if (!links || typeof links !== 'object') return false;
+    const nextBefore = links.beforeUrl || links.before_url;
+    const nextAfter = links.afterUrl || links.after_url;
+    if (!isValidRenewedCompareUrl(nextBefore, INITIAL_BEFORE_URL)) return false;
+    if (!isValidRenewedCompareUrl(nextAfter, INITIAL_AFTER_URL)) return false;
+    currentBeforeUrl = nextBefore;
+    currentAfterUrl = nextAfter;
+    loadedCount = 0;
+    diffImageData = null;
+    beforeImg.src = currentBeforeUrl;
+    afterImg.src = currentAfterUrl;
+    const nextExpires = links.expiresAt || links.expires_at;
+    if (nextExpires && compareExpiresBadge) {{
+      compareExpiresBadge.dataset.expires = nextExpires;
+      compareExpiresBadge.textContent = '有效期至 ' + formatLocalExpiry(nextExpires);
+    }}
+    if (compareRenewBtn) compareRenewBtn.hidden = true;
+    return true;
+  }}
+
+  async function renewCompareDirectly() {{
+    try {{
+      const res = await fetch(currentAfterUrl, {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{
+          action: 'renew',
+          resource_uri: RESOURCE_URI,
+          image_id: IMAGE_ID,
+          base_id: BASE_ID,
+          before_url: currentBeforeUrl,
+          after_url: currentAfterUrl
+        }})
+      }});
+      const rawText = await res.text();
+      let data = {{}};
+      if (rawText) {{
+        try {{
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') data = parsed;
+        }} catch (_e) {{}}
+      }}
+      if (res.ok && applyRenewedCompareLinks(data)) {{
+        return true;
+      }}
+    }} catch (_err) {{}}
+    return false;
+  }}
+
   if (compareRenewBtn) {{
-    compareRenewBtn.addEventListener('click', () => {{
+    compareRenewBtn.addEventListener('click', async () => {{
       if (window.parent && window.parent !== window) {{
+        pendingRenewRequestId = nextRequestId('renew-compare');
         window.parent.postMessage({{
-          type: 'tool',
-          messageId: 'renew-compare-' + Date.now(),
+          type: 'ui-link-renew',
+          messageId: pendingRenewRequestId,
           payload: {{
-            toolName: 'select_region',
-            params: {{ image_id: BASE_ID }}
+            resourceUri: RESOURCE_URI,
+            imageId: IMAGE_ID,
+            baseId: BASE_ID,
+            sessionNonce: SESSION_NONCE,
+            beforeUrl: currentBeforeUrl,
+            afterUrl: currentAfterUrl
           }}
         }}, '*');
       }}
+      await renewCompareDirectly();
     }});
   }}
+
+  window.addEventListener('message', (ev) => {{
+    if (!window.parent || window.parent === window || ev.source !== window.parent) return;
+    if (!ev.data || typeof ev.data !== 'object') return;
+    const msgType = ev.data.type;
+    const payload = ev.data.payload || {{}};
+    if (msgType === 'ui-lifecycle-iframe-render-data' && !renderDataReceived) {{
+      renderDataReceived = true;
+      const renderData = payload.renderData || payload;
+      if (renderData && typeof renderData === 'object') {{
+        applyRenewedCompareLinks(renderData.renewedLinks || renderData);
+      }}
+      return;
+    }}
+    if (msgType === 'ui-message-response' && ev.data.messageId && ev.data.messageId === pendingRenewRequestId) {{
+      pendingRenewRequestId = null;
+      const resp = payload.response || payload;
+      if (!resp || typeof resp !== 'object') return;
+      if (resp.sessionNonce && resp.sessionNonce !== SESSION_NONCE) return;
+      applyRenewedCompareLinks(resp);
+    }}
+  }});
 
   toggleBeforeBtn.addEventListener('click', () => {{
     showBeforeOnly = !showBeforeOnly;

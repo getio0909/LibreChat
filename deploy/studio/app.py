@@ -70,6 +70,7 @@ from .regions import (
     build_compare_viewer_html,
     build_selection_editor_html,
     finish_region_edit,
+    is_editor_nonce_consumed,
     is_editor_token,
     is_image_token,
     load_confirmed_selection,
@@ -1392,7 +1393,168 @@ def create_app(
                     "Not Found", status_code=404, headers=_signed_file_cors_headers()
                 )
 
+        max_renewal_age = max(
+            int(getattr(active_settings, "preview_token_ttl_seconds", 604800)) * 4,
+            30 * 86400,
+        )
+
+        def _extract_token_from_url_or_raw(raw_val: object) -> str:
+            cleaned = str(raw_val or "").strip()
+            if not cleaned:
+                return ""
+            for marker in ("/studio-files/", "/files/"):
+                if marker in cleaned:
+                    tail = cleaned.rsplit(marker, 1)[-1]
+                    return tail.split("?", 1)[0].split("#", 1)[0].strip()
+            return cleaned
+
+        def _format_renewed_url(
+            new_token: str, reference_url: object = None
+        ) -> str:
+            ref_str = str(reference_url or "").strip()
+            if ref_str.startswith(("http://", "https://")):
+                for marker in ("/studio-files/", "/files/"):
+                    if marker in ref_str:
+                        prefix = ref_str.rsplit(marker, 1)[0]
+                        public_base = active_settings.public_base_url.rstrip("/")
+                        req_origin = f"{request.url.scheme}://{request.url.netloc}"
+                        if prefix in (public_base, req_origin):
+                            return f"{prefix}{marker}{new_token}"
+            if request.url.hostname in (
+                "127.0.0.1",
+                "localhost",
+                "testserver",
+            ) and request.url.path.startswith("/files/"):
+                return f"{request.url.scheme}://{request.url.netloc}/files/{new_token}"
+            return build_signed_file_url(active_settings, new_token)
+
         if is_image_token(token):
+            if request.method == "POST":
+                try:
+                    raw_body = await _read_bounded_body(
+                        request, max_region_post_body_bytes
+                    )
+                    payload = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+                except (_PayloadTooLargeError, ValueError, UnicodeDecodeError):
+                    payload = {}
+                if isinstance(payload, dict) and payload.get("action") == "renew":
+                    try:
+                        user_id, image_id, _ = verify_image_token(
+                            active_settings,
+                            token,
+                            allow_expired=True,
+                            max_expired_age_seconds=max_renewal_age,
+                        )
+                        resolved = resolve_image(
+                            active_settings, user_id, image_id, kb_index=kb_index
+                        )
+                    except (ValueError, RuntimeError, OSError):
+                        return PlainTextResponse(
+                            "Not Found",
+                            status_code=404,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    if _load_safe_image_bytes(user_id, resolved) is None:
+                        return PlainTextResponse(
+                            "Not Found",
+                            status_code=404,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    before_ref = payload.get("before_url") or payload.get("beforeUrl")
+                    after_ref = payload.get("after_url") or payload.get("afterUrl")
+                    if before_ref and after_ref:
+                        try:
+                            before_tok = _extract_token_from_url_or_raw(before_ref)
+                            after_tok = _extract_token_from_url_or_raw(after_ref)
+                            b_uid, b_img_id, _ = verify_image_token(
+                                active_settings,
+                                before_tok,
+                                allow_expired=True,
+                                max_expired_age_seconds=max_renewal_age,
+                            )
+                            a_uid, a_img_id, _ = verify_image_token(
+                                active_settings,
+                                after_tok,
+                                allow_expired=True,
+                                max_expired_age_seconds=max_renewal_age,
+                            )
+                            if b_uid != user_id or a_uid != user_id:
+                                raise ValueError("Comparison token user mismatch")
+                            b_resolved = resolve_image(
+                                active_settings, user_id, b_img_id, kb_index=kb_index
+                            )
+                            a_resolved = resolve_image(
+                                active_settings, user_id, a_img_id, kb_index=kb_index
+                            )
+                            if (
+                                _load_safe_image_bytes(user_id, b_resolved) is None
+                                or _load_safe_image_bytes(user_id, a_resolved) is None
+                            ):
+                                raise ValueError("Comparison image missing")
+                        except (ValueError, RuntimeError, OSError):
+                            return PlainTextResponse(
+                                "Not Found",
+                                status_code=404,
+                                headers=_signed_file_cors_headers(),
+                            )
+                        new_before_tok, _ = sign_image_token(
+                            active_settings, user_id, b_resolved.id
+                        )
+                        new_after_tok, after_exp = sign_image_token(
+                            active_settings, user_id, a_resolved.id
+                        )
+                        return JSONResponse(
+                            {
+                                "status": "renewed",
+                                "resource_uri": f"ui://zyb_studio/compare/{a_resolved.id}",
+                                "image_id": a_resolved.id,
+                                "before_url": _format_renewed_url(
+                                    new_before_tok, before_ref
+                                ),
+                                "after_url": _format_renewed_url(
+                                    new_after_tok, after_ref
+                                ),
+                                "expires_at": format_utc_timestamp(after_exp),
+                            },
+                            status_code=200,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    new_preview_tok, preview_exp = sign_image_token(
+                        active_settings, user_id, resolved.id
+                    )
+                    preview_ref = payload.get("preview_url") or payload.get("previewUrl")
+                    return JSONResponse(
+                        {
+                            "status": "renewed",
+                            "image_id": resolved.id,
+                            "preview_url": _format_renewed_url(
+                                new_preview_tok, preview_ref
+                            ),
+                            "preview_expires_at": format_utc_timestamp(preview_exp),
+                            "expires_at": format_utc_timestamp(preview_exp),
+                        },
+                        status_code=200,
+                        headers=_signed_file_cors_headers(),
+                    )
+                try:
+                    user_id, image_id, _ = verify_image_token(active_settings, token)
+                    resolve_image(
+                        active_settings, user_id, image_id, kb_index=kb_index
+                    )
+                except (ValueError, RuntimeError, OSError):
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                return JSONResponse(
+                    {
+                        "error": "Image preview token is read-only and does not permit POST operations"
+                    },
+                    status_code=403,
+                    headers=_signed_file_cors_headers(),
+                )
+
             try:
                 user_id, image_id, _ = verify_image_token(active_settings, token)
                 resolved = resolve_image(
@@ -1401,15 +1563,6 @@ def create_app(
             except (ValueError, RuntimeError, OSError):
                 return PlainTextResponse(
                     "Not Found", status_code=404, headers=_signed_file_cors_headers()
-                )
-
-            if request.method == "POST":
-                return JSONResponse(
-                    {
-                        "error": "Image preview token is read-only and does not permit POST operations"
-                    },
-                    status_code=403,
-                    headers=_signed_file_cors_headers(),
                 )
 
             if request.method in ("GET", "HEAD"):
@@ -1441,8 +1594,49 @@ def create_app(
             )
 
         if is_editor_token(token):
+            post_payload: dict[str, Any] | None = None
+            is_renew_post = False
+            if request.method == "POST":
+                try:
+                    raw_body = await _read_bounded_body(
+                        request, max_region_post_body_bytes
+                    )
+                except _PayloadTooLargeError:
+                    return JSONResponse(
+                        {"error": "Request body exceeds maximum allowed size"},
+                        status_code=413,
+                        headers=_signed_file_cors_headers(),
+                    )
+                except ValueError as exc:
+                    return JSONResponse(
+                        {"error": str(exc)},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                try:
+                    parsed_body = json.loads(raw_body.decode("utf-8"))
+                except (ValueError, UnicodeDecodeError):
+                    return JSONResponse(
+                        {"error": "Invalid JSON request body"},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                if not isinstance(parsed_body, dict):
+                    return JSONResponse(
+                        {"error": "Request body must be a JSON object"},
+                        status_code=400,
+                        headers=_signed_file_cors_headers(),
+                    )
+                post_payload = parsed_body
+                is_renew_post = post_payload.get("action") == "renew"
+
             try:
-                claims = verify_editor_token(active_settings, token)
+                claims = verify_editor_token(
+                    active_settings,
+                    token,
+                    allow_expired=is_renew_post,
+                    max_expired_age_seconds=max_renewal_age if is_renew_post else None,
+                )
                 user_id = str(claims["user_id"])
                 image_id = str(claims["image_id"])
                 expected_sha = str(claims["image_sha256"])
@@ -1486,38 +1680,56 @@ def create_app(
                     headers=img_headers,
                 )
 
-            if request.method == "POST":
-                try:
-                    raw_body = await _read_bounded_body(
-                        request, max_region_post_body_bytes
-                    )
-                except _PayloadTooLargeError:
-                    return JSONResponse(
-                        {"error": "Request body exceeds maximum allowed size"},
-                        status_code=413,
-                        headers=_signed_file_cors_headers(),
-                    )
-                except ValueError as exc:
-                    return JSONResponse(
-                        {"error": str(exc)},
-                        status_code=400,
-                        headers=_signed_file_cors_headers(),
-                    )
-                try:
-                    payload = json.loads(raw_body.decode("utf-8"))
-                except (ValueError, UnicodeDecodeError):
-                    return JSONResponse(
-                        {"error": "Invalid JSON request body"},
-                        status_code=400,
-                        headers=_signed_file_cors_headers(),
-                    )
-                if not isinstance(payload, dict):
-                    return JSONResponse(
-                        {"error": "Request body must be a JSON object"},
-                        status_code=400,
-                        headers=_signed_file_cors_headers(),
-                    )
+            if request.method == "POST" and post_payload is not None:
+                payload = post_payload
                 action = payload.get("action")
+                if action == "renew":
+                    if is_editor_nonce_consumed(
+                        active_settings, user_id, editor_nonce
+                    ):
+                        return JSONResponse(
+                            {
+                                "error": "Selection editor token has already been used to confirm a selection"
+                            },
+                            status_code=409,
+                            headers=_signed_file_cors_headers(),
+                        )
+                    new_preview_tok, preview_exp = sign_image_token(
+                        active_settings, user_id, resolved.id
+                    )
+                    new_editor_tok, editor_exp = sign_editor_token(
+                        active_settings,
+                        user_id,
+                        resolved.id,
+                        expected_sha,
+                        nonce=editor_nonce,
+                    )
+                    editor_ref = payload.get("editor_url") or payload.get("editorUrl")
+                    preview_ref = (
+                        payload.get("preview_url")
+                        or payload.get("previewUrl")
+                        or editor_ref
+                    )
+                    fresh_preview_url = _format_renewed_url(
+                        new_preview_tok, preview_ref
+                    )
+                    fresh_editor_url = _format_renewed_url(
+                        new_editor_tok, editor_ref
+                    )
+                    return JSONResponse(
+                        {
+                            "status": "renewed",
+                            "resource_uri": f"ui://zyb_studio/selection/{resolved.id}",
+                            "image_id": resolved.id,
+                            "preview_url": fresh_preview_url,
+                            "preview_expires_at": format_utc_timestamp(preview_exp),
+                            "editor_url": fresh_editor_url,
+                            "signed_url": fresh_editor_url,
+                            "expires_at": format_utc_timestamp(editor_exp),
+                        },
+                        status_code=200,
+                        headers=_signed_file_cors_headers(),
+                    )
                 if action == "segment":
                     try:
                         seg_out = await asyncio.to_thread(
@@ -1576,6 +1788,52 @@ def create_app(
                     headers=_signed_file_cors_headers(),
                 )
 
+            return PlainTextResponse(
+                "Method Not Allowed",
+                status_code=405,
+                headers=_signed_file_cors_headers(),
+            )
+
+        if request.method == "POST":
+            try:
+                raw_body = await _read_bounded_body(
+                    request, max_region_post_body_bytes
+                )
+                payload = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+            except (_PayloadTooLargeError, ValueError, UnicodeDecodeError):
+                payload = {}
+            if isinstance(payload, dict) and payload.get("action") == "renew":
+                try:
+                    user_id, model_id, _ = verify_file_token(
+                        active_settings,
+                        token,
+                        allow_expired=True,
+                        max_expired_age_seconds=max_renewal_age,
+                    )
+                    load_saved_model_bytes(active_settings, user_id, model_id)
+                except (ValueError, RuntimeError, OSError):
+                    return PlainTextResponse(
+                        "Not Found",
+                        status_code=404,
+                        headers=_signed_file_cors_headers(),
+                    )
+                new_model_tok, model_exp = sign_file_token(
+                    active_settings, user_id, model_id
+                )
+                model_ref = payload.get("model_url") or payload.get("modelUrl")
+                fresh_model_url = _format_renewed_url(new_model_tok, model_ref)
+                return JSONResponse(
+                    {
+                        "status": "renewed",
+                        "resource_uri": f"ui://zyb_studio/model/{model_id}",
+                        "model_id": model_id,
+                        "model_url": fresh_model_url,
+                        "signed_url": fresh_model_url,
+                        "expires_at": format_utc_timestamp(model_exp),
+                    },
+                    status_code=200,
+                    headers=_signed_file_cors_headers(),
+                )
             return PlainTextResponse(
                 "Method Not Allowed",
                 status_code=405,
