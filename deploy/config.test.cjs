@@ -8,6 +8,7 @@ const {
   fileConfig: defaultFileConfig,
   mergeFileConfig,
   getEndpointFileConfig,
+  validateVisionModel,
 } = require('librechat-data-provider');
 const {
   getGoogleConfig,
@@ -424,10 +425,21 @@ test('fileConfig permits image uploads on both google and OpenRouter endpoints',
   }
 });
 
-test('deploy/compose.yml configures hardened studio service and api endpoint wiring', () => {
-  const { services, volumes } = parsedCompose;
+test('deploy/compose.yml configures hardened studio service, IPv6 network, and api endpoint wiring', () => {
+  const { services, volumes, networks } = parsedCompose;
   assert.ok(services.studio, 'studio service must be defined in deploy/compose.yml');
   assert.ok('studio-data' in volumes, 'studio-data volume must be defined in deploy/compose.yml');
+  assert.ok(networks && networks.default, 'default network must be defined in deploy/compose.yml');
+  assert.equal(
+    networks.default.enable_ipv6,
+    true,
+    'default compose network must enable IPv6 for Ark reachability',
+  );
+  assert.equal(
+    studioNetworkUsesDefault(services.studio),
+    true,
+    'studio service must use the IPv6-enabled default compose network',
+  );
 
   const studio = services.studio;
   assert.equal(studio.image, '${STUDIO_IMAGE:?Set STUDIO_IMAGE in image.env}');
@@ -449,6 +461,17 @@ test('deploy/compose.yml configures hardened studio service and api endpoint wir
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
+
+// 校验服务未挂载到禁用IPv6的独立网络而是使用默认IPv6网络
+function studioNetworkUsesDefault(serviceConfig) {
+  if (!serviceConfig.networks) {
+    return true;
+  }
+  if (Array.isArray(serviceConfig.networks)) {
+    return serviceConfig.networks.includes('default');
+  }
+  return Object.prototype.hasOwnProperty.call(serviceConfig.networks, 'default');
+}
 
 test('deploy/nginx.conf routes /studio-files/ to studio:8000/files/ with Range forwarding and matches compose host port', () => {
   const rawNginx = fs.readFileSync('deploy/nginx.conf', 'utf8');
@@ -552,3 +575,137 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.match(rawSmokeTest, /"create_3d_model"/);
   assert.match(rawSmokeTest, /"check_3d_model"/);
 });
+
+test('gemini-4-argon is recognized as multimodal and formats image blocks, tool image results, and thought signatures without throwing', async () => {
+  // 校验 data-provider 视觉模型白名单与 @librechat/agents 补丁挂载
+  assert.equal(
+    validateVisionModel({ model: 'gemini-4-argon' }),
+    true,
+    'validateVisionModel must recognize gemini-4-argon',
+  );
+
+  const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const apiPkg = JSON.parse(fs.readFileSync('api/package.json', 'utf8'));
+  const packagesApiPkg = JSON.parse(fs.readFileSync('packages/api/package.json', 'utf8'));
+  assert.equal(rootPkg.scripts.postinstall, 'patch-package --error-on-fail');
+  assert.ok(rootPkg.dependencies['patch-package'], 'patch-package must be in root dependencies');
+  assert.equal(apiPkg.dependencies['@librechat/agents'], '4.0.4');
+  assert.equal(packagesApiPkg.peerDependencies['@librechat/agents'], '4.0.4');
+  assert.equal(fs.existsSync('patches/@librechat+agents+4.0.4.patch'), true);
+
+  const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
+  const dockerfileMulti = fs.readFileSync('Dockerfile.multi', 'utf8');
+  assert.match(dockerfile, /COPY --chown=node:node patches \.\/patches/);
+  assert.match(dockerfileMulti, /COPY patches \.\/patches/);
+
+  // 校验 CustomChatGoogleGenerativeAI 对 gemini-4-argon 的多模态请求、工具图像结果与 thoughtSignature 处理
+  const { CustomChatGoogleGenerativeAI } = require('@librechat/agents/llm/google');
+  const { HumanMessage, AIMessage, ToolMessage } = require('@langchain/core/messages');
+
+  const llm = new CustomChatGoogleGenerativeAI({
+    model: 'gemini-4-argon',
+    apiKey: 'test-api-key',
+  });
+  assert.equal(llm._isMultimodalModel, true);
+
+  let capturedRequest = null;
+  llm.client.generateContent = async (req) => {
+    capturedRequest = req;
+    return {
+      response: {
+        candidates: [
+          {
+            content: { role: 'model', parts: [{ text: 'ok' }] },
+            finishReason: 'STOP',
+          },
+        ],
+        usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5, totalTokenCount: 15 },
+      },
+    };
+  };
+
+  const userImg = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  const toolImg = 'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+
+  await llm._generate(
+    [
+      new HumanMessage({
+        content: [
+          { type: 'text', text: '分析上传图并检索知识库' },
+          { type: 'image_url', image_url: `data:image/png;base64,${userImg}` },
+        ],
+      }),
+      new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            id: 'call_1',
+            name: 'search_library_mcp_zyb_studio',
+            args: { query: '须弥座' },
+            type: 'tool_call',
+          },
+          {
+            id: 'call_2',
+            name: 'generate_image_mcp_zyb_studio',
+            args: { prompt: '供桌' },
+            type: 'tool_call',
+          },
+        ],
+        additional_kwargs: {
+          __gemini_function_call_thought_signatures__: {
+            call_1: 'explicit_thought_sig_1',
+          },
+        },
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_1',
+        name: 'search_library_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"count":1}' },
+          { type: 'image_url', image_url: `data:image/webp;base64,${toolImg}` },
+        ],
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_2',
+        name: 'generate_image_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"id":"img_1234"}' },
+          { type: 'image_url', image_url: `data:image/webp;base64,${toolImg}` },
+        ],
+      }),
+    ],
+    {},
+  );
+
+  assert.ok(capturedRequest, 'generateContent must be invoked with formatted request');
+  assert.equal(capturedRequest.contents.length, 4);
+  assert.deepEqual(capturedRequest.contents[0].parts[1], {
+    inlineData: { mimeType: 'image/png', data: userImg },
+  });
+  assert.equal(capturedRequest.contents[1].parts[0].thoughtSignature, 'explicit_thought_sig_1');
+  assert.ok(
+    typeof capturedRequest.contents[1].parts[1].thoughtSignature === 'string' &&
+      capturedRequest.contents[1].parts[1].thoughtSignature.length > 20,
+    'missing thoughtSignature on gemini-4-argon must fall back to DUMMY_SIGNATURE',
+  );
+  assert.deepEqual(capturedRequest.contents[2].parts[0].functionResponse.response.result[1], {
+    inlineData: { mimeType: 'image/webp', data: toolImg },
+  });
+});
+
+test('zh-Hans locale translates designer-visible Projects sidebar and upstream model error strings', () => {
+  // 校验简体中文语言包覆盖项目侧栏与上游模型错误提示键
+  const zhTranslation = JSON.parse(
+    fs.readFileSync('client/src/locales/zh-Hans/translation.json', 'utf8'),
+  );
+  assert.equal(zhTranslation.com_ui_projects, '项目');
+  assert.equal(zhTranslation.com_ui_project, '项目');
+  assert.equal(zhTranslation.com_ui_create_project, '创建项目');
+  assert.equal(zhTranslation.com_ui_new_chat_in_project, '在 {{name}} 中新建对话');
+  assert.equal(zhTranslation.com_error_upstream_model, '模型服务暂时无法完成此请求。');
+  assert.equal(
+    zhTranslation.com_error_upstream_model_status,
+    '模型服务暂时无法完成此请求（状态码 {{0}}）。',
+  );
+});
+

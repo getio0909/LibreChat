@@ -1,0 +1,78 @@
+diff --git a/node_modules/@librechat/agents/dist/cjs/llm/google/index.cjs b/node_modules/@librechat/agents/dist/cjs/llm/google/index.cjs
+index 18b0e64..f8b7604 100644
+--- a/node_modules/@librechat/agents/dist/cjs/llm/google/index.cjs
++++ b/node_modules/@librechat/agents/dist/cjs/llm/google/index.cjs
+@@ -15,7 +15,7 @@ var CustomChatGoogleGenerativeAI = class extends _langchain_google_genai.ChatGoo
+ 	thinkingConfig;
+ 	includeServerSideToolInvocations;
+ 	get _isMultimodalModel() {
+-		return this.model.startsWith("gemini-1.5") || this.model.startsWith("gemini-2") || this.model.startsWith("gemma-3-") && !this.model.startsWith("gemma-3-1b") || this.model.startsWith("gemini-3");
++		return this.model.startsWith("gemini-1.5") || this.model.startsWith("gemini-2") || this.model.startsWith("gemma-3-") && !this.model.startsWith("gemma-3-1b") || /^gemini-(?:[3-9]|\d{2,})/.test(this.model);
+ 	}
+ 	constructor(fields) {
+ 		super(fields);
+diff --git a/node_modules/@librechat/agents/dist/cjs/llm/google/utils/common.cjs b/node_modules/@librechat/agents/dist/cjs/llm/google/utils/common.cjs
+index 7f7fc4f..d597020 100644
+--- a/node_modules/@librechat/agents/dist/cjs/llm/google/utils/common.cjs
++++ b/node_modules/@librechat/agents/dist/cjs/llm/google/utils/common.cjs
+@@ -216,7 +216,7 @@ function convertMessageContentToParts(message, isMultimodalModel, previousMessag
+ 				const signature = functionThoughtSignatures?.[tc.id];
+ 				if (signature != null && signature !== "") return signature;
+ 			}
+-			if (model?.includes("gemini-3") === true) return DUMMY_SIGNATURE;
++			if (model != null && /gemini-(?:[3-9]|\d{2,})/.test(model)) return DUMMY_SIGNATURE;
+ 			return "";
+ 		});
+ 		const functionId = getGoogleFunctionId(tc.id);
+diff --git a/node_modules/@librechat/agents/dist/esm/llm/google/index.mjs b/node_modules/@librechat/agents/dist/esm/llm/google/index.mjs
+index 7a6b74a..d5557ea 100644
+--- a/node_modules/@librechat/agents/dist/esm/llm/google/index.mjs
++++ b/node_modules/@librechat/agents/dist/esm/llm/google/index.mjs
+@@ -14,7 +14,7 @@ var CustomChatGoogleGenerativeAI = class extends ChatGoogleGenerativeAI {
+ 	thinkingConfig;
+ 	includeServerSideToolInvocations;
+ 	get _isMultimodalModel() {
+-		return this.model.startsWith("gemini-1.5") || this.model.startsWith("gemini-2") || this.model.startsWith("gemma-3-") && !this.model.startsWith("gemma-3-1b") || this.model.startsWith("gemini-3");
++		return this.model.startsWith("gemini-1.5") || this.model.startsWith("gemini-2") || this.model.startsWith("gemma-3-") && !this.model.startsWith("gemma-3-1b") || /^gemini-(?:[3-9]|\d{2,})/.test(this.model);
+ 	}
+ 	constructor(fields) {
+ 		super(fields);
+diff --git a/node_modules/@librechat/agents/dist/esm/llm/google/utils/common.mjs b/node_modules/@librechat/agents/dist/esm/llm/google/utils/common.mjs
+index 48894b3..a45fa3d 100644
+--- a/node_modules/@librechat/agents/dist/esm/llm/google/utils/common.mjs
++++ b/node_modules/@librechat/agents/dist/esm/llm/google/utils/common.mjs
+@@ -216,7 +216,7 @@ function convertMessageContentToParts(message, isMultimodalModel, previousMessag
+ 				const signature = functionThoughtSignatures?.[tc.id];
+ 				if (signature != null && signature !== "") return signature;
+ 			}
+-			if (model?.includes("gemini-3") === true) return DUMMY_SIGNATURE;
++			if (model != null && /gemini-(?:[3-9]|\d{2,})/.test(model)) return DUMMY_SIGNATURE;
+ 			return "";
+ 		});
+ 		const functionId = getGoogleFunctionId(tc.id);
+diff --git a/node_modules/@librechat/agents/src/llm/google/index.ts b/node_modules/@librechat/agents/src/llm/google/index.ts
+index 93bcd68..134a167 100644
+--- a/node_modules/@librechat/agents/src/llm/google/index.ts
++++ b/node_modules/@librechat/agents/src/llm/google/index.ts
+@@ -51,7 +51,7 @@ export class CustomChatGoogleGenerativeAI extends ChatGoogleGenerativeAI {
+       this.model.startsWith('gemini-2') ||
+       (this.model.startsWith('gemma-3-') &&
+         !this.model.startsWith('gemma-3-1b')) ||
+-      this.model.startsWith('gemini-3')
++      /^gemini-(?:[3-9]|\d{2,})/.test(this.model)
+     );
+   }
+ 
+diff --git a/node_modules/@librechat/agents/src/llm/google/utils/common.ts b/node_modules/@librechat/agents/src/llm/google/utils/common.ts
+index 0c423b1..4189369 100644
+--- a/node_modules/@librechat/agents/src/llm/google/utils/common.ts
++++ b/node_modules/@librechat/agents/src/llm/google/utils/common.ts
+@@ -540,7 +540,7 @@ export function convertMessageContentToParts(
+             return signature;
+           }
+         }
+-        if (model?.includes('gemini-3') === true) {
++        if (model != null && /gemini-(?:[3-9]|\d{2,})/.test(model)) {
+           return DUMMY_SIGNATURE;
+         }
+         return '';

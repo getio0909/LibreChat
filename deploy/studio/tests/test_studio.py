@@ -5300,3 +5300,382 @@ def test_kb_index_and_search_library_with_607_records_and_region_filter(
             assert bad_res.json()["result"].get("isError") is True
 
     asyncio.run(_run())
+
+
+# 校验Seedream、Seed3D与Gemini规划器均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
+def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_uncertain(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    from deploy.studio.app import ConcurrencyLimiter
+    from deploy.studio.models3d import ModelJobManager
+
+    rules = load_rules()
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    src_upload_id = "99999999-1111-2222-3333-444444444444"
+    (user_lc / f"{src_upload_id}__source.jpg").write_bytes(
+        _make_image_bytes(360, 360, fmt="JPEG")
+    )
+
+    observed_timeouts: dict[str, dict[str, Any]] = {}
+
+    async def _inspect_seedream_handler(request: httpx.Request) -> httpx.Response:
+        observed_timeouts["seedream"] = dict(request.extensions.get("timeout") or {})
+        raise httpx.ConnectError("IPv4 unreachable before dispatch")
+
+    async def _inspect_planner_handler(request: httpx.Request) -> httpx.Response:
+        observed_timeouts["planner"] = dict(request.extensions.get("timeout") or {})
+        raise httpx.ConnectTimeout("connect timed out before dispatch")
+
+    async def _run() -> None:
+        # 1. 验证Seedream、Planner与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
+        with pytest.raises(RuntimeError, match="not billed") as exc_img_conn:
+            await generate_seedream(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "seedream_conn_err",
+                transport=httpx.MockTransport(_inspect_seedream_handler),
+            )
+        assert not isinstance(exc_img_conn.value, GenerationUncertain)
+        assert getattr(exc_img_conn.value, "state", None) == "failed"
+        assert getattr(exc_img_conn.value, "billed", None) is False
+        assert "may have been billed" not in str(exc_img_conn.value)
+        assert "uncertain" not in str(exc_img_conn.value).casefold()
+        assert observed_timeouts["seedream"]["connect"] == 10.0
+        assert observed_timeouts["seedream"]["read"] == float(
+            studio_env.seedream_timeout_seconds
+        )
+
+        rec_conn_err = json.loads(
+            (tmp_path / "seedream_conn_err" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_conn_err["state"] == "failed"
+        assert rec_conn_err["billed"] is False
+        assert rec_conn_err["error_code"] == "connect_error"
+
+        # 验证Seedream ConnectTimeout同样标记为failed+未计费
+        async def _seedream_connect_timeout(request: httpx.Request) -> httpx.Response:
+            raise httpx.ConnectTimeout("connect timeout before request bytes sent")
+
+        with pytest.raises(RuntimeError, match="not billed") as exc_img_ct:
+            await generate_seedream(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "seedream_conn_timeout",
+                transport=httpx.MockTransport(_seedream_connect_timeout),
+            )
+        assert not isinstance(exc_img_ct.value, GenerationUncertain)
+        rec_ct = json.loads(
+            (tmp_path / "seedream_conn_timeout" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_ct["state"] == "failed"
+        assert rec_ct["billed"] is False
+
+        # 验证Seedream派发后ReadTimeout依然保持state="uncertain"并抛出GenerationUncertain
+        async def _seedream_read_timeout(request: httpx.Request) -> httpx.Response:
+            raise httpx.ReadTimeout("read timeout after request dispatch")
+
+        with pytest.raises(GenerationUncertain, match="may have been billed"):
+            await generate_seedream(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "seedream_read_timeout",
+                transport=httpx.MockTransport(_seedream_read_timeout),
+            )
+        rec_rt = json.loads(
+            (tmp_path / "seedream_read_timeout" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_rt["state"] == "uncertain"
+
+        # 验证Gemini规划器connect=10.0超时配置与派发前连接异常提示
+        with pytest.raises(RuntimeError, match="not billed"):
+            await plan_concepts(
+                studio_env,
+                rules,
+                brief="供桌方案",
+                count=1,
+                transport=httpx.MockTransport(_inspect_planner_handler),
+            )
+        assert observed_timeouts["planner"]["connect"] == 10.0
+        assert observed_timeouts["planner"]["read"] == float(
+            studio_env.planner_timeout_seconds
+        )
+
+        # 2. 验证Seed3D _build_client配置connect=10.0，且ConnectError/ConnectTimeout与派发后ReadTimeout分流
+        mgr_probe = ModelJobManager(
+            studio_env,
+            user_limiter=ConcurrencyLimiter(max_per_user=3, global_max=10),
+        )
+        async with mgr_probe._build_client() as seed3d_client:
+            assert seed3d_client.timeout.connect == 10.0
+            assert seed3d_client.timeout.read == 60.0
+            assert seed3d_client.timeout.write == 60.0
+            assert seed3d_client.timeout.pool == 60.0
+
+        for idx, exc_to_raise in enumerate(
+            (
+                httpx.ConnectError("connect failed before POST"),
+                httpx.ConnectTimeout("connect timed out before POST"),
+            ),
+            start=1,
+        ):
+
+            async def _seed3d_conn_fail(
+                request: httpx.Request,
+                err: Exception = exc_to_raise,
+                i: int = idx,
+            ) -> httpx.Response:
+                observed_timeouts[f"seed3d_{i}"] = dict(
+                    request.extensions.get("timeout") or {}
+                )
+                raise err
+
+            app_conn = create_app(
+                settings=studio_env,
+                rules=rules,
+                ark_transport=httpx.MockTransport(_seed3d_conn_fail),
+            )
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app_conn),
+                base_url="http://studio:8000",
+            ) as client:
+                # MCP generate_image：返回state=failed, billed=False，且list_images不出现uncertain警告
+                res_img = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 800 + idx,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "generate_image",
+                            "arguments": {"prompt": "须弥座设计"},
+                        },
+                    },
+                )
+                img_res = res_img.json()["result"]
+                assert img_res["isError"] is True
+                img_err = json.loads(img_res["content"][0]["text"])
+                assert img_err["state"] == "failed"
+                assert img_err["billed"] is False
+                assert "not billed" in img_err["error"]
+                assert "may have been billed" not in img_err["error"]
+                assert "uncertain" not in img_err["error"].casefold()
+
+                res_list = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 810 + idx,
+                        "method": "tools/call",
+                        "params": {"name": "list_images", "arguments": {"limit": 10}},
+                    },
+                )
+                list_payload = json.loads(
+                    res_list.json()["result"]["content"][0]["text"]
+                )
+                assert list_payload["warnings"] == []
+                assert all(
+                    item.get("state") != "uncertain" for item in list_payload["images"]
+                )
+
+                # MCP create_3d_model + check_3d_model：返回state=failed, billed=False，无uncertain计费警告
+                res_3d = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 820 + idx,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "create_3d_model",
+                            "arguments": {"image_id": src_upload_id},
+                        },
+                    },
+                )
+                res_3d_body = res_3d.json()["result"]
+                assert res_3d_body["isError"] is True
+                err_3d = json.loads(res_3d_body["content"][0]["text"])
+                assert err_3d["state"] == "failed"
+                assert err_3d["billed"] is False
+                assert "not billed" in err_3d["error"]
+                assert "may have been billed" not in err_3d["error"]
+                assert "uncertain" not in err_3d["error"].casefold()
+                model_job_id = err_3d["job_id"]
+                assert observed_timeouts[f"seed3d_{idx}"]["connect"] == 10.0
+
+                model_rec = json.loads(
+                    (
+                        studio_env.data_dir
+                        / "users"
+                        / USER_A
+                        / "models"
+                        / model_job_id
+                        / "receipt.json"
+                    ).read_text(encoding="utf-8")
+                )
+                assert model_rec["state"] == "failed"
+                assert model_rec["billed"] is False
+                assert model_rec["error_code"] == "connect_error"
+
+                res_chk = await client.post(
+                    "/mcp",
+                    headers={
+                        "X-Studio-Token": VALID_TOKEN,
+                        "X-LibreChat-User-ID": USER_A,
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 830 + idx,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "check_3d_model",
+                            "arguments": {"job_id": model_job_id},
+                        },
+                    },
+                )
+                chk_err = json.loads(res_chk.json()["result"]["content"][0]["text"])
+                assert chk_err["state"] == "failed"
+                assert chk_err["billed"] is False
+                assert "not billed" in chk_err["error"]
+                assert "may have been billed" not in chk_err["error"]
+
+        # 3. 验证Seed3D在POST派发后发生ReadTimeout时仍保持state="uncertain"及计费警告
+        async def _seed3d_read_timeout(request: httpx.Request) -> httpx.Response:
+            raise httpx.ReadTimeout("read timeout after POST dispatch")
+
+        app_rt = create_app(
+            settings=studio_env,
+            rules=rules,
+            ark_transport=httpx.MockTransport(_seed3d_read_timeout),
+        )
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app_rt), base_url="http://studio:8000"
+        ) as client:
+            res_3d_rt = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 850,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "create_3d_model",
+                        "arguments": {"image_id": src_upload_id},
+                    },
+                },
+            )
+            err_3d_rt = json.loads(res_3d_rt.json()["result"]["content"][0]["text"])
+            assert err_3d_rt["state"] == "uncertain"
+            assert "may have been billed" in err_3d_rt["error"]
+
+    asyncio.run(_run())
+
+
+# 校验search_library对「须弥座石雕参考」等多词复合中文查询的分词、停用词剔除、加权排序及缩略图kb_<id>标注
+def test_search_library_chinese_multi_term_tokenization_ranking_and_thumbnail_labels(
+    studio_env: StudioSettings,
+) -> None:
+    real_kb_root = Path(__file__).resolve().parents[3] / "knowledge"
+    assert (real_kb_root / "catalog" / "materials.yaml").is_file()
+    real_index = load_kb_index(real_kb_root)
+
+    # 1. 验证口语停用词（参考、图片、找几张、从资料库）被剔除且复合词切分为实词词元
+    assert real_index._tokenize_query("「须弥座石雕参考」") == ["须弥座", "石雕"]
+    assert real_index._tokenize_query("从资料库找几张须弥座石雕参考图片") == [
+        "须弥座",
+        "石雕",
+    ]
+    assert real_index._tokenize_query("汉白玉莲花柱础参考") == [
+        "汉白玉",
+        "莲花",
+        "柱础",
+    ]
+
+    # 2. 在真实knowledge/记录上检索「须弥座石雕参考」及E2E多词查询，验证非空且按字段权重排序
+    hits_xumizuo = real_index.search("「须弥座石雕参考」", limit=6)
+    assert len(hits_xumizuo) == 6
+    hit_ids = [r.kb_id for r in hits_xumizuo]
+    assert "kb_9ffe71e1ee8bd6e7" in hit_ids
+    assert "kb_db8c9deb470a3da2" in hit_ids
+    assert "kb_b22027a7c44dd495" in hit_ids
+    for rec in hits_xumizuo:
+        assert not rec.is_flagged
+        assert "须弥座" in rec.search_all
+        assert "石雕" in rec.search_all
+
+    # 多词部分命中回退：如“须弥座 石雕 深青灰”与“须弥座 束腰 浮雕 石座”不再返回0条结果
+    hits_grey = real_index.search("须弥座 石雕 深青灰", limit=8)
+    assert len(hits_grey) >= 4
+    hits_waist = real_index.search("须弥座 束腰 浮雕 石座", role="造型", limit=8)
+    assert len(hits_waist) >= 4
+    assert any(r.kb_id == "kb_f462f55696238fbd" for r in hits_waist)
+
+    # 3. 通过MCP端到端调用search_library，验证工具文本中显式包含每张缩略图对应的kb_<id>标签
+    real_env = studio_env.model_copy(update={"kb_root": real_kb_root})
+    app = create_app(settings=real_env, rules=load_rules())
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+        ) as client:
+            res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 901,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "search_library",
+                        "arguments": {
+                            "query": "「须弥座石雕参考」",
+                            "limit": 4,
+                        },
+                    },
+                },
+            )
+            assert res.status_code == 200
+            result = res.json()["result"]
+            assert result.get("isError") is False
+            blocks = result["content"]
+            tool_text = blocks[0]["text"]
+            payload = json.loads(tool_text)
+            assert payload["count"] == 4
+            assert len(blocks) == 1 + 4
+            assert len(payload["thumbnails"]) == 4
+            assert len(payload["thumbnail_labels"]) == 4
+            for idx, item in enumerate(payload["results"], start=1):
+                assert item["id"].startswith("kb_")
+                assert item["thumbnail_index"] == idx
+                assert item["id"] in item["thumbnail_label"]
+                assert payload["thumbnails"][idx - 1]["id"] == item["id"]
+                assert item["id"] in payload["thumbnail_labels"][idx - 1]
+                assert item["thumbnail_label"] in tool_text
+
+    asyncio.run(_run())
