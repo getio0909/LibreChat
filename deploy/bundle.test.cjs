@@ -68,7 +68,7 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
   assert.match(dotEnv, /^OPENROUTER_API_KEY='fixture-openrouter-key'$/m);
   assert.ok(dotEnv.includes(`STUDIO_SHARED_TOKEN='${studioJson.shared_token}'`));
 
-  // 验证 studio.json 包含所有契约规定的配置项（提供 ARK_API_KEY 时默认启用 3D）。
+  // 验证 studio.json 包含所有契约规定的配置项（未显式开启 STUDIO_ENABLE_3D 时默认关闭 3D，即便提供了 ARK_API_KEY）。
   assert.deepEqual(studioJson, {
     shared_token: studioJson.shared_token,
     file_signing_key: studioJson.file_signing_key,
@@ -77,7 +77,7 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     ark_api_key: 'fixture-ark-key',
     image_provider: 'gemini',
     gemini_image_model: 'gemini-nano-banana-2.1',
-    enable_3d: true,
+    enable_3d: false,
     seedream_model: 'doubao-seedream-5-0-pro-260628',
     seed3d_model: 'doubao-seed3d-2-0-260328',
     max_parallel_per_user: 3,
@@ -85,12 +85,25 @@ test('bundle writes .env additions, 0600 studio.json, image.env, and accounts.js
     seedream_timeout_seconds: 240,
   });
 
-  // 验证 ARK_API_KEY 为可选项，未提供或为空字符串时 studio.json 中 ark_api_key 为空且 enable_3d 自动设为 false。
-  const withoutArk = runBundle({ ARK_API_KEY: '' });
+  // 验证 3D 关闭时 ARK_API_KEY 为可选项，未提供或为空字符串时 studio.json 中 ark_api_key 为空且 enable_3d 为 false。
+  const withoutArk = runBundle({ ARK_API_KEY: '', STUDIO_ENABLE_3D: 'false' });
   assert.equal(withoutArk.result.status, 0, withoutArk.result.stderr);
   assert.equal(withoutArk.studioJson.ark_api_key, '');
   assert.equal(withoutArk.studioJson.image_provider, 'gemini');
   assert.equal(withoutArk.studioJson.enable_3d, false);
+
+  // 验证显式设置 STUDIO_ENABLE_3D=true（如 J5005 测试环境）时开启 3D，且此时缺少 ARK_API_KEY 会被拒绝。
+  const with3dEnabled = runBundle({ STUDIO_ENABLE_3D: 'true' });
+  assert.equal(with3dEnabled.result.status, 0, with3dEnabled.result.stderr);
+  assert.equal(with3dEnabled.studioJson.enable_3d, true);
+  assert.equal(with3dEnabled.studioJson.ark_api_key, 'fixture-ark-key');
+
+  const missingArkWhen3dEnabled = runBundle({ STUDIO_ENABLE_3D: 'true', ARK_API_KEY: '' });
+  assert.notEqual(missingArkWhen3dEnabled.result.status, 0);
+  assert.match(missingArkWhen3dEnabled.result.stderr, /ARK_API_KEY/);
+
+  const invalidEnable3d = runBundle({ STUDIO_ENABLE_3D: 'maybe' });
+  assert.notEqual(invalidEnable3d.result.status, 0);
 
   // 验证 DEPLOY_URL 与显式 STUDIO_FILE_SIGNING_KEY 会写入 studio.json。
   const explicitSigningKey = 'c'.repeat(64);

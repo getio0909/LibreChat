@@ -118,9 +118,28 @@ if (!runnerTemp) {
 const target = path.join(runnerTemp, 'bundle');
 mkdirSync(target, { recursive: true });
 
+// 解析 3D 模型生成开关：仅当 STUDIO_ENABLE_3D 显式设为 true 时启用（如 J5005 测试环境），生产环境默认关闭直至具备出网条件；启用 3D 时必须提供 ARK_API_KEY。
+function resolveEnable3d() {
+  const raw = process.env.STUDIO_ENABLE_3D;
+  if (raw === undefined || raw === null || raw.trim() === '') {
+    return false;
+  }
+  const normalized = raw.trim().toLowerCase();
+  if (normalized === 'true') {
+    return true;
+  }
+  if (normalized === 'false') {
+    return false;
+  }
+  throw new Error('STUDIO_ENABLE_3D must be "true" or "false" when provided.');
+}
+
 const geminiApiKey = requireSafeSingleLineSecret('GEMINI_API_KEY');
 const openrouterApiKey = requireSafeSingleLineSecret('OPENROUTER_API_KEY');
-const arkApiKey = optionalSafeSingleLineSecret('ARK_API_KEY');
+const enable3d = resolveEnable3d();
+const arkApiKey = enable3d
+  ? requireSafeSingleLineSecret('ARK_API_KEY')
+  : optionalSafeSingleLineSecret('ARK_API_KEY');
 const librechatImage = requireImageReference('LIBRECHAT_IMAGE');
 const studioImage = requireImageReference('STUDIO_IMAGE');
 const sharedToken = resolveStudioSharedToken();
@@ -146,12 +165,6 @@ writeFileSync(path.join(target, '.env'), envLines.join('\n'), { mode: 0o600 });
 // 写入不可变镜像引用文件 image.env。
 const imageEnvContent = `LIBRECHAT_IMAGE=${librechatImage}\nSTUDIO_IMAGE=${studioImage}\n`;
 writeFileSync(path.join(target, 'image.env'), imageEnvContent, { mode: 0o600 });
-
-// 当配置了火山方舟密钥（如 J5005 测试环境）时默认启用 3D 模型生成，也可通过 STUDIO_ENABLE_3D 显式覆盖。
-const enable3d =
-  process.env.STUDIO_ENABLE_3D !== undefined
-    ? process.env.STUDIO_ENABLE_3D === 'true'
-    : Boolean(arkApiKey);
 
 // 生成权限为 0600 的 studio.json 配置文件。
 const studioSettings = {

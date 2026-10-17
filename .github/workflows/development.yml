@@ -158,6 +158,8 @@ jobs:
           LIBRECHAT_ENV: ${{ secrets.LIBRECHAT_ENV }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           ARK_API_KEY: ${{ secrets.ARK_API_KEY }}
+          # J5005 测试环境默认开启 3D 模型生成；生产环境或无出网环境可通过环境变量显式设为 false。
+          STUDIO_ENABLE_3D: ${{ vars.STUDIO_ENABLE_3D || 'true' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LIBRECHAT_IMAGE: ${{ needs.image.outputs.image }}
@@ -172,23 +174,37 @@ jobs:
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
         run: |
           set -euo pipefail
-          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PORT DEPLOY_PATH DEPLOY_URL DEPLOY_KNOWN_HOSTS DEPLOY_SSH_KEY LIBRECHAT_ENV OPENROUTER_API_KEY ARK_API_KEY GEMINI_API_KEY LIBRECHAT_IMAGE STUDIO_IMAGE ORIGIN_CERT ORIGIN_KEY ADMIN_EMAIL ADMIN_USERNAME ADMIN_PASSWORD USER_EMAIL USER_USERNAME USER_PASSWORD; do
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PORT DEPLOY_PATH DEPLOY_URL DEPLOY_KNOWN_HOSTS DEPLOY_SSH_KEY LIBRECHAT_ENV OPENROUTER_API_KEY GEMINI_API_KEY LIBRECHAT_IMAGE STUDIO_IMAGE ORIGIN_CERT ORIGIN_KEY ADMIN_EMAIL ADMIN_USERNAME ADMIN_PASSWORD USER_EMAIL USER_USERNAME USER_PASSWORD; do
             if [ -z "${!name}" ]; then
               echo "::error::Missing development environment setting: $name"
               exit 1
             fi
           done
+          if [[ "${STUDIO_ENABLE_3D}" != "true" && "${STUDIO_ENABLE_3D}" != "false" ]]; then
+            echo "::error::STUDIO_ENABLE_3D must be explicitly set to true or false."
+            exit 1
+          fi
+          if [[ "${STUDIO_ENABLE_3D}" == "true" && -z "${ARK_API_KEY:-}" ]]; then
+            echo "::error::Missing development environment setting: ARK_API_KEY (required when STUDIO_ENABLE_3D=true)"
+            exit 1
+          fi
           if [[ ! "$DEPLOY_PATH" =~ ^/opt/[a-zA-Z0-9_/-]+$ ]]; then
             echo '::error::DEPLOY_PATH must be a directory under /opt.'
             exit 1
           fi
-          for name in OPENROUTER_API_KEY ARK_API_KEY GEMINI_API_KEY; do
+          for name in OPENROUTER_API_KEY GEMINI_API_KEY; do
             value="${!name}"
             if [[ "$value" == *$'\n'* || "$value" == *$'\r'* || "$value" == *"'"* || "$value" == *\\* ]]; then
               echo "::error::$name must be a single-line API key without single quotes or backslashes."
               exit 1
             fi
           done
+          if [[ -n "${ARK_API_KEY:-}" ]]; then
+            if [[ "$ARK_API_KEY" == *$'\n'* || "$ARK_API_KEY" == *$'\r'* || "$ARK_API_KEY" == *"'"* || "$ARK_API_KEY" == *\\* ]]; then
+              echo "::error::ARK_API_KEY must be a single-line API key without single quotes or backslashes."
+              exit 1
+            fi
+          fi
           umask 077
           mkdir -p "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/bundle" "$RUNNER_TEMP/bootstrap"
           cleanup() {

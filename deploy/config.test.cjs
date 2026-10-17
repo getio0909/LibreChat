@@ -720,6 +720,15 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.match(rawSmokeTest, /"compare_materials"/);
   assert.match(rawSmokeTest, /"create_3d_model"/);
   assert.match(rawSmokeTest, /"check_3d_model"/);
+
+  // 验证部署工作流显式传递 STUDIO_ENABLE_3D（J5005 测试环境默认 true），且仅在启用 3D 时强制要求 ARK_API_KEY。
+  const deployStep = workflow.jobs.deploy.steps.find(
+    (step) => step.name === 'Deploy the published image',
+  );
+  assert.ok(deployStep, 'CI deploy job must have Deploy the published image step');
+  assert.equal(deployStep.env.STUDIO_ENABLE_3D, "${{ vars.STUDIO_ENABLE_3D || 'true' }}");
+  assert.doesNotMatch(deployStep.run, /for name in [^\n]*\bARK_API_KEY\b/);
+  assert.match(deployStep.run, /STUDIO_ENABLE_3D.*==.*"true".*ARK_API_KEY/);
 });
 
 test('gemini-4-argon is recognized as multimodal and formats image blocks, tool image results, and thought signatures without throwing', async () => {
