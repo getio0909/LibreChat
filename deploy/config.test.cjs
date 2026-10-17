@@ -8,6 +8,7 @@ const {
   fileConfig: defaultFileConfig,
   mergeFileConfig,
   getEndpointFileConfig,
+  validateVisionModel,
 } = require('librechat-data-provider');
 const {
   getGoogleConfig,
@@ -574,3 +575,121 @@ test('CI workflow builds studio image with root context, runs Python 3.13 and kn
   assert.match(rawSmokeTest, /"create_3d_model"/);
   assert.match(rawSmokeTest, /"check_3d_model"/);
 });
+
+test('gemini-4-argon is recognized as multimodal and formats image blocks, tool image results, and thought signatures without throwing', async () => {
+  // 校验 data-provider 视觉模型白名单与 @librechat/agents 补丁挂载
+  assert.equal(
+    validateVisionModel({ model: 'gemini-4-argon' }),
+    true,
+    'validateVisionModel must recognize gemini-4-argon',
+  );
+
+  const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const apiPkg = JSON.parse(fs.readFileSync('api/package.json', 'utf8'));
+  const packagesApiPkg = JSON.parse(fs.readFileSync('packages/api/package.json', 'utf8'));
+  assert.equal(rootPkg.scripts.postinstall, 'patch-package --error-on-fail');
+  assert.ok(rootPkg.dependencies['patch-package'], 'patch-package must be in root dependencies');
+  assert.equal(apiPkg.dependencies['@librechat/agents'], '4.0.4');
+  assert.equal(packagesApiPkg.peerDependencies['@librechat/agents'], '4.0.4');
+  assert.equal(fs.existsSync('patches/@librechat+agents+4.0.4.patch'), true);
+
+  const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
+  const dockerfileMulti = fs.readFileSync('Dockerfile.multi', 'utf8');
+  assert.match(dockerfile, /COPY --chown=node:node patches \.\/patches/);
+  assert.match(dockerfileMulti, /COPY patches \.\/patches/);
+
+  // 校验 CustomChatGoogleGenerativeAI 对 gemini-4-argon 的多模态请求、工具图像结果与 thoughtSignature 处理
+  const { CustomChatGoogleGenerativeAI } = require('@librechat/agents/llm/google');
+  const { HumanMessage, AIMessage, ToolMessage } = require('@langchain/core/messages');
+
+  const llm = new CustomChatGoogleGenerativeAI({
+    model: 'gemini-4-argon',
+    apiKey: 'test-api-key',
+  });
+  assert.equal(llm._isMultimodalModel, true);
+
+  let capturedRequest = null;
+  llm.client.generateContent = async (req) => {
+    capturedRequest = req;
+    return {
+      response: {
+        candidates: [
+          {
+            content: { role: 'model', parts: [{ text: 'ok' }] },
+            finishReason: 'STOP',
+          },
+        ],
+        usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5, totalTokenCount: 15 },
+      },
+    };
+  };
+
+  const userImg = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  const toolImg = 'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+
+  await llm._generate(
+    [
+      new HumanMessage({
+        content: [
+          { type: 'text', text: '分析上传图并检索知识库' },
+          { type: 'image_url', image_url: `data:image/png;base64,${userImg}` },
+        ],
+      }),
+      new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            id: 'call_1',
+            name: 'search_library_mcp_zyb_studio',
+            args: { query: '须弥座' },
+            type: 'tool_call',
+          },
+          {
+            id: 'call_2',
+            name: 'generate_image_mcp_zyb_studio',
+            args: { prompt: '供桌' },
+            type: 'tool_call',
+          },
+        ],
+        additional_kwargs: {
+          __gemini_function_call_thought_signatures__: {
+            call_1: 'explicit_thought_sig_1',
+          },
+        },
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_1',
+        name: 'search_library_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"count":1}' },
+          { type: 'image_url', image_url: `data:image/webp;base64,${toolImg}` },
+        ],
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_2',
+        name: 'generate_image_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"id":"img_1234"}' },
+          { type: 'image_url', image_url: `data:image/webp;base64,${toolImg}` },
+        ],
+      }),
+    ],
+    {},
+  );
+
+  assert.ok(capturedRequest, 'generateContent must be invoked with formatted request');
+  assert.equal(capturedRequest.contents.length, 4);
+  assert.deepEqual(capturedRequest.contents[0].parts[1], {
+    inlineData: { mimeType: 'image/png', data: userImg },
+  });
+  assert.equal(capturedRequest.contents[1].parts[0].thoughtSignature, 'explicit_thought_sig_1');
+  assert.ok(
+    typeof capturedRequest.contents[1].parts[1].thoughtSignature === 'string' &&
+      capturedRequest.contents[1].parts[1].thoughtSignature.length > 20,
+    'missing thoughtSignature on gemini-4-argon must fall back to DUMMY_SIGNATURE',
+  );
+  assert.deepEqual(capturedRequest.contents[2].parts[0].functionResponse.response.result[1], {
+    inlineData: { mimeType: 'image/webp', data: toolImg },
+  });
+});
+

@@ -1,5 +1,7 @@
 import { Providers } from '@librechat/agents';
 import { AuthKeys, ThinkingLevel } from 'librechat-data-provider';
+import { CustomChatGoogleGenerativeAI } from '@librechat/agents/llm/google';
+import { AIMessage, ToolMessage, HumanMessage } from '@langchain/core/messages';
 import type { GoogleClientOptions } from '@librechat/agents';
 import type * as t from '~/types';
 import { getGoogleConfig, getSafetySettings, knownGoogleParams } from './llm';
@@ -2044,3 +2046,160 @@ describe('knownGoogleParams', () => {
     });
   });
 });
+
+describe('Gemini 4 multimodal and thought signature formatting', () => {
+  it('formats a gemini-4-argon request with an image block and a tool result containing images without throwing and handles thoughtSignatures', async () => {
+    // 校验 gemini-4-argon 被识别为多模态模型且正确序列化图像块、工具图像结果与 thoughtSignature
+    const llm = new CustomChatGoogleGenerativeAI({
+      model: 'gemini-4-argon',
+      apiKey: 'test-api-key',
+    });
+
+    expect(llm._isMultimodalModel).toBe(true);
+
+    let capturedRequest: Record<string, unknown> | undefined;
+    (
+      llm as unknown as {
+        client: { generateContent: (req: Record<string, unknown>) => Promise<unknown> };
+      }
+    ).client.generateContent = jest.fn(async (req: Record<string, unknown>) => {
+      capturedRequest = req;
+      return {
+        response: {
+          candidates: [
+            {
+              content: {
+                role: 'model',
+                parts: [{ text: '格式化校验通过' }],
+              },
+              finishReason: 'STOP',
+            },
+          ],
+          usageMetadata: {
+            promptTokenCount: 100,
+            candidatesTokenCount: 20,
+            totalTokenCount: 120,
+          },
+        },
+      };
+    });
+
+    const userImageBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+    const toolImageBase64 = 'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+
+    const messages = [
+      new HumanMessage({
+        content: [
+          { type: 'text', text: '请参考这张上传图检索知识库并给出方案' },
+          {
+            type: 'image_url',
+            image_url: `data:image/png;base64,${userImageBase64}`,
+          },
+        ],
+      }),
+      new AIMessage({
+        content: '',
+        tool_calls: [
+          {
+            id: 'call_signed_1',
+            name: 'search_library_mcp_zyb_studio',
+            args: { query: '须弥座石雕' },
+            type: 'tool_call',
+          },
+          {
+            id: 'call_unsigned_2',
+            name: 'list_images_mcp_zyb_studio',
+            args: { limit: 5 },
+            type: 'tool_call',
+          },
+        ],
+        additional_kwargs: {
+          __gemini_function_call_thought_signatures__: {
+            call_signed_1: 'sig_explicit_gemini4_token',
+          },
+        },
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_signed_1',
+        name: 'search_library_mcp_zyb_studio',
+        content: [
+          { type: 'text', text: '{"count":1,"results":[{"id":"kb_9ffe71e1ee8bd6e7"}]}' },
+          {
+            type: 'image_url',
+            image_url: `data:image/webp;base64,${toolImageBase64}`,
+          },
+        ],
+      }),
+      new ToolMessage({
+        tool_call_id: 'call_unsigned_2',
+        name: 'list_images_mcp_zyb_studio',
+        content: '{"count":0,"images":[]}',
+      }),
+    ];
+
+    const result = await llm._generate(messages, {});
+    expect(result.generations[0]?.text).toBe('格式化校验通过');
+    expect(capturedRequest).toBeDefined();
+
+    const contents = capturedRequest?.contents as Array<{
+      role: string;
+      parts: Array<Record<string, unknown>>;
+    }>;
+    expect(contents).toHaveLength(4);
+
+    // 1. 用户消息同时包含文本与 inlineData 图像块
+    expect(contents[0].role).toBe('user');
+    expect(contents[0].parts).toEqual([
+      { text: '请参考这张上传图检索知识库并给出方案' },
+      {
+        inlineData: {
+          mimeType: 'image/png',
+          data: userImageBase64,
+        },
+      },
+    ]);
+
+    // 2. 模型工具调用同时保留显式签名并对缺失签名回退到 DUMMY_SIGNATURE
+    expect(contents[1].role).toBe('model');
+    expect(contents[1].parts).toHaveLength(2);
+    expect(contents[1].parts[0]).toEqual({
+      functionCall: {
+        id: 'call_signed_1',
+        name: 'search_library_mcp_zyb_studio',
+        args: { query: '须弥座石雕' },
+      },
+      thoughtSignature: 'sig_explicit_gemini4_token',
+    });
+    expect(contents[1].parts[1].functionCall).toEqual({
+      id: 'call_unsigned_2',
+      name: 'list_images_mcp_zyb_studio',
+      args: { limit: 5 },
+    });
+    expect(typeof contents[1].parts[1].thoughtSignature).toBe('string');
+    expect((contents[1].parts[1].thoughtSignature as string).length).toBeGreaterThan(20);
+    expect(contents[1].parts[1].thoughtSignature).not.toBe('sig_explicit_gemini4_token');
+
+    // 3. 工具结果中的图像块同样转换为 inlineData 而不抛异常
+    expect(contents[2].role).toBe('user');
+    expect(contents[2].parts).toEqual([
+      {
+        functionResponse: {
+          id: 'call_signed_1',
+          name: 'search_library_mcp_zyb_studio',
+          response: {
+            result: [
+              { text: '{"count":1,"results":[{"id":"kb_9ffe71e1ee8bd6e7"}]}' },
+              {
+                inlineData: {
+                  mimeType: 'image/webp',
+                  data: toolImageBase64,
+                },
+              },
+            ],
+          },
+        },
+      },
+    ]);
+  });
+});
+

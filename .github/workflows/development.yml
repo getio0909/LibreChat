@@ -12,6 +12,7 @@ on:
       - 'api/**'
       - 'client/**'
       - 'package*.json'
+      - 'patches/**'
       - 'Dockerfile*'
   push:
     branches: [develop]
