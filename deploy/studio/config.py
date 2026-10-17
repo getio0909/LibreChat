@@ -64,6 +64,7 @@ class StudioSettings(BaseModel):
     seed3d_model: str = "doubao-seed3d-2-0-260328"
     max_parallel_per_user: int = Field(default=3, ge=1, le=10)
     global_max_parallel: int = Field(default=12, ge=1, le=64)
+    comparison_preview_max_bytes: int = Field(default=48 * 1024, ge=16 * 1024, le=48 * 1024)
     seed3d_max_parallel: int = Field(default=5, ge=1, le=32)
     seedream_timeout_seconds: int = Field(default=240, ge=5, le=600)
     seed3d_poll_timeout_seconds: float = Field(default=480.0, gt=0.0, le=600.0)

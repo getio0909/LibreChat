@@ -13,22 +13,20 @@ from .store import read_bytes_no_follow, user_studio_dir
 
 def comparison_key(
     *,
-    conversation_id: str | None,
     base_id: str,
     base_sha256: str,
     target: str,
-    material_ids: list[str],
-    sample_fingerprints: list[list[str]],
+    material_id: str,
+    sample_fingerprints: list[str],
     size: str,
     request_key: str,
 ) -> str:
     payload = [
-        "compare-materials-v1",
-        conversation_id or "",
+        "compare-materials-variant-v2",
         base_id,
         base_sha256,
         target,
-        material_ids,
+        material_id,
         sample_fingerprints,
         size,
         request_key,
@@ -38,8 +36,8 @@ def comparison_key(
     ).hexdigest()
 
 
-def comparison_job_id(key: str, index: int) -> str:
-    digest = hashlib.sha256(f"{key}:{index}".encode("ascii")).hexdigest()
+def comparison_job_id(key: str) -> str:
+    digest = hashlib.sha256(f"compare-materials-job:{key}".encode("ascii")).hexdigest()
     return f"img_{digest[:32]}"
 
 
@@ -90,7 +88,11 @@ def saved_comparison_result(
                 False,
             )
         if receipt.get("state") == "failed" and receipt.get("billed") is False:
-            return None, "Previous comparison variant failed; not billed", False
+            # 未派发请求的收据不占用付费任务编号；仅清理没有其他产物的失败任务。
+            if any(path.name != "receipt.json" for path in job_dir.iterdir()):
+                return None, "Previous comparison job has unexpected files; no paid retry was made", True
+            receipt_file.unlink()
+            return None
         if receipt.get("state") == "rejected":
             return None, "Previous comparison variant was rejected; no paid retry was made", False
     except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):

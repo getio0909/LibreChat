@@ -299,10 +299,6 @@ STUDIO_TOOLS: list[types.Tool] = [
 # 默认暂停对外提供的三维模型生成工具名称集合（仅当enable_3d开启时启用）
 THREE_D_TOOL_NAMES: frozenset[str] = frozenset({"create_3d_model", "check_3d_model"})
 
-# 三张预览图须同时留在LibreChat四MiB MCP响应上限与四十万字符模型投影预算内。
-MAX_COMPARISON_PREVIEW_BYTES = 80 * 1024
-
-
 # 汇总显式传入的带标记知识库资产警告信息（按编号去重）
 def _collect_flag_warnings(items: list[ResolvedImage]) -> list[str]:
     warnings: list[str] = []
@@ -627,6 +623,10 @@ def build_mcp_server(
                     resolved_materials.append(
                         (raw_mat_name.strip(), mat_obj, sample_images)
                     )
+                if len({mat_obj.id for _, mat_obj, _ in resolved_materials}) != len(
+                    resolved_materials
+                ):
+                    raise ValueError("materials must refer to distinct catalog materials")
 
                 base_resolved = resolve_image(
                     settings, user_id, base_id, kb_index=active_kb
@@ -635,22 +635,22 @@ def build_mcp_server(
                 base_uri, base_size = normalize_reference_with_size(
                     base_resolved.path, allowed_roots
                 )
-                key = comparison_key(
-                    conversation_id=ctx.conversation_id,
-                    base_id=base_resolved.id,
-                    base_sha256=hashlib.sha256(base_resolved.path.read_bytes()).hexdigest(),
-                    target=target,
-                    material_ids=[mat_obj.id for _, mat_obj, _ in resolved_materials],
-                    sample_fingerprints=[
-                        [
+                base_sha256 = hashlib.sha256(base_resolved.path.read_bytes()).hexdigest()
+                variant_keys = [
+                    comparison_key(
+                        base_id=base_resolved.id,
+                        base_sha256=base_sha256,
+                        target=target,
+                        material_id=mat_obj.id,
+                        sample_fingerprints=[
                             f"{sample.id}:{hashlib.sha256(sample.path.read_bytes()).hexdigest()}"
-                            for sample in samples
-                        ]
-                        for _, _, samples in resolved_materials
-                    ],
-                    size=size,
-                    request_key=request_key,
-                )
+                            for sample in sample_images
+                        ],
+                        size=size,
+                        request_key=request_key,
+                    )
+                    for _, mat_obj, sample_images in resolved_materials
+                ]
 
                 # 对target中可能出现的任何石材商业名称做中性化处理，再生成Mac标准替换说明
                 generic_stone_map = {
@@ -665,12 +665,10 @@ def build_mcp_server(
                 )
 
                 async def _render_material_variant(
-                    index: int,
-                    req_name: str,
+                    img_id: str,
                     mat_obj: Any,
                     sample_images: list[ResolvedImage],
                 ) -> tuple[dict[str, Any] | None, str | None, bool]:
-                    img_id = comparison_job_id(key, index)
                     previous = saved_comparison_result(settings, user_id, img_id)
                     if previous is not None:
                         return previous
@@ -712,13 +710,32 @@ def build_mcp_server(
                     except (ValueError, TypeError, RuntimeError, OSError) as exc:
                         return None, str(exc), False
 
-                async with comparison_guard(settings, user_id, key):
-                    rendered_variants = await asyncio.gather(
-                        *(
-                            _render_material_variant(index, req_name, mat_obj, sample_images)
-                            for index, (req_name, mat_obj, sample_images) in enumerate(resolved_materials)
+                # 交叠批次按相同顺序加锁，重复材质共用一次生成结果。
+                async with contextlib.AsyncExitStack() as locks:
+                    for variant_key in sorted(set(variant_keys)):
+                        await locks.enter_async_context(
+                            comparison_guard(settings, user_id, variant_key)
                         )
-                    )
+                    unique_variants = {
+                        variant_key: (mat_obj, sample_images)
+                        for variant_key, (_, mat_obj, sample_images) in zip(
+                            variant_keys, resolved_materials
+                        )
+                    }
+                    async with asyncio.TaskGroup() as tasks:
+                        result_tasks = {
+                            variant_key: tasks.create_task(
+                                _render_material_variant(
+                                    comparison_job_id(variant_key), mat_obj, sample_images
+                                )
+                            )
+                            for variant_key, (mat_obj, sample_images) in unique_variants.items()
+                        }
+                    result_by_key = {
+                        variant_key: task.result()
+                        for variant_key, task in result_tasks.items()
+                    }
+                    rendered_variants = [result_by_key[key] for key in variant_keys]
 
                 variants_out: list[dict[str, Any]] = []
                 image_blocks: list[types.ImageContent] = []
@@ -746,7 +763,7 @@ def build_mcp_server(
                             f"{img_res['width']}x{img_res['height']}"
                         )
                         disp_bytes, disp_mime = encode_display_image(
-                            img_res["raw_bytes"], max_bytes=MAX_COMPARISON_PREVIEW_BYTES
+                            img_res["raw_bytes"], max_bytes=settings.comparison_preview_max_bytes
                         )
                         image_blocks.append(
                             types.ImageContent(
@@ -770,7 +787,7 @@ def build_mcp_server(
                     "variants": variants_out,
                     "comparisons": variants_out,
                     "count": len(image_blocks),
-                    "idempotency_key": key,
+                    "idempotency_key": request_key,
                     "image_context": "Preview images follow the successful variants in order. Inspect each image before describing its colors or edited parts; the named material is not visual evidence.",
                     "warnings": warnings,
                 }

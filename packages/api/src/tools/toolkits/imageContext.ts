@@ -687,7 +687,11 @@ async function loadStudioReferenceBytes({
     requestServer && 'headers' in requestServer ? requestServer.headers : undefined;
   const legacyServer = req?.config?.mcpServers?.zyb_studio;
   const rawMcpUrl =
-    configUrl || legacyServer?.url || process.env.STUDIO_MCP_URL || process.env.STUDIO_URL || '';
+    resolveTemplateEnvValue(configUrl) ||
+    resolveTemplateEnvValue(legacyServer?.url) ||
+    process.env.STUDIO_MCP_URL ||
+    process.env.STUDIO_URL ||
+    'http://studio:8000/mcp';
   const sharedToken =
     resolveTemplateEnvValue(
       configHeaders?.['X-Studio-Token'] ?? legacyServer?.headers?.['X-Studio-Token'],

@@ -21,6 +21,8 @@ const {
   loadToolDefinitions,
   requiresEphemeralUserConnection,
   isChatSelectableMCPServer,
+  toCatalogConnectionConfig,
+  getMissingRuntimeBodyPlaceholderFields,
 } = require('@librechat/api');
 const {
   STUDIO_AGENT_PLACEHOLDERS,
@@ -499,15 +501,21 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   assert.equal(studioServer.requiresOAuth, false);
   assert.equal(studioServer.timeout, 900000);
   assert.equal(isChatSelectableMCPServer(studioServer), false);
-  assert.equal(requiresEphemeralUserConnection(studioServer), true);
+  assert.equal(requiresEphemeralUserConnection(studioServer), false);
   assert.deepEqual(studioServer.headers, {
     'X-LibreChat-User-ID': '{{LIBRECHAT_STUDIO_PRINCIPAL}}',
     'X-LibreChat-Raw-User-ID': '{{LIBRECHAT_USER_ID}}',
-    'X-LibreChat-Conversation-ID': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
     'X-Studio-Token': '${STUDIO_SHARED_TOKEN}',
   });
+  assert.equal(studioServer.requestHeaders, undefined);
 
-  // 验证 processMCPEnv 能正确替换用户、对话和共享令牌占位符。
+  // 目录工具列表与重新初始化没有聊天请求体，连接配置必须在两条路径上都可用。
+  const catalogConfig = toCatalogConnectionConfig(studioServer);
+  assert.equal(catalogConfig.requestHeaders, undefined);
+  assert.deepEqual(getMissingRuntimeBodyPlaceholderFields(catalogConfig), []);
+  assert.deepEqual(getMissingRuntimeBodyPlaceholderFields(studioServer), []);
+
+  // 验证 processMCPEnv 能正确替换用户与共享令牌占位符。
   const previousToken = process.env.STUDIO_SHARED_TOKEN;
   process.env.STUDIO_SHARED_TOKEN = 'test-shared-secret-token';
   try {
@@ -519,7 +527,6 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
     assert.deepEqual(resolved.headers, {
       'X-LibreChat-User-ID': 'user-123',
       'X-LibreChat-Raw-User-ID': 'user-123',
-      'X-LibreChat-Conversation-ID': 'conv-456',
       'X-Studio-Token': 'test-shared-secret-token',
     });
   } finally {
@@ -615,7 +622,10 @@ test('deploy/compose.yml configures hardened studio service, IPv6 network, and a
   assert.equal(api.environment.ENDPOINTS, 'agents,custom,google');
   assert.equal(api.environment.GOOGLE_MODELS, 'gemini-4-argon');
   assert.equal(api.environment.GEMINI_IMAGE_MODEL, '${GEMINI_IMAGE_MODEL:-gemini-nano-banana-2.1}');
-  assert.equal(api.environment.STUDIO_MCP_URL, configSchema.parse(parsedYaml).mcpServers.zyb_studio.url);
+  assert.equal(
+    api.environment.STUDIO_MCP_URL,
+    configSchema.parse(parsedYaml).mcpServers.zyb_studio.url,
+  );
   assert.equal(api.depends_on.studio.condition, 'service_healthy');
 });
 

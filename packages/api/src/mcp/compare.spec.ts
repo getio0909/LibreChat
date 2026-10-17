@@ -1,5 +1,5 @@
-import { projectArtifactPayload } from '@librechat/agents';
 import { AIMessage, ToolMessage } from '@langchain/core/messages';
+import { calculateMaxToolResultChars, projectArtifactPayload } from '@librechat/agents';
 import type { MCPToolCallResponse } from './types';
 import { formatToolContent } from './parsers';
 
@@ -11,7 +11,7 @@ describe('Studio comparison image context', () => {
       'img_33333333333333333333333333333333',
     ];
     const previews = imageIds.map((_, index) =>
-      Buffer.alloc(80 * 1024, index + 1).toString('base64'),
+      Buffer.alloc(48 * 1024, index + 1).toString('base64'),
     );
     const result: MCPToolCallResponse = {
       content: [
@@ -36,13 +36,16 @@ describe('Studio comparison image context', () => {
     };
     const [content, artifact] = formatToolContent(result, 'google');
     const toolCallId = 'comparison-call';
-    const messages = projectArtifactPayload([
-      new AIMessage({
-        content: '',
-        tool_calls: [{ id: toolCallId, name: 'compare_materials', args: {} }],
-      }),
-      new ToolMessage({ content, artifact, tool_call_id: toolCallId }),
-    ]);
+    const messages = projectArtifactPayload(
+      [
+        new AIMessage({
+          content: '',
+          tool_calls: [{ id: toolCallId, name: 'compare_materials', args: {} }],
+        }),
+        new ToolMessage({ content, artifact, tool_call_id: toolCallId }),
+      ],
+      calculateMaxToolResultChars(200_000),
+    );
     const visionContent = messages[messages.length - 1]?.content;
     expect(Array.isArray(visionContent)).toBe(true);
     expect(visionContent).toEqual([

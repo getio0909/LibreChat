@@ -245,11 +245,20 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
     assert loaded.seedream_model == "doubao-seedream-5-0-pro-260628"
     assert loaded.seed3d_model == "doubao-seed3d-2-0-260328"
     assert loaded.max_parallel_per_user == 3
+    assert loaded.comparison_preview_max_bytes == 48 * 1024
     assert loaded.seed3d_max_parallel == 5
     assert loaded.public_base_url == "https://dev.xuqian.io"
     assert loaded.file_token_ttl_seconds == 86400
     assert loaded.seedream_timeout_seconds == 240
     assert loaded.kb_root == Path("/kb")
+
+    with pytest.raises(ValueError, match="comparison_preview_max_bytes"):
+        StudioSettings(
+            shared_token=VALID_TOKEN,
+            file_signing_key=VALID_SIGNING_KEY,
+            gemini_api_key="gkey",
+            comparison_preview_max_bytes=48 * 1024 + 1,
+        )
 
     # 当启用seedream或enable_3d时必须提供ark_api_key
     with pytest.raises(ValueError, match="ark_api_key"):
@@ -322,6 +331,14 @@ def test_auth_and_health_endpoints(studio_env: StudioSettings) -> None:
                     json=rpc_body,
                 )
                 assert res_bad_uid.status_code == 403
+
+            # 目录查询无需对话编号，重复查询同一连接仍能列出设计工具。
+            headers = {"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A}
+            for _ in range(2):
+                listed = await client.post("/mcp", headers=headers, json=rpc_body)
+                assert listed.status_code == 200
+                names = {tool["name"] for tool in listed.json()["result"]["tools"]}
+                assert {"edit_region", "compare_materials"}.issubset(names)
 
     asyncio.run(_run())
 
@@ -882,7 +899,10 @@ def test_compare_materials_bounded_previews_and_durable_idempotency(
                 assert len({v["image_id"] for v in payload["variants"]}) == 3
                 for variant, block in zip(payload["variants"], result["content"][1:]):
                     assert block["type"] == "image"
-                    assert len(base64.b64decode(block["data"])) <= 80 * 1024
+                    assert (
+                        len(base64.b64decode(block["data"]))
+                        <= studio_env.comparison_preview_max_bytes
+                    )
                     saved = (
                         studio_env.data_dir
                         / "users"
@@ -904,6 +924,27 @@ def test_compare_materials_bounded_previews_and_durable_idempotency(
         ):
             retry = await _call(client, arguments)
             assert retry.json()["result"]["isError"] is False
+            assert paid_calls == 3
+            original_variants = json.loads(first.json()["result"]["content"][0]["text"])[
+                "variants"
+            ]
+            headers["X-LibreChat-Conversation-ID"] = "22222222-3333-4444-5555-666666666666"
+            split = await _call(client, {**arguments, "materials": ["蓝金灰"]})
+            split_variants = json.loads(split.json()["result"]["content"][0]["text"])[
+                "variants"
+            ]
+            assert split_variants[0]["image_id"] == original_variants[2]["image_id"]
+            reordered = await _call(
+                client, {**arguments, "materials": ["蓝金灰", "敦煌金", "金镶玉"]}
+            )
+            reordered_variants = json.loads(
+                reordered.json()["result"]["content"][0]["text"]
+            )["variants"]
+            assert [item["image_id"] for item in reordered_variants] == [
+                original_variants[2]["image_id"],
+                original_variants[0]["image_id"],
+                original_variants[1]["image_id"],
+            ]
             assert paid_calls == 3
             fresh = await _call(client, {**arguments, "idempotency_key": "new-render"})
             assert fresh.json()["result"]["isError"] is False
@@ -987,6 +1028,141 @@ def test_compare_materials_partial_result_retry_does_not_rebill(
             first_payload = json.loads(first["content"][0]["text"])
             retry_payload = json.loads(retry["content"][0]["text"])
             assert first_payload["variants"][0]["image_id"] == retry_payload["variants"][0]["image_id"]
+
+    asyncio.run(_run())
+
+
+# 未派发的请求可沿用同一变体编号重试，已保存的结果不会因再次调用而计费。
+def test_compare_materials_retries_only_unbilled_variant(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e3333333-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    attempts = 0
+    billed = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal attempts, billed
+        attempts += 1
+        if attempts == 1:
+            raise httpx.ConnectError("simulated pre-dispatch failure")
+        billed += 1
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+    body = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": "compare_materials",
+            "arguments": {
+                "base_id": base_id,
+                "target": "供桌台面",
+                "materials": ["敦煌金"],
+            },
+        },
+    }
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            headers = {"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A}
+            first = await client.post("/mcp", headers=headers, json=body)
+            assert first.json()["result"]["isError"] is True
+            jobs = list((studio_env.data_dir / "users" / USER_A / "jobs").iterdir())
+            assert len(jobs) == 1
+            assert json.loads((jobs[0] / "receipt.json").read_text())["billed"] is False
+
+            second = await client.post("/mcp", headers=headers, json=body)
+            assert second.json()["result"]["isError"] is False
+            third = await client.post("/mcp", headers=headers, json=body)
+            assert third.json()["result"]["isError"] is False
+            assert attempts == 2
+            assert billed == 1
+            assert json.loads((jobs[0] / "receipt.json").read_text())["state"] == "saved"
+
+    asyncio.run(_run())
+
+
+# 两个顺序相反且包含相同石材的并发请求必须共用任务，并且不会互相等待成死锁。
+def test_compare_materials_overlapping_reordered_batches(
+    studio_env: StudioSettings,
+) -> None:
+    user_lc = studio_env.librechat_images_dir / USER_A
+    user_lc.mkdir(parents=True, mode=0o700)
+    base_id = "e4444444-2222-3333-4444-555555555555"
+    (user_lc / f"{base_id}__base.png").write_bytes(_make_image_bytes(fmt="PNG"))
+    billed = 0
+
+    async def _gemini_handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal billed
+        billed += 1
+        await asyncio.sleep(0.02)
+        return httpx.Response(
+            200,
+            json=_gemini_image_response(_make_image_bytes(fmt="PNG"), mime_type="image/png"),
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
+    )
+
+    async def _run() -> None:
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app), base_url="http://studio:8000"
+            ) as client,
+        ):
+            async def _call(materials: list[str]) -> dict[str, Any]:
+                response = await client.post(
+                    "/mcp",
+                    headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "compare_materials",
+                            "arguments": {
+                                "base_id": base_id,
+                                "target": "供桌台面",
+                                "materials": materials,
+                            },
+                        },
+                    },
+                )
+                result = response.json()["result"]
+                assert result["isError"] is False
+                return json.loads(result["content"][0]["text"])
+
+            first, reversed_order = await asyncio.wait_for(
+                asyncio.gather(
+                    _call(["敦煌金", "金镶玉"]),
+                    _call(["金镶玉", "敦煌金"]),
+                ),
+                timeout=10,
+            )
+            assert billed == 2
+            assert [item["image_id"] for item in first["variants"]] == [
+                item["image_id"] for item in reversed(reversed_order["variants"])
+            ]
 
     asyncio.run(_run())
 
@@ -1882,6 +2058,27 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
                 assert known_name in err_text
             assert len(gemini_requests) == 0
 
+            duplicate_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 304,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "compare_materials",
+                        "arguments": {
+                            "base_id": base_upload_id,
+                            "target": "供桌台面",
+                            "materials": ["敦煌金", "天川金"],
+                        },
+                    },
+                },
+            )
+            assert duplicate_res.json()["result"]["isError"] is True
+            assert "distinct catalog materials" in duplicate_res.json()["result"]["content"][0]["text"]
+            assert len(gemini_requests) == 0
+
             # 2. 对比“天川金”（别名->敦煌金，2张样图）与“梵高皇”（别名->敦煌壁，1张样图），验证同一底图独立渲染且绝不链式串改
             cmp_res = await client.post(
                 "/mcp",
@@ -1978,6 +2175,7 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
                             "base_id": base_upload_id,
                             "target": "供桌台面",
                             "materials": ["敦煌金", "梵高皇", "金镶玉"],
+                            "idempotency_key": "partial-failure-case",
                         },
                     },
                 },

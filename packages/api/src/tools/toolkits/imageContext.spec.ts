@@ -369,6 +369,98 @@ describe('resolveGeminiReferenceImages', () => {
     expect(saveBase64Image).toHaveBeenCalledTimes(2);
   });
 
+  it('resolves a configured Studio URL template and retains the deployment URL fallback', async () => {
+    const original = await sharp({
+      create: { width: 2, height: 2, channels: 4, background: '#345678' },
+    })
+      .png()
+      .toBuffer();
+    const previousMcpUrl = process.env.STUDIO_MCP_URL;
+    const previousStudioUrl = process.env.STUDIO_URL;
+    const fetchedUrls: string[] = [];
+    const fetchImpl = Object.assign(
+      jest.fn(async (input: RequestInfo | URL) => {
+        fetchedUrls.push(String(input));
+        return new Response(original, { headers: { 'content-type': 'image/png' } });
+      }),
+      { preconnect: jest.fn() },
+    );
+    const uploaded: Buffer[] = [];
+    const uploadImageBuffer = jest.fn(async ({ metadata }) => {
+      uploaded.push(metadata.buffer);
+      return {
+        file_id: metadata.file_id,
+        filepath: `/images/${metadata.file_id}.png`,
+        filename: metadata.filename,
+        type: metadata.type,
+      };
+    });
+
+    try {
+      for (const [configuredUrl, environmentUrl] of [
+        ['${STUDIO_MCP_URL}', 'http://studio-override:8000/mcp'],
+        [undefined, undefined],
+      ]) {
+        if (environmentUrl) {
+          process.env.STUDIO_MCP_URL = environmentUrl;
+        } else {
+          delete process.env.STUDIO_MCP_URL;
+        }
+        delete process.env.STUDIO_URL;
+        const output = {
+          name: 'compare_materials_mcp_zyb_studio',
+          content: JSON.stringify({ variants: [{ image_id: imgId }] }),
+          artifact: {
+            content: [
+              { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,cHJldmlldw==' } },
+            ],
+            file_ids: [] as string[],
+          },
+        };
+        const artifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
+        const published = await processToolImageArtifacts({
+          output,
+          req: {
+            user: { id: userA },
+            config: {
+              mcpConfig: {
+                zyb_studio: {
+                  ...(configuredUrl && { url: configuredUrl }),
+                  headers: { 'X-Studio-Token': 'fixture-token' },
+                },
+              },
+            },
+          },
+          artifactPromises,
+          dataDir: path.join(tmpRoot, 'missing-data'),
+          uploadImageBuffer,
+          fetchImpl,
+          buildMetadata: (file) => file,
+          onFileSaved: jest.fn(),
+        });
+        expect(published).toBe(true);
+        expect(await Promise.all(artifactPromises)).toHaveLength(1);
+      }
+      expect(fetchedUrls).toEqual([
+        `http://studio-override:8000/files/${imgId}`,
+        `http://studio:8000/files/${imgId}`,
+      ]);
+      expect(uploaded).toHaveLength(2);
+      expect(uploaded.every((bytes) => bytes.equals(original))).toBe(true);
+    } finally {
+      if (previousMcpUrl === undefined) {
+        delete process.env.STUDIO_MCP_URL;
+      } else {
+        process.env.STUDIO_MCP_URL = previousMcpUrl;
+      }
+      if (previousStudioUrl === undefined) {
+        delete process.env.STUDIO_URL;
+      } else {
+        process.env.STUDIO_URL = previousStudioUrl;
+      }
+    }
+  });
+
   it('rejects supplied and fetched Files from another tenant and isolates Studio image jobs', async () => {
     const tenantA = 'tenant-a';
     const tenantB = 'tenant-b';
