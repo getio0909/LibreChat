@@ -357,6 +357,7 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
       and (.tools | index("gemini_image_gen") != null)
       and (.tools | index("sys__all__sys_mcp_zyb_studio") != null)
       and (.instructions | endswith($marker))
+      and (.support_contact.name == "庄严宝刹")
     ' "$stage/agent-saved.json" >/dev/null; then
       printf 'Studio agent provisioning verification failed for %s.\n' "$agent_name" >&2
       exit 1
@@ -384,6 +385,10 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
     model: "gemini-4-argon",
     instructions: ($instructions + "\n\n" + $marker),
     tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
+    support_contact: {
+      name: "庄严宝刹",
+      email: ""
+    },
     model_parameters: {
       thinking: true,
       thinkingLevel: "high",
@@ -400,6 +405,10 @@ if grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$stage/librechat.yaml"; the
     model: "anthropic/claude-haiku-5.5",
     instructions: ($instructions + "\n\n" + $marker),
     tools: ["gemini_image_gen", "sys__all__sys_mcp_zyb_studio"],
+    support_contact: {
+      name: "庄严宝刹",
+      email: ""
+    },
     model_parameters: {
       maxContextTokens: 200000,
       max_tokens: 32000

@@ -12,6 +12,10 @@ const STUDIO_AGENT_PROVIDERS = Object.freeze({
 });
 
 const STUDIO_AGENT_TOOLS = Object.freeze(['gemini_image_gen', 'sys__all__sys_mcp_zyb_studio']);
+const STUDIO_AGENT_SUPPORT_CONTACT = Object.freeze({
+  name: '庄严宝刹',
+  email: '',
+});
 const STUDIO_AGENT_OWNER_MARKERS = Object.freeze({
   'zyb-design': '<!-- librechat-studio-owner:zyb-design:v1 -->',
   'zyb-design-fast': '<!-- librechat-studio-owner:zyb-design-fast:v1 -->',
@@ -50,6 +54,7 @@ function buildStudioAgentDefinitions(config) {
         instructions: `${preset.promptPrefix ?? ''}\n\n${STUDIO_AGENT_OWNER_MARKERS[spec.name]}`,
         tools: [...STUDIO_AGENT_TOOLS],
         mcpServerNames: ['zyb_studio'],
+        support_contact: { ...STUDIO_AGENT_SUPPORT_CONTACT },
         model_parameters: modelParameters,
       },
     };
@@ -122,6 +127,7 @@ module.exports = {
   STUDIO_AGENT_PLACEHOLDERS,
   STUDIO_AGENT_PROVIDERS,
   STUDIO_AGENT_TOOLS,
+  STUDIO_AGENT_SUPPORT_CONTACT,
   STUDIO_AGENT_OWNER_MARKERS,
   buildStudioAgentDefinitions,
   isStudioOwnedAgent,

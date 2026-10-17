@@ -59,6 +59,8 @@ from .models3d import (
     ModelJobManager,
     build_model_viewer_html,
     build_signed_file_url,
+    format_model_content_disposition,
+    format_model_download_markdown,
     format_utc_timestamp,
     load_saved_model_bytes,
     parse_byte_range,
@@ -414,7 +416,7 @@ def build_mcp_server(
         token, exp_ts = sign_file_token(settings, user_id, model_id)
         signed_url = build_signed_file_url(settings, token)
         expires_at = format_utc_timestamp(exp_ts)
-        download_markdown = f"[下载 GLB 模型 ({model_id}.glb)]({signed_url})"
+        download_markdown = format_model_download_markdown(model_id, signed_url)
 
         summary_payload: dict[str, Any] = {
             "model_id": model_id,
@@ -1960,7 +1962,7 @@ def create_app(
             {
                 "Accept-Ranges": "bytes",
                 "Cache-Control": "private, max-age=3600",
-                "Content-Disposition": f'attachment; filename="{model_id}.glb"',
+                "Content-Disposition": format_model_content_disposition(model_id),
             }
         )
         range_header = request.headers.get("range")
