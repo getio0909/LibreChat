@@ -15,11 +15,15 @@ from PIL import Image, ImageCms
 from deploy.studio.app import create_app
 from deploy.studio.config import StudioSettings, load_rules, load_settings
 from deploy.studio.images import (
+    GEMINI_MODEL,
     NATIVE,
     GenerationUncertain,
     build_edit_prompt,
     build_generate_prompt,
     comparison_target,
+    gemini_aspect_and_size,
+    generate_gemini,
+    generate_image_with_provider,
     generate_seedream,
     normalize_reference,
     source_dimensions,
@@ -41,6 +45,40 @@ VALID_SIGNING_KEY = "f" * 64
 USER_A = "65f00000000000000000000a"
 USER_B = "65f00000000000000000000b"
 FIXTURE_KB_TEMPLATE = Path(__file__).resolve().parent / "fixtures" / "kb"
+
+
+# 构造Gemini Nano Banana 2.1生图响应JSON辅助函数
+def _gemini_image_response(
+    image_bytes: bytes, mime_type: str = "image/jpeg"
+) -> dict[str, Any]:
+    return {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "inlineData": {
+                                "mimeType": mime_type,
+                                "data": base64.b64encode(image_bytes).decode("ascii"),
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+
+# 从Gemini generateContent请求体提取inlineData URI列表与提示词文本
+def _extract_gemini_parts(body: dict[str, Any]) -> tuple[list[str], str]:
+    parts = body["contents"][0]["parts"]
+    uris = [
+        f"data:{p['inlineData']['mimeType']};base64,{p['inlineData']['data']}"
+        for p in parts
+        if "inlineData" in p
+    ]
+    texts = [p["text"] for p in parts if "text" in p]
+    return uris, (texts[-1] if texts else "")
 
 
 # 生成指定尺寸与格式的测试图像字节
@@ -125,7 +163,6 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
                 "shared_token": VALID_TOKEN,
                 "file_signing_key": VALID_SIGNING_KEY,
                 "gemini_api_key": "gkey",
-                "ark_api_key": "akey",
             }
         ),
         encoding="utf-8",
@@ -136,6 +173,10 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
 
     secret_file.chmod(0o600)
     loaded = load_settings(secret_file)
+    assert loaded.image_provider == "gemini"
+    assert loaded.gemini_image_model == "gemini-nano-banana-2.1"
+    assert loaded.enable_3d is False
+    assert loaded.ark_api_key == ""
     assert loaded.seedream_model == "doubao-seedream-5-0-pro-260628"
     assert loaded.seed3d_model == "doubao-seed3d-2-0-260328"
     assert loaded.planner_model == "gemini-4-argon"
@@ -147,6 +188,22 @@ def test_settings_permissions_and_defaults(tmp_path: Path) -> None:
     assert loaded.seedream_timeout_seconds == 240
     assert loaded.planner_timeout_seconds == 540
     assert loaded.kb_root == Path("/kb")
+
+    # 当启用seedream或enable_3d时必须提供ark_api_key
+    with pytest.raises(ValueError, match="ark_api_key"):
+        StudioSettings(
+            shared_token=VALID_TOKEN,
+            file_signing_key=VALID_SIGNING_KEY,
+            gemini_api_key="gkey",
+            image_provider="seedream",
+        )
+    with pytest.raises(ValueError, match="ark_api_key"):
+        StudioSettings(
+            shared_token=VALID_TOKEN,
+            file_signing_key=VALID_SIGNING_KEY,
+            gemini_api_key="gkey",
+            enable_3d=True,
+        )
 
 
 # 校验/health端点与/mcp端点的认证和用户ID隔离检查
@@ -605,7 +662,7 @@ def _assert_flat_schema(node: Any) -> None:
             _assert_flat_schema(item)
 
 
-# 校验MCP tools/list扁平Schema与tools/call端到端调用（generate_image、edit_image、design_concepts、list_images）
+# 校验MCP tools/list扁平Schema（默认不含3D工具）与tools/call端到端调用（generate_image、edit_image、design_concepts、list_images）
 def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None:
     # 为用户A准备一张上传参考图
     user_a_lc = studio_env.librechat_images_dir / USER_A
@@ -624,19 +681,22 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
     raw_big_png = big_png_buf.getvalue()
     assert len(raw_big_png) > 3 * 1024 * 1024
 
-    ark_requests: list[dict[str, Any]] = []
-
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={
-                "data": [{"b64_json": base64.b64encode(raw_big_png).decode("ascii")}]
-            },
-        )
+    gemini_image_requests: list[dict[str, Any]] = []
 
     async def _gemini_handler(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content.decode("utf-8"))
+        if "gemini-nano-banana-2.1" in request.url.path:
+            assert request.headers.get("x-goog-api-key") == studio_env.gemini_api_key
+            assert body["generationConfig"]["responseModalities"] == [
+                "TEXT",
+                "IMAGE",
+            ]
+            gemini_image_requests.append(body)
+            return httpx.Response(
+                200,
+                json=_gemini_image_response(raw_big_png, mime_type="image/png"),
+            )
+
         assert body["generationConfig"]["thinkingConfig"]["thinkingLevel"] == "HIGH"
         concepts = [
             {
@@ -671,7 +731,6 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
         gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
@@ -691,7 +750,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
         ):
             assert app.state.session_manager is not None
             assert getattr(app.state.session_manager, "_task_group", None) is not None
-            # 1. 验证tools/list返回恰好10个工具且Schema完全扁平
+            # 1. 验证默认enable_3d=False时tools/list仅返回8个工具（不含create_3d_model/check_3d_model）且Schema完全扁平
             list_res = await client.post(
                 "/mcp",
                 headers=headers,
@@ -708,8 +767,6 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 "list_images",
                 "search_library",
                 "compare_materials",
-                "create_3d_model",
-                "check_3d_model",
             ]
             for tool in tools:
                 _assert_flat_schema(tool["inputSchema"])
@@ -725,6 +782,26 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                     "deepseek",
                 ):
                     assert forbidden_vendor not in serialized
+
+            # 默认状态下调用create_3d_model或check_3d_model必须返回明确暂停提示
+            for disabled_3d_tool in ("create_3d_model", "check_3d_model"):
+                hold_res = await client.post(
+                    "/mcp",
+                    headers=headers,
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 99,
+                        "method": "tools/call",
+                        "params": {
+                            "name": disabled_3d_tool,
+                            "arguments": {"image_id": upload_id, "job_id": "mdl_test"},
+                        },
+                    },
+                )
+                assert hold_res.status_code == 200
+                hold_result = hold_res.json()["result"]
+                assert hold_result["isError"] is True
+                assert "on hold" in hold_result["content"][0]["text"]
 
             # 2. 端到端调用generate_image，返回文本JSON块+小于3MB的展示图像块，且落盘保留原始PNG字节
             call_gen_res = await client.post(
@@ -766,6 +843,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 "seedream",
                 "doubao",
                 "ark",
+                "gemini",
             ):
                 assert forbidden_key not in content_blocks[0]["text"].casefold()
 
@@ -782,8 +860,14 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
                 / "original.png"
             )
             assert saved_orig.read_bytes() == raw_big_png
-            assert "敦煌金" not in ark_requests[-1]["prompt"]
-            assert "图1所示石材" in ark_requests[-1]["prompt"]
+            gen_uris, gen_prompt = _extract_gemini_parts(gemini_image_requests[-1])
+            assert len(gen_uris) == 1
+            assert gemini_image_requests[-1]["generationConfig"]["imageConfig"] == {
+                "aspectRatio": "4:3",
+                "imageSize": "2K",
+            }
+            assert "敦煌金" not in gen_prompt
+            assert "图1所示石材" in gen_prompt
 
             # 3. 端到端调用edit_image（使用@latest作为底图，保持底图1:1比例）
             call_edit_res = await client.post(
@@ -809,11 +893,14 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
             assert call_edit_res.status_code == 200
             edit_result = call_edit_res.json()["result"]
             assert edit_result.get("isError") is False
-            assert ark_requests[-1]["size"] == "1024x1024"
-            assert isinstance(ark_requests[-1]["image"], list)
-            assert len(ark_requests[-1]["image"]) == 2
-            assert "天川金" not in ark_requests[-1]["prompt"]
-            assert "图2所示石材" in ark_requests[-1]["prompt"]
+            edit_uris, edit_prompt = _extract_gemini_parts(gemini_image_requests[-1])
+            assert gemini_image_requests[-1]["generationConfig"]["imageConfig"] == {
+                "aspectRatio": "1:1",
+                "imageSize": "1K",
+            }
+            assert len(edit_uris) == 2
+            assert "天川金" not in edit_prompt
+            assert "图2所示石材" in edit_prompt
 
             # 4. 端到端调用design_concepts，验证规划+并发出图且不泄露image_prompt与模型名
             call_concepts_res = await client.post(
@@ -870,7 +957,7 @@ def test_mcp_tools_list_and_end_to_end_calls(studio_env: StudioSettings) -> None
 def test_concurrency_cap_and_mcp_error_states(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
-    # 校验HTTP 401被标记为rejected且不泄露上游响应体
+    # 校验HTTP 401被标记为rejected且不泄露上游响应体（覆盖Gemini与Seedream）
     calls_401 = 0
 
     async def _handler_401(request: httpx.Request) -> httpx.Response:
@@ -879,6 +966,24 @@ def test_concurrency_cap_and_mcp_error_states(
         return httpx.Response(401, content=b"sensitive-upstream-secret-detail")
 
     async def _run_401() -> None:
+        job_401_gemini = tmp_path / "job_401_gemini"
+        with pytest.raises(RuntimeError, match="authentication failed") as exc_gemini:
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=job_401_gemini,
+                transport=httpx.MockTransport(_handler_401),
+            )
+        assert "sensitive-upstream-secret-detail" not in str(exc_gemini.value)
+        rec_g = json.loads(
+            (job_401_gemini / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_g["state"] == "rejected"
+        assert rec_g["http_status"] == 401
+
         job_401 = tmp_path / "job_401"
         with pytest.raises(RuntimeError, match="authentication failed") as exc_info:
             await generate_seedream(
@@ -891,7 +996,7 @@ def test_concurrency_cap_and_mcp_error_states(
                 transport=httpx.MockTransport(_handler_401),
             )
         assert "sensitive-upstream-secret-detail" not in str(exc_info.value)
-        assert calls_401 == 1
+        assert calls_401 == 2
         rec = json.loads((job_401 / "receipt.json").read_text(encoding="utf-8"))
         assert rec["state"] == "rejected"
         assert rec["http_status"] == 401
@@ -904,18 +1009,15 @@ def test_concurrency_cap_and_mcp_error_states(
     max_observed_in_flight = 0
     small_jpg = _make_image_bytes(32, 32, fmt="JPEG")
 
-    async def _slow_ark_handler(request: httpx.Request) -> httpx.Response:
-        nonlocal active_in_flight, max_observed_in_flight
-        active_in_flight += 1
-        max_observed_in_flight = max(max_observed_in_flight, active_in_flight)
-        await asyncio.sleep(0.05)
-        active_in_flight -= 1
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
-        )
-
     async def _gemini_3_concepts(request: httpx.Request) -> httpx.Response:
+        nonlocal active_in_flight, max_observed_in_flight
+        if "gemini-nano-banana-2.1" in request.url.path:
+            active_in_flight += 1
+            max_observed_in_flight = max(max_observed_in_flight, active_in_flight)
+            await asyncio.sleep(0.05)
+            active_in_flight -= 1
+            return httpx.Response(200, json=_gemini_image_response(small_jpg))
+
         concepts = [
             {
                 "title": f"方向{i}",
@@ -949,7 +1051,6 @@ def test_concurrency_cap_and_mcp_error_states(
     app = create_app(
         settings=capped_settings,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_slow_ark_handler),
         gemini_transport=httpx.MockTransport(_gemini_3_concepts),
     )
 
@@ -1092,12 +1193,22 @@ def test_receipt_write_failure_preserves_uncertain_warning(
         return httpx.Response(502, content=b"bad gateway")
 
     async def _invalid_body_handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={"data": []})
+        return httpx.Response(200, json={"data": [], "candidates": []})
 
     async def _run() -> None:
         for idx, handler in enumerate(
             (_timeout_handler, _502_handler, _invalid_body_handler)
         ):
+            with pytest.raises(GenerationUncertain, match="may have been billed"):
+                await generate_gemini(
+                    studio_env,
+                    "prompt",
+                    [],
+                    size="1K",
+                    aspect="1:1",
+                    destination=tmp_path / f"flaky_gemini_{idx}",
+                    transport=httpx.MockTransport(handler),
+                )
             with pytest.raises(GenerationUncertain, match="may have been billed"):
                 await generate_seedream(
                     studio_env,
@@ -1114,6 +1225,7 @@ def test_receipt_write_failure_preserves_uncertain_warning(
             settings=studio_env,
             rules=load_rules(),
             ark_transport=httpx.MockTransport(_timeout_handler),
+            gemini_transport=httpx.MockTransport(_timeout_handler),
         )
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(
@@ -1330,19 +1442,16 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
         assert (resolved.width, resolved.height) == (3000, 4000)
 
     captured_requests: list[dict[str, Any]] = []
-    out_jpg = _make_image_bytes(1776, 2368, fmt="JPEG")
+    out_jpg = _make_image_bytes(1792, 2400, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
         captured_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run() -> None:
@@ -1374,8 +1483,11 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
                 assert res.status_code == 200
                 assert res.json()["result"]["isError"] is False
                 req_body = captured_requests[-1]
-                assert req_body["size"] == "1776x2368"
-                sent_b64 = req_body["image"].split(",", 1)[1]
+                assert req_body["generationConfig"]["imageConfig"] == {
+                    "aspectRatio": "3:4",
+                    "imageSize": "2K",
+                }
+                sent_b64 = req_body["contents"][0]["parts"][1]["inlineData"]["data"]
                 with Image.open(io.BytesIO(base64.b64decode(sent_b64))) as sent_im:
                     assert sent_im.width < sent_im.height
                     assert sent_im.size == (1536, 2048)
@@ -1387,19 +1499,17 @@ def test_edit_image_exif_orientation_dimensions(studio_env: StudioSettings) -> N
 def test_concept_rendering_includes_binding_design_constraints(
     studio_env: StudioSettings,
 ) -> None:
-    ark_prompts: list[str] = []
+    image_prompts: list[str] = []
     small_jpg = _make_image_bytes(64, 48, fmt="JPEG")
-
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        body = json.loads(request.content.decode("utf-8"))
-        ark_prompts.append(body["prompt"])
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
-        )
 
     # 模拟规划器在image_prompt中遗漏了“配套三足香炉”和“禅堂全景布局”，只写了孤立供桌
     async def _omitting_gemini_handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        if "gemini-nano-banana-2.1" in request.url.path:
+            _, prompt_text = _extract_gemini_parts(body)
+            image_prompts.append(prompt_text)
+            return httpx.Response(200, json=_gemini_image_response(small_jpg))
+
         concept = {
             "title": "极简石案",
             "positioning": "主供桌定位",
@@ -1430,7 +1540,6 @@ def test_concept_rendering_includes_binding_design_constraints(
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
         gemini_transport=httpx.MockTransport(_omitting_gemini_handler),
     )
 
@@ -1462,8 +1571,8 @@ def test_concept_rendering_includes_binding_design_constraints(
             )
             assert res.status_code == 200
             assert res.json()["result"]["isError"] is False
-            assert len(ark_prompts) == 1
-            sent_prompt = ark_prompts[0]
+            assert len(image_prompts) == 1
+            sent_prompt = image_prompts[0]
             assert "design_constraints" in sent_prompt
             assert (
                 json.dumps({"design_constraints": brief_text}, ensure_ascii=False)
@@ -1641,21 +1750,18 @@ def test_mcp_lifespan_shared_session_manager_concurrent_user_isolation(
     in_flight_count = 0
     small_jpg = _make_image_bytes(64, 64, fmt="JPEG")
 
-    async def _barrier_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _barrier_gemini_handler(request: httpx.Request) -> httpx.Response:
         nonlocal in_flight_count
         in_flight_count += 1
         if in_flight_count >= 2:
             both_in_flight.set()
         await asyncio.wait_for(both_in_flight.wait(), timeout=5.0)
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(small_jpg).decode("ascii")}]},
-        )
+        return httpx.Response(200, json=_gemini_image_response(small_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_barrier_ark_handler),
+        gemini_transport=httpx.MockTransport(_barrier_gemini_handler),
     )
 
     async def _run() -> None:
@@ -1964,20 +2070,17 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
     assert "rejected" in flagged_rej.warning_reasons
 
     # 4. 在generate_image与edit_image中使用kb_<id>作为材质参考或底图，验证石材名通过catalog资产ID中性化且返回flagged警告
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run() -> None:
@@ -2012,8 +2115,9 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
             assert "warnings" in meta
             assert any("kb_6666666666666661" in w for w in meta["warnings"])
             # 即使未提供note，通过kb_1111111111111111匹配catalog中的敦煌金后仍将“敦煌金”中性化为“图1所示石材”
-            assert "敦煌金" not in ark_requests[-1]["prompt"]
-            assert "图1所示石材" in ark_requests[-1]["prompt"]
+            _, gen_prompt = _extract_gemini_parts(gemini_requests[-1])
+            assert "敦煌金" not in gen_prompt
+            assert "图1所示石材" in gen_prompt
 
             # 使用kb_5555555555555551作为edit_image的base_id
             edit_res = await client.post(
@@ -2037,8 +2141,9 @@ def test_kb_id_resolution_isolation_and_flagged_warnings(
             )
             assert edit_res.status_code == 200
             assert edit_res.json()["result"].get("isError") is False
-            assert "梵高皇" not in ark_requests[-1]["prompt"]
-            assert "图2所示石材" in ark_requests[-1]["prompt"]
+            _, edit_prompt = _extract_gemini_parts(gemini_requests[-1])
+            assert "梵高皇" not in edit_prompt
+            assert "图2所示石材" in edit_prompt
 
     asyncio.run(_run())
 
@@ -2080,20 +2185,17 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
         )
     ]
 
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_ok_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_ok_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_ok_handler),
+        gemini_transport=httpx.MockTransport(_gemini_ok_handler),
     )
 
     async def _run_ok_and_unknown() -> None:
@@ -2126,7 +2228,7 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
             assert "未知火星石" in err_text
             for known_name in ("敦煌金", "敦煌壁", "金镶玉", "蓝金灰"):
                 assert known_name in err_text
-            assert len(ark_requests) == 0
+            assert len(gemini_requests) == 0
 
             # 2. 对比“天川金”（别名->敦煌金，2张样图）与“梵高皇”（别名->敦煌壁，1张样图），验证同一底图独立渲染且绝不链式串改
             cmp_res = await client.post(
@@ -2169,42 +2271,41 @@ def test_compare_materials_payloads_partial_failure_and_unknown_material(
             ]
             assert payload["comparisons"][1]["reference_ids"] == ["kb_2222222222222221"]
 
-            assert len(ark_requests) == 2
+            assert len(gemini_requests) == 2
             # 两个变体的首张图（图1底图）完全一致，均来自原始base_id而非前一次生成结果
-            assert ark_requests[0]["image"][0] == expected_base_uri
-            assert ark_requests[1]["image"][0] == expected_base_uri
-            assert ark_requests[0]["image"][1:] == expected_dunhuang_uris
-            assert ark_requests[1]["image"][1:] == expected_vangogh_uris
-            for req in ark_requests:
+            uris_0, prompt_0 = _extract_gemini_parts(gemini_requests[0])
+            uris_1, prompt_1 = _extract_gemini_parts(gemini_requests[1])
+            assert uris_0[0] == expected_base_uri
+            assert uris_1[0] == expected_base_uri
+            assert uris_0[1:] == expected_dunhuang_uris
+            assert uris_1[1:] == expected_vangogh_uris
+            for prompt in (prompt_0, prompt_1):
                 assert (
                     "将图1的供桌台面替换为本次材质样图所示石材，其他部分不变。"
-                    in req["prompt"]
+                    in prompt
                 )
-                assert rules.edit_rules in req["prompt"]
-                assert "敦煌金" not in req["prompt"]
-                assert "天川金" not in req["prompt"]
-                assert "梵高皇" not in req["prompt"]
-                assert "敦煌壁" not in req["prompt"]
+                assert rules.edit_rules in prompt
+                assert "敦煌金" not in prompt
+                assert "天川金" not in prompt
+                assert "梵高皇" not in prompt
+                assert "敦煌壁" not in prompt
 
     asyncio.run(_run_ok_and_unknown())
 
     # 3. 验证部分失败时保留成功生成的变体图像并返回告警
     call_counter = 0
 
-    async def _partial_fail_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _partial_fail_gemini_handler(request: httpx.Request) -> httpx.Response:
         nonlocal call_counter
         call_counter += 1
         if call_counter == 2:
             return httpx.Response(400, content=b"bad request on second variant")
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app_partial = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_partial_fail_ark_handler),
+        gemini_transport=httpx.MockTransport(_partial_fail_gemini_handler),
     )
 
     async def _run_partial() -> None:
@@ -2465,7 +2566,7 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
         return httpx.Response(404)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_seed3d_handler),
     )
@@ -2475,6 +2576,23 @@ def test_create_3d_model_success_ui_resource_and_no_secret_leak(
         async with httpx.AsyncClient(
             transport=transport, base_url="http://studio:8000"
         ) as client:
+            # 0. 当enable_3d=True时tools/list包含create_3d_model与check_3d_model（共10个工具）
+            list_res = await client.post(
+                "/mcp",
+                headers={"X-Studio-Token": VALID_TOKEN, "X-LibreChat-User-ID": USER_A},
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 400,
+                    "method": "tools/list",
+                    "params": {},
+                },
+            )
+            assert list_res.status_code == 200
+            tool_names = [t["name"] for t in list_res.json()["result"]["tools"]]
+            assert "create_3d_model" in tool_names
+            assert "check_3d_model" in tool_names
+            assert len(tool_names) == 10
+
             # 1. 标准精度（100k faces / low）+ ZIP内嵌GLB解包
             res_std = await client.post(
                 "/mcp",
@@ -2757,6 +2875,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
         _make_image_bytes(360, 360, fmt="JPEG")
     )
     raw_glb = _make_glb_bytes(b"PAGODA_GLB_MODEL")
+    env_3d = studio_env.model_copy(update={"enable_3d": True})
 
     # 1. 上游任务返回status="failed"时记录failed且不自动重试
     failed_create_calls = 0
@@ -2776,7 +2895,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
         )
 
     app_fail = create_app(
-        settings=studio_env,
+        settings=env_3d,
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_failed_task_handler),
     )
@@ -2790,7 +2909,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
         raise httpx.ReadTimeout("timeout after POST create-task")
 
     app_uncertain = create_app(
-        settings=studio_env,
+        settings=env_3d,
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_timeout_create_handler),
     )
@@ -2821,7 +2940,7 @@ def test_create_3d_model_failure_uncertain_background_poll_and_check_resumption(
             return httpx.Response(200, content=raw_glb)
         return httpx.Response(404)
 
-    short_poll_settings = studio_env.model_copy(
+    short_poll_settings = env_3d.model_copy(
         update={
             "seed3d_poll_timeout_seconds": 0.03,
             "seed3d_poll_initial_seconds": 0.01,
@@ -2982,7 +3101,7 @@ def test_seed3d_per_user_and_global_concurrency_limits(
         )
 
     capped = studio_env.model_copy(
-        update={"max_parallel_per_user": 2, "seed3d_max_parallel": 3}
+        update={"enable_3d": True, "max_parallel_per_user": 2, "seed3d_max_parallel": 3}
     )
     raw_glb = _make_glb_bytes()
     active_seed3d = 0
@@ -3087,20 +3206,17 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
         allowed_roots,
     )
 
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run_fixture_kb() -> None:
@@ -3133,12 +3249,14 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
                 "kb_3333333333333331"[:3] + "4444444444444441"
             ]
             assert payload["warnings"] == []
-            assert len(ark_requests) == 2
-            assert ark_requests[0]["image"] == [
+            assert len(gemini_requests) == 2
+            uris_0, _ = _extract_gemini_parts(gemini_requests[0])
+            uris_1, _ = _extract_gemini_parts(gemini_requests[1])
+            assert uris_0 == [
                 expected_base_uri,
                 expected_gold_jade_unflagged_uri,
             ]
-            assert ark_requests[1]["image"] == [
+            assert uris_1 == [
                 expected_base_uri,
                 expected_blue_grey_unflagged_uri,
             ]
@@ -3162,11 +3280,11 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
             real_kb_root / "assets" / "ref2048" / "68d94ad9e998ccc2.jpg",
             real_allowed,
         )
-        ark_requests.clear()
+        gemini_requests.clear()
         real_app = create_app(
             settings=real_env,
             rules=rules,
-            ark_transport=httpx.MockTransport(_ark_handler),
+            gemini_transport=httpx.MockTransport(_gemini_handler),
         )
 
         async def _run_real_kb() -> None:
@@ -3205,12 +3323,14 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
                     "kb_68d94ad9e998ccc2"
                 ]
                 assert payload["warnings"] == []
-                assert len(ark_requests) == 2
-                assert ark_requests[0]["image"] == [
+                assert len(gemini_requests) == 2
+                uris_0, _ = _extract_gemini_parts(gemini_requests[0])
+                uris_1, _ = _extract_gemini_parts(gemini_requests[1])
+                assert uris_0 == [
                     expected_base_uri,
                     expected_real_gold,
                 ]
-                assert ark_requests[1]["image"] == [
+                assert uris_1 == [
                     expected_base_uri,
                     expected_real_blue,
                 ]
@@ -3226,11 +3346,11 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
     )
     mat_yaml_path.write_text(mat_yaml_text, encoding="utf-8")
     flagged_env = studio_env.model_copy(update={"kb_root": all_flagged_kb})
-    ark_requests.clear()
+    gemini_requests.clear()
     flagged_app = create_app(
         settings=flagged_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run_all_flagged() -> None:
@@ -3259,7 +3379,7 @@ def test_compare_materials_excludes_flagged_samples_and_rejects_all_flagged(
             result = res.json()["result"]
             assert result.get("isError") is True
             assert "no usable unflagged sample assets" in result["content"][0]["text"]
-            assert len(ark_requests) == 0
+            assert len(gemini_requests) == 0
 
     asyncio.run(_run_all_flagged())
 
@@ -3290,20 +3410,17 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
         allowed_roots,
     )
 
-    ark_requests: list[dict[str, Any]] = []
+    gemini_requests: list[dict[str, Any]] = []
     out_jpg = _make_image_bytes(160, 120, fmt="JPEG")
 
-    async def _ark_handler(request: httpx.Request) -> httpx.Response:
-        ark_requests.append(json.loads(request.content.decode("utf-8")))
-        return httpx.Response(
-            200,
-            json={"data": [{"b64_json": base64.b64encode(out_jpg).decode("ascii")}]},
-        )
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        gemini_requests.append(json.loads(request.content.decode("utf-8")))
+        return httpx.Response(200, json=_gemini_image_response(out_jpg))
 
     app = create_app(
         settings=studio_env,
         rules=rules,
-        ark_transport=httpx.MockTransport(_ark_handler),
+        gemini_transport=httpx.MockTransport(_gemini_handler),
     )
 
     async def _run() -> None:
@@ -3412,7 +3529,8 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
                 edit_latest_res.json()["result"]["content"][0]["text"]
             )
             assert edit_latest_meta["base_id"] == upload_id
-            assert ark_requests[-1]["image"] == expected_upload_uri
+            latest_uris, _ = _extract_gemini_parts(gemini_requests[-1])
+            assert latest_uris == [expected_upload_uri]
 
             # 5. 验证显式传入带标记预览图的UUID时，自动映射回kb_3333333333333332的ref2048高清图、保留石材名中性化并返回low_res警告
             edit_with_preview_res = await client.post(
@@ -3442,12 +3560,13 @@ def test_search_library_persisted_previews_do_not_hijack_latest_or_lose_kb_metad
                 "kb_3333333333333332" in w and "low_res" in w
                 for w in edit_preview_meta["warnings"]
             )
-            assert ark_requests[-1]["image"] == [
+            preview_uris, preview_prompt = _extract_gemini_parts(gemini_requests[-1])
+            assert preview_uris == [
                 expected_upload_uri,
                 expected_flagged_gold_ref2048_uri,
             ]
-            assert "金镶玉" not in ark_requests[-1]["prompt"]
-            assert "图2所示石材" in ark_requests[-1]["prompt"]
+            assert "金镶玉" not in preview_prompt
+            assert "图2所示石材" in preview_prompt
 
     asyncio.run(_run())
 
@@ -3667,6 +3786,7 @@ def test_p2b_finding1_get_only_recovery_after_uncertain_or_restart(
 
     cfg = studio_env.model_copy(
         update={
+            "enable_3d": True,
             "seed3d_poll_timeout_seconds": 0.01,
             "seed3d_background_timeout_seconds": 0.03,
             "seed3d_poll_initial_seconds": 0.01,
@@ -3805,7 +3925,7 @@ def test_p2b_finding2_storage_failure_returns_uncertain_with_job_id_and_recovers
     monkeypatch.setattr(models3d_mod, "write_model_receipt", _flaky_write_receipt)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_handler),
     )
@@ -3943,6 +4063,7 @@ def test_p2b_finding3_terminal_saved_never_overwritten_by_race_or_timeout(
 
     cfg = studio_env.model_copy(
         update={
+            "enable_3d": True,
             "seed3d_poll_timeout_seconds": 0.005,
             "seed3d_background_timeout_seconds": 0.04,
             "seed3d_poll_initial_seconds": 0.02,
@@ -4062,7 +4183,7 @@ def test_p2b_finding4_query_4xx_marks_uncertain_not_failed_and_recovers(
         return httpx.Response(200, content=raw_glb)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_handler),
     )
@@ -4183,6 +4304,7 @@ def test_p2b_finding5_admission_held_across_background_handoff_until_terminal(
     # 设置max_parallel_per_user=1与seed3d_max_parallel=1，验证后台续跑期间配额不泄露
     cfg = studio_env.model_copy(
         update={
+            "enable_3d": True,
             "max_parallel_per_user": 1,
             "seed3d_max_parallel": 1,
             "seed3d_poll_timeout_seconds": 0.015,
@@ -4388,7 +4510,7 @@ def test_p2b_finding8_seed3d_image_prep_aspect_padding_and_min_size_rejection(
         return httpx.Response(200, content=raw_glb)
 
     app = create_app(
-        settings=studio_env,
+        settings=studio_env.model_copy(update={"enable_3d": True}),
         rules=load_rules(),
         ark_transport=httpx.MockTransport(_handler),
     )
@@ -4464,7 +4586,10 @@ def test_p2b_finding6_sandboxed_viewer_and_host_download_link(
         port = s.getsockname()[1]
 
     local_cfg = studio_env.model_copy(
-        update={"public_base_url": f"http://127.0.0.1:{port}"}
+        update={
+            "enable_3d": True,
+            "public_base_url": f"http://127.0.0.1:{port}",
+        }
     )
 
     async def _seed3d_handler(request: httpx.Request) -> httpx.Response:
@@ -5304,7 +5429,7 @@ def test_kb_index_and_search_library_with_607_records_and_region_filter(
     asyncio.run(_run())
 
 
-# 校验Seedream、Seed3D与Gemini规划器均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
+# 校验Gemini生图、Seedream、Seed3D与Gemini规划器均配置connect=10超时，且派发前ConnectError/ConnectTimeout归类为failed+未计费，派发后异常保持uncertain
 def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_uncertain(
     studio_env: StudioSettings, tmp_path: Path
 ) -> None:
@@ -5321,6 +5446,10 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
 
     observed_timeouts: dict[str, dict[str, Any]] = {}
 
+    async def _inspect_gemini_handler(request: httpx.Request) -> httpx.Response:
+        observed_timeouts["gemini"] = dict(request.extensions.get("timeout") or {})
+        raise httpx.ConnectError("IPv4 unreachable before dispatch")
+
     async def _inspect_seedream_handler(request: httpx.Request) -> httpx.Response:
         observed_timeouts["seedream"] = dict(request.extensions.get("timeout") or {})
         raise httpx.ConnectError("IPv4 unreachable before dispatch")
@@ -5330,7 +5459,31 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         raise httpx.ConnectTimeout("connect timed out before dispatch")
 
     async def _run() -> None:
-        # 1. 验证Seedream、Planner与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
+        # 1. 验证Gemini生图、Seedream、Planner与Seed3D的httpx.Timeout均使用connect=10.0且保留各自总超时
+        with pytest.raises(RuntimeError, match="not billed") as exc_gem_conn:
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gemini_conn_err",
+                transport=httpx.MockTransport(_inspect_gemini_handler),
+            )
+        assert not isinstance(exc_gem_conn.value, GenerationUncertain)
+        assert getattr(exc_gem_conn.value, "state", None) == "failed"
+        assert getattr(exc_gem_conn.value, "billed", None) is False
+        assert observed_timeouts["gemini"]["connect"] == 10.0
+        assert observed_timeouts["gemini"]["read"] == float(
+            studio_env.seedream_timeout_seconds
+        )
+        rec_gem_conn = json.loads(
+            (tmp_path / "gemini_conn_err" / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_gem_conn["state"] == "failed"
+        assert rec_gem_conn["billed"] is False
+        assert rec_gem_conn["error_code"] == "connect_error"
+
         with pytest.raises(RuntimeError, match="not billed") as exc_img_conn:
             await generate_seedream(
                 studio_env,
@@ -5360,9 +5513,28 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         assert rec_conn_err["billed"] is False
         assert rec_conn_err["error_code"] == "connect_error"
 
-        # 验证Seedream ConnectTimeout同样标记为failed+未计费
+        # 验证Gemini与Seedream ConnectTimeout同样标记为failed+未计费
         async def _seedream_connect_timeout(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectTimeout("connect timeout before request bytes sent")
+
+        with pytest.raises(RuntimeError, match="not billed") as exc_gem_ct:
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gemini_conn_timeout",
+                transport=httpx.MockTransport(_seedream_connect_timeout),
+            )
+        assert not isinstance(exc_gem_ct.value, GenerationUncertain)
+        rec_gem_ct = json.loads(
+            (tmp_path / "gemini_conn_timeout" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_gem_ct["state"] == "failed"
+        assert rec_gem_ct["billed"] is False
 
         with pytest.raises(RuntimeError, match="not billed") as exc_img_ct:
             await generate_seedream(
@@ -5383,9 +5555,26 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         assert rec_ct["state"] == "failed"
         assert rec_ct["billed"] is False
 
-        # 验证Seedream派发后ReadTimeout依然保持state="uncertain"并抛出GenerationUncertain
+        # 验证Gemini与Seedream派发后ReadTimeout依然保持state="uncertain"并抛出GenerationUncertain
         async def _seedream_read_timeout(request: httpx.Request) -> httpx.Response:
             raise httpx.ReadTimeout("read timeout after request dispatch")
+
+        with pytest.raises(GenerationUncertain, match="may have been billed"):
+            await generate_gemini(
+                studio_env,
+                "prompt",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gemini_read_timeout",
+                transport=httpx.MockTransport(_seedream_read_timeout),
+            )
+        rec_gem_rt = json.loads(
+            (tmp_path / "gemini_read_timeout" / "receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert rec_gem_rt["state"] == "uncertain"
 
         with pytest.raises(GenerationUncertain, match="may have been billed"):
             await generate_seedream(
@@ -5448,9 +5637,10 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
                 raise err
 
             app_conn = create_app(
-                settings=studio_env,
+                settings=studio_env.model_copy(update={"enable_3d": True}),
                 rules=rules,
                 ark_transport=httpx.MockTransport(_seed3d_conn_fail),
+                gemini_transport=httpx.MockTransport(_seed3d_conn_fail),
             )
             async with httpx.AsyncClient(
                 transport=httpx.ASGITransport(app=app_conn),
@@ -5572,9 +5762,10 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
             raise httpx.ReadTimeout("read timeout after POST dispatch")
 
         app_rt = create_app(
-            settings=studio_env,
+            settings=studio_env.model_copy(update={"enable_3d": True}),
             rules=rules,
             ark_transport=httpx.MockTransport(_seed3d_read_timeout),
+            gemini_transport=httpx.MockTransport(_seed3d_read_timeout),
         )
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app_rt), base_url="http://studio:8000"
@@ -5679,5 +5870,181 @@ def test_search_library_chinese_multi_term_tokenization_ranking_and_thumbnail_la
                 assert payload["thumbnails"][idx - 1]["id"] == item["id"]
                 assert item["id"] in payload["thumbnail_labels"][idx - 1]
                 assert item["thumbnail_label"] in tool_text
+
+    asyncio.run(_run())
+
+
+# 校验Gemini Nano Banana 2.1尺寸/比例映射、thought分块跳过、无图错误与image_provider双后端切换
+def test_gemini_nano_banana_21_unit_and_provider_switch(
+    studio_env: StudioSettings, tmp_path: Path
+) -> None:
+    # 1. 验证gemini_aspect_and_size支持的标准比例与source自适应最近比例映射
+    assert gemini_aspect_and_size("1K", "1:1") == ("1:1", (1024, 1024))
+    assert gemini_aspect_and_size("2K", "3:4") == ("3:4", (1792, 2400))
+    assert gemini_aspect_and_size("2K", "source", (1600, 1200)) == (
+        "4:3",
+        (2400, 1792),
+    )
+    assert gemini_aspect_and_size("1K", "source", (1080, 1920)) == (
+        "9:16",
+        (768, 1376),
+    )
+    with pytest.raises(ValueError, match="Invalid image size or aspect ratio"):
+        gemini_aspect_and_size("8K", "1:1")
+    with pytest.raises(ValueError, match="Invalid image size or aspect ratio"):
+        gemini_aspect_and_size("1K", "7:5")
+    with pytest.raises(ValueError, match="Invalid source image dimensions"):
+        gemini_aspect_and_size("1K", "source", None)
+
+    # 2. 验证generate_gemini跳过thought=True分块、解析inline_data/inlineData、并在无图时抛出GenerationUncertain
+    raw_png = _make_image_bytes(160, 120, color=(40, 90, 140), fmt="PNG")
+    ref_uri = "data:image/jpeg;base64," + base64.b64encode(
+        _make_image_bytes(120, 90, color=(200, 100, 50), fmt="JPEG")
+    ).decode("ascii")
+
+    captured_reqs: list[dict[str, Any]] = []
+
+    async def _gemini_handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers.get("x-goog-api-key") == "test-gemini-key-no-spaces"
+        assert request.url.path.endswith(f"/models/{GEMINI_MODEL}:generateContent")
+        body = json.loads(request.content.decode("utf-8"))
+        captured_reqs.append(body)
+        if len(captured_reqs) == 1:
+            return httpx.Response(
+                200,
+                json={
+                    "candidates": [
+                        {
+                            "content": {
+                                "parts": [
+                                    {
+                                        "thought": True,
+                                        "inlineData": {
+                                            "mimeType": "image/png",
+                                            "data": base64.b64encode(
+                                                _make_image_bytes(
+                                                    32, 32, color=(0, 0, 0), fmt="PNG"
+                                                )
+                                            ).decode("ascii"),
+                                        },
+                                    },
+                                    {"text": "Rendering finished."},
+                                    {
+                                        "inline_data": {
+                                            "mime_type": "image/png",
+                                            "data": base64.b64encode(raw_png).decode(
+                                                "ascii"
+                                            ),
+                                        }
+                                    },
+                                ]
+                            }
+                        }
+                    ]
+                },
+            )
+        # 第二次请求返回纯文本无图像 -> 应判定为post-dispatch uncertain
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {"content": {"parts": [{"text": "I cannot generate that image."}]}}
+                ]
+            },
+        )
+
+    seedream_called = 0
+
+    async def _seedream_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal seedream_called
+        seedream_called += 1
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {"b64_json": base64.b64encode(raw_png).decode("ascii")},
+                ]
+            },
+        )
+
+    async def _gemini_ok_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=_gemini_image_response(raw_png))
+
+    async def _run() -> None:
+        res_ok = await generate_gemini(
+            studio_env,
+            "石雕须弥座测试",
+            [ref_uri],
+            size="2K",
+            aspect="source",
+            source_size=(1600, 1200),
+            destination=tmp_path / "gem_ok",
+            transport=httpx.MockTransport(_gemini_handler),
+        )
+        assert res_ok["raw_bytes"] == raw_png
+        assert res_ok["width"] == 160
+        assert res_ok["height"] == 120
+        req0 = captured_reqs[0]
+        assert req0["generationConfig"] == {
+            "responseModalities": ["TEXT", "IMAGE"],
+            "imageConfig": {"aspectRatio": "4:3", "imageSize": "2K"},
+        }
+        parts0 = req0["contents"][0]["parts"]
+        assert parts0[0] == {"text": "石雕须弥座测试"}
+        assert parts0[1]["inlineData"]["mimeType"] == "image/jpeg"
+
+        rec_ok = json.loads(
+            (tmp_path / "gem_ok" / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_ok["state"] == "saved"
+        assert rec_ok["provider"] == "gemini"
+        assert rec_ok["model"] == GEMINI_MODEL
+        assert rec_ok["aspect_ratio"] == "4:3"
+        assert rec_ok["image_size"] == "2K"
+
+        # 无图响应必须标记为uncertain且不自动重试
+        with pytest.raises(GenerationUncertain, match="no image data"):
+            await generate_gemini(
+                studio_env,
+                "石雕须弥座无图测试",
+                [],
+                size="1K",
+                aspect="1:1",
+                destination=tmp_path / "gem_no_img",
+                transport=httpx.MockTransport(_gemini_handler),
+            )
+        rec_no_img = json.loads(
+            (tmp_path / "gem_no_img" / "receipt.json").read_text(encoding="utf-8")
+        )
+        assert rec_no_img["state"] == "uncertain"
+        assert rec_no_img["error_code"] == "no_image"
+
+        # 3. 验证generate_image_with_provider根据settings.image_provider在gemini与seedream之间切换
+        res_switch_gem = await generate_image_with_provider(
+            studio_env,
+            "默认走Gemini",
+            [],
+            size="1K",
+            aspect="1:1",
+            destination=tmp_path / "switch_gem",
+            ark_transport=httpx.MockTransport(_seedream_handler),
+            gemini_transport=httpx.MockTransport(_gemini_ok_handler),
+        )
+        assert res_switch_gem["raw_bytes"] == raw_png
+        assert seedream_called == 0
+
+        seedream_cfg = studio_env.model_copy(update={"image_provider": "seedream"})
+        res_switch_sd = await generate_image_with_provider(
+            seedream_cfg,
+            "切换回Seedream",
+            [],
+            size="1K",
+            aspect="1:1",
+            destination=tmp_path / "switch_sd",
+            ark_transport=httpx.MockTransport(_seedream_handler),
+            gemini_transport=httpx.MockTransport(_gemini_handler),
+        )
+        assert res_switch_sd["raw_bytes"] == raw_png
+        assert seedream_called == 1
 
     asyncio.run(_run())

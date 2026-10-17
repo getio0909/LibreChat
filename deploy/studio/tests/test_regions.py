@@ -18,6 +18,7 @@ from PIL import Image, ImageDraw
 
 from deploy.studio.app import create_app
 from deploy.studio.config import StudioSettings, load_rules, load_settings
+from deploy.studio.images import GEMINI_NATIVE
 from deploy.studio.regions import (
     DEFAULT_SAM2_MODEL_DIR,
     MODEL_REPO,
@@ -474,25 +475,45 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
     base_img = Image.new("RGB", (320, 240), (150, 130, 110))
     save_exact(base_img, base_file)
 
-    captured_ark_requests: list[dict[str, Any]] = []
+    captured_gemini_requests: list[dict[str, Any]] = []
 
-    async def _mock_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _mock_gemini_handler(request: httpx.Request) -> httpx.Response:
+        assert request.url == httpx.URL(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-nano-banana-2.1:generateContent"
+        )
+        assert request.headers["x-goog-api-key"] == studio_env.gemini_api_key
         body = json.loads(request.content.decode("utf-8"))
-        captured_ark_requests.append(body)
-        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        captured_gemini_requests.append(body)
+        img_cfg = body["generationConfig"]["imageConfig"]
+        req_w, req_h = GEMINI_NATIVE[img_cfg["imageSize"]][img_cfg["aspectRatio"]]
         gen_img = Image.new("RGB", (req_w, req_h), (210, 195, 175))
         buf = io.BytesIO()
         gen_img.save(buf, format="PNG")
         b64_png = base64.b64encode(buf.getvalue()).decode("ascii")
         return httpx.Response(
             200,
-            json={"data": [{"b64_json": b64_png}]},
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "inlineData": {
+                                        "mimeType": "image/png",
+                                        "data": b64_png,
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
         )
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_mock_ark_handler),
+        gemini_transport=httpx.MockTransport(_mock_gemini_handler),
     )
 
     async def _run() -> None:
@@ -657,10 +678,15 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             assert edit_blocks[2]["type"] == "image"
             assert edit_blocks[2]["mimeType"] in ("image/jpeg", "image/webp")
 
-            # 验证发往生图服务的提示词包含局部裁切<bbox>约束
-            assert len(captured_ark_requests) == 1
-            sent_prompt = captured_ark_requests[0]["prompt"]
+            # 验证发往Gemini生图服务的提示词与多模态结构包含局部裁切<bbox>约束与底图裁切inlineData
+            assert len(captured_gemini_requests) == 1
+            sent_parts = captured_gemini_requests[0]["contents"][0]["parts"]
+            sent_prompt = sent_parts[0]["text"]
             assert "<bbox>" in sent_prompt and "</bbox>" in sent_prompt
+            assert "inlineData" in sent_parts[1]
+            assert captured_gemini_requests[0]["generationConfig"][
+                "responseModalities"
+            ] == ["TEXT", "IMAGE"]
 
             # 验证落盘后的结果图在选区外与底图100%字节一致
             saved_resolved = resolve_image(studio_env, USER_A, edit_summary["id"])
@@ -1338,25 +1364,41 @@ def test_edit_region_aborts_if_base_image_mutated_during_generation(
     rec = save_confirmed_selection(studio_env, USER_A, upload_id, base_file, selection)
     sel_id = rec["selection_id"]
 
-    async def _mutating_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _mutating_gemini_handler(request: httpx.Request) -> httpx.Response:
         # 模拟并发请求在供应商响应返回前修改了底图文件字节
         save_exact(Image.new("RGB", (320, 240), (141, 120, 100)), base_file)
         body = json.loads(request.content.decode("utf-8"))
-        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        img_cfg = body["generationConfig"]["imageConfig"]
+        req_w, req_h = GEMINI_NATIVE[img_cfg["imageSize"]][img_cfg["aspectRatio"]]
         gen_img = Image.new("RGB", (req_w, req_h), (210, 190, 160))
         buf = io.BytesIO()
         gen_img.save(buf, format="PNG")
         return httpx.Response(
             200,
             json={
-                "data": [{"b64_json": base64.b64encode(buf.getvalue()).decode("ascii")}]
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "inlineData": {
+                                        "mimeType": "image/png",
+                                        "data": base64.b64encode(buf.getvalue()).decode(
+                                            "ascii"
+                                        ),
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
             },
         )
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_mutating_ark_handler),
+        gemini_transport=httpx.MockTransport(_mutating_gemini_handler),
     )
 
     async def _run() -> None:
@@ -1425,7 +1467,7 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
 
     provider_calls = 0
 
-    async def _ark_handler_then_transient_base_fault(
+    async def _gemini_handler_then_transient_base_fault(
         request: httpx.Request,
     ) -> httpx.Response:
         nonlocal provider_calls
@@ -1433,21 +1475,37 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
         # 模拟供应商已成功生成并计费，但此时底图短暂被占用/替换导致回贴阶段失败
         save_exact(Image.new("RGB", (320, 240), (99, 99, 99)), base_file)
         body = json.loads(request.content.decode("utf-8"))
-        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        img_cfg = body["generationConfig"]["imageConfig"]
+        req_w, req_h = GEMINI_NATIVE[img_cfg["imageSize"]][img_cfg["aspectRatio"]]
         gen_img = Image.new("RGB", (req_w, req_h), (215, 185, 125))
         buf = io.BytesIO()
         gen_img.save(buf, format="PNG")
         return httpx.Response(
             200,
             json={
-                "data": [{"b64_json": base64.b64encode(buf.getvalue()).decode("ascii")}]
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "inlineData": {
+                                        "mimeType": "image/png",
+                                        "data": base64.b64encode(buf.getvalue()).decode(
+                                            "ascii"
+                                        ),
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
             },
         )
 
     app = create_app(
         settings=studio_env,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_ark_handler_then_transient_base_fault),
+        gemini_transport=httpx.MockTransport(_gemini_handler_then_transient_base_fault),
     )
 
     async def _run() -> None:
@@ -1693,19 +1751,38 @@ def test_playwright_sandboxed_selection_editor_null_origin_cors_subtract_and_pro
         update={"public_base_url": f"http://127.0.0.1:{port}"}
     )
 
-    async def _mock_ark_handler(request: httpx.Request) -> httpx.Response:
+    async def _mock_gemini_handler(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content.decode("utf-8"))
-        req_w, req_h = (int(x) for x in body["size"].split("x"))
+        img_cfg = body["generationConfig"]["imageConfig"]
+        req_w, req_h = GEMINI_NATIVE[img_cfg["imageSize"]][img_cfg["aspectRatio"]]
         gen_img = Image.new("RGB", (req_w, req_h), (225, 190, 140))
         buf = io.BytesIO()
         gen_img.save(buf, format="PNG")
         b64_png = base64.b64encode(buf.getvalue()).decode("ascii")
-        return httpx.Response(200, json={"data": [{"b64_json": b64_png}]})
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "inlineData": {
+                                        "mimeType": "image/png",
+                                        "data": b64_png,
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
 
     studio_app = create_app(
         settings=local_cfg,
         rules=load_rules(),
-        ark_transport=httpx.MockTransport(_mock_ark_handler),
+        gemini_transport=httpx.MockTransport(_mock_gemini_handler),
     )
 
     def _call_mcp_http(
