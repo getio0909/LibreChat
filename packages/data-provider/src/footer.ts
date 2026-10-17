@@ -33,8 +33,6 @@ export function hasConfiguredFooter(source?: TConfiguredFooterSource | null): bo
   const footer =
     typeof source?.customFooter === 'string'
       ? source.customFooter
-      : typeof source?.interface?.customFooter === 'string'
-        ? source.interface.customFooter
-        : undefined;
+      : source?.interface?.customFooter;
   return typeof footer === 'string' && footer.trim() !== '';
 }

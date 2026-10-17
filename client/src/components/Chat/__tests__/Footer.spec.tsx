@@ -39,6 +39,30 @@ describe('Footer', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
+  test('renders an interface footer when no top-level footer is configured', () => {
+    render(
+      <Footer
+        startupConfig={{ interface: { customFooter: '[Docs](https://example.com/docs)' } }}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      'https://example.com/docs',
+    );
+    expect(screen.queryByRole('link', { name: /LibreChat/ })).not.toBeInTheDocument();
+  });
+
+  test('preserves an explicitly blank top-level footer over the interface footer', () => {
+    const { container } = render(
+      <Footer
+        startupConfig={{ customFooter: '', interface: { customFooter: 'Operator policy' } }}
+      />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   test('keeps privacy policy and terms of service links in the same tab', () => {
     render(
       <Footer
