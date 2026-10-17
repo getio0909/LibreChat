@@ -5436,9 +5436,11 @@ def test_http_connect_timeout_and_connect_error_not_billed_vs_post_dispatch_unce
         ):
 
             async def _seed3d_conn_fail(
-                request: httpx.Request, err: Exception = exc_to_raise
+                request: httpx.Request,
+                err: Exception = exc_to_raise,
+                i: int = idx,
             ) -> httpx.Response:
-                observed_timeouts[f"seed3d_{idx}"] = dict(
+                observed_timeouts[f"seed3d_{i}"] = dict(
                     request.extensions.get("timeout") or {}
                 )
                 raise err
@@ -5677,4 +5679,3 @@ def test_search_library_chinese_multi_term_tokenization_ranking_and_thumbnail_la
                 assert item["thumbnail_label"] in tool_text
 
     asyncio.run(_run())
-

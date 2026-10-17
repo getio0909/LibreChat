@@ -616,9 +616,7 @@ def build_mcp_server(
                     "count": len(result_items),
                     "query": query.strip(),
                     "thumbnails": thumbnail_entries,
-                    "thumbnail_labels": [
-                        entry["label"] for entry in thumbnail_entries
-                    ],
+                    "thumbnail_labels": [entry["label"] for entry in thumbnail_entries],
                 }
                 return types.CallToolResult(
                     content=[

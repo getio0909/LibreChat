@@ -2084,7 +2084,8 @@ describe('Gemini 4 multimodal and thought signature formatting', () => {
       };
     });
 
-    const userImageBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+    const userImageBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
     const toolImageBase64 = 'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
 
     const messages = [
@@ -2202,4 +2203,3 @@ describe('Gemini 4 multimodal and thought signature formatting', () => {
     ]);
   });
 });
-

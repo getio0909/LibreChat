@@ -713,7 +713,11 @@ class KnowledgeBaseIndex:
 
         clean_query = str(query or "").strip()
         tokens, ngram_tokens = self._extract_query_plan(clean_query)
-        if clean_query and not tokens and not (clean_type or clean_role or clean_region):
+        if (
+            clean_query
+            and not tokens
+            and not (clean_type or clean_role or clean_region)
+        ):
             return []
 
         stone_terms = {
@@ -748,9 +752,7 @@ class KnowledgeBaseIndex:
                 full_ranked.append((base_score, rec.id, rec))
                 continue
 
-            matched_tokens = [
-                t for t in tokens if _token_matches(t, rec.search_all)
-            ]
+            matched_tokens = [t for t in tokens if _token_matches(t, rec.search_all)]
             matched_count = len(matched_tokens)
 
             score = 0
@@ -768,7 +770,9 @@ class KnowledgeBaseIndex:
                 continue
 
             matched_stone = any(t in stone_terms for t in matched_tokens)
-            if rec.material_ids and (matched_stone or (has_stone_token and matched_count == len(tokens))):
+            if rec.material_ids and (
+                matched_stone or (has_stone_token and matched_count == len(tokens))
+            ):
                 score += 20
             if rec.is_catalog_sample:
                 score += 5
@@ -778,9 +782,7 @@ class KnowledgeBaseIndex:
             if matched_count == len(tokens):
                 full_ranked.append((score + ngram_score, rec.id, rec))
             else:
-                partial_ranked.append(
-                    (matched_count, score + ngram_score, rec.id, rec)
-                )
+                partial_ranked.append((matched_count, score + ngram_score, rec.id, rec))
 
         full_ranked.sort(key=lambda item: (-item[0], item[1]))
         partial_ranked.sort(key=lambda item: (-item[0], -item[1], item[2]))
