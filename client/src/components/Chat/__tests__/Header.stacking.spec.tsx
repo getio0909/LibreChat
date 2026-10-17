@@ -63,18 +63,21 @@ describe('Header stacking', () => {
     mockEndpoint.current = 'agents';
   });
 
-  test('keeps header controls above the z-10 composer approval review with an opaque surface bar', () => {
+  test('keeps header controls in normal flex flow with an opaque semantic surface bar above z-10 overlays', () => {
     const { container } = render(<Header />);
 
     expect(container.firstElementChild).toHaveClass(
-      'absolute',
+      'sticky',
       'top-0',
       'z-20',
-      'bg-surface-canvas/95',
-      'backdrop-blur-md',
+      'shrink-0',
+      'bg-surface-primary-alt',
+      'border-border-light',
       'border-b',
     );
     expect(container.firstElementChild).not.toHaveClass(
+      'absolute',
+      'bg-surface-canvas/95',
       '2xl:from-surface-canvas/0',
       'to-transparent',
     );

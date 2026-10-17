@@ -11,6 +11,7 @@ import {
   saveUIDraft,
   studioSelectionDraftsAtom,
   studioUIStore,
+  unwrapLegacyUIPromptText,
   upgradePersistedStudioHtml,
 } from '~/utils';
 import { MCPAppsPolicyProvider } from '~/Providers/MCPAppsPolicyContext';
@@ -492,5 +493,38 @@ describe('UIResourceRenderer', () => {
     } finally {
       global.fetch = originalFetch;
     }
+  });
+
+  it('submits clean Chinese prompt text without English MCP-UI boilerplate or code fences and unwraps legacy persisted prompt messages', async () => {
+    const ask = jest.fn();
+    const chinesePrompt =
+      '已确认选区 sel_807d4455d1784369a3cc8525（底图 f21a1a8e-106f-4d88-96a8-53cf8298e3db），请执行局部修改：将台面改为汉白玉';
+
+    await handleUIAction(
+      {
+        type: 'prompt',
+        payload: { prompt: `  ${chinesePrompt}  ` },
+      } as unknown as UIActionResult,
+      ask,
+    );
+
+    expect(ask).toHaveBeenCalledTimes(1);
+    expect(ask).toHaveBeenCalledWith({ text: chinesePrompt });
+    expect(ask.mock.calls[0][0].text).not.toContain('embedded UI Resource');
+    expect(ask.mock.calls[0][0].text).not.toContain('```');
+
+    const legacyWrapped = [
+      'The user clicked a button in an embedded UI Resource, and we got a message of type `prompt`.',
+      'The prompt is:',
+      '',
+      '```',
+      chinesePrompt,
+      '```',
+      '',
+      'Execute the intention of the prompt that is mentioned in the message using the tools available to you.',
+    ].join('\n');
+
+    expect(unwrapLegacyUIPromptText(legacyWrapped)).toBe(chinesePrompt);
+    expect(unwrapLegacyUIPromptText('普通用户提问文本')).toBe('普通用户提问文本');
   });
 });

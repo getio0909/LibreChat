@@ -2034,8 +2034,11 @@ def build_selection_editor_html(
   }}
   refreshExpiryBadge();
 
-  function notifyHostSize() {{
+  let lastNotifiedHeight = 0;
+  function notifyHostSize(onlyIfChanged) {{
     const h = Math.max(540, Math.ceil(root.getBoundingClientRect().height + 16));
+    if (onlyIfChanged === true && h === lastNotifiedHeight) return;
+    lastNotifiedHeight = h;
     if (window.parent && window.parent !== window) {{
       window.parent.postMessage({{ type: 'ui-size-change', payload: {{ height: h }} }}, '*');
     }}
@@ -2044,6 +2047,7 @@ def build_selection_editor_html(
   function setStatus(text, kind) {{
     statusText.textContent = text;
     statusText.className = 'status-line' + (kind ? ' ' + kind : '');
+    notifyHostSize(true);
   }}
 
   function buildDraftSnapshot() {{
@@ -2315,6 +2319,7 @@ def build_selection_editor_html(
       canvas.height = dispH;
     }}
     renderOverlay();
+    notifyHostSize();
   }}
 
   function hasAdditiveShape() {{
@@ -2853,6 +2858,11 @@ def build_selection_editor_html(
   }}
 
   window.addEventListener('resize', syncStageLayout);
+  if (typeof ResizeObserver !== 'undefined' && root) {{
+    new ResizeObserver(() => {{
+      notifyHostSize(true);
+    }}).observe(root);
+  }}
   baseImg.src = currentPreviewUrl;
   updateToolbarUI();
   notifyHostSize();
@@ -3366,6 +3376,12 @@ def build_compare_viewer_html(
     render();
   }});
 
+  window.addEventListener('resize', notifyHostSize);
+  if (typeof ResizeObserver !== 'undefined' && root) {{
+    new ResizeObserver(() => {{
+      notifyHostSize();
+    }}).observe(root);
+  }}
   beforeImg.src = currentBeforeUrl;
   afterImg.src = currentAfterUrl;
   notifyHostSize();

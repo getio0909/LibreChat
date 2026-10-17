@@ -304,6 +304,22 @@ function formatLocalTimestampDisplay(isoText: string): string {
   return `${parsed.getFullYear()}-${pad2(parsed.getMonth() + 1)}-${pad2(parsed.getDate())} ${pad2(parsed.getHours())}:${pad2(parsed.getMinutes())}`;
 }
 
+// 匹配旧版MCP-UI自动包裹的英文提示模板及未标注语言的三重反引号围栏（曾导致被highlight.js误判为wasm代码块）
+const LEGACY_UI_PROMPT_WRAPPER_RE =
+  /^The user clicked a button in an embedded UI Resource,\s*and we got a message of type `prompt`\.[\s\S]*?```(?:[a-zA-Z0-9_-]*)\n([\s\S]*?)\n```[\s\S]*$/;
+
+// 剥离历史会话中已落库的英文MCP-UI包装文本与代码块围栏，使气泡展示纯中文确认选区内容
+export function unwrapLegacyUIPromptText(text: string): string {
+  if (typeof text !== 'string' || !text.includes('embedded UI Resource')) {
+    return text;
+  }
+  const match = LEGACY_UI_PROMPT_WRAPPER_RE.exec(text.trim());
+  if (match?.[1]) {
+    return match[1].trim();
+  }
+  return text;
+}
+
 export function upgradePersistedStudioHtml(
   html: string,
   uri?: string | null,
@@ -319,12 +335,18 @@ export function upgradePersistedStudioHtml(
   }
   let next = html;
 
-  // 将旧版持久化卡片中的原始UUID/sel_/img_标题与UTC ISO时间戳升级为中文友好标题与本地时间
+  // 将旧版持久化卡片中的原始UUID/sel_/img_标题与UTC ISO时间戳升级为中文友好标题与本地时间，并补齐移动端缩放高度通知
   if (uri.startsWith(STUDIO_SELECTION_PREFIX)) {
     next = next.replace(
       /<span class="title">只改局部\s*·\s*选区编辑器（[^（）]*?(?:[0-9a-f]{8}-[0-9a-f]{4}|img_[0-9a-f]+)[^（）]*?·\s*(\d+×\d+)）<\/span>/gi,
       '<span class="title">只改局部 · 选区编辑器（$1）</span>',
     );
+    if (!next.includes('new ResizeObserver')) {
+      next = next.replace(
+        /window\.addEventListener\('resize',\s*syncStageLayout\);/g,
+        "window.addEventListener('resize', function() { syncStageLayout(); notifyHostSize(); }); if (typeof ResizeObserver !== 'undefined' && root) { new ResizeObserver(function() { notifyHostSize(); }).observe(root); }",
+      );
+    }
   } else if (uri.startsWith(STUDIO_COMPARE_PREFIX)) {
     next = next.replace(
       /<span class="title">局部修改前后对比（[^（）]*?(?:sel_[0-9a-f]+|img_[0-9a-f]+|[0-9a-f]{8}-[0-9a-f]{4})[^（）]*?·\s*(\d+×\d+)(?:\s*·\s*变更像素\s*[^（）]+)?）<\/span>/gi,

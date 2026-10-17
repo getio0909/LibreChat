@@ -1257,7 +1257,7 @@ describe('ToolCall sole tool disclosure', () => {
     const { unmount } = render(
       <RecoilRoot>
         <ToolCall
-          args='{}'
+          args="{}"
           name="edit_region_mcp_other_server"
           output="ok"
           initialProgress={1}
@@ -1272,7 +1272,7 @@ describe('ToolCall sole tool disclosure', () => {
     const { unmount: unmountStudio } = render(
       <RecoilRoot>
         <ToolCall
-          args='{}'
+          args="{}"
           name="edit_region_mcp_zyb_studio"
           output="ok"
           initialProgress={1}
@@ -1287,7 +1287,7 @@ describe('ToolCall sole tool disclosure', () => {
     render(
       <RecoilRoot>
         <ToolCall
-          args='{}'
+          args="{}"
           name="zyb_studio_mcp_zyb_studio"
           output="ok"
           initialProgress={1}

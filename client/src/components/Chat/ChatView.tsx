@@ -223,7 +223,7 @@ function ChatView({
                                it the composer lands 4px right of where a conversation
                                puts it and slides sideways on the way in. */
                                 'scrollbar-gutter-spacer flex-1 items-center justify-end sm:justify-center'
-                              : 'h-full overflow-y-auto',
+                              : 'min-h-0 flex-1 overflow-y-auto',
                             !isLandingPage && chatProjectId && 'pt-9',
                           )}
                         >

@@ -3,8 +3,8 @@ import MarkdownLite from '~/components/Chat/Messages/Content/MarkdownLite';
 import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
 import useSmoothStreaming from '~/hooks/Messages/useSmoothStreaming';
 import Markdown from '~/components/Chat/Messages/Content/Markdown';
+import { cn, unwrapLegacyUIPromptText } from '~/utils';
 import CollapsibleText from './CollapsibleText';
-import { cn } from '~/utils';
 
 type TextPartProps = {
   text: string;
@@ -22,6 +22,10 @@ const TextPart = memo(function TextPart({ text, isCreatedByUser, showCursor }: T
   const { isSubmitting = false, isLatestMessage = false } = useMessage();
   const { enableUserMsgMarkdown, collapseLongUserMessages } = useUserTextPreferences();
   const smoothStreaming = useSmoothStreaming();
+  const displayText = useMemo(
+    () => (isCreatedByUser ? unwrapLegacyUIPromptText(text) : text),
+    [isCreatedByUser, text],
+  );
   // The word fade itself indicates streaming, so the trailing block cursor
   // only shows when the fade is unavailable (setting off or reduced motion).
   const showCursorState = useMemo(
@@ -31,20 +35,20 @@ const TextPart = memo(function TextPart({ text, isCreatedByUser, showCursor }: T
 
   const content: ContentType = useMemo(() => {
     if (!isCreatedByUser) {
-      return <Markdown content={text} isLatestMessage={isLatestMessage} />;
+      return <Markdown content={displayText} isLatestMessage={isLatestMessage} />;
     } else if (enableUserMsgMarkdown) {
-      return <MarkdownLite content={text} />;
+      return <MarkdownLite content={displayText} />;
     } else {
-      return <>{text}</>;
+      return <>{displayText}</>;
     }
-  }, [isCreatedByUser, enableUserMsgMarkdown, text, isLatestMessage]);
+  }, [isCreatedByUser, enableUserMsgMarkdown, displayText, isLatestMessage]);
 
   return (
     <CollapsibleText enabled={isCreatedByUser && collapseLongUserMessages}>
       <div
         className={cn(
           isSubmitting ? 'submitting' : '',
-          showCursorState && !!text.length ? 'result-streaming' : '',
+          showCursorState && !!displayText.length ? 'result-streaming' : '',
           'markdown prose message-content dark:prose-invert light w-full break-words',
           isCreatedByUser && !enableUserMsgMarkdown && 'whitespace-pre-wrap',
           'text-text-primary',

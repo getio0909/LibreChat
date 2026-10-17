@@ -294,17 +294,14 @@ ${JSON.stringify(params, null, 2)}
 Execute the tool that is mentioned in the message using the tools available to you.
     `;
   } else if (type === 'prompt') {
+    // 直接提交内嵌视图传入的中文指令文本，避免英文MCP-UI包装模板与无语言代码块围栏触发wasm语法高亮标签
     const { prompt } = payload;
-    messageText = `The user clicked a button in an embedded UI Resource, and we got a message of type \`prompt\`.
-The prompt is:
-
-\`\`\`
-${prompt}
-\`\`\`
-
-Execute the intention of the prompt that is mentioned in the message using the tools available to you.
-    `;
+    messageText = typeof prompt === 'string' ? prompt.trim() : '';
   } else {
+    return;
+  }
+
+  if (!messageText.trim()) {
     return;
   }
 

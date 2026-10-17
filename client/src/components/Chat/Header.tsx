@@ -81,9 +81,9 @@ function Header({
   const hiddenBehindNav = navVisible === true && isSmallScreen && 'hidden';
 
   return (
-    /* The composer review is in a z-10 stacking context. Keep header controls
-       above it when a tall review reaches the top of a short viewport. */
-    <div className="bg-surface-canvas/95 border-border-light/40 text-text-primary absolute top-0 z-20 flex h-[3.25rem] w-full items-center gap-2 border-b p-2 font-semibold backdrop-blur-md">
+    /* 顶部栏采用文档流内 sticky top-0 z-20 shrink-0 与既有语义表面令牌 bg-surface-primary-alt，
+       使下方滚动容器从标题栏底边起算，防止消息文本与工具卡片在滚动时穿过「庄严设计助手」按钮后方。 */
+    <div className="border-border-light bg-surface-primary-alt text-text-primary sticky top-0 z-20 flex h-[3.25rem] w-full shrink-0 items-center gap-2 border-b p-2 font-semibold">
       <div className={cn('flex-shrink-0 items-center', isSmallScreen ? 'flex' : 'hidden')}>
         <OpenSidebar testId="header-open-sidebar-button" />
       </div>

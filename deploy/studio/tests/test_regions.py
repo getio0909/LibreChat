@@ -2780,10 +2780,17 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
     window.__renewRequests = [];
     window.__toolRequests = [];
     window.__promptMessages = [];
+    window.__sizeChanges = [];
     window.addEventListener('message', (ev) => {
       if (!ev.data || typeof ev.data !== 'object') return;
       const { type, messageId, payload } = ev.data;
-      if (type === 'ui-draft-save' && payload && payload.draftKey) {
+      if (type === 'ui-size-change' && payload && typeof payload.height === 'number') {
+        window.__sizeChanges.push(payload.height);
+        const edEl = document.getElementById('ed');
+        if (edEl && ev.source === edEl.contentWindow) {
+          edEl.style.height = payload.height + 'px';
+        }
+      } else if (type === 'ui-draft-save' && payload && payload.draftKey) {
         window.__draftStore[payload.draftKey] = {
           editorCapability: payload.editorCapability,
           draft: payload.draft
@@ -2857,7 +2864,40 @@ def test_round5b_preview_token_ttl_chinese_titles_and_renewal_path(
                 frame.locator("#instructionInput").fill("局部石材替换为汉白玉")
                 assert frame.locator("#confirmBtn").is_disabled() is False
 
-                # 模拟移动端/桌面端断点切换导致同一编辑器实例卸载并重新挂载（remount）
+                # 模拟移动端/桌面端断点切换导致同一编辑器实例卸载并重新挂载（remount），以及 375×812 视口工具栏换行后触发 ui-size-change 自适应增高
+                desktop_size = page.evaluate(
+                    "() => window.__sizeChanges[window.__sizeChanges.length - 1] || 0"
+                )
+                assert desktop_size >= 540
+                page.set_viewport_size({"width": 375, "height": 812})
+                page.evaluate(
+                    """() => {
+                        const ed = document.getElementById('ed');
+                        ed.style.width = '375px';
+                    }"""
+                )
+                page.wait_for_timeout(200)
+                mobile_metrics = frame.locator("#editorRoot").evaluate(
+                    """(root) => {
+                        const rootRect = root.getBoundingClientRect();
+                        const inputRect = document.getElementById('instructionInput').getBoundingClientRect();
+                        const confirmRect = document.getElementById('confirmBtn').getBoundingClientRect();
+                        return {
+                            rootBottom: Math.ceil(rootRect.bottom),
+                            inputBottom: Math.ceil(inputRect.bottom),
+                            confirmBottom: Math.ceil(confirmRect.bottom)
+                        };
+                    }"""
+                )
+                mobile_size = page.evaluate(
+                    "() => window.__sizeChanges[window.__sizeChanges.length - 1] || 0"
+                )
+                assert mobile_size > desktop_size
+                assert mobile_size >= mobile_metrics["rootBottom"]
+                assert mobile_size >= mobile_metrics["inputBottom"]
+                assert mobile_size >= mobile_metrics["confirmBottom"]
+                page.set_viewport_size({"width": 840, "height": 720})
+
                 page.evaluate(
                     """(html) => {
                         const oldFrame = document.getElementById('ed');
