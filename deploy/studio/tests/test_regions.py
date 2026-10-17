@@ -676,9 +676,9 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
             assert VENDOR_PATTERN.search(compare_html) is None
 
             assert edit_blocks[2]["type"] == "image"
-            assert edit_blocks[2]["mimeType"] == "image/png"
-            canonical_bytes = base64.b64decode(edit_blocks[2]["data"])
-            assert hashlib.sha256(canonical_bytes).hexdigest() == edit_summary["sha256"]
+            assert edit_blocks[2]["mimeType"] in ("image/jpeg", "image/png", "image/webp")
+            display_bytes = base64.b64decode(edit_blocks[2]["data"])
+            assert 0 < len(display_bytes) < 10 * 1024 * 1024
 
             # 验证发往Gemini生图服务的提示词与多模态结构包含局部裁切<bbox>约束与底图裁切inlineData
             assert len(captured_gemini_requests) == 1
@@ -690,9 +690,10 @@ def test_select_region_and_edit_region_mcp_end_to_end_and_signed_urls_only(
                 "responseModalities"
             ] == ["TEXT", "IMAGE"]
 
-            # 验证落盘后的结果图在选区外与底图100%字节一致，且MCP返回的规范File字节与之完全相同
+            # 验证落盘后的结果图在选区外与底图100%字节一致，且规范原图SHA-256与summary完全匹配
             saved_resolved = resolve_image(studio_env, USER_A, edit_summary["id"])
-            assert canonical_bytes == saved_resolved.path.read_bytes()
+            canonical_bytes = saved_resolved.path.read_bytes()
+            assert hashlib.sha256(canonical_bytes).hexdigest() == edit_summary["sha256"]
             saved_img = open_image(saved_resolved.path)
             mask = mask_for(confirm_selection, base_img.size)
             assert count_outside_changes(base_img, saved_img, mask) == 0
@@ -1603,8 +1604,9 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
             assert rec_summary["outside_changed_pixels"] == 0
             assert (job_dir / "original.png").is_file()
             assert rec_result["content"][2]["type"] == "image"
-            assert rec_result["content"][2]["mimeType"] == "image/png"
-            rec_canonical = base64.b64decode(rec_result["content"][2]["data"])
+            assert rec_result["content"][2]["mimeType"] in ("image/jpeg", "image/png")
+            assert len(rec_result["content"][2]["data"]) < 2 * 1024 * 1024
+            rec_canonical = (job_dir / "original.png").read_bytes()
             assert hashlib.sha256(rec_canonical).hexdigest() == rec_summary["sha256"]
 
             # 校验选区外像素与原底图逐字节一致
@@ -1616,7 +1618,7 @@ def test_edit_region_post_provider_failure_persists_recoverable_crop_and_finishe
     asyncio.run(_run())
 
 
-# 回归测试（Finding #2）：edit_region 返回的规范 File（MCP ImageContent）必须为无损 PNG（含 Alpha），通过 LibreChat File UUID 再次下载或复用时选区外像素与透明度 100% 保持不变
+# 回归测试（Finding #2）：edit_region 产出的规范无损原图（含 Alpha）通过 /files/<id> 与 LibreChat 规范 File 链路保存后，再次下载或复用时选区外像素与透明度 100% 保持不变
 def test_edit_region_canonical_file_id_preserves_lossless_png_and_rgba_alpha(
     studio_env: StudioSettings,
 ) -> None:
@@ -1721,22 +1723,24 @@ def test_edit_region_canonical_file_id_preserves_lossless_png_and_rgba_alpha(
             assert blocks[1]["type"] == "resource"
             assert blocks[1]["resource"]["uri"] == f"ui://zyb_studio/compare/{summary['id']}"
             assert blocks[2]["type"] == "image"
-            assert blocks[2]["mimeType"] == "image/png"
 
-            canonical_png_bytes = base64.b64decode(blocks[2]["data"])
+            file_res = await client.get(f"/files/{summary['id']}", headers=headers_a)
+            assert file_res.status_code == 200
+            assert file_res.headers["content-type"].startswith("image/png")
+            canonical_png_bytes = file_res.content
             assert hashlib.sha256(canonical_png_bytes).hexdigest() == summary["sha256"]
 
-            # 模拟 LibreChat 将该规范 ImageContent 保存为用户的可下载/可复用 File UUID 记录
+            # 模拟 LibreChat processToolImageArtifacts 拉取规范无损原图并保存为用户的可下载/可复用 File UUID 记录
             canonical_file_id = "99999999-aaaa-bbbb-cccc-dddddddddddd"
             canonical_lc_path = (
                 user_a_lc
-                / f"{canonical_file_id}-edit_region_mcp_zyb_studio_img_V1StGXR8_Z5jdHi6B-er9.png"
+                / f"{canonical_file_id}-edit_region_img_{summary['id']}.png"
             )
             canonical_lc_path.write_bytes(canonical_png_bytes)
 
             reused = resolve_image(studio_env, USER_A, canonical_file_id)
-            assert reused.id == canonical_file_id
-            assert reused.kind == "generated"
+            assert reused.id == summary["id"]
+            assert reused.kind == "studio"
             reused_img = open_image(reused.path, keep_alpha=True)
             assert reused_img.mode == "RGBA"
             mask = mask_for(selection, (w, h))
@@ -1751,6 +1755,123 @@ def test_edit_region_canonical_file_id_preserves_lossless_png_and_rgba_alpha(
                 np.sum(rgba_arr[:, :, 3][outside] == 128)
             )
             assert np.array_equal(rgba_arr[outside], reused_arr[outside])
+
+    asyncio.run(_run())
+
+
+# 回归测试（Finding #2）：2048x2048 复杂 RGBA 图像无损 PNG 超过 10 MiB 时，MCP 内联预览保持轻量且不触发 10 MiB 传输上限，同时规范无损文件完整保留
+def test_edit_region_2048x2048_rgba_over_10mib_mcp_limit(
+    studio_env: StudioSettings,
+) -> None:
+    user_a_lc = studio_env.librechat_images_dir / USER_A
+    user_a_lc.mkdir(parents=True, mode=0o700, exist_ok=True)
+    upload_id = "77777777-8888-9999-aaaa-bbbbbbbbbbbb"
+    base_file = user_a_lc / f"{upload_id}__high_entropy_2048.png"
+
+    w, h = 2048, 2048
+    rng = np.random.default_rng(20261017)
+    rgba_arr = rng.integers(0, 256, size=(h, w, 4), dtype=np.uint8)
+    rgba_arr[0:64, 0:64, 3] = 0
+    rgba_arr[1980:2048, 1980:2048, 3] = 128
+    base_rgba_img = Image.fromarray(rgba_arr, mode="RGBA")
+    save_exact(base_rgba_img, base_file)
+    assert base_file.stat().st_size > 10 * 1024 * 1024
+
+    selection = {
+        "version": 1,
+        "shapes": [
+            {
+                "type": "rect",
+                "op": "add",
+                "points": [{"x": 400, "y": 400}, {"x": 600, "y": 600}],
+            }
+        ],
+    }
+    rec = save_confirmed_selection(studio_env, USER_A, upload_id, base_file, selection)
+    sel_id = rec["selection_id"]
+
+    async def _mock_gemini_handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        img_cfg = body["generationConfig"]["imageConfig"]
+        req_w, req_h = GEMINI_NATIVE[img_cfg["imageSize"]][img_cfg["aspectRatio"]]
+        gen_img = Image.new("RGBA", (req_w, req_h), (200, 160, 100, 255))
+        buf = io.BytesIO()
+        gen_img.save(buf, format="PNG")
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [
+                                {
+                                    "inlineData": {
+                                        "mimeType": "image/png",
+                                        "data": base64.b64encode(buf.getvalue()).decode(
+                                            "ascii"
+                                        ),
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        )
+
+    app = create_app(
+        settings=studio_env,
+        rules=load_rules(),
+        gemini_transport=httpx.MockTransport(_mock_gemini_handler),
+    )
+
+    async def _run() -> None:
+        headers_a = {
+            "X-Studio-Token": VALID_TOKEN,
+            "X-LibreChat-User-ID": USER_A,
+        }
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://studio:8000",
+        ) as client:
+            edit_res = await client.post(
+                "/mcp",
+                headers=headers_a,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 89,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "edit_region",
+                        "arguments": {
+                            "base_id": upload_id,
+                            "selection_id": sel_id,
+                            "instruction": "将中心选区替换为青金石纹样",
+                            "size": "1K",
+                        },
+                    },
+                },
+            )
+            assert edit_res.status_code == 200
+            result = edit_res.json()["result"]
+            assert result.get("isError") is False
+            blocks = result["content"]
+            summary = json.loads(blocks[0]["text"])
+            assert summary["width"] == 2048
+            assert summary["height"] == 2048
+            assert summary["outside_changed_pixels"] == 0
+
+            # 内联 MCP 图像块必须小于 10 MiB MCP 传输上限
+            inline_raw = base64.b64decode(blocks[2]["data"])
+            assert len(inline_raw) < 5 * 1024 * 1024
+            assert len(blocks[2]["data"]) < 10 * 1024 * 1024
+
+            # 规范无损 PNG 文件大小超过 10 MiB，且完整保留 2048x2048 RGBA 与选区外像素
+            file_res = await client.get(f"/files/{summary['id']}", headers=headers_a)
+            assert file_res.status_code == 200
+            canonical_bytes = file_res.content
+            assert len(canonical_bytes) > 10 * 1024 * 1024
+            assert hashlib.sha256(canonical_bytes).hexdigest() == summary["sha256"]
 
     asyncio.run(_run())
 

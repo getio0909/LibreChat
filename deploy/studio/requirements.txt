@@ -12,4 +12,3 @@ torch==2.14.0+cpu
 torchvision==0.29.1+cpu
 transformers==5.16.1
 uvicorn==0.53.0
-

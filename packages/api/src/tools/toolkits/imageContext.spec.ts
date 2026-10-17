@@ -1,14 +1,19 @@
 import fs from 'node:fs';
 import os from 'node:os';
+import sharp from 'sharp';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { Constants, FileContext } from 'librechat-data-provider';
 import type { GeminiReferenceFileRecord } from './imageContext';
 import {
   buildImageToolContext,
   buildMCPImageToolContext,
   isStudioReferenceId,
+  readImageDimensions,
   deriveStudioBridgeFileId,
+  processToolImageArtifacts,
   resolveGeminiReferenceImages,
+  extractStudioArtifactImageIds,
   collectBranchImageCandidateIds,
   collectConversationBranchImageFiles,
 } from './imageContext';
@@ -486,5 +491,315 @@ describe('resolveGeminiReferenceImages', () => {
       expect(result.error.unresolvedIds).toEqual(['kb_deadbeefdeadbeef']);
       expect(result.error.message).toContain('kb_deadbeefdeadbeef');
     }
+  });
+
+  // 校验 image_ids 数量超限时返回 TOO_MANY_IMAGE_REFERENCES，并对重复 ID 及同一资产的原始 ID 与桥接 UUID 去重
+  it('enforces maxItems limit (TOO_MANY_IMAGE_REFERENCES) and deduplicates repeated or aliased image_ids', async () => {
+    const overLimitIds = Array.from({ length: 15 }, (_, idx) => `file-${idx}`);
+    const overLimitResult = await resolveGeminiReferenceImages({
+      image_ids: overLimitIds,
+      req: { user: { id: userA } },
+    });
+    expect(overLimitResult.ok).toBe(false);
+    if (!overLimitResult.ok) {
+      expect(overLimitResult.error.code).toBe('TOO_MANY_IMAGE_REFERENCES');
+      expect(overLimitResult.error.message).toContain('TOO_MANY_IMAGE_REFERENCES');
+    }
+
+    const bridgedId = deriveStudioBridgeFileId(userA, imgId);
+    const createFile = jest.fn(async (data: Record<string, unknown>) => ({
+      ...(data as unknown as GeminiReferenceFileRecord),
+    }));
+    const saveBuffer = jest.fn(
+      async ({ userId: u, fileName }: { userId: string; fileName: string }) => {
+        return `/images/${u}/${fileName}`;
+      },
+    );
+    const getDownloadStream = jest.fn(async () =>
+      (async function* () {
+        yield imgBytes;
+      })(),
+    );
+
+    const dedupResult = await resolveGeminiReferenceImages({
+      image_ids: [imgId, imgId.toUpperCase(), bridgedId],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      getFiles: async () => [],
+      createFile,
+      getStrategyFunctions: () => ({
+        saveBuffer,
+        getDownloadStream,
+      }),
+    });
+
+    expect(dedupResult.ok).toBe(true);
+    if (dedupResult.ok) {
+      expect(dedupResult.value).toHaveLength(1);
+    }
+    expect(createFile).toHaveBeenCalledTimes(1);
+    expect(getDownloadStream).toHaveBeenCalledTimes(1);
+  });
+
+  // 校验单图与总字节上限（IMAGE_REFERENCE_TOO_LARGE）以及桥接真实图片尺寸测量
+  it('enforces per-image and total byte limits (IMAGE_REFERENCE_TOO_LARGE) and records measured image dimensions', async () => {
+    const realPng = await sharp({
+      create: {
+        width: 320,
+        height: 180,
+        channels: 4,
+        background: { r: 100, g: 120, b: 140, alpha: 1 },
+      },
+    })
+      .png()
+      .toBuffer();
+
+    const realImgId = 'img_99999999999999999999999999999999';
+    const jobDir = path.join(dataDir, 'users', userA, 'jobs', realImgId);
+    fs.mkdirSync(jobDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(jobDir, 'receipt.json'),
+      JSON.stringify({ state: 'saved', file: 'original.png' }),
+    );
+    fs.writeFileSync(path.join(jobDir, 'original.png'), realPng);
+
+    const dims = await readImageDimensions(realPng);
+    expect(dims).toEqual({ width: 320, height: 180 });
+
+    const createFile = jest.fn(async (data: Record<string, unknown>) => ({
+      ...(data as unknown as GeminiReferenceFileRecord),
+    }));
+    const dimRes = await resolveGeminiReferenceImages({
+      image_ids: [realImgId],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      getFiles: async () => [],
+      createFile,
+      getStrategyFunctions: () => ({
+        saveBuffer: async ({ userId: u, fileName }) => `/images/${u}/${fileName}`,
+        getDownloadStream: async () =>
+          (async function* () {
+            yield realPng;
+          })(),
+      }),
+    });
+    expect(dimRes.ok).toBe(true);
+    expect(createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        width: 320,
+        height: 180,
+        bytes: realPng.length,
+      }),
+      true,
+    );
+
+    // 单图超过 maxImageBytes 时返回 IMAGE_REFERENCE_TOO_LARGE
+    const largeBuffer = crypto.randomBytes(2048);
+    fs.writeFileSync(path.join(jobDir, 'original.png'), largeBuffer);
+    const tooLargeSingle = await resolveGeminiReferenceImages({
+      image_ids: [realImgId],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      limits: { maxImageBytes: 1024 },
+      getFiles: async () => [],
+      createFile,
+      getStrategyFunctions: () => ({
+        saveBuffer: async () => '/images/x.png',
+        getDownloadStream: async () => null,
+      }),
+    });
+    expect(tooLargeSingle.ok).toBe(false);
+    if (!tooLargeSingle.ok) {
+      expect(tooLargeSingle.error.code).toBe('IMAGE_REFERENCE_TOO_LARGE');
+      expect(tooLargeSingle.error.unresolvedIds).toEqual([realImgId]);
+    }
+
+    // 多图累计超过 maxTotalBytes 时返回 IMAGE_REFERENCE_TOO_LARGE
+    const file1: GeminiReferenceFileRecord = {
+      file_id: 'f-1',
+      filepath: '/images/f1.png',
+      type: 'image/png',
+      source: 'local',
+      user: userA,
+    };
+    const file2: GeminiReferenceFileRecord = {
+      file_id: 'f-2',
+      filepath: '/images/f2.png',
+      type: 'image/png',
+      source: 'local',
+      user: userA,
+    };
+    const tooLargeTotal = await resolveGeminiReferenceImages({
+      imageFiles: [file1, file2],
+      image_ids: ['f-1', 'f-2'],
+      req: { user: { id: userA } },
+      limits: { maxImageBytes: 2048, maxTotalBytes: 1500 },
+      getStrategyFunctions: () => ({
+        getDownloadStream: async () =>
+          (async function* () {
+            yield Buffer.alloc(1000, 1);
+          })(),
+      }),
+    });
+    expect(tooLargeTotal.ok).toBe(false);
+    if (!tooLargeTotal.ok) {
+      expect(tooLargeTotal.error.code).toBe('IMAGE_REFERENCE_TOO_LARGE');
+      expect(tooLargeTotal.error.unresolvedIds).toEqual(['f-2']);
+    }
+  });
+});
+
+// 验证 processToolImageArtifacts 落盘 >10 MiB 规范 Studio 原图以及失败关闭时抹除未落盘图像 ID
+describe('processToolImageArtifacts', () => {
+  const userA = '65f0000000000000000000a1';
+  let tmpRoot: string;
+  let dataDir: string;
+
+  beforeEach(() => {
+    tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-artifact-barrier-'));
+    dataDir = path.join(tmpRoot, 'data');
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpRoot, { recursive: true, force: true });
+  });
+
+  it('extracts Studio image IDs from single and multi-variant tool outputs', () => {
+    const singleId = 'img_11111111111111111111111111111111';
+    const v1 = 'img_22222222222222222222222222222222';
+    const v2 = 'img_33333333333333333333333333333333';
+
+    expect(
+      extractStudioArtifactImageIds({
+        content: [
+          { type: 'text', text: JSON.stringify({ id: singleId, width: 2048, height: 2048 }) },
+        ],
+      }),
+    ).toEqual([singleId]);
+
+    expect(
+      extractStudioArtifactImageIds({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              variants: [{ image_id: v1 }, { image_id: v2 }],
+            }),
+          },
+        ],
+      }),
+    ).toEqual([v1, v2]);
+  });
+
+  it('persists canonical >10 MiB lossless Studio PNG instead of lightweight inline preview', async () => {
+    const studioImgId = 'img_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    const jobDir = path.join(dataDir, 'users', userA, 'jobs', studioImgId);
+    fs.mkdirSync(jobDir, { recursive: true });
+
+    // 构造超过 10 MiB 的规范原图字节与轻量预览字节
+    const canonicalLargePng = crypto.randomBytes(11 * 1024 * 1024);
+    fs.writeFileSync(
+      path.join(jobDir, 'receipt.json'),
+      JSON.stringify({ state: 'saved', file: 'original.png' }),
+    );
+    fs.writeFileSync(path.join(jobDir, 'original.png'), canonicalLargePng);
+
+    const smallPreviewDataUrl = `data:image/jpeg;base64,${Buffer.from('small-jpeg-preview').toString('base64')}`;
+    const output = {
+      name: 'edit_region_mcp_zyb_studio',
+      tool_call_id: 'call-er-1',
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            id: studioImgId,
+            width: 2048,
+            height: 2048,
+            outside_changed_pixels: 0,
+          }),
+        },
+      ],
+      artifact: {
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: smallPreviewDataUrl },
+          },
+        ],
+        file_ids: ['initial-random-uuid'],
+      },
+    };
+
+    let savedBuffer: Buffer | null = null;
+    const createFile = jest.fn(async (data: Record<string, unknown>) => ({
+      ...(data as unknown as GeminiReferenceFileRecord),
+    }));
+    const onFileSaved = jest.fn();
+    const artifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
+
+    await processToolImageArtifacts({
+      output,
+      req: { user: { id: userA }, config: {} },
+      metadata: { run_id: 'run-1', thread_id: 'thread-1', provider: 'google' },
+      artifactPromises,
+      dataDir,
+      createFile,
+      getStrategyFunctions: () => ({
+        saveBuffer: async ({ userId, fileName, buffer }) => {
+          savedBuffer = buffer;
+          return `/images/${userId}/${fileName}`;
+        },
+      }),
+      buildMetadata: (file) => ({ ...file, messageId: 'run-1', conversationId: 'thread-1' }),
+      onFileSaved,
+    });
+
+    const results = await Promise.all(artifactPromises);
+    expect(results).toHaveLength(1);
+    expect(savedBuffer).not.toBeNull();
+    expect(savedBuffer!.length).toBe(canonicalLargePng.length);
+    expect(savedBuffer!.equals(canonicalLargePng)).toBe(true);
+    expect(onFileSaved).toHaveBeenCalledTimes(1);
+  });
+
+  it('scrubs generated_image_id and clears artifact.file_ids when image persistence fails', async () => {
+    const unpersistedId = 'unpersisted-file-uuid-1234';
+    const output = {
+      name: 'gemini_image_gen',
+      tool_call_id: 'call-gen-fail',
+      content: `Gemini displayed an image.\n\ngenerated_image_id: "${unpersistedId}"`,
+      artifact: {
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB' },
+          },
+        ],
+        file_ids: [unpersistedId],
+      },
+    };
+
+    const artifactPromises: Array<Promise<Record<string, unknown> | null>> = [];
+    const onFileSaved = jest.fn();
+
+    await processToolImageArtifacts({
+      output,
+      req: { user: { id: userA }, config: {} },
+      metadata: { run_id: 'run-1', thread_id: 'thread-1', provider: 'google' },
+      artifactPromises,
+      saveBase64Image: jest.fn().mockRejectedValue(new Error('disk full')),
+      buildMetadata: (file) => file,
+      onFileSaved,
+    });
+
+    const results = await Promise.all(artifactPromises);
+    expect(results).toEqual([null]);
+    expect(onFileSaved).not.toHaveBeenCalled();
+    expect(output.artifact.file_ids).toEqual([]);
+    expect(String(output.content)).toContain('IMAGE_PERSISTENCE_FAILED');
+    expect(String(output.content)).not.toContain(unpersistedId);
   });
 });

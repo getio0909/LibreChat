@@ -154,6 +154,10 @@ describe('formatGeneratedImageFilename', () => {
     expect(formatGeneratedImageFilename('user_upload_sketch.png', zhLocalize)).toBe(
       'user_upload_sketch.png',
     );
+    expect(formatGeneratedImageFilename('vacation_img_01.png', zhLocalize)).toBe(
+      'vacation_img_01.png',
+    );
+    expect(getDownloadFilename('vacation_img_01.png', 'file-vac')).toBe('vacation_img_01.png');
   });
 });
 

@@ -11,11 +11,11 @@ import {
 } from '@librechat/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { TFile } from 'librechat-data-provider';
+import { formatGeneratedImageFilename, getFileType, formatDate } from '~/utils';
 import ImagePreview from '~/components/Chat/Input/Files/ImagePreview';
 import FilePreview from '~/components/Chat/Input/Files/FilePreview';
 import { TranslationKeys, useLocalize } from '~/hooks';
 import { SortFilterHeader } from './SortFilterHeader';
-import { formatDate, getFileType } from '~/utils';
 
 const contextMap: Record<any, TranslationKeys> = {
   [FileContext.avatar]: 'com_ui_avatar',
@@ -105,7 +105,9 @@ export const columns: ColumnDef<TFile>[] = [
       );
     },
     cell: ({ row }) => {
+      const localize = useLocalize();
       const file = row.original;
+      const displayName = formatGeneratedImageFilename(file.filename, localize);
       if (file.type?.startsWith('image')) {
         return (
           <div className="flex gap-2">
@@ -114,7 +116,7 @@ export const columns: ColumnDef<TFile>[] = [
               className="relative h-10 w-10 shrink-0 overflow-visible rounded-md"
               source={file.source}
             />
-            <span className="self-center truncate">{file.filename}</span>
+            <span className="self-center truncate">{displayName}</span>
           </div>
         );
       }
@@ -123,7 +125,7 @@ export const columns: ColumnDef<TFile>[] = [
       return (
         <div className="flex gap-2">
           {fileType && <FilePreview fileType={fileType} className="relative" file={file} />}
-          <span className="self-center truncate">{file.filename}</span>
+          <span className="self-center truncate">{displayName}</span>
         </div>
       );
     },

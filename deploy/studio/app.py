@@ -812,10 +812,11 @@ def build_mcp_server(
                     img_id = str(rec_result["id"])
                     rec_base_id = str(rec_result["base_id"])
                     rec_sel_id = str(rec_result["selection_id"])
-                    # 直接将无损校验通过的PNG合成原图作为MCP ImageContent返回，使LibreChat注册的规范File保持无损与Alpha通道；预览由独立compare资源承担
-                    b64_canonical = base64.b64encode(rec_result["raw_bytes"]).decode(
-                        "ascii"
+                    # MCP内联图像块使用受控展示编码以避免大图超出10MiB传输上限；规范无损PNG通过Studio文件目录与认证接口落盘为LibreChat File
+                    disp_bytes, disp_mime = encode_display_image(
+                        rec_result["raw_bytes"]
                     )
+                    b64_display = base64.b64encode(disp_bytes).decode("ascii")
                     before_token, before_exp = sign_image_token(
                         settings, user_id, rec_base_id
                     )
@@ -869,7 +870,7 @@ def build_mcp_server(
                                 ),
                             ),
                             types.ImageContent(
-                                type="image", data=b64_canonical, mimeType="image/png"
+                                type="image", data=b64_display, mimeType=disp_mime
                             ),
                         ],
                         isError=False,
@@ -985,10 +986,9 @@ def build_mcp_server(
                         gemini_transport=gemini_transport,
                     )
 
-                # 直接将无损校验通过的PNG合成原图作为MCP ImageContent返回，使LibreChat注册的规范File保持无损与Alpha通道；预览由独立compare资源承担
-                b64_canonical = base64.b64encode(gen_result["raw_bytes"]).decode(
-                    "ascii"
-                )
+                # MCP内联图像块使用受控展示编码以避免大图超出10MiB传输上限；规范无损PNG通过Studio文件目录与认证接口落盘为LibreChat File
+                disp_bytes, disp_mime = encode_display_image(gen_result["raw_bytes"])
+                b64_display = base64.b64encode(disp_bytes).decode("ascii")
 
                 before_token, before_exp = sign_image_token(
                     settings, user_id, base_resolved.id
@@ -1041,7 +1041,7 @@ def build_mcp_server(
                             ),
                         ),
                         types.ImageContent(
-                            type="image", data=b64_canonical, mimeType="image/png"
+                            type="image", data=b64_display, mimeType=disp_mime
                         ),
                     ],
                     isError=False,

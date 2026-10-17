@@ -284,9 +284,11 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
       { configurable: { thread_id: 'conv-1' } },
     );
 
-    expect(createFileMock).toHaveBeenCalledTimes(2);
+    expect(createFileMock).toHaveBeenCalledTimes(3);
     expect(createFileMock.mock.calls[0][0].file_id).toBe(deriveStudioBridgeFileId(userA, kbId));
     expect(createFileMock.mock.calls[1][0].file_id).toBe(deriveStudioBridgeFileId(userA, imgId));
+    expect(createFileMock.mock.calls[2][0].width).toBe(16);
+    expect(createFileMock.mock.calls[2][0].height).toBe(16);
     expect(generateContentMock).toHaveBeenCalledTimes(1);
     const callArg = generateContentMock.mock.calls[0][0];
     expect(callArg.contents).toEqual([
@@ -338,5 +340,22 @@ describe('GeminiImageGen Studio reference bridging and fail-closed validation', 
     expect(generateContentMock).not.toHaveBeenCalled();
     expect(artifact).toEqual({ content: [], file_ids: [] });
     expect(contentResult[0].text).toContain('unresolved-id-999');
+  });
+
+  it('does not expose generated_image_id when persisting generated image fails', async () => {
+    const { toolInstance, createFileMock } = setupToolForUser(userA);
+    createFileMock.mockRejectedValueOnce(new Error('storage failure'));
+
+    const [contentResult, artifact] = await toolInstance.func(
+      {
+        prompt: '生成一张供桌图片但落盘失败',
+      },
+      undefined,
+      { configurable: { thread_id: 'conv-4' } },
+    );
+
+    expect(artifact).toEqual({ content: [], file_ids: [] });
+    expect(contentResult[0].text).toContain('IMAGE_PERSISTENCE_FAILED');
+    expect(contentResult[0].text).not.toContain('generated_image_id:');
   });
 });

@@ -104,11 +104,28 @@ case "$url" in
   */api/agents\?limit=100)
     test "$method" = GET
     test "$auth" = "Authorization: Bearer mock-jwt-token"
+    printf 'api:GET:/api/agents?limit=100\n' >> "$DEPLOY_TEST_LOG"
     if [[ -n "${DEPLOY_TEST_AGENTS_DB:-}" && -f "$DEPLOY_TEST_AGENTS_DB" ]]; then
       cp "$DEPLOY_TEST_AGENTS_DB" "$output"
     else
       printf '{"data":[]}\n' > "$output"
     fi
+    ;;
+  */api/agents\?limit=100\&cursor=*)
+    test "$method" = GET
+    test "$auth" = "Authorization: Bearer mock-jwt-token"
+    printf 'api:GET:%s\n' "${url#http://127.0.0.1:3080}" >> "$DEPLOY_TEST_LOG"
+    if [[ -n "${DEPLOY_TEST_AGENTS_PAGE2:-}" && -f "$DEPLOY_TEST_AGENTS_PAGE2" ]]; then
+      cp "$DEPLOY_TEST_AGENTS_PAGE2" "$output"
+    else
+      printf '{"data":[],"has_more":false,"after":null}\n' > "$output"
+    fi
+    ;;
+  */api/agents/*/expanded)
+    test "$method" = GET
+    test "$auth" = "Authorization: Bearer mock-jwt-token"
+    printf '{"error":"Not found"}\n' > "$output"
+    exit 22
     ;;
   */api/agents|*/api/agents/*)
     test "$auth" = "Authorization: Bearer mock-jwt-token"
@@ -164,7 +181,7 @@ printf 'test-token' > "$work/bundle/registry.token"
 printf '%s\n' '{"admin":{"email":"admin@example.test","username":"admin","password":"test-password"},"user":{"email":"user@example.test","username":"user","password":"test-password"}}' > "$work/bundle/accounts.json"
 tar -czf "$work/bundle.tgz" -C "$work/bundle" .
 
-printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手"},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速"}]}' > "$work/existing-agents.json"
+printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]}]}' > "$work/existing-agents.json"
 
 # 首次部署与重部署成功后，librechat.yaml 中的占位符应被替换为解析后的持久化 agent_id。
 mkdir -p "$work/expected-first" "$work/redeployed"
@@ -196,7 +213,7 @@ for scenario in none health command login role final first-none first-login firs
     test "$status" != 0
     grep -q 'The failed initial application deployment has been stopped.' "$work/output.log"
     grep -q '^down:' "$DEPLOY_TEST_LOG"
-    for file in compose.yml librechat.yaml .env image.env studio.json .file_signing_key; do test ! -f "$root/$file"; done
+    for file in compose.yml librechat.yaml .env image.env studio.json .file_signing_key .studio_agent_ids.json; do test ! -f "$root/$file"; done
     test -f "$DEPLOY_TEST_GATE"
   elif [[ "$failure" == none ]]; then
     test "$status" = 0
@@ -215,6 +232,10 @@ for scenario in none health command login role final first-none first-login firs
     grep -q '^api:PUT:/api/permissions/agent/670000000000000000000001$' "$DEPLOY_TEST_LOG"
     grep -q '^api:PUT:/api/permissions/agent/670000000000000000000002$' "$DEPLOY_TEST_LOG"
     ! grep -qE 'agent___STUDIO_AGENT_ID_(MAIN|FAST)__' "$root/librechat.yaml"
+    test -f "$root/.studio_agent_ids.json"
+    test "$(stat -c '%a' "$root/.studio_agent_ids.json")" = 600
+    test "$(jq -r '.agent___STUDIO_AGENT_ID_MAIN__' "$root/.studio_agent_ids.json")" = "agent_studio_main_id"
+    test "$(jq -r '.agent___STUDIO_AGENT_ID_FAST__' "$root/.studio_agent_ids.json")" = "agent_studio_fast_id"
     grep -q '^up:false:.*11111111' "$DEPLOY_TEST_LOG"
     test -f "$root/.file_signing_key"
     test "$(stat -c '%a' "$root/.file_signing_key")" = 600
@@ -238,6 +259,26 @@ for scenario in none health command login role final first-none first-login firs
   test -z "$(find "$root" -maxdepth 1 -name '.incoming.*' -print -quit)"
   printf 'Deployment recovery test passed: %s\n' "$scenario"
 done
+
+# 验证分页拉取与归属保护：第一页含非 Studio 同名智能体且带分页游标，第二页含真实 Studio 智能体时绝不覆盖同名外部智能体。
+printf '%s\n' '{"data":[{"id":"agent_unrelated_user_id","_id":"670000000000000000000099","name":"庄严设计助手","tools":["web_search"]}],"has_more":true,"after":"cursor_p2"}' > "$work/agents-page1.json"
+printf '%s\n' '{"data":[{"id":"agent_studio_main_id","_id":"670000000000000000000001","name":"庄严设计助手","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]},{"id":"agent_studio_fast_id","_id":"670000000000000000000002","name":"庄严设计助手 · 快速","tools":["gemini_image_gen","sys__all__sys_mcp_zyb_studio"]}],"has_more":false,"after":null}' > "$work/agents-page2.json"
+mkdir -p "$work/paginated"
+cp "$work/previous/"* "$work/previous/.env" "$work/paginated/"
+chmod 600 "$work/paginated/"* "$work/paginated/.env"
+: > "$DEPLOY_TEST_LOG"
+export DEPLOY_TEST_FAILURE=none
+export DEPLOY_TEST_AGENTS_DB="$work/agents-page1.json"
+export DEPLOY_TEST_AGENTS_PAGE2="$work/agents-page2.json"
+SSH_ORIGINAL_COMMAND="deploy $work/paginated" bash "$work/deploy.sh" "$work/paginated" \
+  < "$work/bundle.tgz" > "$work/output.log" 2>&1
+unset DEPLOY_TEST_AGENTS_PAGE2
+grep -q '^api:GET:/api/agents?limit=100$' "$DEPLOY_TEST_LOG"
+grep -q '^api:GET:/api/agents?limit=100&cursor=cursor_p2$' "$DEPLOY_TEST_LOG"
+! grep -q 'agent_unrelated_user_id' "$DEPLOY_TEST_LOG"
+grep -q '^api:PATCH:/api/agents/agent_studio_main_id:agent_studio_main_id$' "$DEPLOY_TEST_LOG"
+grep -q '^api:PATCH:/api/agents/agent_studio_fast_id:agent_studio_fast_id$' "$DEPLOY_TEST_LOG"
+echo 'Deployment pagination and Studio agent ownership test passed.'
 
 # 验证首次部署生成的签名密钥在后续重部署时不会被新归档中的随机密钥覆盖。
 mkdir -p "$work/bundle2"

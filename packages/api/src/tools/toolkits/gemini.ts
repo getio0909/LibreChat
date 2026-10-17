@@ -1,3 +1,4 @@
+import { imageReferenceDefaults } from 'librechat-data-provider';
 import type { ExtendedJsonSchema } from '../registry/schema';
 
 /** Default description for Gemini image generation tool */
@@ -57,6 +58,7 @@ const geminiImageGenJsonSchema: ExtendedJsonSchema = {
     image_ids: {
       type: 'array',
       items: { type: 'string' },
+      maxItems: imageReferenceDefaults.maxItems,
       description: getGeminiImageIdsDescription(),
     },
     aspectRatio: {

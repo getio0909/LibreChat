@@ -33,6 +33,7 @@ IMAGE_PRODUCING_TOOLS: frozenset[str] = frozenset(
         "edit_region",
         "finish_region_edit",
         "compare_materials",
+        "studio_ref",
         # 保留已下线旧产图工具名称，确保历史已保存的 LibreChat File UUID 仍能正常解析读取
         "generate_image",
         "edit_image",
@@ -736,6 +737,17 @@ def resolve_image(
                         else:
                             saw_unmapped_preview = True
                         continue
+                    explicit_studio_img = re.search(
+                        r"img_([0-9a-f]{32})", rest, re.IGNORECASE
+                    )
+                    if explicit_studio_img is not None:
+                        canonical_img_id = f"img_{explicit_studio_img.group(1).lower()}"
+                        try:
+                            return resolve_image(
+                                settings, uid, canonical_img_id, kb_index=kb_index
+                            )
+                        except ValueError:
+                            pass
                     if tool_name not in IMAGE_PRODUCING_TOOLS:
                         continue
                 width, height = _read_image_dimensions(entry, lc_dir)

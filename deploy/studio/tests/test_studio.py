@@ -5441,3 +5441,35 @@ def test_internal_files_bridge_for_kb_and_user_img_with_isolation(
 
     asyncio.run(_run())
 
+
+# 验证桥接生成的 studio_ref_img_<32位hex> LibreChat File UUID 可被 Studio 专精工具解析并复用
+def test_resolve_bridged_studio_ref_img_uuid(studio_env: StudioSettings) -> None:
+    png_bytes = _make_image_bytes(320, 240, fmt="PNG")
+    img_id = "img_fedcba0987654321fedcba0987654321"
+    job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / img_id
+    job_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
+    (job_dir / "original.png").write_bytes(png_bytes)
+    (job_dir / "receipt.json").write_text(
+        json.dumps({"state": "saved", "file": "original.png"}), encoding="utf-8"
+    )
+
+    lc_dir = Path(studio_env.librechat_images_dir) / USER_A
+    lc_dir.mkdir(parents=True, exist_ok=True)
+    bridged_uuid = "55555555-6666-5777-8888-999999999999"
+    bridged_name = f"{bridged_uuid}-studio_ref_{img_id}_img_{bridged_uuid[:8]}.png"
+    (lc_dir / bridged_name).write_bytes(png_bytes)
+
+    resolved = resolve_image(studio_env, USER_A, bridged_uuid)
+    assert resolved.id == img_id
+    assert resolved.kind == "studio"
+    assert resolved.width == 320
+    assert resolved.height == 240
+    assert resolved.path.read_bytes() == png_bytes
+
+    # 若工作台原图目录已清理，仍能回退使用桥接在 lc_dir 中的文件并保留真实尺寸
+    (job_dir / "receipt.json").unlink()
+    fallback_resolved = resolve_image(studio_env, USER_A, bridged_uuid)
+    assert fallback_resolved.id == bridged_uuid
+    assert fallback_resolved.width == 320
+    assert fallback_resolved.height == 240
+    assert fallback_resolved.path.read_bytes() == png_bytes

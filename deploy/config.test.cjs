@@ -27,6 +27,9 @@ const {
   STUDIO_AGENT_PROVIDERS,
   STUDIO_AGENT_TOOLS,
   buildStudioAgentDefinitions,
+  isStudioOwnedAgent,
+  findStudioOwnedAgent,
+  collectPaginatedAgents,
 } = require('./studio-agents.cjs');
 
 const rawYaml = fs.readFileSync('librechat.yaml', 'utf8');
@@ -864,3 +867,33 @@ test('zh-Hans locale translates designer-visible Projects sidebar and upstream m
   );
 });
 
+test('Studio agent discovery paginates past 100 agents and never matches a non-Studio same-named agent', async () => {
+  const page1Agents = Array.from({ length: 100 }, (_, idx) => ({
+    id: `agent_other_${idx}`,
+    name: idx === 0 ? '庄严设计助手' : `其他助手 ${idx}`,
+    tools: ['web_search'],
+  }));
+  const studioMain = {
+    id: 'agent_studio_main_owned',
+    name: '庄严设计助手',
+    tools: [...STUDIO_AGENT_TOOLS],
+  };
+  const page2Agents = [studioMain];
+
+  const allAgents = await collectPaginatedAgents(async ({ cursor }) => {
+    if (!cursor) {
+      return { data: page1Agents, has_more: true, after: 'cursor_100' };
+    }
+    return { data: page2Agents, has_more: false, after: null };
+  });
+
+  assert.equal(allAgents.length, 101);
+  assert.equal(isStudioOwnedAgent(page1Agents[0], '庄严设计助手'), false);
+  assert.equal(isStudioOwnedAgent(studioMain, '庄严设计助手'), true);
+
+  const matched = findStudioOwnedAgent(allAgents, '庄严设计助手');
+  assert.equal(matched?.id, 'agent_studio_main_owned');
+
+  // 若仅有同名非 Studio 智能体，必须返回 null 以便新建而非覆盖
+  assert.equal(findStudioOwnedAgent(page1Agents, '庄严设计助手'), null);
+});

@@ -5,7 +5,6 @@ const {
   StepTypes,
   StepEvents,
   ContentTypes,
-  FileContext,
   ErrorTypes,
   UsageEvents,
   getRunStepDurationMs,
@@ -37,6 +36,7 @@ const {
   collectToolCallIds,
   createToolTimingAdapter,
   stampCommandExecutor,
+  processToolImageArtifacts,
 } = require('@librechat/api');
 const { processFileCitations } = require('~/server/services/Files/Citations');
 const { processCodeOutput, runPreviewFinalize } = require('~/server/services/Files/Code/process');
@@ -1077,52 +1077,26 @@ function createToolEndCallback({ req, res, artifactPromises, streamId = null, jo
     }
 
     if (output.artifact.content) {
-      /** @type {FormattedContent[]} */
-      const content = output.artifact.content;
-      // 等待图像产物落盘与数据库登记完成后再结束工具回调，防止同轮后续专精工具在文件发布前读取失败
-      const imageArtifactPromises = [];
-      for (let i = 0; i < content.length; i++) {
-        const part = content[i];
-        if (!part) {
-          continue;
-        }
-        if (part.type !== 'image_url') {
-          continue;
-        }
-        const { url } = part.image_url;
-        const imagePromise = (async () => {
-          const filename = `${output.name}_img_${nanoid()}`;
-          const file_id = output.artifact.file_ids?.[i];
-          const file = await saveBase64Image(url, {
-            req,
-            file_id,
-            filename,
-            endpoint: metadata.provider,
-            context: FileContext.image_generation,
-          });
-          const fileMetadata = Object.assign(file, {
+      await processToolImageArtifacts({
+        output,
+        req,
+        metadata,
+        artifactPromises,
+        saveBase64Image,
+        logger,
+        buildMetadata: (file) =>
+          Object.assign(file, {
             messageId: metadata.run_id,
             toolCallId: output.tool_call_id,
             conversationId: metadata.thread_id,
-          });
+          }),
+        onFileSaved: (fileMetadata) => {
           if (!streamId && !res.headersSent) {
-            return fileMetadata;
+            return;
           }
-
-          if (!fileMetadata) {
-            return null;
-          }
-
           writeAttachment(res, streamId, fileMetadata, jobCreatedAt);
-          return fileMetadata;
-        })().catch((error) => {
-          logger.error('Error processing artifact content:', error);
-          return null;
-        });
-        artifactPromises.push(imagePromise);
-        imageArtifactPromises.push(imagePromise);
-      }
-      await Promise.all(imageArtifactPromises);
+        },
+      });
       return;
     }
 
@@ -1446,38 +1420,18 @@ function createResponsesToolEndCallback({ req, res, tracker, artifactPromises })
     }
 
     if (output.artifact.content) {
-      /** @type {FormattedContent[]} */
-      const content = output.artifact.content;
-      // Responses API 同样等待图像产物落盘完成后再结束工具回调，保证同轮后续工具可立即按 ID 访问
-      const imageArtifactPromises = [];
-      for (let i = 0; i < content.length; i++) {
-        const part = content[i];
-        if (!part) {
-          continue;
-        }
-        if (part.type !== 'image_url') {
-          continue;
-        }
-        const { url } = part.image_url;
-        const imagePromise = (async () => {
-          const filename = `${output.name}_img_${nanoid()}`;
-          const file_id = output.artifact.file_ids?.[i];
-          const file = await saveBase64Image(url, {
-            req,
-            file_id,
-            filename,
-            endpoint: metadata.provider,
-            context: FileContext.image_generation,
-          });
-          const fileMetadata = Object.assign(file, {
+      await processToolImageArtifacts({
+        output,
+        req,
+        metadata,
+        artifactPromises,
+        saveBase64Image,
+        logger,
+        buildMetadata: (file) =>
+          Object.assign(file, {
             toolCallId: output.tool_call_id,
-          });
-
-          if (!fileMetadata) {
-            return null;
-          }
-
-          // For Responses API, emit attachment during streaming
+          }),
+        onFileSaved: (fileMetadata) => {
           if (res.headersSent && !res.writableEnded) {
             const attachment = {
               file_id: fileMetadata.file_id,
@@ -1490,16 +1444,8 @@ function createResponsesToolEndCallback({ req, res, tracker, artifactPromises })
             };
             writeResponsesAttachment(res, tracker, attachment, metadata);
           }
-
-          return fileMetadata;
-        })().catch((error) => {
-          logger.error('Error processing artifact content:', error);
-          return null;
-        });
-        artifactPromises.push(imagePromise);
-        imageArtifactPromises.push(imagePromise);
-      }
-      await Promise.all(imageArtifactPromises);
+        },
+      });
       return;
     }
 

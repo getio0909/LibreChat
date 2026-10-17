@@ -36,6 +36,7 @@ jest.mock('@librechat/api', () => ({
   captureSubagentIdentity: jest.requireActual('@librechat/api').captureSubagentIdentity,
   createToolTimingAdapter: jest.requireActual('@librechat/api').createToolTimingAdapter,
   stampCommandExecutor: jest.requireActual('@librechat/api').stampCommandExecutor,
+  processToolImageArtifacts: jest.requireActual('@librechat/api').processToolImageArtifacts,
 }));
 
 jest.mock('@librechat/data-schemas', () => ({
@@ -1853,5 +1854,44 @@ describe('isStreamWritable', () => {
 
   it('returns true on the happy path: headers sent, not ended, no streamId', () => {
     expect(isStreamWritable({ headersSent: true, writableEnded: false }, null)).toBe(true);
+  });
+});
+
+describe('createToolEndCallback image persistence barrier', () => {
+  it('scrubs generated_image_id and clears artifact.file_ids when saveBase64Image fails', async () => {
+    const { saveBase64Image } = require('~/server/services/Files/process');
+    const { createToolEndCallback } = require('../callbacks');
+
+    saveBase64Image.mockRejectedValueOnce(new Error('disk full'));
+
+    const artifactPromises = [];
+    const callback = createToolEndCallback({
+      req: { user: { id: '65f0000000000000000000a1' }, config: {} },
+      res: { headersSent: true, writableEnded: false, write: jest.fn() },
+      artifactPromises,
+    });
+
+    const output = {
+      name: 'gemini_image_gen',
+      tool_call_id: 'call-img-1',
+      content: 'Gemini displayed an image.\n\ngenerated_image_id: "unpersisted-uuid-999"',
+      artifact: {
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB' },
+          },
+        ],
+        file_ids: ['unpersisted-uuid-999'],
+      },
+    };
+
+    await callback({ output }, { run_id: 'run-1', thread_id: 'thread-1', provider: 'google' });
+
+    const settled = await Promise.all(artifactPromises);
+    expect(settled).toEqual([null]);
+    expect(output.artifact.file_ids).toEqual([]);
+    expect(output.content).toContain('IMAGE_PERSISTENCE_FAILED');
+    expect(output.content).not.toContain('unpersisted-uuid-999');
   });
 });
