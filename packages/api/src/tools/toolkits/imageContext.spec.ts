@@ -1,7 +1,14 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { Constants, FileContext } from 'librechat-data-provider';
+import type { GeminiReferenceFileRecord } from './imageContext';
 import {
   buildImageToolContext,
   buildMCPImageToolContext,
+   isStudioReferenceId,
+  deriveStudioBridgeFileId,
+  resolveGeminiReferenceImages,
   collectBranchImageCandidateIds,
   collectConversationBranchImageFiles,
 } from './imageContext';
@@ -233,3 +240,249 @@ describe('collectConversationBranchImageFiles', () => {
     ]);
   });
 });
+
+// 验证 Gemini 图像生成引用解析：桥接 kb_ 与当前用户的 img_ 为授权 File 记录，拒绝跨用户 img_，并在无法解析时失败关闭
+describe('resolveGeminiReferenceImages', () => {
+  let tmpRoot: string;
+  let kbRoot: string;
+  let dataDir: string;
+  const userA = '65f0000000000000000000a1';
+  const userB = '65f0000000000000000000b2';
+  const kbId = 'kb_0123456789abcdef';
+  const kbBytes = Buffer.from('fake-kb-jpeg-bytes');
+  const imgId = 'img_abcdef0123456789abcdef0123456789';
+  const imgBytes = Buffer.from('fake-studio-png-bytes');
+
+  beforeEach(() => {
+    tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-bridge-test-'));
+    kbRoot = path.join(tmpRoot, 'kb');
+    dataDir = path.join(tmpRoot, 'data');
+
+    fs.mkdirSync(path.join(kbRoot, 'records'), { recursive: true });
+    fs.mkdirSync(path.join(kbRoot, 'assets', 'ref2048'), { recursive: true });
+    fs.writeFileSync(path.join(kbRoot, 'records', '0123456789abcdef.yaml'), 'id: 0123456789abcdef\n');
+    fs.writeFileSync(path.join(kbRoot, 'assets', 'ref2048', '0123456789abcdef.jpg'), kbBytes);
+
+    const userAJobDir = path.join(dataDir, 'users', userA, 'jobs', imgId);
+    fs.mkdirSync(userAJobDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(userAJobDir, 'receipt.json'),
+      JSON.stringify({ state: 'saved', file: 'original.png' }),
+    );
+    fs.writeFileSync(path.join(userAJobDir, 'original.png'), imgBytes);
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpRoot, { recursive: true, force: true });
+  });
+
+  it('recognizes kb_<16-hex> and img_<32-hex> studio reference IDs and derives per-user bridge file_ids', () => {
+    expect(isStudioReferenceId(kbId)).toBe(true);
+    expect(isStudioReferenceId(imgId)).toBe(true);
+    expect(isStudioReferenceId('bad-id')).toBe(false);
+
+    const bridgeA = deriveStudioBridgeFileId(userA, kbId);
+    const bridgeB = deriveStudioBridgeFileId(userB, kbId);
+    expect(bridgeA).not.toBe(bridgeB);
+    expect(deriveStudioBridgeFileId(userA, kbId)).toBe(bridgeA);
+  });
+
+  it('bridges search_knowledge kb_<16-hex> into an authorized LibreChat File record and returns inlineData', async () => {
+    const fileStore = new Map<string, { record: GeminiReferenceFileRecord; bytes: Buffer }>();
+
+    const getFiles = jest.fn(async (filter: Record<string, unknown>) => {
+      const requested = (filter.file_id as { $in?: string[] })?.$in ?? [];
+      return requested
+        .map((id) => fileStore.get(id)?.record)
+        .filter((f): f is GeminiReferenceFileRecord => Boolean(f && f.user === filter.user));
+    });
+
+    const saveBase64Image = jest.fn(
+      async (
+        dataUrl: string,
+        options: { file_id: string; filename: string; req?: { user?: { id?: string } } },
+      ) => {
+        const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+        const mimeType = match?.[1] ?? 'image/jpeg';
+        const buffer = Buffer.from(match?.[2] ?? '', 'base64');
+        const filepath = `/images/${options.req?.user?.id}/${options.filename}.jpg`;
+        const record: GeminiReferenceFileRecord = {
+          file_id: options.file_id,
+          filepath,
+          type: mimeType,
+          source: 'local',
+          filename: options.filename,
+          user: options.req?.user?.id,
+          width: 1024,
+          height: 1024,
+        };
+        fileStore.set(options.file_id, { record, bytes: buffer });
+        return record;
+      },
+    );
+
+    const getStrategyFunctions = jest.fn(() => ({
+      getDownloadStream: jest.fn(async (_req: unknown, filepath: string) => {
+        for (const entry of fileStore.values()) {
+          if (entry.record.filepath === filepath) {
+            return (async function* () {
+              yield entry.bytes;
+            })();
+          }
+        }
+        return null;
+      }),
+    }));
+
+    const firstResult = await resolveGeminiReferenceImages({
+      image_ids: [kbId],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      getFiles,
+      saveBase64Image,
+      getStrategyFunctions,
+    });
+
+    expect(firstResult).toEqual({
+      ok: true,
+      value: [
+        {
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: kbBytes.toString('base64'),
+          },
+        },
+      ],
+    });
+    expect(saveBase64Image).toHaveBeenCalledTimes(1);
+    expect(saveBase64Image.mock.calls[0][1].file_id).toBe(deriveStudioBridgeFileId(userA, kbId));
+
+    // 同一用户再次引用同一 kb_ 时直接命中已桥接的授权 File 记录，无需重复写入
+    const secondResult = await resolveGeminiReferenceImages({
+      image_ids: [kbId],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      getFiles,
+      saveBase64Image,
+      getStrategyFunctions,
+    });
+    expect(secondResult.ok).toBe(true);
+    expect(saveBase64Image).toHaveBeenCalledTimes(1);
+  });
+
+  it('bridges current user img_<32-hex> and rejects another user img_<32-hex>', async () => {
+    const fileStore = new Map<string, { record: GeminiReferenceFileRecord; bytes: Buffer }>();
+    const saveBase64Image = jest.fn(
+      async (
+        dataUrl: string,
+        options: { file_id: string; filename: string; req?: { user?: { id?: string } } },
+      ) => {
+        const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+        const mimeType = match?.[1] ?? 'image/png';
+        const buffer = Buffer.from(match?.[2] ?? '', 'base64');
+        const filepath = `/images/${options.req?.user?.id}/${options.filename}.png`;
+        const record: GeminiReferenceFileRecord = {
+          file_id: options.file_id,
+          filepath,
+          type: mimeType,
+          source: 'local',
+          filename: options.filename,
+          user: options.req?.user?.id,
+          width: 1024,
+          height: 1024,
+        };
+        fileStore.set(options.file_id, { record, bytes: buffer });
+        return record;
+      },
+    );
+    const getStrategyFunctions = jest.fn(() => ({
+      getDownloadStream: jest.fn(async (_req: unknown, filepath: string) => {
+        for (const entry of fileStore.values()) {
+          if (entry.record.filepath === filepath) {
+            return (async function* () {
+              yield entry.bytes;
+            })();
+          }
+        }
+        return null;
+      }),
+    }));
+
+    const ownerResult = await resolveGeminiReferenceImages({
+      image_ids: [imgId],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      getFiles: async () => [],
+      saveBase64Image,
+      getStrategyFunctions,
+    });
+
+    expect(ownerResult).toEqual({
+      ok: true,
+      value: [
+        {
+          inlineData: {
+            mimeType: 'image/png',
+            data: imgBytes.toString('base64'),
+          },
+        },
+      ],
+    });
+
+    // 另一用户请求 userA 的 img_<32-hex> 时必须被拒绝且不创建桥接记录
+    saveBase64Image.mockClear();
+    const crossUserResult = await resolveGeminiReferenceImages({
+      image_ids: [imgId],
+      req: { user: { id: userB } },
+      kbRoot,
+      dataDir,
+      getFiles: async () => [],
+      saveBase64Image,
+      getStrategyFunctions,
+    });
+
+    expect(crossUserResult.ok).toBe(false);
+    if (!crossUserResult.ok) {
+      expect(crossUserResult.error.code).toBe('UNRESOLVED_IMAGE_REFERENCES');
+      expect(crossUserResult.error.unresolvedIds).toEqual([imgId]);
+    }
+    expect(saveBase64Image).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when any requested image_ids entry cannot be resolved', async () => {
+    const validFile: GeminiReferenceFileRecord = {
+      file_id: 'file-valid-1',
+      filepath: '/images/userA/valid.png',
+      type: 'image/png',
+      source: 'local',
+      user: userA,
+    };
+
+    const result = await resolveGeminiReferenceImages({
+      imageFiles: [validFile],
+      image_ids: ['file-valid-1', 'kb_deadbeefdeadbeef'],
+      req: { user: { id: userA } },
+      kbRoot,
+      dataDir,
+      getFiles: async () => [],
+      saveBase64Image: jest.fn(),
+      getStrategyFunctions: () => ({
+        getDownloadStream: async () =>
+          (async function* () {
+            yield Buffer.from('valid-bytes');
+          })(),
+      }),
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.code).toBe('UNRESOLVED_IMAGE_REFERENCES');
+      expect(result.error.unresolvedIds).toEqual(['kb_deadbeefdeadbeef']);
+      expect(result.error.message).toContain('kb_deadbeefdeadbeef');
+    }
+  });
+});
+

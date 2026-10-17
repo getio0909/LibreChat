@@ -1294,6 +1294,47 @@ def create_app(
         if request.method == "OPTIONS":
             return Response(b"", status_code=204, headers=_signed_file_cors_headers())
 
+        # 允许携带内部X-Studio-Token与X-LibreChat-User-ID的后端服务按用户权限读取kb_或img_原图以桥接LibreChat File记录
+        if (
+            not is_image_token(token)
+            and not is_editor_token(token)
+            and token.startswith(("kb_", "img_"))
+            and request.method in ("GET", "HEAD")
+        ):
+            provided_token = request.headers.get("x-studio-token")
+            expected_token = active_settings.shared_token
+            if isinstance(provided_token, str) and hmac.compare_digest(
+                provided_token.encode("utf-8"),
+                expected_token.encode("utf-8"),
+            ):
+                try:
+                    auth_user_id = validate_user_id(
+                        request.headers.get("x-librechat-user-id")
+                    )
+                    resolved_internal = resolve_image(
+                        active_settings, auth_user_id, token, kb_index=kb_index
+                    )
+                    loaded_internal = _load_safe_image_bytes(
+                        auth_user_id, resolved_internal
+                    )
+                except (ValueError, RuntimeError, OSError):
+                    loaded_internal = None
+                if loaded_internal is not None:
+                    img_bytes, media_type = loaded_internal
+                    return Response(
+                        b"" if request.method == "HEAD" else img_bytes,
+                        status_code=200,
+                        media_type=media_type,
+                        headers={
+                            "Cache-Control": "private, no-store",
+                            "Content-Length": str(len(img_bytes)),
+                            "X-Content-Type-Options": "nosniff",
+                        },
+                    )
+                return PlainTextResponse(
+                    "Not Found", status_code=404, headers=_signed_file_cors_headers()
+                )
+
         if is_image_token(token):
             try:
                 user_id, image_id, _ = verify_image_token(active_settings, token)

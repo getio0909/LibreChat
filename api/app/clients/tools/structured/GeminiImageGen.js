@@ -11,8 +11,10 @@ const {
   getBalanceConfig,
   getEnvProxyDispatcher,
   getTransactionsConfig,
+  resolveGeminiReferenceImages,
 } = require('@librechat/api');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
+const { saveBase64Image } = require('~/server/services/Files/process');
 const { spendTokens, getFiles } = require('~/models');
 
 /**
@@ -122,88 +124,6 @@ async function initializeGeminiClient(options = {}) {
     location: process.env.GOOGLE_CLOUD_LOCATION || process.env.GOOGLE_LOC || 'global',
     googleAuthOptions: { credentials: serviceKey },
   });
-}
-
-/**
- * Convert image files to Gemini inline data format
- * @param {Object} params - Parameters
- * @returns {Promise<Array>} - Array of inline data objects
- */
-async function convertImagesToInlineData({ imageFiles, image_ids, req, fileStrategy }) {
-  if (!image_ids || image_ids.length === 0) {
-    return [];
-  }
-
-  const streamMethods = {};
-  const requestFilesMap = Object.fromEntries(imageFiles.map((f) => [f.file_id, { ...f }]));
-  const orderedFiles = new Array(image_ids.length);
-  const idsToFetch = [];
-  const indexOfMissing = Object.create(null);
-
-  for (let i = 0; i < image_ids.length; i++) {
-    const id = image_ids[i];
-    const file = requestFilesMap[id];
-    if (file) {
-      orderedFiles[i] = file;
-    } else {
-      idsToFetch.push(id);
-      indexOfMissing[id] = i;
-    }
-  }
-
-  if (idsToFetch.length && req?.user?.id) {
-    const fetchedFiles = await getFiles(
-      {
-        user: req.user.id,
-        file_id: { $in: idsToFetch },
-        height: { $exists: true },
-        width: { $exists: true },
-      },
-      {},
-      {},
-    );
-
-    for (const file of fetchedFiles) {
-      requestFilesMap[file.file_id] = file;
-      orderedFiles[indexOfMissing[file.file_id]] = file;
-    }
-  }
-
-  const inlineDataArray = [];
-  for (const imageFile of orderedFiles) {
-    if (!imageFile) continue;
-
-    try {
-      const source = imageFile.source || fileStrategy;
-      if (!source) continue;
-
-      let getDownloadStream = streamMethods[source];
-      if (!getDownloadStream) {
-        ({ getDownloadStream } = getStrategyFunctions(source));
-        streamMethods[source] = getDownloadStream;
-      }
-      if (!getDownloadStream) continue;
-
-      const stream = await getDownloadStream(req, imageFile.filepath);
-      if (!stream) continue;
-
-      const chunks = [];
-      for await (const chunk of stream) {
-        chunks.push(chunk);
-      }
-      const buffer = Buffer.concat(chunks);
-      const base64Data = buffer.toString('base64');
-      const mimeType = imageFile.type || 'image/png';
-
-      inlineDataArray.push({
-        inlineData: { mimeType, data: base64Data },
-      });
-    } catch (error) {
-      logger.error('[GeminiImageGen] Error processing image:', imageFile.file_id, error);
-    }
-  }
-
-  return inlineDataArray;
 }
 
 /**
@@ -345,14 +265,28 @@ function createGeminiImageTool(fields = {}) {
       const contents = [{ text: replaceUnwantedChars(prompt) }];
 
       if (image_ids?.length > 0) {
-        const contextImages = await convertImagesToInlineData({
+        const referenceResult = await resolveGeminiReferenceImages({
           imageFiles,
           image_ids,
           req,
+          userId,
           fileStrategy,
+          getFiles,
+          saveBase64Image,
+          getStrategyFunctions,
         });
-        contents.push(...contextImages);
-        logger.debug('[GeminiImageGen] Added', contextImages.length, 'context images');
+        if (!referenceResult.ok) {
+          logger.warn('[GeminiImageGen] Failed to resolve reference image IDs:', {
+            code: referenceResult.error.code,
+            unresolvedIds: referenceResult.error.unresolvedIds,
+          });
+          return [
+            [{ type: ContentTypes.TEXT, text: referenceResult.error.message }],
+            { content: [], file_ids: [] },
+          ];
+        }
+        contents.push(...referenceResult.value);
+        logger.debug('[GeminiImageGen] Added', referenceResult.value.length, 'context images');
       }
 
       let apiResponse;

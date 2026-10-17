@@ -5373,3 +5373,71 @@ def test_gemini_nano_banana_21_unit_and_provider_switch(
         assert seedream_called == 1
 
     asyncio.run(_run())
+
+
+# 校验内部 /files/{kb_...|img_...} 桥接端点：凭共享令牌与用户ID返回知识库资产或当前用户专精产物，拒绝跨用户访问
+def test_internal_files_bridge_for_kb_and_user_img_with_isolation(
+    studio_env: StudioSettings,
+) -> None:
+    img_id = "img_1234567890abcdef1234567890abcdef"
+    job_dir = studio_env.data_dir / "users" / USER_A / "jobs" / img_id
+    job_dir.mkdir(parents=True, mode=0o700, exist_ok=True)
+    png_bytes = _make_image_bytes(64, 64, fmt="PNG")
+    (job_dir / "original.png").write_bytes(png_bytes)
+    (job_dir / "receipt.json").write_text(
+        json.dumps({"state": "saved", "file": "original.png"}), encoding="utf-8"
+    )
+
+    app = create_app(settings=studio_env, rules=load_rules())
+
+    async def _run() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://studio:8000"
+        ) as client:
+            # 1. 合法令牌+用户ID获取kb_<16-hex>
+            kb_res = await client.get(
+                "/files/kb_1111111111111111",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_A,
+                },
+            )
+            assert kb_res.status_code == 200
+            assert kb_res.headers["content-type"].startswith("image/jpeg")
+            assert len(kb_res.content) > 0
+
+            # 2. 合法令牌+所属用户获取img_<32-hex>
+            own_res = await client.get(
+                f"/files/{img_id}",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_A,
+                },
+            )
+            assert own_res.status_code == 200
+            assert own_res.headers["content-type"].startswith("image/png")
+            assert own_res.content == png_bytes
+
+            # 3. 跨用户获取USER_A的img_<32-hex>被拒绝（404）
+            other_res = await client.get(
+                f"/files/{img_id}",
+                headers={
+                    "X-Studio-Token": VALID_TOKEN,
+                    "X-LibreChat-User-ID": USER_B,
+                },
+            )
+            assert other_res.status_code == 404
+
+            # 4. 缺少或错误令牌被拒绝（404，不泄露内部ID存在性）
+            unauth_res = await client.get(
+                f"/files/{img_id}",
+                headers={
+                    "X-Studio-Token": "0" * 64,
+                    "X-LibreChat-User-ID": USER_A,
+                },
+            )
+            assert unauth_res.status_code == 404
+
+    asyncio.run(_run())
+
