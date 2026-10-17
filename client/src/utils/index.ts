@@ -72,6 +72,7 @@ import {
   buildStudioDraftKey,
   extractStudioEditorCapability,
   extractStudioSelectionImageId,
+  isStudioUIResource,
   loadUIDraft,
   renewStudioResourceLinks,
   saveUIDraft,
@@ -172,7 +173,7 @@ function verifyStudioSelectionContext(
     return { ok: false, reason: 'unauthenticated_or_missing_resource' };
   }
   const resourceImageId = extractStudioSelectionImageId(context.resource.uri);
-  if (!resourceImageId) {
+  if (!resourceImageId || !isStudioUIResource(context.resource, context.serverName)) {
     return { ok: false, reason: 'invalid_selection_resource' };
   }
   if (
@@ -294,14 +295,25 @@ ${JSON.stringify(params, null, 2)}
 Execute the tool that is mentioned in the message using the tools available to you.
     `;
   } else if (type === 'prompt') {
-    // 直接提交内嵌视图传入的中文指令文本，避免英文MCP-UI包装模板与无语言代码块围栏触发wasm语法高亮标签
     const { prompt } = payload;
-    messageText = typeof prompt === 'string' ? prompt.trim() : '';
-  } else {
-    return;
-  }
+    if (isStudioUIResource(context?.resource, context?.serverName)) {
+      // 仅对已认证的智印工坊资源直接提交纯中文指令文本，避免无语言代码块围栏触发wasm语法高亮标签
+      messageText = typeof prompt === 'string' ? prompt.trim() : '';
+      if (!messageText) {
+        return;
+      }
+    } else {
+      messageText = `The user clicked a button in an embedded UI Resource, and we got a message of type \`prompt\`.
+The prompt is:
 
-  if (!messageText.trim()) {
+\`\`\`
+${prompt}
+\`\`\`
+
+Execute the intention of the prompt that is mentioned in the message using the tools available to you.
+    `;
+    }
+  } else {
     return;
   }
 

@@ -811,6 +811,7 @@ def build_model_viewer_html(
 
   <script type="module">
     const INITIAL_MODEL_URL = {safe_url_js};
+    const MODEL_URL = INITIAL_MODEL_URL;
     let currentModelUrl = INITIAL_MODEL_URL;
     const MODEL_ID = {safe_model_id_js};
     const RESOURCE_URI = 'ui://zyb_studio/model/' + MODEL_ID;

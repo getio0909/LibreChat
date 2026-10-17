@@ -70,7 +70,13 @@ export default function UIResourceRenderer({
   const isSupported = Boolean(policy?.legacyHtmlEnabled) && isSupportedUIResource(resource);
 
   const resourceKey = useMemo(
-    () => buildStudioResourceKey({ userId, conversationId, resource }),
+    () =>
+      buildStudioResourceKey({
+        userId,
+        conversationId,
+        serverName: resource.serverName,
+        resource,
+      }),
     [userId, conversationId, resource],
   );
   const renewedLinksMap = useAtomValue(studioRenewedLinksAtom, { store: studioUIStore });
@@ -88,6 +94,7 @@ export default function UIResourceRenderer({
         nextResource.text,
         nextResource.uri,
         renewedLinks,
+        nextResource.serverName,
       );
     }
     return nextResource;
@@ -96,7 +103,12 @@ export default function UIResourceRenderer({
   const safeHtmlProps = useMemo(() => {
     const nextHtmlProps = { ...htmlProps };
     delete nextHtmlProps.sandboxPermissions;
-    const draftKey = buildStudioDraftKey({ userId, conversationId, resource });
+    const draftKey = buildStudioDraftKey({
+      userId,
+      conversationId,
+      serverName: resource.serverName,
+      resource,
+    });
     const selectionDraft = draftKey ? loadUIDraft(draftKey, studioUIStore) : undefined;
     if (selectionDraft !== undefined || renewedLinks !== undefined) {
       nextHtmlProps.iframeRenderData = {
@@ -119,6 +131,7 @@ export default function UIResourceRenderer({
         return handleUIAction(result, NOOP_ASK, {
           userId,
           conversationId,
+          serverName: resource.serverName,
           resource,
           store: studioUIStore,
           renewFetcher: renewThroughHost as typeof fetch,

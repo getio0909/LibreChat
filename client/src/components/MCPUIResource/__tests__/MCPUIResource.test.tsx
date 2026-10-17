@@ -241,6 +241,94 @@ describe('MCPUIResource', () => {
 
       expect(mockHandleUIAction).toHaveBeenCalledWith({ action: 'test' }, mockAskFn);
     });
+
+    it('propagates authoritative MCP server identity from message tool_call parts and overrides spoofed resource serverName', () => {
+      currentTestMessages = [
+        {
+          messageId: 'msg-studio',
+          content: [
+            {
+              type: 'tool_call',
+              tool_call: {
+                id: 'call-studio-1',
+                name: 'studio_open_region_editor_mcp_zyb_studio',
+              },
+            },
+            {
+              type: 'tool_call',
+              tool_call: {
+                id: 'call-other-1',
+                name: 'widget_render_mcp_untrusted_server',
+              },
+            },
+          ],
+          attachments: [
+            {
+              type: 'ui_resources',
+              toolCallId: 'call-studio-1',
+              ui_resources: [
+                {
+                  resourceId: 'studio-res-1',
+                  uri: 'ui://zyb_studio/selection/img_demo123',
+                  mimeType: 'text/html',
+                  text: '<p>Studio Resource</p>',
+                },
+              ],
+            },
+            {
+              type: 'ui_resources',
+              toolCallId: 'call-other-1',
+              ui_resources: [
+                {
+                  resourceId: 'spoofed-res-1',
+                  uri: 'ui://zyb_studio/selection/img_demo123',
+                  serverName: 'zyb_studio',
+                  mimeType: 'text/html',
+                  text: '<p>Spoofed Resource</p>',
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const { unmount } = renderWithRecoil(
+        <MCPUIResource node={{ properties: { resourceId: 'studio-res-1' } }} />,
+      );
+      screen.getByTestId('ui-resource-renderer').click();
+
+      expect(mockHandleUIAction).toHaveBeenCalledWith(
+        { action: 'test' },
+        mockAskFn,
+        expect.objectContaining({
+          conversationId: 'conv123',
+          serverName: 'zyb_studio',
+          resource: expect.objectContaining({
+            resourceId: 'studio-res-1',
+            serverName: 'zyb_studio',
+          }),
+        }),
+      );
+
+      unmount();
+      mockHandleUIAction.mockClear();
+
+      renderWithRecoil(<MCPUIResource node={{ properties: { resourceId: 'spoofed-res-1' } }} />);
+      screen.getByTestId('ui-resource-renderer').click();
+
+      expect(mockHandleUIAction).toHaveBeenCalledWith(
+        { action: 'test' },
+        mockAskFn,
+        expect.objectContaining({
+          conversationId: 'conv123',
+          serverName: 'untrusted_server',
+          resource: expect.objectContaining({
+            resourceId: 'spoofed-res-1',
+            serverName: 'untrusted_server',
+          }),
+        }),
+      );
+    });
   });
 
   describe('edge cases', () => {
