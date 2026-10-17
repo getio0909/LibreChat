@@ -23,11 +23,14 @@ const {
   isChatSelectableMCPServer,
   toCatalogConnectionConfig,
   getMissingRuntimeBodyPlaceholderFields,
+  attachAgentOwnerContacts,
+  resolveAgentOwnerContact,
 } = require('@librechat/api');
 const {
   STUDIO_AGENT_PLACEHOLDERS,
   STUDIO_AGENT_PROVIDERS,
   STUDIO_AGENT_TOOLS,
+  STUDIO_AGENT_SUPPORT_CONTACT,
   STUDIO_AGENT_OWNER_MARKERS,
   buildStudioAgentDefinitions,
   isStudioOwnedAgent,
@@ -1017,4 +1020,46 @@ test('Studio agent discovery paginates past 100 agents and never matches a non-S
     collectPaginatedAgents(async () => ({ data: [], has_more: true, after: null })),
     /Incomplete Studio agent pagination/,
   );
+});
+
+test('seeded Studio agents set neutral support_contact so landing page renders 庄严宝刹 instead of seeding admin username', async () => {
+  // 校验预置智能体通过 LibreChat 原生 support_contact 字段设置中性显示名，避免回退暴露播种管理员用户名 zybc_test_admin
+  const config = configSchema.parse(parsedYaml);
+  const defs = buildStudioAgentDefinitions(config);
+  assert.equal(defs.length, 2);
+
+  for (const entry of defs) {
+    assert.deepEqual(entry.agent.support_contact, {
+      name: '庄严宝刹',
+      email: '',
+    });
+    assert.deepEqual(entry.agent.support_contact, STUDIO_AGENT_SUPPORT_CONTACT);
+    assert.equal(resolveAgentOwnerContact(entry.agent, { username: 'zybc_test_admin' }), undefined);
+  }
+
+  let getUsersCalled = false;
+  const rows = defs.map((entry, idx) => ({
+    ...entry.agent,
+    _id: `67000000000000000000000${idx + 1}`,
+    author: '670000000000000000000099',
+    authorName: 'zybc_test_admin',
+    owner_contact: { name: 'zybc_test_admin' },
+  }));
+  const resolved = await attachAgentOwnerContacts(rows, {
+    findAccessibleResources: async () => [],
+    getUsers: async () => {
+      getUsersCalled = true;
+      return [{ _id: '670000000000000000000099', username: 'zybc_test_admin' }];
+    },
+  });
+
+  assert.equal(getUsersCalled, false);
+  for (const agent of resolved) {
+    assert.deepEqual(agent.support_contact, { name: '庄严宝刹', email: '' });
+    assert.equal(agent.owner_contact, undefined);
+  }
+
+  const deploySh = fs.readFileSync('deploy/deploy.sh', 'utf8');
+  assert.match(deploySh, /support_contact:\s*\{\s*name:\s*"庄严宝刹",\s*email:\s*""\s*\}/);
+  assert.match(deploySh, /\.support_contact\.name == "庄严宝刹"/);
 });

@@ -2691,6 +2691,16 @@ def test_signed_file_endpoint_auth_expiry_tamper_cross_user_range_and_cors(
                 assert res_ok.headers["accept-ranges"] == "bytes"
                 assert res_ok.headers["access-control-allow-origin"] == "*"
                 assert int(res_ok.headers["content-length"]) == len(glb_bytes)
+                assert model_id not in res_ok.headers["content-disposition"]
+                assert (
+                    f'filename="model-{model_id.removeprefix("mdl_")[:8]}.glb"'
+                    in res_ok.headers["content-disposition"]
+                )
+                assert (
+                    "filename*=UTF-8''%E4%B8%89%E7%BB%B4%E6%A8%A1%E5%9E%8B-"
+                    f"{model_id.removeprefix('mdl_')[:8]}.glb"
+                    in res_ok.headers["content-disposition"]
+                )
 
                 # 2. HEAD与OPTIONS请求支持
                 res_head = await client.head(f"/files/{valid_tok}")
@@ -4526,12 +4536,17 @@ def test_p2b_finding6_sandboxed_viewer_and_host_download_link(
 
     meta, viewer_html = asyncio.run(_call_create())
     model_id = meta["model_id"]
+    short_model_hex = model_id.removeprefix("mdl_")[:8]
+    expected_display_filename = f"三维模型-{short_model_hex}.glb"
     download_url = meta["download_url"]
     download_md = meta["download_markdown"]
 
-    # 1. 验证文本结果包含签名下载链接与Markdown链接，且viewer_html不含<a、download=或target="_blank"
+    # 1. 验证文本结果包含签名下载链接与简短中文名Markdown链接，不暴露完整mdl_<32位hex>，且viewer_html不含<a、download=或target="_blank"
     assert download_url.startswith(f"http://127.0.0.1:{port}/studio-files/")
-    assert download_md == f"[下载 GLB 模型 ({model_id}.glb)]({download_url})"
+    assert (
+        download_md == f"[下载 GLB 模型 ({expected_display_filename})]({download_url})"
+    )
+    assert f"{model_id}.glb" not in download_md
     assert download_md in meta["message"]
     assert "<a " not in viewer_html
     assert "download=" not in viewer_html
@@ -4669,7 +4684,7 @@ export class GLTFLoader {
   </script>
   <iframe id="mcp-sandbox-frame" sandbox="allow-scripts" srcdoc="{escaped_srcdoc}" style="width:640px;height:440px;border:0;"></iframe>
   <div id="chat-message">
-    <a id="host-chat-download-link" href="{escaped_dl}">下载 GLB 模型 ({model_id}.glb)</a>
+    <a id="host-chat-download-link" href="{escaped_dl}">下载 GLB 模型 ({expected_display_filename})</a>
   </div>
 </body>
 </html>"""
@@ -4800,7 +4815,7 @@ const {{ chromium }} = require('playwright');
             "parsedExtras": "FINDING6_REAL_GLTF2_BINARY",
         }
         assert pw_out["hostHeight"] >= 360
-        assert pw_out["suggestedFilename"] == f"{model_id}.glb"
+        assert pw_out["suggestedFilename"] == expected_display_filename
         assert dl_target.read_bytes() == raw_glb
     finally:
         uvi_server.should_exit = True
@@ -5993,3 +6008,36 @@ def test_resolve_bridged_studio_ref_img_uuid(studio_env: StudioSettings) -> None
     assert fallback_resolved.width == 320
     assert fallback_resolved.height == 240
     assert fallback_resolved.path.read_bytes() == png_bytes
+
+
+# 验证三维模型下载文件名、Markdown下载链接与Content-Disposition使用简短中文命名（三维模型-<8位hex>.glb）且不暴露原始mdl_<32位hex>
+def test_model_download_filename_and_content_disposition_use_short_chinese_name() -> (
+    None
+):
+    from deploy.studio.models3d import (
+        format_model_content_disposition,
+        format_model_download_filename,
+        format_model_download_markdown,
+    )
+
+    model_id = "mdl_464d284fabcd1234567890abcdef1234"
+    signed_url = "https://zybc.example.com/studio-files/tok.sig"
+
+    filename = format_model_download_filename(model_id)
+    assert filename == "三维模型-464d284f.glb"
+    assert "mdl_" not in filename
+    assert "464d284fabcd" not in filename
+
+    markdown = format_model_download_markdown(model_id, signed_url)
+    assert markdown == f"[下载 GLB 模型 (三维模型-464d284f.glb)]({signed_url})"
+    assert model_id not in markdown
+
+    disposition = format_model_content_disposition(model_id)
+    # HTTP响应头必须可按Latin-1编码（Starlette/ASGI要求），同时通过RFC 5987提供UTF-8中文文件名
+    disposition.encode("latin-1")
+    assert model_id not in disposition
+    assert 'filename="model-464d284f.glb"' in disposition
+    assert (
+        "filename*=UTF-8''%E4%B8%89%E7%BB%B4%E6%A8%A1%E5%9E%8B-464d284f.glb"
+        in disposition
+    )

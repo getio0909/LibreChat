@@ -14,6 +14,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -497,6 +498,28 @@ def verify_file_token(
 def build_signed_file_url(settings: StudioSettings, token: str) -> str:
     base = settings.public_base_url.rstrip("/")
     return f"{base}/studio-files/{token}"
+
+
+# 生成面向设计师的简短中文三维模型下载文件名（对齐设计图-<8位十六进制>命名规范，不暴露内部mdl_前缀与32位完整哈希）
+def format_model_download_filename(model_id: str) -> str:
+    mid = validate_model_id(model_id)
+    short_hex = mid.removeprefix("mdl_")[:8]
+    return f"三维模型-{short_hex}.glb"
+
+
+# 生成面向设计师的Markdown三维模型下载链接文本
+def format_model_download_markdown(model_id: str, signed_url: str) -> str:
+    display_filename = format_model_download_filename(model_id)
+    return f"[下载 GLB 模型 ({display_filename})]({signed_url})"
+
+
+# 生成遵循RFC 5987 / RFC 6266的三维模型下载Content-Disposition响应头（复用LibreChat getContentDisposition编码策略）
+def format_model_content_disposition(model_id: str) -> str:
+    mid = validate_model_id(model_id)
+    short_hex = mid.removeprefix("mdl_")[:8]
+    display_filename = f"三维模型-{short_hex}.glb"
+    encoded_filename = quote(display_filename, safe="-_.")
+    return f"attachment; filename=\"model-{short_hex}.glb\"; filename*=UTF-8''{encoded_filename}"
 
 
 # 将Unix秒级时间戳格式化为ISO8601 UTC字符串
