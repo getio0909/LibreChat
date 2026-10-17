@@ -23,8 +23,13 @@ interface:
   # 替换为中性中文页脚，隐藏默认 LibreChat 版本与标语
   customFooter: '庄严宝刹 AI 设计助手 · 仅供内部概念设计参考'
 
-# 聊天附件上传配置，允许两个模型端点上传参考图片
+# 聊天附件上传与内置生图分辨率配置：
+# imageGeneration.percentage 设为 100 以保留 2K/4K 完整像素尺寸（如 2400×1792），防止默认 high 档位缩放到 768 短边；
+# 普通内置生图（gemini_image_gen）仅需完整像素分辨率与无损 PNG 重编码，无需额外保存字节级一致的原始响应流；
+# 局部重绘（edit_region）的像素级一致与透明通道保证由 Studio 原生 PNG 合成文件与原图归档承担。
 fileConfig:
+  imageGeneration:
+    percentage: 100
   endpoints:
     google: &image-files
       disabled: false

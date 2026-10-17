@@ -502,9 +502,33 @@ test('zyb_studio MCP headers, placeholders, and allowedAddresses match the contr
   }
 });
 
-test('fileConfig permits image uploads on agents, google, and OpenRouter endpoints', () => {
+test('fileConfig permits image uploads on agents, google, and OpenRouter endpoints and preserves 100% generated image resolution', async () => {
   const config = configSchema.parse(parsedYaml);
   const merged = mergeFileConfig(config.fileConfig);
+
+  assert.deepEqual(config.fileConfig.imageGeneration, { percentage: 100 });
+
+  // 验证 2400×1792 的 2K 生图在配置了 imageGeneration.percentage: 100 后不会再被缩放到 1029×768。
+  const sharp = require('sharp');
+  const { resizeImageBuffer } = require('../api/server/services/Files/images/resize');
+  const fixtureBuffer = await sharp({
+    create: {
+      width: 2400,
+      height: 1792,
+      channels: 4,
+      background: { r: 120, g: 90, b: 60, alpha: 1 },
+    },
+  })
+    .png()
+    .toBuffer();
+  const resized = await resizeImageBuffer(
+    fixtureBuffer,
+    config.fileConfig.imageGeneration,
+    EModelEndpoint.agents,
+  );
+  assert.equal(resized.width, 2400);
+  assert.equal(resized.height, 1792);
+  assert.equal(resized.type, 'image/png');
 
   for (const endpoint of ['agents', 'google', 'OpenRouter']) {
     const endpointConfig = getEndpointFileConfig({
